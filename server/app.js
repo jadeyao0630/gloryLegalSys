@@ -4,11 +4,22 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 
 const path = require('path');
-dotenv.config();
+const { env } = process;
+dotenv.config({
+    path: path.resolve(
+        __dirname,
+        `./env.${env.NODE_ENV ? env.NODE_ENV : "local"}`
+      ),
+});
 
 const DbService = require('./dbService');
 
-app.use(cors());
+const corsConfig = {
+    origin: "*",
+    credentials:true
+}
+
+app.use(cors(corsConfig));
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
 

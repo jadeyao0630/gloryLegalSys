@@ -1,15 +1,22 @@
 const mysql = require('mysql');
 const dotenv = require('dotenv');
+const path = require("path");
 let instance = null;
-dotenv.config();
+const { env } = process;
+dotenv.config({
+    path: path.resolve(
+        __dirname,
+        `./env.${env.NODE_ENV ? env.NODE_ENV : "local"}`
+      ),
+});
 
 const connection = mysql.createConnection({
-    host: process.env.HOST,
-    user:process.env.USERNAME,
-    password:process.env.PASSWORD,
-    database:process.env.DATABASE,
-    por:process.env.DB_PORT,
-    ssl: true,
+    host: env.HOST,
+    user:env.USER,
+    password:env.PASSWORD,
+    database:env.DATABASE,
+    por:env.DB_PORT,
+    //ssl: true,
 });
 
 connection.connect((err)=>{

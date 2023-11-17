@@ -179,7 +179,7 @@ return '<div id="popup_progress_'+details.id+'" data-role="popup" data-theme="a"
 }
 function progressDetailsPopup(details,status){
   
-  var main_popup=$('<div class="popup-main popup-hide"><form><h4>test</h4></form></div>')
+  var main_popup=$('<div class="popup-main popup-hide"><form class="popup-main-form"><h4>test</h4></form></div>')
   var mian_popup_buttons=$('<fieldset class="ui-grid-a popup_status_buts">'+
   '<div class="ui-block-a"><a id="process_save_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_status_but" data-datas="'+status.id+'">提交</a></div>'+
   '<div class="ui-block-b"><a id="process_quit_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_status_but">取消</a></div>');
@@ -199,6 +199,28 @@ function progressDetailsPopup(details,status){
     
   });
   return '<div>'+container.html()+'</div>';
+}
+function addItemsToUpdatePopup(data){
+  var form=$('.popup-main-form');
+  var list={
+    caseUpdated:{
+      label:"进展",
+  },caseDisputed:{
+    label:"争议",
+  }}
+  var table=$('<table data-role="table" class="ui-responsive"></table>');
+  var header=$('<thead></thead>');
+  var body=$('<tbody></tbody>');
+  var th=$('<th></th>');
+  
+  var tr=$('<tr></tr>');
+  header.append(th);
+  body.append(tr);
+  table.append(header);
+  table.append(body);
+  $.each(list,function(key,value){
+
+  });
 }
 
 function formatSatusIndex(status){

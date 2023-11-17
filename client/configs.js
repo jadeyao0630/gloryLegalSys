@@ -186,3 +186,25 @@ var regTemplate={
         }
     }
 }
+const progress_status_details_request={
+    courtDate:{
+      type:"date",
+      label:"开庭日期："
+    },
+    courtName:{
+      type:"text",
+      label:"法院："
+    },
+    caseLegal:{
+      type:"text",
+      label:"代理法务："
+    },
+    caseLawfirm:{
+      type:"text",
+      label:"代理律所："
+    },
+    penaltyAmount:{
+      type:"text",
+      label:"判决金额："
+    },
+  }

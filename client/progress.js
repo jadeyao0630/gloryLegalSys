@@ -1,20 +1,22 @@
-let table_progress_data=[
+const table_progress_data=[
     {id:1,caseNo:"A202311110005",caseName:"管文波离职案件",caseLabel:2,caseReason:0,caseType:0,caseBelong:"北七家",applicant:"张国庆",penaltyAmount:500.00,exexuteAmount:300.00,caseCause:6,caseStatus:3.1,createDate:"2023-11-11 14:03:19"},
     {id:2,caseNo:"A202311110004",caseName:"产品商标案件",caseLabel:0,caseReason:0,caseType:0,caseBelong:"北七家",applicant:"李晓霞",penaltyAmount:500.00,exexuteAmount:300.00,caseCause:8,caseStatus:1,courtDate:"2023-12-15 14:00:00",createDate:"2023-11-11 14:03:19"}
 ];
-let table_progress_status=[
+const table_progress_status=[
   {id:1,caseNo:"A202311110005",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:3.1,courtName:"东城法院"},
   {id:2,caseNo:"A202311110004",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:1,courtName:"大兴法院"}
 ]
-let table_progress_updates=[
+const table_progress_updates=[
   {id:1,caseNo:"A202311110005",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:3.1,courtName:"东城法院"},
   {id:2,caseNo:"A202311110004",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:1,courtName:"大兴法院"}
 ]
 const table_progress = document.getElementById("table2");
 table_progress.innerHTML= _createProgressTableHTML(table_progress_data,table_progress_status,table_progress_updates);
 
-let progresses=["一审","二审","执行",["强制执行","正常执行","未执行"],"结案","再审","监督"];    
+const progresses=["一审","二审","执行",["强制执行","正常执行","未执行"],"结案","再审","监督"];    
 var deads=["未执行"]; 
+
+
 $('.popup_status_but').on("click",function(e){
   console.log($(e.currentTarget).data('datas'));
   $('.popup-main').addClass("popup-hide");
@@ -176,28 +178,7 @@ return '<div id="popup_progress_'+details.id+'" data-role="popup" data-theme="a"
         '</div></form></div>';
 }
 function progressDetailsPopup(details,status){
-  let progress_status_details_request={
-    courtDate:{
-      type:"date",
-      label:"开庭日期："
-    },
-    courtName:{
-      type:"text",
-      label:"法院："
-    },
-    caseLegal:{
-      type:"text",
-      label:"代理法务："
-    },
-    caseLawfirm:{
-      type:"text",
-      label:"代理律所："
-    },
-    penaltyAmount:{
-      type:"text",
-      label:"判决金额："
-    },
-  }
+  
   var main_popup=$('<div class="popup-main popup-hide"><form><h4>test</h4></form></div>')
   var mian_popup_buttons=$('<fieldset class="ui-grid-a popup_status_buts">'+
   '<div class="ui-block-a"><a id="process_save_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_status_but" data-datas="'+status.id+'">提交</a></div>'+

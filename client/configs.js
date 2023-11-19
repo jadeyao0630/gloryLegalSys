@@ -1,4 +1,13 @@
-let ip='192.168.8.132';
+let ip='cn.luyao.site';
+let port=5555;
+const mainPage="main.html";
+class Message{
+    static LOGIN_IS_EMPTY='<p style="color:red;">用户名和密码不能为空</p>';
+    static LOGIN_ISNOT_MATCH='<p style="color:red;">用户名和密码不匹配</p>';
+    static LOGIN_WELCOME_F='<p style="color:red;">欢迎{0}回来</p>';
+    static PROGRESS_DELETE_WARNING_F='确定删除此流程点[{0}]后已存在其它流程点吗？';
+}
+
 const TextColor="rgb(51, 51, 51)";
 const case_types=["被诉","主诉"];
 const case_catelogs=["诉讼","仲裁"];
@@ -41,7 +50,7 @@ const columns={
     caseApplicant:"varchar(100) NOT NULL",
     caseCreateDate:"datetime NOT NULL",
 }
-
+var projects=["北七家","大兴"]
 var regTemplate={
     baseInfo:{
         label:"基础信息",
@@ -65,6 +74,7 @@ var regTemplate={
                 isOptional:false,
                 data:case_labels
             },
+            /*
             caseDepartment:{
                 placeholder:"所属业务单元",
                 label:"所属业务单元:",
@@ -79,12 +89,13 @@ var regTemplate={
                 isOptional:false,
                 data:["无"]
             },
+            */
             caseProject:{
                 placeholder:"所属项目",
                 label:"所属项目:",
                 type:"combobox",
                 isOptional:false,
-                data:["无"]
+                data:projects
             },
             casePersonnel:{
                 placeholder:"我方当事人",
@@ -205,6 +216,6 @@ const progress_status_details_request={
     },
     penaltyAmount:{
       type:"text",
-      label:"判决金额："
+      label:"判决金额(万)："
     },
   }

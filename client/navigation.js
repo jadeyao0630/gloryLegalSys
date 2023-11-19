@@ -14,13 +14,13 @@ $(function(){
 
 var form_item_ids={};
 _createNewCaseForm(regTemplate);
-function _createNewCaseForm(data){
+function _createNewCaseForm(template){
     form_item_ids={};
-    var main_catelogs=Object.keys(data);
+    var main_catelogs=Object.keys(template);
     var main_catelogs_html="<h3>新增案件</h3>";
     main_catelogs.forEach((main_catelog)=>{
-        main_catelogs_html+='<div data-role="collapsible" data-theme="b" data-content-theme="a" data-collapsed="false">';
-        var catelog=data[main_catelog];
+        main_catelogs_html+='<div class="collapsible-case-reg" data-parent-popup="#add_case_popup" data-role="collapsible" data-theme="b" data-content-theme="a" data-collapsed="false">';
+        var catelog=template[main_catelog];
         main_catelogs_html+='<h4>'+catelog.label+'</h4>';
         if (catelog.data){
             main_catelogs_html+='<div class="ui-grid-2">';
@@ -39,6 +39,8 @@ function _createNewCaseForm(data){
                         case "date":
                             main_catelogs_html+=_createDateItem(item,item_key);
                             break;
+                        case "datetime":
+                            main_catelogs_html+=_createDateTimeItem(item,item_key);
                         case "combobox":
                             main_catelogs_html+=_createComboBoxItem(item,item_key);
                             break;
@@ -55,13 +57,51 @@ function _createNewCaseForm(data){
         main_catelogs_html+='</div></div>';
     });
     main_catelogs_html+='<fieldset class="ui-grid-a">'+
-                        '<div class="ui-block-a"><button type="submit" id="caseReg_but" class="ui-btn ui-corner-all ui-shadow ui-icon-check" data-rel="back">提交</button></div>'+
-                        '<div class="ui-block-b"><a id="caseReg_but_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back" data-rel="back">取消</a></div>';
+                        '<div class="ui-block-a"><button type="submit" id="caseReg_but" class="ui-btn ui-corner-all ui-shadow ui-icon-check case-reg-but">提交</button></div>'+
+                        '<div class="ui-block-b"><a id="caseReg_but_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back case-reg-but">取消</a></div>';
     const popup_form = document.getElementById("popup_form_main");
+    
     popup_form.innerHTML=main_catelogs_html;
+    //console.log($('div[data-role="collapsible"]'))
+    /*
+    $('div[data-role="collapsible"]').collapsible({
+        collapse: function( event, ui ) {
+            console.log($($(event.target).data('parent-popup')));
+            $($(event.target).data('parent-popup')).popup({
+                afteropen: function( event, ui ) {
 
+                    $($(event.target).data('parent-popup')).popup( "reposition",{positionTo:"window"});
+                }
+            });
+        },
+        expand: function( event, ui ) {
+            console.log($($(event.target).data('parent-popup')));
+            $($(event.target).data('parent-popup')).popup({
+                afteropen: function( event, ui ) {
+                    $($(event.target).data('parent-popup')).popup( "reposition",{positionTo:"window"});
+                }
+            });
+        }
+      });
+      */
+    $('#add_case_but').on('click',function(e){
+        //console.log("add......................");
+        _setBlurBackgroundVisibility(true);
+    });
+    $('.case-reg-but').on('click',function(e){
+        //console.log(e.currentTarget);
+        if(e.currentTarget.id=="caseReg_but_cancel"){
 
-
+            _setBlurBackgroundVisibility(false);
+        }
+        //
+    });
+    popup_form.addEventListener("submit", function(e){
+        console.log(e);
+        //window.location.href = mainPage;
+        location.reload();
+        _setBlurBackgroundVisibility(false);
+    });
     const regist_but = document.getElementById("caseReg_but");
     const result={};
     regist_but.addEventListener('click', async function() {
@@ -80,6 +120,7 @@ function _createNewCaseForm(data){
                     case "INPUT":
                         var val=item.value;
                         if(form_item_ids[id].type=="date"){
+                            //console.log(item.value);
                             val=new Date(item.value).toISOString().slice(0, 19).replace('T', ' ');
                         }else if(form_item_ids[id].numberOnly==true){
                             if(item.value.length==0){
@@ -95,7 +136,9 @@ function _createNewCaseForm(data){
                             //console.log(id+" error "+item.parentElement.dataset.isOptional);
                             
                         }
-                        hasError=item.value.length==0 && form_item_ids[id].isOptional==false;
+                        if(item.value.length==0 && form_item_ids[id].isOptional==false){
+                            hasError=true;
+                        }
                         break;
                     case "SELECT":
                         result[id]=item.value.length==0?0:parseInt(item.value);
@@ -124,7 +167,7 @@ function _createNewCaseForm(data){
         if(hasError){
 
         }else{
-            await fetch("http://"+ip+":5555/insertCase",{
+            await fetch("http://"+ip+":"+port+"/insertCase",{
                 headers:{
                     'Content-Type': 'application/json'
                 },
@@ -133,11 +176,20 @@ function _createNewCaseForm(data){
             })
             .then(response => response.json())
             .then(data => {});
-            history.back();
+            //history.back();
         }
         
     });
     
+}
+function _setData(data){
+    var dataKeys=Object.keys(data);
+    Object.keys(form_item_ids).forEach((id)=>{
+        if(dataKeys.includes(id)){
+            $("#"+id).val(data[id]);
+        }
+        
+    });
 }
 function _setOptionMark(item){
     if(item.isOptional){
@@ -155,16 +207,24 @@ function _createTextItem(item,id){
 }
 function _createTextAreaItem(item,id){
     var required=item.isOptional?"":"required oninvalid='setCustomValidity(\"此项必须填写\")' oninput='setCustomValidity(\"\")'";
-    return '<div class="ui-grid-sub2-textarea">'+
+    return '<div class="ui-grid-sub2-textarea" >'+
             '<label for="'+id+'">'+_setOptionMark(item)+item.label+'</label>'+
-            '<textarea cols="40" rows="8" name="'+id+'" id="'+id+'" placeholder="'+item.placeholder+'" '+required+'></textarea>'+
+            '<textarea cols="40" rows="18" name="'+id+'" id="'+id+'" placeholder="'+item.placeholder+'" '+required+'></textarea>'+
             '</div>';
 }
 function _createDateItem(item,id){
     var required=item.isOptional?"":"required oninvalid='setCustomValidity(\"此项必须填写\")' oninput='setCustomValidity(\"\")'";
     return '<div class="ui-grid-sub2">'+
             '<label for="'+id+'">'+_setOptionMark(item)+item.label+'</label>'+
-            '<input type="date" name="'+id+'" id="'+id+'" placeholder="'+item.placeholder+'" value="" '+required+'>'+
+            '<input type="date" name="'+id+'" id="'+id+'" placeholder="'+item.placeholder+'" value="'+new Date().toISOString().substr(0,10)+'" '+required+'>'+
+            '</div>';
+}
+
+function _createDateTimeItem(item,id){
+    var required=item.isOptional?"":"required oninvalid='setCustomValidity(\"此项必须填写\")' oninput='setCustomValidity(\"\")'";
+    return '<div class="ui-grid-sub2">'+
+            '<label for="'+id+'">'+_setOptionMark(item)+item.label+'</label>'+
+            '<input type="datetime" name="'+id+'" id="'+id+'" placeholder="'+item.placeholder+'" value="'+new Date().toISOString().substr(0,10)+'" '+required+'>'+
             '</div>';
 }
 function _createFileItem(item,id){
@@ -209,3 +269,16 @@ function _createComboBoxItem(item,id){
             '<select name="'+id+'" id="'+id+'" '+required+'>'+options_html+'</select>'+
             '</div>';
 }
+function _setBlurBackgroundVisibility(isVisible){
+    if(isVisible) {
+        $('.popup-background.popup-b').removeClass('popup-hide');
+        $("#add_case_popup").popup();
+        $("#add_case_popup").popup("open");
+        //console.log($('.popup-background.popup-a'));
+    }
+    else {
+        $("#add_case_popup").popup("close");
+        $('.popup-background.popup-b').addClass('popup-hide');
+    }
+}
+

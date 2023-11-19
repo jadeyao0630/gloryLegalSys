@@ -1,6 +1,6 @@
 
 document.addEventListener('DOMContentLoaded',function(){
-    fetch('http://'+ip+':5555/getAll')
+    fetch('http://'+ip+':'+port+'/getAll')
     .then(response => response.json())
     .then(data => loadHTML(data['data']));
 });
@@ -22,7 +22,7 @@ addBut.onclick = async function (){
     const name = nameInput.value;
     //nameInput.value="";
     //alert(name);
-    await fetch("http://"+ip+":5555/insertUser",{
+    await fetch("http://"+ip+":"+port+"/insertUser",{
         headers:{
             'Content-Type': 'application/json',
             //'Access-Control-Allow-Origin':'*',
@@ -44,7 +44,7 @@ loginBut.onclick = async function (){
     //nameInput.value="";
     //alert(name);
     if (IsLoginVaild()){
-        await fetch("http://"+ip+":5555/login",{
+        await fetch("http://"+ip+":"+port+"/login",{
             headers:{
                 'Content-Type': 'application/json'
             },
@@ -68,7 +68,7 @@ function login(data){
         message.innerHTML=formatString(Message.LOGIN_WELCOME_F,JSON.parse(data.data).name);
         sessionStorage.setItem("currentUser", data.data);
         //console.log(JSON.parse(sessionStorage.getItem("currentUser")).name+"--"+data.data);
-        window.location.href = 'navigation.html';
+        window.location.href = mainPage;
     }else{
         message.innerHTML=Message.LOGIN_ISNOT_MATCH;
     }
@@ -94,14 +94,10 @@ function IsLoginVaild(){
     return user != "" && pass != "";
 }
 
-class Message{
-    static LOGIN_IS_EMPTY='<p style="color:red;">用户名和密码不能为空</p>';
-    static LOGIN_ISNOT_MATCH='<p style="color:red;">用户名和密码不匹配</p>';
-    static LOGIN_WELCOME_F='<p style="color:red;">欢迎{0}回来</p>';
-}
+
 
 //console.log(JSON.stringify(columns));
-fetch("http://"+ip+":5555/createTable",{
+fetch("http://"+ip+":"+port+"/createTable",{
     headers:{
         'Content-Type': 'application/json'
     },
@@ -109,4 +105,4 @@ fetch("http://"+ip+":5555/createTable",{
     body: JSON.stringify({ table: "cases", columns:columns})
 })
 .then(response => response.json())
-.then(data => {});
+.then(data => {console.log(data);});

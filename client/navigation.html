@@ -7,6 +7,7 @@
 	<link rel="shortcut icon" href="./favicon.ico">
 	<link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
 	<link rel="stylesheet" href="./css/ystep.css">
+	<link rel="stylesheet" href="./css/popup.css">
 	<script src="./js/jquery.js"></script>
 <script src="./js/jquery.mobile-1.4.5.min.js"></script>
 
@@ -223,7 +224,7 @@
 			top:105px;
 			position: absolute;
 			width: calc(100% - 240px);
-			z-index: 99;
+			z-index: 29;
 		}
 		#table1{
 			padding-top: 200px;
@@ -256,14 +257,11 @@
 			top:50%;
 			left:50%;
 			transform:translate(-50%,-50%);
-			text-align: center;
 			background: white;
-			width:500px;
-			height:200px;
+			min-width:800px;
+			min-height:200px;
 			z-index: 99;
-			text-align: center;
-			vertical-align: bottom;
-			padding:10px;
+			padding:10px 30px 10px 30px;
 		}
 		.popup-hide{
 			display:none;
@@ -272,11 +270,51 @@
 			bottom:20px;
 			vertical-align: bottom;
 		}
+		.popup-main table{
+			text-align: center;
+			vertical-align: middle;
+		}
+		.popup-main table th{
+			text-align: center;
+			vertical-align: middle;
+		}
+		#process_update_list td{
+			text-align: center;
+			vertical-align: top;
+		}
+		#popupBasic{
+			min-width: 800px;
+			padding: 20px;
+		}
+		
+		#process_update_upload_list{
+			width: calc(100% - 0px);
+			display: table;
+			white-space: nowrap;
+		}
+		#progress_status_details{
+			min-width: 250px;
+		}
 	</style>
 </head>
 	
 
 <body>
+	<div class="popup-background popup-a popup-hide"></div>
+        <div id="popup_progress_main" class="popup-main popup-hide">
+            
+            <h3 id="popup_progress_title"></h3>
+            <div class="progress_popup">
+                <div id="progress_status_details">test
+                </div>
+                <div id="progress_status_container"></div>
+            </div>
+            <fieldset class="ui-grid-a popup_status_buts">
+                <div class="ui-block-a"><a id="process_save_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_status_but">提交</a></div>
+                <div class="ui-block-b"><a id="process_quit_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_status_but">取消</a></div>
+            </fieldset>
+        </div>
+		<div class="popup-background popup-b popup-hide"></div>
 	<div id="frame">
 	<div id="left">
 		<div id="title"><h2>法务系统管理</h2></div>
@@ -313,8 +351,8 @@
 			</form>
 		</div>
 		<div data-role="controlgroup" data-type="horizontal" id="all_remove_buts">
-			<a href="#add_case" data-rel="popup" data-position-to="window" data-transition="pop" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-left btn-icon-green">新增</a>
-			<div data-role="popup" id="add_case" data-theme="a" class="ui-corner-all ui-shadow" data-dismissible="false" >
+			<a href="#" id="add_case_but"  class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-left btn-icon-green">新增</a>
+			<div data-role="popup" id="add_case_popup" data-theme="a" data-position-to="window" data-transition="pop"  class="ui-corner-all ui-shadow" data-dismissible="false" >
 					<form style="padding:10px 20px;" id="popup_form_main">
 					</form>
 			</div>
@@ -335,8 +373,45 @@
 			<input id="filterBasic-input2" data-type="search">
 		</form>
 		<table id="table2" data-mode="columntoggle" class="ui-responsive table-stroke" data-column-btn-text="" data-role="table" data-filter="true" data-input="#filterBasic-input2">
-		
+			<div id="popup_progress_main" class="popup-main popup-hide">
+				<h3 id="popup_progress_title"></h3>
+				<div class="progress_popup">
+					  <div id="progress_status_details">
+					  </div>
+					  <div id="progress_status_container"></div>
+				</div>
+				<fieldset class="ui-grid-a popup_status_buts">
+					<div class="ui-block-a"><a id="process_update_save_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_update_but">提交</a></div>
+					<div class="ui-block-b"><a id="process_update_quit_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_status_but">取消</a></div>
+				</fieldset>
+			</div>
 		</table>
+		
+		<div data-role="popup" id="popupBasic" data-history="false" data-transition="pop" data-dismissible="false">
+			<h3 id="process_updates_title"></h3>
+			<div class="process_updates_collapsibleset" style="width:900px;" data-role="collapsibleset" data-content-theme="b">
+				<div id="process_update_collapset" data-role="collapsible" data-theme="b" data-content-theme="a">
+					<h3>进展明细</h3>
+					<table id="process_update_list" class="ui-responsive table-stroke">
+					</table>
+				</div>
+				<div id="process_execute_collapset" data-role="collapsible" data-theme="b" data-content-theme="a" class="popup-hide">
+					<h3>执行明细</h3>
+					<table id="process_execute_list" class="ui-responsive table-stroke">
+					</table>
+				</div>
+				<div data-role="collapsible" data-theme="b" data-content-theme="a">
+					<h3>附件</h3>
+					<table id="process_update_upload_list" class="ui-responsive table-stroke">
+					</table>
+					<div><label>支持扩展名：rar. zip. doc. docx. pdf. jpg… 单个文件不超过200MB</label></div>
+				</div>
+			</div>
+			<fieldset class="ui-grid-a popup_status_buts">
+				<div class="ui-block-a"><a id="process_update_save_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_update_but">提交</a></div>
+				<div class="ui-block-b"><a id="process_update_quit_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_update_but">取消</a></div>
+			</fieldset>
+		</div>
 	</div>
 	<div id="page3" class="hide">
 		<form class="ui-filterable filtertable">
@@ -360,13 +435,49 @@
 	
 </div>
 	</div>
+</div>
+</div>
 	<script type="text/javascript">
+		
         $(function () {
             $("#table1").hpaging({ limit: 5 });
 			$("#table2").hpaging({ limit: 5 });
 			$("#table3").hpaging({ limit: 5 });
 			$("#table4").hpaging({ limit: 5 });
+			
         });
+		var menu_buts = document.querySelectorAll("a[name^=menu_]");
+		var selectedMenu=null;
+		menu_buts.forEach(function(menu_but) {
+			if(selectedMenu == null) {
+				selectedMenu=menu_but;
+				
+				//console.log($('a[name='+menu_but.name+"]").css('background-color'));
+				selectedMenu.style.color='white';
+				selectedMenu.style.textShadow ='none';
+				selectedMenu.style.background='#1362B7';
+			}
+			menu_but.addEventListener('click', function() {
+				if(selectedMenu != null) {
+					selectedMenu.style.color=TextColor;
+					selectedMenu.style.textShadow ='rgb(243, 243, 243) 0px 1px 0px';
+					selectedMenu.style.background='rgb(243, 243, 243)';
+				}
+				var pre_table=$(selectedMenu.dataset.page);
+				pre_table.addClass('hide');
+				selectedMenu=menu_but;
+				
+				//console.log($('a[name='+menu_but.name+"]").css('background-color'));
+				selectedMenu.style.color='white';
+				selectedMenu.style.textShadow ='none';
+				selectedMenu.style.background='#1362B7';
+				
+				var table=$(menu_but.dataset.page);
+
+				table.removeClass('hide');
+			//console.log(table);
+			});
+		});
     </script>
 	<script src="./navigation.js"></script>
 	<script src="./progress.js"></script>

@@ -41,6 +41,7 @@
     z-index: 12;
     text-align: center;
     cursor:pointer;
+    font-weight: 700;
     /*border: 1px solid #000000;*/
   }
   .progress-but-shadow{
@@ -72,6 +73,16 @@
   .progress-but-label{
     z-index: 22;
     text-align: center;
+  }
+  .progress-but-counter{
+    z-index: 23;
+    position: absolute;
+    text-align: center;
+    background: orangered;
+    color:white;
+    text-align: center;
+    vertical-align: middle;
+    filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5));
   }
   .progress-popup-buttons{
     position: absolute;

@@ -1,6 +1,6 @@
 function extend(opt1,opt2){
     for(var attr in opt2){
-        console.log(attr+": "+opt1[attr]+"-->"+opt2[attr]);
+        //console.log(attr+": "+opt1[attr]+"-->"+opt2[attr]);
         opt1[attr] = opt2[attr];
     }
 }
@@ -28,12 +28,14 @@ function ProgressesButton(arg){
         showSubSteps:true,
         readOnly:false,
         hasShadow:false,
+        showCounter:false,
+        counterData:[],
     }
     this.init(arg)
 }
 
 ProgressesButton.prototype.init=function(arg){
-    console.log("init.............."+this.opt.labelPosition);
+    //console.log("init.............."+this.opt.labelPosition);
     var _this=this;
     extend(this.opt,arg);
     this.dataId=this.opt.dataId;
@@ -100,7 +102,7 @@ ProgressesButton.prototype.init=function(arg){
     if(tops.length==1){
         middle_line=tops[0];
     }
-    this.outter_frame.css({height:(tops[tops.length-1]+_this.opt.size+_this.opt.line_size*2)+"px"});
+    //this.instance.css({height:(tops[tops.length-2]+_this.opt.size+_this.opt.line_size*2)+"px"});
     //console.log("H: "+(tops[1]-tops[0])+"--W: "+step+"="+Math.sqrt(v_h*v_h+step*step));
     var drawNextLine=true;
     steps.forEach(function(step_item,index){
@@ -216,6 +218,8 @@ ProgressesButton.prototype.init=function(arg){
                 },_this.opt.showLabel&&_this.opt.labelPosition!="center"?sub_step:"");
                 frame.append(label)
                 _this.outter_frame.append(frame);
+                
+                setCounterIndecator(lefts[index],tops[i],index,i);
                 //#endregion
             });
             
@@ -253,7 +257,7 @@ ProgressesButton.prototype.init=function(arg){
                 "borderRadius":(_this.opt.size)+"px",
                 "fontSize":_this.opt.fontSize+'px',
             },_this.opt.showLabel&&_this.opt.labelPosition=="center"?(_this.opt.fontSize+4>=_this.opt.size?step_item.substring(0,1):step_item):"");
-            indicator.data("main-index",realIndex);
+            $(indicator).data("main-index",realIndex);
             indicator.data("isMainIndicator",true);
             if(_this.opt.hasShadow) indicator.addClass('progress-but-shadow');
             if(realIndex<=_this.opt.currentPosition && (arrayIndex.includes(realIndex+1)||_this.breakpoint.includes(realIndex+1))) {
@@ -271,7 +275,10 @@ ProgressesButton.prototype.init=function(arg){
                 "fontSize":_this.opt.fontSize+'px',
             },_this.opt.showLabel&&_this.opt.labelPosition!="center"?step_item:"");
             frame.append(label)
+            
             _this.outter_frame.append(frame);
+            setCounterIndecator(lefts[index],middle_line,realIndex);
+            
             //#endregion
         }
         if(index+1<steps.length && drawNextLine){
@@ -340,11 +347,38 @@ ProgressesButton.prototype.init=function(arg){
         
         if(_this.opt.isViewMode&&$(e.currentTarget).data('canSelect')){
             $(_this.outter_frame).trigger({type:'itemOnClicked', Position:formatIndex($(e.currentTarget).data('main-index')),
-                        dataId:_this.dataId});
+                        dataId:_this.dataId, target:$(e.currentTarget)});
         }
         if($(e.currentTarget).data('canSelect')&&!_this.opt.isViewMode){
             //await _this.setProgress($(e.currentTarget).data('index'),_this.opt.duration);
             await _this.setFlow($(e.currentTarget),_this.opt.duration,!$(e.currentTarget).data('isMainIndicator'));
+        }
+    }
+    function setCounterIndecator(left,top,index,sub){
+        if(_this.opt.showCounter && _this.opt.counterData.length>0){
+            var _counter=_this.opt.counterData.filter(value=>{ 
+                if(sub==undefined)
+                    return formatIndex(value.caseStatusId).main==(index);
+                else
+                    return value.caseStatusId==index+sub/10
+            });
+            if(_counter.length>0){
+                if(_this.opt.showCounter){
+                    var size=_this.opt.size*2*0.4;
+                    var counter=getElement("progress-but-counter",{
+                        width:(size)+"px",
+                        height:(size)+"px",
+                        "line-height":size+"px",
+                        "fontSize":_this.opt.fontSize*0.9+'px',
+                        "fontWeight":700,
+                        "borderRadius":(size*0.5)+"px",
+                        'left':(left+_this.opt.size*0.5)+'px',
+                        'top':(top-_this.opt.size*1.2)+'px',
+                    },_counter.length);
+                    _this.outter_frame.append(counter)
+                }
+                
+            }
         }
     }
     function getElement(className,css,text){
@@ -372,9 +406,9 @@ ProgressesButton.prototype.init=function(arg){
         }else{
             if(isSelectable(mainIndex-1,-1)==false){
                 //if(!_this.opt.isViewMode) {
-                    //element.css({"color":"gray"});
+                    element.css({"color":"gray"});
                     
-                    element.addClass("progress-but-disable");
+                    //element.addClass("progress-but-disable");
                 //}
                 element.data("canSelect",false);
             }
@@ -641,10 +675,10 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
             element.removeClass("progress-but-disable");
             element.data("isSelected",false);
             if(nextElement){
-                if(!_this.opt.isViewMode) {
+                //if(!_this.opt.isViewMode) {
                     nextElement.css({"color":"gray"});
-                    $(nextElement).toggleClass("progress-but-disable");
-                }
+                    //$(nextElement).toggleClass("progress-but-disable");
+                //}
                 nextElement.data("canSelect",false);
             }
         }
@@ -652,6 +686,21 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
 }
 ProgressesButton.prototype.switchSubStepVisibility=function(args){
     args["showSubSteps"]=!this.opt.showSubSteps;
-    console.log(args.showSubSteps);
+    //console.log(args.showSubSteps);
     this.init(args);
+}
+ProgressesButton.prototype.refresh=function(args){
+    //args["showSubSteps"]=!this.opt.showSubSteps;
+    //console.log(args.showSubSteps);
+    this.init(args);
+}
+ProgressesButton.prototype.getItem=function(position){
+    var items=$(this.outter_frame).find(".main-indicator-index"+position.main).filter(function(index,item){
+        return Number($(item).data('main-index'))==position.main+position.sub/10;
+    });
+    if(items.length>0) return items[0];
+    return undefined;
+}
+ProgressesButton.prototype.setStep=async function(target){
+    await this.setFlow($(target),this.opt.duration,!$(target).data('isMainIndicator'));
 }

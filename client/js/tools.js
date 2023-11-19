@@ -3,3 +3,9 @@ const formatString = (template, ...args) => {
         return typeof args[index] === 'undefined' ? match : args[index];
     });
 }
+function formatIndex(position){
+    if(position==null) position=Number(_this.opt.currentPosition);
+    var main=Math.floor(position);
+    var sub=Math.round((position-main)*10);
+    return {main:main,sub:sub};
+}

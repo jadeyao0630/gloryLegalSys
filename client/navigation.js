@@ -12,10 +12,12 @@ $(function(){
 });
 
 
-var form_item_ids={};
+var form_item_ids=getFormItemsId(FormTemplate);
 _createNewCaseForm(regTemplate);
+
 function _createNewCaseForm(template){
-    form_item_ids={};
+    /*
+    //form_item_ids={};
     var main_catelogs=Object.keys(template);
     var main_catelogs_html="<h3>新增案件</h3>";
     main_catelogs.forEach((main_catelog)=>{
@@ -27,7 +29,7 @@ function _createNewCaseForm(template){
             var item_keys=Object.keys(catelog.data);
             item_keys.forEach((item_key)=>{
                 var item=catelog.data[item_key];
-                form_item_ids[item_key]=item;
+                //form_item_ids[item_key]=item;
                 if(item.type){
                     switch(item.type){
                         case "text":
@@ -56,12 +58,29 @@ function _createNewCaseForm(template){
         }
         main_catelogs_html+='</div></div>';
     });
+    
     main_catelogs_html+='<fieldset class="ui-grid-a">'+
                         '<div class="ui-block-a"><button type="submit" id="caseReg_but" class="ui-btn ui-corner-all ui-shadow ui-icon-check case-reg-but">提交</button></div>'+
-                        '<div class="ui-block-b"><a id="caseReg_but_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back case-reg-but">取消</a></div>';
-    const popup_form = document.getElementById("popup_form_main");
+                        '<div class="ui-block-b"><a id="caseReg_but_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back case-reg-but">取消</a></div></fieldset>';
     
+    const popup_form = document.getElementById("popup_form_main");
     popup_form.innerHTML=main_catelogs_html;
+    console.log($(popup_form).html());
+    */
+    
+    var form=generateForm(FormTemplate);
+    //form.append();
+    //console.log(form);
+    const popup_form = document.getElementById("popup_form_main");
+    //popup_form.innerHTML+=form.html();
+    form.append($('<fieldset class="ui-grid-a">'+
+    '<div class="ui-block-a"><button type="submit" id="caseReg_but" class="ui-btn ui-corner-all ui-shadow ui-icon-check case-reg-but">提交</button></div>'+
+    '<div class="ui-block-b"><a id="caseReg_but_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back case-reg-but">取消</a></div></fieldset>'));
+    //form.css({padding:"10px 20px"});
+    //$("#add_case_popup").children().remove();
+    $(popup_form).html('<h3 id="reg_form_title">新增案件</h3>'+form.html());
+    //console.log($(popup_form).html());
+    //popup_form.innerHTML=main_catelogs_html;
     //console.log($('div[data-role="collapsible"]'))
     /*
     $('div[data-role="collapsible"]').collapsible({
@@ -86,6 +105,13 @@ function _createNewCaseForm(template){
       */
     $('#add_case_but').on('click',function(e){
         //console.log("add......................");
+        
+        $("#reg_form_title").text("新增档案");
+        Object.keys(form_item_ids).forEach((id)=>{
+            $("#"+id).val("");
+            if(form_item_ids[id].type=="date"||form_item_ids[id].type=="datetime"||form_item_ids[id].type=="time")  $("#"+id).val(getDateTime());
+            else if(form_item_ids[id].type=="combobox"||form_item_ids[id].type=="radio")  $("#"+id).val(0);
+        });
         _setBlurBackgroundVisibility(true);
     });
     $('.case-reg-but').on('click',function(e){
@@ -183,6 +209,7 @@ function _createNewCaseForm(template){
     
 }
 function _setData(data){
+    $("#reg_form_title").text("修改档案");
     var dataKeys=Object.keys(data);
     Object.keys(form_item_ids).forEach((id)=>{
         if(dataKeys.includes(id)){

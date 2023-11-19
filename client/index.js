@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded',function(){
     .then(response => response.json())
     .then(data => loadHTML(data['data']));
 });
+const log = document.getElementById("debug");
 const message = document.getElementById("message");
 const addBut = document.getElementById("addBut");
 
@@ -85,7 +86,7 @@ function loadHTML(data){
     data.forEach(function ({user,pass,position,level,createDate}){
         tableHtml += user + ", "+pass + ", "+position + ", "+level + ", "+new Date(createDate).toLocaleDateString();
     });
-    message.innerHTML=tableHtml;
+    log.innerHTML=tableHtml;
 }
 
 function IsLoginVaild(){

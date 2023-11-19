@@ -1,108 +1,38 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=0" />
-<title>jQueryMobileListTest</title>
-
-<link rel="stylesheet"href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
-
-<!-- Some extra padding, you should move this to your app's CSS file -->
-<style>.padding{ padding-bottom : 20px; }</style>
-
-<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
-
-<script>
-//Note: You should move everything under this script tag to another file.
-
-//Read about the event here:
-//http://jquerymobile.com/test/docs/api/events.html
-$(document).on('pageinit', function(){
-	console.log('page init ready');
-	
-	//Read about .on() here:
-	//http://api.jquery.com/on/
-	
-	//Called when we click the submit button
-	//Appends a new item to the list
-	//Gets data from: input#basic
-	$('button#submit').on('click', function(){
-	
-		var txt = $('input#basic').val(),
-			ul_tweets = $('ul#tweets');
-	
-		console.log('submit clicked', txt);
-	
-		if(txt.length > 0){
-			ul_tweets.append("<li><a href='"+txt+".html'>"+txt+"</a></li>");
-			ul_tweets.listview("refresh");	
-			$('input#basic').val('');
-		}else{
-			alert('field is empty');
-		}
-	});
-	
-	//Called when we click the delete button
-	//Clears the field
-	$('button#cancel').on('click', function(){
-		console.log('cancel clicked');
-		$('input#basic').val('');
-	});
-	
-});
-
-</script>
-
-
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
+	<link rel="stylesheet" href="./css/form.css" />
+	<script src="./js/jquery.js"></script>
+	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
+	<script src="./configs.js"></script>
+	<script type="text/javascript" src="./js/tools.js"></script>
 </head>
-<body onload="WL.Client.init({})" id="content" style="display: none">
-
-<!-- HTML Taken from: http://jquerymobile.com/demos/1.1.1/docs/pages/page-anatomy.html -->
-
-	<div data-role="page">
-
-		<div data-role="header"><h1>Some Title</h1></div>
-		<!-- /header -->
-
-		<div data-role="content">
-
-		<div class='padding'>
+<body>
+	<div id="form_parent">test</div>
+	<script>
+		console.log("generateForm");
+		console.log(FormTemplate);
+		var fieldset=$('<fieldset class="ui-grid-a"></fieldset>');
+		var ba=$('<div class="ui-block-a"></div>');
+		var bb=$('<div class="ui-block-b"></div>');
+		var submit=$('<button type="submit" id="caseReg_but" class="ui-btn ui-corner-all ui-shadow ui-icon-check case-reg-but">提交</button>');
+		var cancel=$('<a id="caseReg_but_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back case-reg-but">取消</a>');
+		ba.append(submit);
+		bb.append(cancel);
+		fieldset.append(ba);
 		
-			<!-- HTML Taken from: http://jquerymobile.com/demos/1.1.1/docs/forms/textinputs/ -->
-			<input type="text" name="name" id="basic" value="" />
-			
-			<!-- HTML Taken from: http://jquerymobile.com/demos/1.1.1/docs/forms/forms-all.html -->
-			<fieldset class="ui-grid-a">
-				<div class="ui-block-a">
-					<button id="cancel" type="submit" data-theme="d">Cancel</button>
-				</div>
-				<div class="ui-block-b">
-					<button id="submit" type="submit" data-theme="a">Submit</button>
-				</div>
-			</fieldset>
-			
-		</div><!-- /.padding -->
-
-		<!-- List HTML taken from: http://stackoverflow.com/q/11722742/186909 -->
-
-		<ul data-role="listview" id="tweets">
-			<li><a href="astra.html">Astra</a></li>
-			<li><a href="ford.html">Ford</a></li>
-			<li><a href="triumph.html">Triump</a></li>
-			<li><a href="chevrolet.html">Chevrolet</a></li>
-			<li><a href="dodge.html">Dodge</a></li>
-		</ul>
-
-		</div>
-		<!-- /content -->
-
-		<div data-role="footer"><h4>Some Footer</h4></div><!-- /footer -->
-	
-	</div>
-	<!-- /page -->
-
+		fieldset.append(bb);
+		var form=generateForm(FormTemplate,fieldset);
+		//form.append();
+		
+		$('#form_parent').children().remove();
+		
+		$('#form_parent').append(form);
+		$('#form_parent').trigger( "create" );
+	</script>
 </body>
 </html>

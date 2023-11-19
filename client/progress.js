@@ -166,7 +166,7 @@ document.querySelectorAll("td[name='progress_but']").forEach((pbut)=>{
         containerId:'#'+pbut.id,
         currentPosition:Number(pbut.dataset.value),
         fontSize:12,
-        line_size:2,
+        line_size:4,
         size:12,
         width:240,
         isViewMode:true,

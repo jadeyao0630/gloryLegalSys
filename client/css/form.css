@@ -1,0 +1,29 @@
+.optionMark{
+    color:#C31825;
+}
+.form_item_panel_tb{
+    text-align: left;
+}
+.form_item_panel_tb fieldset{
+    text-align: left;
+}
+.form_item_panel{
+    display:grid;
+    grid-template-columns: auto 1fr;
+    grid-gap:0px;
+    text-align: left;
+}
+.form_item_panel label{
+    min-width: 120px;
+    text-align: left;
+    vertical-align:top;
+    margin-top: 15px;
+} 
+.form_item_panel fieldset{
+    text-align: left;
+}
+.form_grid{
+    display:grid;
+    grid-gap: 20px;
+    padding:20px 0px;
+}

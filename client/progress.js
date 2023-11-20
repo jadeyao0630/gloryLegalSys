@@ -338,6 +338,55 @@ function _createProgressTableHTML(data,data1,data2){
     return '<tbody>'+item_html+'</tbody>';
     
 }
+var progressTableTemplate=[
+  {
+    width:Number.NaN,
+    data:{
+      caseLabel:{
+
+      }
+    }
+  },
+  {
+    width:Number.NaN,
+    data:{
+      caseReason:{
+        label:"案发原因：",
+        data:case_reason
+      },
+      createDate:{
+        label:"提交日期：",
+      }
+    }
+  },
+  {
+    width:Number.NaN,
+    data:{
+      caseCause:{
+        label:"案由：",
+        data:case_causes
+      },
+      caseStatus:{
+        label:"状态：",
+        data:progresses
+      }
+    }
+  },
+  {
+    width:Number.NaN,
+    data:{
+      penaltyAmount:{
+        label:"判决金额(万)：",
+      },
+      exexuteAmount:{
+        label:"执行金额(万)：",
+      }
+    }
+  }
+]
+
+
+
 function addItemsToUpdatePopup(data){
 var table=$('<table></table>')
   var body=$('<tbody></tbody>');

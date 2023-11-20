@@ -19,8 +19,8 @@ passInput.oninput = (event) => {
 };
 
 addBut.onclick = async function (){
-    const nameInput = document.getElementById("user");
-    const name = nameInput.value;
+    const userInput = document.getElementById("user");
+    const user = userInput.value;
     //nameInput.value="";
     //alert(name);
     await fetch("http://"+ip+":"+port+"/insertUser",{
@@ -32,7 +32,7 @@ addBut.onclick = async function (){
             //'Access-Control-Allow-Headers': 'x-requested-with,content-type',
         },
         method: 'POST',
-        body: JSON.stringify({ name: name})
+        body: JSON.stringify({ user: user,pass:$('#password').val()})
     })
     .then(response => response.json())
     .then(data => insertRowIntoTable(data['data']));
@@ -45,6 +45,7 @@ loginBut.onclick = async function (){
     //nameInput.value="";
     //alert(name);
     if (IsLoginVaild()){
+
         await fetch("http://"+ip+":"+port+"/login",{
             headers:{
                 'Content-Type': 'application/json'
@@ -79,7 +80,7 @@ function loadHTML(data){
     
     console.log(data);
     if(data.length === 0){
-        message.innerHTML = "<div>no data</div>";
+        message.innerHTML = "<div>没有数据</div>";
         return;
     }
     let tableHtml = "";

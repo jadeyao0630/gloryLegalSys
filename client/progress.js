@@ -297,8 +297,8 @@ function _createProgressTableHTML(data,data1,data2){
         var relatedStatusData=data1.filter(value=>{ return value.id==item.id && value.caseNo==item.caseNo});
         var relatedUpdateData=data2.filter(value=>{ return value.id==item.id && value.caseNo==item.caseNo});
         if (relatedStatusData.length==0 && relatedUpdateData==0) return false;
-        console.log(relatedStatusData);
-        console.log("relatedStatusData....");
+        //console.log(relatedStatusData);
+        //console.log("relatedStatusData....");
         var item_col_html="";
         var style=" style='max-width:100px;{0}'";
         var background="";
@@ -314,7 +314,7 @@ function _createProgressTableHTML(data,data1,data2){
         if(background.length>0 || color.length>0){
             
             style=formatString(style,(background.length>0?background:"")+(color.length>0?color:""));
-            console.log("color---"+item.caseNo+": "+style);
+            //console.log("color---"+item.caseNo+": "+style);
         }
         else{
             //style="";
@@ -490,8 +490,12 @@ function addItemsToUploadPopup(data){
           
         }
       })
-      tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"}));
+      tr.append(SetData({empty:{type:"buttons"}},"empty",[
+        {subid:item.subId,icon:"btn-icon-red ui-icon-minus",width:"50%",label:"删除"},
+        {subid:item.subId,icon:"btn-icon-green ui-icon-eye",width:"50%",label:"查看"}
+      ]));
       body.append(tr);
+
       
     });
     
@@ -561,6 +565,15 @@ function SetData(data,key,item){
   }else if(type=="button"){
     item_ele=$("<td"+w+">"+'<div class="custom-border-radius">'+
     '<a href="#" data-index="'+item.subid+'" class="ui-btn '+item.icon+' ui-btn-icon-notext ui-corner-all">'+item.label+'</a></div>'+"</td>");
+  }else if(type=="buttons"){
+    var but_html="";
+    var col_style=[];
+    item.forEach((b)=>{
+      but_html+='<div class="custom-border-radius">'+
+      '<a href="#" data-index="'+b.subid+'" class="ui-btn '+b.icon+' ui-btn-icon-notext ui-corner-all">'+b.label+'</a></div>';
+      col_style.push(b.width);
+    });
+    item_ele=$("<td"+" style='width:"+70+"px;'"+"><div style='display:grid;grid-template-columns:"+col_style.join(" ")+";column-gap:5px;'>"+but_html+"</div></td>");
   }else if(type=="file"){
     item_ele=$("<td"+w+">"+'<input type="'+type+'" id="'+key+'_'+item.subid+'" value="" >'+"</td>");
   }else if(type=="tel"){

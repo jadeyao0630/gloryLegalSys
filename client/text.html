@@ -9,11 +9,14 @@
 	<script src="./js/jquery.js"></script>
 	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
 	<script src="./configs.js"></script>
+	<script src="./js/db.js"></script>
 	<script type="text/javascript" src="./js/tools.js"></script>
 </head>
 <body>
 	<div id="form_parent">test</div>
 	<script>
+		getCaseLatestIndex().then(id=>{console.log(id);});
+		
 		console.log("generateForm");
 		console.log(FormTemplate);
 		var fieldset=$('<fieldset class="ui-grid-a"></fieldset>');
@@ -33,6 +36,11 @@
 		
 		$('#form_parent').append(form);
 		$('#form_parent').trigger( "create" );
+		collectFormValues(FormTemplate,1,function(hasError,values){
+			console.log("hasError...."+hasError)
+			
+			console.log(values)
+		});
 	</script>
 </body>
 </html>

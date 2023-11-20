@@ -1,52 +1,23 @@
 
-var table_data=[
-    {id:1,caseNo:"A202311110005",caseName:"管文波离职案件",caseReason:"劳动争议纠纷",caseType:0,caseBelong:0,applicant:"张国庆",attachnebts:"",createDate:"2023-11-11 14:03:19"},
-    {id:2,caseNo:"A202311110004",caseName:"产品商标案件",caseReason:"行政诉讼",caseType:0,caseBelong:0,applicant:"李晓霞",attachnebts:"",createDate:"2023-11-11 14:03:19"}
-];
-var table_columns={
-id:{
-   label: "序号",
-   width:50,
-},
-caseNo:{
-    label:"案件编号"
-},
-caseName:{label:"案件名称"},
-caseReason:{label:"案由"},
-caseType:{label:"案件类型"},
-caseBelong:{label:"所属项目"},
-applicant:{label:"申请人"},
-createDate:{label:"创建时间"},
-}
 
 
 
 
 
-_initRegTable(table_data,table_columns);
 
 
-var checkboxes = document.querySelectorAll("input[type=checkbox][name=item_checkbox]")
-checkboxes.forEach(function(checkbox) {
-checkbox.addEventListener('change', function() {
+//_initRegTable(table_data,table_columns);
 
-        console.log(checkbox.dataset.item);
+let userList=[];
 
-    
-    })
-});
 
-var checkbox_main = document.querySelector(".reg-checkbox-all")
-checkbox_main.addEventListener('change', function() {
-
-        console.log(document.querySelectorAll("input[type=checkbox][name=item_checkbox]:checked"));
-
-    
-});
 
 function _initRegTable(table_data,table_columns){
+    //console.log("table created: "+table_data);
     const table = document.getElementById("table1");
     table.innerHTML=_getTableHTML(table_data,table_columns);
+    $(table).trigger('create');
+    
     //#region 操作按钮
     var fn_buts = document.querySelectorAll("button[name^=fn_btn]")
     fn_buts.forEach(function(fn_but) {
@@ -56,7 +27,7 @@ function _initRegTable(table_data,table_columns){
             //console.log(table_data[fn_but.dataset.item]);
             var matchItems=table_data.filter((item) =>item.id == fn_but.dataset.item);
             if(fn_but.name=="fn_btn_delete"){
-                console.log(table_data);
+                //console.log(table_data);
                 if(matchItems.length>0){
                     table_data.splice(table_data.indexOf(matchItems[0]),1);
                 }
@@ -89,6 +60,23 @@ function _initRegTable(table_data,table_columns){
         
         })
     });
+    var checkboxes = document.querySelectorAll("input[type=checkbox][name=item_checkbox]")
+    checkboxes.forEach(function(checkbox) {
+    checkbox.addEventListener('change', function() {
+
+        console.log(checkbox.dataset.item);
+
+    
+    })
+});
+
+var checkbox_main = document.querySelector(".reg-checkbox-all")
+checkbox_main.addEventListener('change', function() {
+
+        console.log(document.querySelectorAll("input[type=checkbox][name=item_checkbox]:checked"));
+
+    
+});
     //#endregion
 }
 function _getTableHTML(data,columnData){
@@ -127,25 +115,35 @@ function _getTableHTML(data,columnData){
         body_row_str="";
         var counter=0;
         columns_keys.forEach((column)=>{
-            //console.log(column);
-            
+            console.log(column+"---"+keys.includes(column));
+            console.log(columnData[column]);
             if(keys.includes(column)){
                 
                 if (counter==0){
                     body_row_str+=`<td><input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item=${item["id"]}></td>`;
                 } 
-                
-                if(column=="caseType"){
-                    body_row_str+=`<td>${case_types[parseInt(item[column])]}</td>`;
-                }else if(column=="caseBelong"){
-                    body_row_str+=`<td>${projects[parseInt(item[column])]}</td>`;
+                if(columnData[column].data){
+                    if(column=="caseApplicant"){
+                        console.log(columnData[column].data[parseInt(item[column])]);
+                        body_row_str+=`<td>${columnData[column].data[parseInt(item[column])].name}</td>`;
+                    }else
+                        body_row_str+=`<td>${columnData[column].data[parseInt(item[column])]}</td>`;
                 }else{
-                    body_row_str+=`<td>${item[column]}</td>`;
+                    if(column=="caseCreateDate")
+                        body_row_str+=`<td>${formatDateTime(new Date(item[column]),'yyyy年MM月dd日')}</td>`;
+                    else if(column=="caseApplicant"){
+                        console.log(parseInt(item[column]));
+                        var user=userList.filter((user)=>user.id==parseInt(item[column]));
+                        if(user.length>0)
+                            body_row_str+=`<td>${user[0].name}</td>`;
+                    }
+                    else
+                        body_row_str+=`<td>${item[column]}</td>`;
                 }
                 //console.log(keys);
                 //console.log(counter+"=="+(keys.length-1));
                 if (counter==keys.length-1-offset){
-                    console.log(formatString(function_buts,item["id"]));
+                    //console.log(formatString(function_buts,item["id"]));
                     body_row_str+=`<td>${formatString(function_buts,item["id"])}</td>`;
                 }
                 counter++;

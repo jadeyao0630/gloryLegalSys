@@ -197,7 +197,7 @@ ProgressesButton.prototype.init=function(arg){
                     "borderRadius":(_this.opt.size)+"px",
                     "fontSize":_this.opt.fontSize+'px',
                 },_this.opt.showLabel&&_this.opt.labelPosition=="center"?(_this.opt.fontSize+4>=_this.opt.size?sub_step.substring(0,1):sub_step):"");
-                console.log(sub_step+"-->"+sub_step.substring(1));
+                //console.log(sub_step+"-->"+sub_step.substring(1));
                 sub_indicator.data("sub-index",i);
                 sub_indicator.data("main-index",index+i/10);
                 if(_this.opt.readOnly) sub_indicator.css({"cursor":"default"});
@@ -417,7 +417,7 @@ ProgressesButton.prototype.init=function(arg){
     }
     function isSelected(mainIndex,subIndex){
         var main=Math.floor(_this.opt.currentPosition);
-        console.log(mainIndex+":"+subIndex+"==");
+        //console.log(mainIndex+":"+subIndex+"==");
         if(subIndex>-1){
             var sub=Math.round((_this.opt.currentPosition-main)*10);
             return main>=mainIndex && sub==subIndex;

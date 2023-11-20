@@ -3,152 +3,39 @@ const formatString = (template, ...args) => {
         return typeof args[index] === 'undefined' ? match : args[index];
     });
 }
+function formatDateTime(date, format) {
+    const o = {
+      'M+': date.getMonth() + 1, // 月份
+      'd+': date.getDate(), // 日
+      'h+': date.getHours() % 12 === 0 ? 12 : date.getHours() % 12, // 小时
+      'H+': date.getHours(), // 小时
+      'm+': date.getMinutes(), // 分
+      's+': date.getSeconds(), // 秒
+      'q+': Math.floor((date.getMonth() + 3) / 3), // 季度
+      S: date.getMilliseconds(), // 毫秒
+      a: date.getHours() < 12 ? '上午' : '下午', // 上午/下午
+      A: date.getHours() < 12 ? 'AM' : 'PM', // AM/PM
+    };
+    if (/(y+)/.test(format)) {
+      format = format.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+    }
+    for (let k in o) {
+      if (new RegExp('(' + k + ')').test(format)) {
+        format = format.replace(
+          RegExp.$1,
+          RegExp.$1.length === 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length)
+        );
+      }
+    }
+    return format;
+  }
 function formatIndex(position){
     if(position==null) position=Number(_this.opt.currentPosition);
     var main=Math.floor(position);
     var sub=Math.round((position-main)*10);
     return {main:main,sub:sub};
 }
-var FormTemplate={
-    settings:{
-        templateColumn:"50% 50%",
-        hasLabel:true,
-        hasPlaceHolder:true,
-        labelPosition:"left",
-        width:"100%",
-        textareaHeight:90,
-    },
-    template:{
-        baseInfo:{
-            label:"基础信息",
-            data:{
-                caseNo:{
-                    placeholder:"案件编号",
-                    label:"案件编号:",
-                    type:"text",
-                    isOptional:false,
-                },
-                caseName:{
-                    placeholder:"案件名称",
-                    label:"案件名称:",
-                    type:"text",
-                    isOptional:false,
-                },
-                caseLabel:{
-                    placeholder:"案件标签",
-                    label:"案件标签:",
-                    type:"combobox",
-                    isOptional:false,
-                    data:case_labels
-                },
-                caseProject:{
-                    placeholder:"所属项目",
-                    label:"所属项目:",
-                    type:"combobox",
-                    isOptional:false,
-                    data:projects
-                },
-                casePersonnel:{
-                    placeholder:"我方当事人",
-                    label:"我方当事人:",
-                    type:"text",
-                    isOptional:false,
-                },
-                case2ndParty:{
-                    placeholder:"对方当事人",
-                    label:"对方当事人:",
-                    type:"text",
-                    isOptional:false,
-                },
-                caseCatelog:{
-                    placeholder:"案件类别",
-                    label:"案件类别:",
-                    type:"radio",
-                    isOptional:false,
-                    data:case_catelogs
-                },
-                caseType:{
-                    placeholder:"案件类型",
-                    label:"案件类型:",
-                    type:"radio",
-                    isOptional:false,
-                    data:case_types
-                },
-                caseAttachments:{
-                    placeholder:"上传文件",
-                    label:"附件:",
-                    type:"file",
-                    isOptional:true,
-                    data:"支持扩展名：rar. zip. doc. docx. pdf. jpg… 单个文件不超过200MB"
-                }
-            }
-            
-        },
-        caseInfo:{
-            label:"案件信息",
-            data:{
-                caseCause:{
-                    placeholder:"案由",
-                    label:"案由:",
-                    type:"combobox",
-                    isOptional:false,
-                    data:case_causes
-                },
-                caseDate:{
-                    placeholder:"立案日期",
-                    label:"立案日期:",
-                    type:"date",
-                    isOptional:false,
-                },
-                caseOrgnization:{
-                    placeholder:"受理机构",
-                    label:"受理机构:",
-                    type:"text",
-                    isOptional:false,
-                },
-                caseReason:{
-                    placeholder:"案发原因",
-                    label:"案发原因:",
-                    type:"combobox",
-                    isOptional:false,
-                    data:case_reason
-                },
-                caseLawsuit:{
-                    placeholder:"本诉金额",
-                    label:"本诉金额(万元);",
-                    type:"text",
-                    isOptional:true,
-                    numberOnly:true
-                },
-                caseCounterclaim:{
-                    placeholder:"反诉金额",
-                    label:"反诉金额(万元):",
-                    type:"text",
-                    isOptional:true,
-                    numberOnly:true
-                },
-                caseLawsuitRequest:{
-                    placeholder:"本诉请求",
-                    label:"本诉请求:",
-                    type:"textarea",
-                    isOptional:true,
-                },
-                caseCounterclaimRequest:{
-                    placeholder:"反诉请求",
-                    label:"反诉请求:",
-                    type:"textarea",
-                    isOptional:true,
-                },
-                caseSum:{
-                    placeholder:"案件摘要",
-                    label:"案件摘要:",
-                    type:"textarea",
-                    isOptional:true,
-                },
-            }
-        }
-    }
-}
+//#region 关于生成表单的功能
 function loadCssCode(code) {
     var style = document.createElement('style')
     style.type = 'text/css'
@@ -178,6 +65,61 @@ function getFormItemsId(template){
     });
     return form_item_ids;
 }
+function collectFormValues(template,dataId,res){
+    const values={"id":dataId};
+    var hasError=false;
+    var catelogs=Object.keys(template.template);
+    catelogs.forEach((catelog_key)=>{
+        var catelog=template.template[catelog_key];
+        
+        if(catelog.data!=undefined && Object.keys(catelog.data).length>0){
+            var catelog_item_keys=Object.keys(catelog.data);
+            catelog_item_keys.forEach((item_key)=>{
+                //form_item_ids[item_key]=catelog.data[item_key];
+                if(catelog.data[item_key].type.toLowerCase()=='radio'){
+                    values[item_key]=parseInt(document.querySelector('input[name="'+item_key+'"]:checked').id.replace(item_key+"-",""));
+                }else{
+                    var element=document.getElementById(item_key);
+                    values[item_key]=dataValidation(element,catelog.data[item_key],function(he){
+                        hasError=he;
+                    });
+                }
+            });
+        }
+    });
+    values["caseCreateDate"]=getDateTime();
+    //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
+    if(sessionStorage.getItem("currentUser")==undefined && sessionStorage.getItem("currentUser").id){
+        console.log("currentUser-- has error value");
+        hasError=true;
+    }
+    values["caseApplicant"]=JSON.parse(sessionStorage.getItem("currentUser")).id;
+    res(hasError,values);
+}
+function dataValidation(element,itemTemplate,res){
+    switch (element.nodeName.toUpperCase()){
+        case "INPUT":
+            var val=element.value;
+            //console.log(element.type);
+            if(element.type.toLowerCase()=="date"||element.type.toLowerCase()=="time"||element.type.toLowerCase()=="datetime"){
+                val=new Date(val).toISOString().slice(0, 19).replace('T', ' ');
+            }else if(itemTemplate.numberOnly){
+                if(eval.length==0) val=0;
+                else val=parseInt(val);
+            }
+            if(val.length==0 && !itemTemplate.isOptional){
+                console.log(itemTemplate.label+"-- has error value"+val);
+                res(true);
+            }
+            return val;
+        case "SELECT":
+            return element.value.length==0?0:parseInt(element.value);
+        case "TEXTAREA":
+            return element.value;
+    }
+    
+    res(false);
+}
 function generateForm(template,buttons){
     if(template.settings.textareaHeight != undefined){
         loadCssCode('textarea.ui-input-text {min-height: '+template.settings.textareaHeight+'px;}')
@@ -206,7 +148,7 @@ function generateForm(template,buttons){
             var stepControler=0;
             
             catelog_item_keys.forEach((item_key)=>{
-                console.log(item_key);
+                //console.log(item_key);
                 var item=catelog.data[item_key];
                 //console.log(item.type);
                 if(item.type!=undefined){
@@ -277,6 +219,8 @@ function getDateTime(dateTimeStr){
 function setRequired(isOptional,message){
     return isOptional?"":"required oninvalid='setCustomValidity(\""+message+"\")' oninput='setCustomValidity(\"\")'";
 }
+//#region 创建表单元素
+
 function generateInputTypeBase(item_container,item,id,hasPlaceHolder){
     //var item_container=$('<div class="form_item_panel"></div>');
     var placeholder="";
@@ -334,3 +278,6 @@ function generateComboBoxItem(item_container,item,id){
     item_container.append(selectItem);
     //return item_container;
 }
+//#endregion
+
+//#endregion 

@@ -1,12 +1,16 @@
 //案件基本数据
 const table_progress_data=[
-    {id:1,caseNo:"A202311110005",caseName:"管文波离职案件",caseLabel:2,caseReason:0,caseType:0,caseBelong:"北七家",applicant:"张国庆",caseCause:6,createDate:"2023-11-11 14:03:19"},
-    {id:2,caseNo:"A202311110004",caseName:"产品商标案件",caseLabel:0,caseReason:0,caseType:0,caseBelong:"北七家",applicant:"李晓霞",caseCause:8,courtDate:"2023-12-15 14:00:00",createDate:"2023-11-11 14:03:19"}
+    {id:1,caseNo:"A202311110005",caseName:"管文波离职案件",caseLabel:2,caseReason:0,caseType:0,caseBelong:"北七家",applicant:"张国庆",caseCause:6,createDate:"2023-11-11 14:03:19",isReadOnly:true},
+    {id:2,caseNo:"A202311110004",caseName:"产品商标案件",caseLabel:0,caseReason:0,caseType:0,caseBelong:"北七家",applicant:"李晓霞",caseCause:8,courtDate:"2023-12-15 14:00:00",createDate:"2023-11-11 14:03:19",isReadOnly:false}
 ];
 //案件进展数据
 const table_progress_status=[
   {id:1,caseNo:"A202311110005",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:3.1,courtName:"东城法院"},
   {id:2,caseNo:"A202311110004",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:1,courtName:"大兴法院"}
+]
+const table_progress_property=[
+  {id:1,caseNo:"A202311110005",caseStatusId:0,subId:0,propertyName:"未知",propertyStatus:1,dateUpdated:"2023-11-01 14:00:00"},
+  {id:2,caseNo:"A202311110004",caseStatusId:0,subId:0,propertyName:"未知",propertyStatus:0,dateUpdated:"2023-12-01 14:00:00"},
 ]
 //案件进展明细数据
 const table_progress_updates=[
@@ -21,8 +25,8 @@ const table_progress_updates_attachments=[
 ]
 //案件执行明细数据
 const table_progress_executes=[
-  {id:1,exeId:0,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张三",personContact:18612221231,purposeExecute:"财产",exexuteAmount:200,sumExecuted:"",filePath:"",dateExecuted:"2023-11-01 14:00:00"},
-  {id:1,exeId:1,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张五",personContact:1572312534,purposeExecute:"",exexuteAmount:34,sumExecuted:"",filePath:"",dateExecuted:"2023-12-01 14:00:00"},
+  {id:1,subId:0,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张三",personContact:18612221231,purposeExecute:"财产",exexuteAmount:200,sumExecuted:"",filePath:"",dateExecuted:"2023-11-01 14:00:00"},
+  {id:1,subId:1,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张五",personContact:1572312534,purposeExecute:"",exexuteAmount:34,sumExecuted:"",filePath:"",dateExecuted:"2023-12-01 14:00:00"},
 ]
 const clickedTarget = {
   same: 'same',
@@ -39,6 +43,21 @@ var list={
   },dateUpdated:{
     label:"更新日期",
     type:"date"
+  }
+}
+var list_proerty={
+  propertyName:{
+    label:"资产",
+    type:"text",
+    width:550,
+  },propertyStatus:{
+    label:"状态",
+    type:"combobox",
+    data:property_status,
+    width:150,
+  },dateUpdated:{
+    label:"更新日期",
+    type:"date",
   }
 }
 var list_evidence={
@@ -86,6 +105,7 @@ var list_executed={
 }
 var progressButtons={};
 var progressUpdateStatus={
+  currentParentProgressButton:undefined,
   currentProgressButton:undefined,
   currentProgressTarget:undefined,
   clickedPosition:{main:-1,sub:0},
@@ -153,8 +173,26 @@ document.querySelectorAll("a[name^='popup_progress_']").forEach((pbut)=>{
  //设定每个查看按钮对应的流程图预览
   $(pbut).on("click",  function (e){
     //console.log("data-index: "+$(pbut).data("index"));
+    sessionStorage.setItem("currentId", $(pbut).data("index"));
     _setFlowChart(table_progress_data,table_progress_status,table_progress_executes,table_progress_updates,$(pbut).data("index"));
   });
+});
+$('.ui-but-lock').on('click',function(e){
+  
+  var data=table_progress_data.filter(item=>item.id==sessionStorage.getItem("currentId"));
+  if(data.length>0){
+    //console.log(data[0].isReadOnly);
+    data[0].isReadOnly=!data[0].isReadOnly;
+    //console.log(data[0].isReadOnly);
+    if(data[0].isReadOnly){
+      $("#process_save_but").addClass('ui-state-disabled');
+      $(".ui-but-lock").removeClass('btn-icon-green').addClass('btn-icon-red');
+    }else{
+      $("#process_save_but").removeClass('ui-state-disabled');
+      $(".ui-but-lock").removeClass('btn-icon-red').addClass('btn-icon-green');
+    }
+    progressUpdateStatus.currentParentProgressButton.switchReadyOnly();
+  }
 });
 document.querySelectorAll("td[name='progress_but']").forEach((pbut)=>{
 
@@ -209,7 +247,9 @@ function _setFlowChart(data,status,executes,updates,targetId){
   var data3=executes.filter(value=>{ return value.id==targetId});
   var data4=updates.filter(value=>{ return value.id==targetId});
   if(data1.length>0 && data2.length>0){
+    console.log("isReadOnly------"+data1[0].isReadOnly);
     $("#progress_status_details").html(progressDetailsPopup(data2[0]));
+    
     $("#progress_status_details").trigger("create");
     $("#progress_status_container").empty();
     $('#popup_progress_title').text(data1[0].caseName+"-"+data2[0].caseNo);
@@ -228,10 +268,12 @@ function _setFlowChart(data,status,executes,updates,targetId){
       //verticalGap:2,
       //labelPosition:"bottom",
       showSubSteps:true,
-      //readOnly:true,
+      readOnly:data1[0].isReadOnly,
       showCounter:true,
       counterData:data3.concat(data4),
     });
+    
+  progressUpdateStatus.currentParentProgressButton=but;
     //设置流程图里每个点的按钮连接任务
     $(but.instance).on("itemOnClicked",  function (e){
       progressUpdateStatus.currentProgressButton=but;
@@ -249,7 +291,7 @@ function _setFlowChart(data,status,executes,updates,targetId){
       }
       
       
-      console.log($("#process_execute_list"));
+      console.log("isReadOnly===================="+data1[0].isReadOnly);
       
       //console.log(but.getItem(e.Position)==but.getItem(formatIndex(but.opt.currentPosition)));
 
@@ -257,13 +299,15 @@ function _setFlowChart(data,status,executes,updates,targetId){
       $("#process_updates_title").text(title);
       //$("#progress_step_update_list").html('');
       
-      $("#process_update_list").html(addItemsToUpdatePopup(table_progress_updates.filter(value=>{ return value.id==data2[0].id && value.caseNo==data2[0].caseNo})) );
+      $("#process_update_list").html(addItemsToUpdatePopup(table_progress_updates.filter(value=>{ return value.id==data2[0].id && value.caseNo==data2[0].caseNo}),data1[0].isReadOnly) );
       $("#process_update_list").trigger("create");
-      $("#process_update_upload_list").html(addItemsToUploadPopup(table_progress_updates_attachments.filter(value=>{ return value.id==data2[0].id && value.caseNo==data2[0].caseNo})) );
+      $("#process_property_list").html(addItemsToPropertyPopup(table_progress_property.filter(value=>{ return value.id==data2[0].id && value.caseNo==data2[0].caseNo}),data1[0].isReadOnly) );
+      $("#process_property_list").trigger("create");
+      $("#process_update_upload_list").html(addItemsToUploadPopup(table_progress_updates_attachments.filter(value=>{ return value.id==data2[0].id && value.caseNo==data2[0].caseNo}),data1[0].isReadOnly) );
       
       if(e.Position.main==3){
         $("#process_execute_collapset").removeClass('popup-hide');
-        $("#process_execute_list").html(addItemsToExecutePopup(table_progress_executes.filter(value=>{ return value.id==data2[0].id && value.caseNo==data2[0].caseNo})) );
+        $("#process_execute_list").html(addItemsToExecutePopup(table_progress_executes.filter(value=>{ return value.id==data2[0].id && value.caseNo==data2[0].caseNo}),data1[0].isReadOnly) );
         
         //$("#process_update_collapset").data('collapsed',true);
         $("#process_execute_collapset").collapsible( "option", "collapsed", false );
@@ -282,7 +326,15 @@ function _setFlowChart(data,status,executes,updates,targetId){
       //$('.popup-main').addClass('blur-background');
       
     });
+    if(data1[0].isReadOnly) {
+      $("#process_save_but").addClass('ui-state-disabled');
+      $(".ui-but-lock").removeClass('btn-icon-green').addClass('btn-icon-red');
+    }else{
+      $("#process_save_but").removeClass('ui-state-disabled');
+      $(".ui-but-lock").removeClass('btn-icon-red').addClass('btn-icon-green');
+    }
     //$('#progress_status_details').html(progressDetailsPopup(data1[0],data2[0]));
+    
   }
   progressUpdateStatus.clickedPosition=formatIndex(Number(data2[0].caseStatus));
     progressUpdateStatus.currentPopupId=targetId;
@@ -387,7 +439,7 @@ var progressTableTemplate=[
 
 
 
-function addItemsToUpdatePopup(data){
+function addItemsToUpdatePopup(data,isReadOnly){
 var table=$('<table></table>')
   var body=$('<tbody></tbody>');
 
@@ -424,13 +476,16 @@ var table=$('<table></table>')
           
         }
       })
-      tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"}));
-      body.append(tr);
+      if(!isReadOnly){
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"}));
+      }
+        body.append(tr);
       
     });
     
   }
-  var tr=$('<tr></tr>');
+  if(!isReadOnly){
+    var tr=$('<tr></tr>');
       keys.forEach(function(key){
         if(emptyItem[key]!= undefined){
         //console.log(key+": "+item[key]);
@@ -439,14 +494,15 @@ var table=$('<table></table>')
         }
       });
       
-      tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
-      body.append(tr);
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
+        body.append(tr);
+    }
   //console.log(table.html());
   table.append(thead);
   table.append(body);
   return table.html();
 }
-function addItemsToExecutePopup(data){
+function addItemsToExecutePopup(data,isReadOnly){
   var table=$('<table></table>')
   var body=$('<tbody></tbody>');
  
@@ -480,12 +536,17 @@ function addItemsToExecutePopup(data){
           
         }
       })
-      tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"}));
-      body.append(tr);
+      if(!isReadOnly){
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"}));
+      }
+        body.append(tr);
+      
       
     });
     
   }
+  
+  if(!isReadOnly){
   var tr=$('<tr></tr>');
       keys.forEach(function(key){
         if(emptyItem[key]!= undefined){
@@ -499,15 +560,81 @@ function addItemsToExecutePopup(data){
           
         }
       });
-      
-      tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
-      body.append(tr);
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
+        body.append(tr);
+      }
   //console.log(table.html());
   table.append(thead);
   table.append(body);
   return table.html();
 }
-function addItemsToUploadPopup(data){
+function addItemsToPropertyPopup(data,isReadOnly){
+  console.log(isReadOnly);
+  var table=$('<table></table>')
+  var body=$('<tbody></tbody>');
+ 
+  var filtedData=data.filter(function(item){ return comparePoistion(formatIndex(item.caseStatusId),progressUpdateStatus.clickedPosition)});
+ 
+  var keys=[];
+  var emptyItem={};
+  var th=$('<tr></tr>');
+  var thead=$('<thead></thead>');
+  thead.append(th);
+  $.each(list_proerty,function(key,value){
+    var w=setColumnWidth(value.width);
+    //console.log(w);
+    var h=$('<th'+w+'>'+value.label+'</th>');
+    th.append(h);
+    keys.push(key);
+    emptyItem[key]=key=="propertyStatus"?0:"";
+  });
+  var h=$('<th></th>');
+  th.append(h);
+  if(filtedData.length>0){
+    filtedData.forEach(function(item){
+      console.log(item);
+      var tr=$('<tr></tr>');
+      keys.forEach(function(key){
+        if(item[key]!= undefined){
+          emptyItem['subId']=item.subId+1;
+        //console.log(key+": "+item[key]);
+          tr.append(SetData(list_proerty,key,item));
+          
+        }
+      })
+      if(!isReadOnly){
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"}));
+      }
+        body.append(tr);
+
+      
+    });
+    
+  }
+  if(!isReadOnly){
+  var tr=$('<tr></tr>');
+      keys.forEach(function(key){
+        if(emptyItem[key]!= undefined){
+          //if(key=="fileName"){
+          //  tr.append(SetData("file",key,emptyItem));
+          //}else{
+            tr.append(SetData(list_proerty,key,emptyItem));
+          //}
+        //console.log(key+": "+item[key]);
+          
+          
+        }
+      });
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
+        body.append(tr);
+      }
+  //console.log(table.html());
+  table.append(thead);
+  table.append(body);
+  return table.html();
+}
+function addItemsToUploadPopup(data,isReadOnly){
+  console.log(isReadOnly);
   var table=$('<table></table>')
   var body=$('<tbody></tbody>');
  
@@ -539,16 +666,19 @@ function addItemsToUploadPopup(data){
           
         }
       })
-      tr.append(SetData({empty:{type:"buttons"}},"empty",[
-        {subid:item.subId,icon:"btn-icon-red ui-icon-minus",width:"50%",label:"删除"},
-        {subid:item.subId,icon:"btn-icon-green ui-icon-eye",width:"50%",label:"查看"}
-      ]));
-      body.append(tr);
+      if(!isReadOnly){
+        tr.append(SetData({empty:{type:"buttons"}},"empty",[
+          {subid:item.subId,icon:"btn-icon-red ui-icon-minus",width:"50%",label:"删除"},
+          {subid:item.subId,icon:"btn-icon-green ui-icon-eye",width:"50%",label:"查看"}
+        ]));
+      }
+        body.append(tr);
 
       
     });
     
   }
+  if(!isReadOnly){
   var tr=$('<tr></tr>');
       keys.forEach(function(key){
         if(emptyItem[key]!= undefined){
@@ -562,9 +692,9 @@ function addItemsToUploadPopup(data){
           
         }
       });
-      
-      tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
-      body.append(tr);
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
+        body.append(tr);
+      }
   //console.log(table.html());
   table.append(thead);
   table.append(body);
@@ -627,6 +757,20 @@ function SetData(data,key,item){
     item_ele=$("<td"+w+">"+'<input type="'+type+'" id="'+key+'_'+item.subid+'" value="" >'+"</td>");
   }else if(type=="tel"){
     item_ele=$("<td"+w+">"+'<input type="'+type+'" id="'+key+'_'+item.subid+'" value="'+item[key]+'" >'+"</td>");
+  }else if(type=="combobox"){
+    var selectItem=$('<select id="'+key+'_'+item.subid+'" value='+item[key]+'></select>');
+    
+    if(data[key].data){
+      data[key].data.forEach((d,counter)=>{
+        var selected='';
+        if(counter==item[key])
+          selected=' selected="selected"';
+        selectItem.append($('<option value="'+counter+'"'+selected+'>'+d+'</option>'));
+      });
+    }
+    //console.log(selectItem.html());
+    item_ele=$("<td"+w+"></td>");
+    item_ele.append(selectItem);
   }
   return item_ele;
 }

@@ -58,6 +58,7 @@ ProgressesButton.prototype.init=function(arg){
     this.outter_frame=getElement("outter",{
     });
     this.breakpoint=[];
+    this.items=[];
     var v_dist=_this.opt.size*1.5;
     var top_start=(_this.opt.size+_this.opt.line_size/2);
     var top_offset=_this.opt.size-_this.opt.line_size/2;
@@ -129,7 +130,7 @@ ProgressesButton.prototype.init=function(arg){
                 //#region sub visible pre line
                 var sub_selected_line=getElement("progress-but-background-line progress-but-indicator-selected selected-line"+(index)+"-"+(i)+" main-index"+index+" sub-index"+i,{
                     'background':_this.opt.selected_color,
-                    'width':(isSelectable(index,i)?long_edge:0)+'px',
+                    'width':(_this.isSelectable(index,i)?long_edge:0)+'px',
                     'height':_this.opt.line_size+'px',
                     'left':(lefts[index-1])+'px',
                     'top':(middle_line)+'px',
@@ -164,7 +165,7 @@ ProgressesButton.prototype.init=function(arg){
                     if((tops[i]-_this.opt.line_size/2)>middle_line) angle=Math.abs(angle);
                     sub_selected_next_line=getElement("progress-but-background-line progress-but-indicator-selected selected-line"+(index+1)+"-"+(i)+" main-index"+(index+1)+" sub-index"+i,{
                         'background':_this.opt.selected_color,
-                        'width':(isSelectable(index+1,i)?long_edge:0)+'px',
+                        'width':(_this.isSelectable(index+1,i)?long_edge:0)+'px',
                         'height':_this.opt.line_size+'px',
                         'left':(lefts[index])+'px',
                         'top':(tops[i]-_this.opt.line_size/2)+'px',
@@ -200,7 +201,7 @@ ProgressesButton.prototype.init=function(arg){
                 //console.log(sub_step+"-->"+sub_step.substring(1));
                 sub_indicator.data("sub-index",i);
                 sub_indicator.data("main-index",index+i/10);
-                if(_this.opt.readOnly) sub_indicator.css({"cursor":"default"});
+                //if(_this.opt.readOnly) sub_indicator.css({"cursor":"default"});
                 sub_indicator.data("isMainIndicator",false);
                 sub_indicator.data("preLineId","selected-line"+(index)+"-"+(i));
                 sub_indicator.data("nextLineId","selected-line"+(index+1)+"-"+(i));
@@ -209,7 +210,8 @@ ProgressesButton.prototype.init=function(arg){
                 //setselectable(sub_indicator,index<=_this.opt.currentPosition+1);
                 //console.log(Math.floor(_this.opt.currentPosition));
                 //var isSelectable=Math.round((_this.opt.currentPosition-Math.floor(_this.opt.currentPosition))*10)==i
-                setState(sub_indicator,index,i);
+                _this.setState(sub_indicator,index,i);
+                _this.items.push(sub_indicator);
                 sub_indicator.on('click',clickedEvent);
                 frame.append(sub_indicator)
 
@@ -263,11 +265,13 @@ ProgressesButton.prototype.init=function(arg){
             if(realIndex<=_this.opt.currentPosition && (arrayIndex.includes(realIndex+1)||_this.breakpoint.includes(realIndex+1))) {
 
             }else{
-                if(_this.opt.readOnly) indicator.css({"cursor":"default"});
+                //if(_this.opt.readOnly) indicator.css({"cursor":"default"});
             }
             indicator.data("preLineId","selected-line"+(realIndex));
             //setselectable(indicator,index<=_this.opt.currentPosition+1);
-            setState(indicator,realIndex,-1);
+            _this.setState(indicator,realIndex,-1);
+            
+            _this.items.push(indicator);
             indicator.on('click',clickedEvent);
             frame.append(indicator)
 
@@ -340,7 +344,9 @@ ProgressesButton.prototype.init=function(arg){
            //console.log(index);
             drawNextLine=true;
         }
+        
     });  
+    //console.log("this items length..........."+_this.items.length);
     _this.instance.append(_this.outter_frame); 
     this.parent.append(this.instance);
     async function clickedEvent(e){
@@ -392,60 +398,12 @@ ProgressesButton.prototype.init=function(arg){
         const sinOfAngleX = straight / oblique;
         return Math.round((Math.asin(sinOfAngleX)*180)/Math.PI);
     }
-   
-    function setState(element,mainIndex,subIndex){
-        element.data("canSelect",true);
-        element.data("isSelected",false);
-        if(isSelectable(mainIndex,subIndex)){
-            if(isSelected(mainIndex,subIndex)){
-                
-                element.css({"background":_this.opt.selected_color,"color":"white"});
-                
-                element.data("isSelected",true);
-            }
-        }else{
-            if(isSelectable(mainIndex-1,-1)==false){
-                //if(!_this.opt.isViewMode) {
-                    element.css({"color":"gray"});
-                    
-                    //element.addClass("progress-but-disable");
-                //}
-                element.data("canSelect",false);
-            }
-            
-        }
-    }
-    function isSelected(mainIndex,subIndex){
-        var main=Math.floor(_this.opt.currentPosition);
-        //console.log(mainIndex+":"+subIndex+"==");
-        if(subIndex>-1){
-            var sub=Math.round((_this.opt.currentPosition-main)*10);
-            return main>=mainIndex && sub==subIndex;
-        }else{
-            return main>=mainIndex;
-        }
-        
-    }
-    function isSelectable(mainIndex,subIndex){
-        var main=Math.floor(_this.opt.currentPosition);
-        var sub=Math.round((_this.opt.currentPosition-main)*10);
-        if(subIndex>-1){
-            return main>=mainIndex && sub==subIndex;
-        }
-        return main>=mainIndex;
-    }
-    function formatIndex(position){
-        if(position==null) position=Number(_this.opt.currentPosition);
-        var main=Math.floor(position);
-        var sub=Math.round((position-main)*10);
-        return {main:main,sub:sub};
-    }
 }
 
 ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
     var _this=this;
-    var currentPosition=formatIndex();
-    var targetPosition=formatIndex($(target).data('main-index'));
+    var currentPosition=_this.formatIndex();
+    var targetPosition=_this.formatIndex($(target).data('main-index'));
     var preLine=$(_this.outter_frame).find("#"+target.data("preLineId"));
     var nextLine=$(_this.outter_frame).find("#"+target.data("nextLineId"));
     if(_this.breakpoint.includes(targetPosition.main-1)){
@@ -492,7 +450,7 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
                     
                     var _preLine=$(_this.outter_frame).find("#"+$(subIndicator).data("preLineId"));
                     var _nextLine=$(_this.outter_frame).find("#"+$(subIndicator).data("nextLineId"));
-                    if(formatIndex($(subIndicator).data("main-index")).sub==targetPosition.sub){
+                    if(_this.formatIndex($(subIndicator).data("main-index")).sub==targetPosition.sub){
                         if (_this.opt.deadSteps.includes($(subIndicator).text())) nextElement=null;
                         await _preLine.animate({
                             width: _preLine.data("width")+"px",
@@ -515,7 +473,7 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
             
         }else{
             //if($(target).data("isSelected"))
-                setState($(target),!$(target).data("isSelected"),nextElement);
+            setState($(target),!$(target).data("isSelected"),nextElement);
                 var _preLine=$(_this.outter_frame).find("#"+$(target).data("preLineId"));
                 //console.log(_preLine);
                 if(_this.breakpoint.includes(currentPosition.main-1)){
@@ -535,7 +493,7 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
                 
                 console.log("remove self: "+currentPosition.main+"."+currentPosition.sub+"-->"+_this.opt.currentPosition);
         }
-        $(_this.outter_frame).trigger({type:'stepChanged', Position:formatIndex(_this.opt.currentPosition),
+        $(_this.outter_frame).trigger({type:'stepChanged', Position:_this.formatIndex(_this.opt.currentPosition),
                         dataId:_this.dataId});
     }
     async function MoveToNext(){
@@ -555,7 +513,7 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
                               
                               $(_this.outter_frame).find(".main-indicator-index"+(i)).each(function (index,subIndicator){
                                 //console.log(subIndicator)
-                                if(formatIndex($(subIndicator).data("main-index")).sub==targetPosition.sub){
+                                if(_this.formatIndex($(subIndicator).data("main-index")).sub==targetPosition.sub){
                                     if (_this.opt.deadSteps.includes($(subIndicator).text())) nextElement=null;
                                     setState($(subIndicator),true,nextElement);
                                 }else{
@@ -563,7 +521,7 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
                                 }
                               });
                           }else{
-                              setState($(_this.outter_frame).find(".main-indicator-index"+i),true,$(_this.outter_frame).find(".main-indicator-index"+(i+1)));
+                            setState($(_this.outter_frame).find(".main-indicator-index"+i),true,$(_this.outter_frame).find(".main-indicator-index"+(i+1)));
                           }
                           
                   });
@@ -582,7 +540,7 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
                 
             }
         }
-        $(_this.outter_frame).trigger({type:'stepChanged', Position:formatIndex(_this.opt.currentPosition),
+        $(_this.outter_frame).trigger({type:'stepChanged', Position:_this.formatIndex(_this.opt.currentPosition),
                         dataId:_this.dataId});
     }
     async function MoveToPre(){
@@ -620,7 +578,7 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
                     $(_this.outter_frame).find(".main-indicator-index"+(i-1)).each(async function (index,subIndicator){
                         //console.log(subIndicator)
                         var __preLine=$(_this.outter_frame).find("#"+$(subIndicator).data("preLineId"));
-                        if(formatIndex($(subIndicator).data("main-index")).sub==targetPosition.sub && isSub){
+                        if(_this.formatIndex($(subIndicator).data("main-index")).sub==targetPosition.sub && isSub){
                             if (_this.opt.deadSteps.includes($(subIndicator).text())) _nextElement=null;
                             
                             await __preLine.animate({
@@ -651,38 +609,38 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
                 console.log("move pre: "+currentPosition.main+"."+currentPosition.sub+"-->"+_this.opt.currentPosition);
             }
         }
-        $(_this.outter_frame).trigger({type:'stepChanged', Position:formatIndex(_this.opt.currentPosition),
+        $(_this.outter_frame).trigger({type:'stepChanged', Position:_this.formatIndex(_this.opt.currentPosition),
                         dataId:_this.dataId});
-    }
-    function formatIndex(position){
-        if(position==null) position=Number(_this.opt.currentPosition);
-        var main=Math.floor(position);
-        var sub=Math.round((position-main)*10);
-        return {main:main,sub:sub};
     }
     function setState(element,isSelected,nextElement){
         if(isSelected){
-            element.css({"background":_this.opt.selected_color,"color":"white"});
             //element.removeClass("progress-but-disable");
+            element.css({"background":_this.opt.selected_color,"color":"white"});
             element.data("isSelected",true);
             if(nextElement){
-                nextElement.css({"color":"rgb(51, 51, 51)"});
-                nextElement.removeClass("progress-but-disable");
+                nextElement.css({"color":"rgb(51, 51, 51)",'cursor':'pointer'});
+                //nextElement.addClass("progress-but-disable");
                 nextElement.data("canSelect",true);
             }
         }else{
-            element.css({"background":_this.opt.background_color,"color":"rgb(51, 51, 51)"});
-            element.removeClass("progress-but-disable");
+            //element.removeClass("progress-but-disable");
+            element.css({"background":_this.opt.background_color,"color":"rgb(51, 51, 51)",'cursor':'pointer'});
             element.data("isSelected",false);
             if(nextElement){
                 //if(!_this.opt.isViewMode) {
-                    nextElement.css({"color":"gray"});
-                    //$(nextElement).toggleClass("progress-but-disable");
+                    nextElement.css({"color":"gray",'cursor':'default'});
+                    //$(nextElement).addClass("progress-but-disable");
                 //}
                 nextElement.data("canSelect",false);
             }
         }
     }
+}
+ProgressesButton.prototype.formatIndex=function(position){
+    if(position==null) position=Number(this.opt.currentPosition);
+        var main=Math.floor(position);
+        var sub=Math.round((position-main)*10);
+        return {main:main,sub:sub};
 }
 ProgressesButton.prototype.switchSubStepVisibility=function(args){
     args["showSubSteps"]=!this.opt.showSubSteps;
@@ -703,4 +661,64 @@ ProgressesButton.prototype.getItem=function(position){
 }
 ProgressesButton.prototype.setStep=async function(target){
     await this.setFlow($(target),this.opt.duration,!$(target).data('isMainIndicator'));
+}
+ProgressesButton.prototype.switchReadyOnly= function(){
+    this.opt.readOnly=!this.opt.readOnly
+    this.items.forEach((ele)=>{
+        var posisiton=this.formatIndex($(ele).data('main-index'));
+        console.log(posisiton);
+        this.setState(ele,posisiton.main,$(ele).data('isMainIndicator')?-1:posisiton.sub);
+    });
+}
+ProgressesButton.prototype.isSelectable= function(mainIndex,subIndex){
+    var main=Math.floor(this.opt.currentPosition);
+        var sub=Math.round((this.opt.currentPosition-main)*10);
+        if(subIndex>-1){
+            return main>=mainIndex && sub==subIndex;
+        }
+        return main>=mainIndex;
+}
+ProgressesButton.prototype.isSelected= function(mainIndex,subIndex){
+    var main=Math.floor(this.opt.currentPosition);
+        //console.log(mainIndex+":"+subIndex+"==");
+        if(subIndex>-1){
+            var sub=Math.round((this.opt.currentPosition-main)*10);
+            return main>=mainIndex && sub==subIndex;
+        }else{
+            return main>=mainIndex;
+        }
+}
+
+ProgressesButton.prototype.setState=function(element,mainIndex,subIndex){
+    element.data("canSelect",true);
+    element.data("isSelected",false);
+    if(this.isSelected(mainIndex,subIndex)){
+        
+            
+            element.css({"background":this.opt.selected_color,"color":"white"});
+            
+            element.data("isSelected",true);
+
+        
+        
+    }else{
+        if(this.isSelected(mainIndex-1,-1)==false){
+            //if(!_this.opt.isViewMode) {
+                element.css({"color":"gray","cursor":"default"});
+                
+                //element.addClass("progress-but-disable");
+            //}
+            element.data("canSelect",false);
+            
+        }else{
+            if(!this.opt.readOnly){
+                element.css({"background":this.opt.background_color,"color":"rgb(51, 51, 51)",'cursor':'pointer'});
+                //element.data("canSelect",true);
+            }
+        }
+        if(this.opt.readOnly){
+            element.css({"color":"gray","cursor":"default"});
+            element.data("canSelect",false);
+        }
+    }
 }

@@ -30,7 +30,6 @@ function formatDateTime(date, format) {
     return format;
   }
 function formatIndex(position){
-    if(position==null) position=Number(_this.opt.currentPosition);
     var main=Math.floor(position);
     var sub=Math.round((position-main)*10);
     return {main:main,sub:sub};

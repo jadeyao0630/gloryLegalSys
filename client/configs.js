@@ -9,6 +9,7 @@ class Message{
 }
 
 const TextColor="rgb(51, 51, 51)";
+const property_status=["查封","冻结"];
 const case_types=["被诉","主诉"];
 const case_catelogs=["诉讼","仲裁"];
 const case_labels=["普通案件","重大案件300万以上","重大案件1000万以上","重大案件 群诉"];

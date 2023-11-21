@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <canvas id="myCanvas" width="600" height="1200" style="border:3px double #996633;">
+    <script>
+        
+        var cricles=[];
+        var _cricles=[];
+        class drawPos{
+            constructor (x,y) {
+                this.x = x;
+                this.y=y;
+            }
+        }
+        class drawSize{
+            constructor (w,h) {
+                this.width = w;
+                this.height=h;
+            }
+        }
+        var canvas=document.getElementById('myCanvas');
+
+        var _ctx=canvas.getContext('2d');
+        canvas.onmouseup = e => {
+            
+            
+            cricles.forEach((cricle)=>{
+                var distance = Math.pow(e.offsetX - cricle.x, 2) + Math.pow(e.offsetY- cricle.y, 2) - Math.pow(cricle.radius, 2);
+                if (distance < 0) {
+                    //console.log(cricle.label) ;
+                    return;
+                } 
+            });
+            _cricles.forEach((circle)=>{
+                const isPointInPath =_ctx.isPointInStroke(circle, e.offsetX, e.offsetY);
+                if (isPointInPath) {
+                    _ctx.strokeStyle="black";
+                    _ctx.lineWidth=3;
+                    _ctx.stroke(circle);
+                    console.log("circle.label") ;
+                    return;
+                } 
+            });
+        }
+
+        var _data={
+            template:["立案","一审","二审","执行","结案","再审","监督"],
+            basic:{
+                id:1,caseNo:"A202311110005",caseName:"管文波离职案件",caseLabel:2,caseReason:0,caseType:0,caseBelong:"北七家",applicant:"张国庆",
+                caseCause:6,createDate:"2023-11-11 14:03:19",isReadOnly:true
+            },
+            progressStatus:{
+                id:1,caseNo:"A202311110005",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",
+                penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:3.1,courtName:"东城法院"
+                ,data:[
+                    {id:1,subid:0,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.9.28送达一审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00"},
+                    {id:1,subid:1,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.9.28送达一审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00"},
+                    {id:1,subid:0,caseStatusId:1,caseNo:"A202311110005",caseUpdated:"23.10.28送达二审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00"}
+                ]
+            },
+            excuteStatus:[
+                {id:1,subId:0,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张三",personContact:18612221231,purposeExecute:"财产",exexuteAmount:200,sumExecuted:"",filePath:"",dateExecuted:"2023-11-01 14:00:00"},
+                {id:1,subId:1,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张五",personContact:1572312534,purposeExecute:"",exexuteAmount:34,sumExecuted:"",filePath:"",dateExecuted:"2023-12-01 14:00:00"},
+            ],
+            propertyStatus:[
+                {id:1,subId:0,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张三",personContact:18612221231,purposeExecute:"财产",exexuteAmount:200,sumExecuted:"",filePath:"",dateExecuted:"2023-11-01 14:00:00"},
+                {id:1,subId:1,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张五",personContact:1572312534,purposeExecute:"",exexuteAmount:34,sumExecuted:"",filePath:"",dateExecuted:"2023-12-01 14:00:00"},
+
+            ],
+            attachments:[
+                {id:1,evidenceId:0,caseStatusId:0,caseNo:"A202311110005",numFile:2,numCPage:5,numCopy:1,numOriginal:1,fileName:"审判决书",filePath:"",dateUploaded:"2023-11-01 14:00:00"},
+            ]
+        }
+        var width=600;
+        var stopsGap=80;
+        var line2SpotDist=35;
+        var textPosition=[];
+        var datePosition=[];
+        var listPosition=[];
+        var colors=["#5E9B9F","#D66755","#E25C62","#4B9DCB","#43607A","#7C7594","#C76B8C","#65875D"];
+
+        drawTimeline(_data,_ctx);
+        function drawTimeline(data,ctx){
+            var from=new drawPos(width/2,20);
+            var to=new drawPos(width/2,20+60);
+            var currentPos=drawLine(from,to,ctx,colors[0],16);
+            var isOppsite=true;
+            _data.template.forEach((label,index)=>{
+                currentPos=drawOneStop(new drawPos(width/2,currentPos+line2SpotDist),ctx,colors[index+1],16,isOppsite=!isOppsite,label);
+            });
+            isOppsite=true;
+            _data.template.forEach((label,index)=>{
+                drawIndicatorText(textPosition[index],label,ctx,colors[index+1]);
+                
+                drawDateText(datePosition[index],label,ctx,"black");
+                drawListText(listPosition[index],label,ctx,"black",isOppsite=!isOppsite,label);
+            });
+            //var currentPos=drawOneStop(200,20,ctx);
+            //drawOneStop(200,currentPos+line2SpotDist,ctx);
+        }
+        function drawLine(from,to,ctx,color,size,){
+
+            
+            
+
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = size;
+            ctx.lineCap = "round";
+            ctx.moveTo(from.x, from.y); 
+            ctx.lineTo(to.x, to.y);
+            ctx.stroke();
+
+            
+
+            return to.y;
+        }
+        
+        function drawIndicatorText(startPos,text,ctx,color){
+            ctx.font = 'bold 20px Arial';
+            let text_size = getTextSize(text,ctx); 
+            ctx.beginPath();
+            ctx.textStyle = color;
+            ctx.fillStyle = color;
+            ctx.fillText(text, startPos.x-text_size.width/2, startPos.y+text_size.height/2-4);
+        }
+        function drawDateText(startPos,text,ctx,color){
+            ctx.font = 'bold 40px Arial';
+            let text_size = getTextSize(text,ctx); 
+            ctx.beginPath();
+            ctx.textStyle = color;
+            ctx.fillStyle = color;
+            ctx.fillText(text, startPos.x-text_size.width/2, startPos.y-text_size.height/2);
+        }
+        function drawListText(startPos,text,ctx,color,isOppsite){
+            ctx.font = 'bold 14px Arial';
+            let text_size = getTextSize(text,ctx); 
+            ctx.beginPath();
+            ctx.textStyle = color;
+            ctx.fillStyle = color;
+            ctx.fillText(text, isOppsite?startPos.x-15-text_size.width:startPos.x+15, startPos.y+text_size.height+5);
+        }
+        function drawOneStop(startPos,ctx,color,size,isOppsite,text){
+            var insideCircleSize=size+8;
+            var indicatorSize=100;
+            var _fromX=startPos.x-insideCircleSize;
+            var _toX=startPos.x-insideCircleSize-indicatorSize;
+            
+            //阶段图标线
+            ctx.beginPath();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 2;
+            var iconSize=35;
+            var iconStrokeSize=6;
+            var nextX=_toX-iconSize-iconStrokeSize-6;
+            if(isOppsite) {
+                _fromX=startPos.x+insideCircleSize;
+                _toX=startPos.x+insideCircleSize+indicatorSize;
+                nextX=_toX+iconSize+iconStrokeSize+6;
+            }
+            ctx.moveTo(_fromX, startPos.y); 
+            ctx.lineTo(_toX, startPos.y);
+            ctx.stroke();
+            //图标大圆
+            const circle = new Path2D();
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = iconStrokeSize;
+            circle.arc(nextX, startPos.y, iconSize, 0, Math.PI*2);
+            ctx.stroke(circle);
+            ctx.closePath();
+            cricles.push({
+                label:text,
+                x:nextX,
+                y:startPos.y,
+                radius:iconSize
+            });
+            _cricles.push(circle);
+            textPosition.push(new drawPos(nextX,startPos.y));
+            //图标小圆外框
+            ctx.beginPath();
+            ctx.strokeStyle = "white";
+            ctx.lineWidth = 3;
+            if (isOppsite) ctx.arc(_toX+4, startPos.y, 6, 225, Math.PI*2.4);
+            else ctx.arc(_toX-4, startPos.y, 6, 90, Math.PI+1.2);
+            ctx.stroke();
+            ctx.closePath();
+            //图标小圆
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.arc(isOppsite?_toX+4:_toX-4, startPos.y, 4, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.closePath();
+            
+            //阶段事件线
+            var infoSize=250;
+            
+            var fromX=startPos.x+insideCircleSize;
+            var toX=startPos.x+insideCircleSize+infoSize;
+            var triangleX=fromX+12;
+            var _triangleX=fromX-2;
+            var listX=fromX;
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+
+            if(isOppsite) {
+                fromX=startPos.x-insideCircleSize;
+                toX=startPos.x-insideCircleSize-infoSize;
+                triangleX=fromX-12;
+                _triangleX=fromX+2;
+                listX=fromX;
+            }
+            ctx.moveTo(fromX, startPos.y); 
+            ctx.lineTo(toX, startPos.y);
+            ctx.stroke();
+
+            datePosition.push(new drawPos(toX-(toX-fromX)/2,startPos.y));
+            listPosition.push(new drawPos(listX,startPos.y));
+            //三角箭头
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.moveTo(triangleX, startPos.y); 
+            ctx.lineTo(_triangleX, startPos.y+8);
+            ctx.moveTo(triangleX, startPos.y); 
+            ctx.lineTo(_triangleX, startPos.y-8);
+            ctx.lineTo(_triangleX, startPos.y+8);
+            ctx.fill();
+            ctx.closePath();
+
+            //时间事件圆点
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.lineWidth = 1;
+            ctx.arc(toX, startPos.y, 2, 0, Math.PI*2);
+            ctx.fill();
+            ctx.closePath();
+
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.arc(isOppsite?toX-4-1.5:toX+4+1.5, startPos.y, 4, 0, Math.PI*2);
+            ctx.stroke();
+            ctx.closePath();
+
+            //阶段大点
+            ctx.beginPath();
+            ctx.fillStyle = color;
+            ctx.lineWidth = 1;
+            ctx.arc(startPos.x, startPos.y, size, 0, Math.PI*2);
+            ctx.fill();
+            ctx.closePath();
+
+            //阶段小点
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            if(isOppsite) ctx.arc(startPos.x, startPos.y, insideCircleSize, 225, Math.PI*2.4);
+            else ctx.arc(startPos.x, startPos.y, insideCircleSize, 90, Math.PI+1.2);
+            ctx.stroke();
+
+            
+            ctx.beginPath();
+            ctx.fillStyle = "white";
+            ctx.lineWidth = 1;
+            ctx.arc(startPos.x, startPos.y, size/2.5, 0, Math.PI*2);
+            ctx.fill();
+            ctx.closePath();
+            
+            var from=new drawPos(startPos.x,startPos.y+line2SpotDist);
+            var to=new drawPos(startPos.x,startPos.y+line2SpotDist+stopsGap);
+            return drawLine(from,to,ctx,color,size);
+        }
+        function getTextSize(text,ctx){
+            let metrics = ctx.measureText(text); 
+            let actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent; 
+            return new drawSize(metrics.width,actualHeight);
+        }
+    </script>
+</body>
+</html>

@@ -329,7 +329,27 @@
 			left:9px;
 			top:8px;
 		}
-		
+		.ui-select .multiSelect{
+			width:200px;
+			}
+			.ui-selectmenu.ui-popup .ui-input-search {
+				margin-left: .5em;
+				margin-right: .5em;
+			}
+			.ui-selectmenu.ui-dialog .ui-content {
+				padding-top: 0;
+			}
+			.ui-selectmenu.ui-dialog .ui-selectmenu-list {
+				margin-top: 0;
+			}
+			.ui-selectmenu.ui-popup .ui-selectmenu-list li.ui-first-child .ui-btn {
+				border-top-width: 1px;
+				-webkit-border-radius: 0;
+				border-radius: 0;
+			}
+			.ui-selectmenu.ui-dialog .ui-header {
+				border-bottom-width: 1px;
+			}
 	</style>
 </head>
 	
@@ -345,12 +365,10 @@
             <div id="progress_status_details">test
             </div>
             <div id="progress_status_container"></div>
-			
 			<div class="progress_lock">
 				<div class="ui-input-btn ui-btn ui-icon-lock ui-btn-icon-notext ui-corner-all ui-shadow btn-icon-red ui-but-lock">
 					<input type="button" data-enhanced="true" value="Enhanced - Icon only">
 				  </div>
-				  
 			  </div>
         </div>
         <fieldset class="ui-grid-a popup_status_buts">
@@ -358,9 +376,14 @@
             <div class="ui-block-b"><a id="process_quit_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_status_but">取消</a></div>
         </fieldset>
     </div>
-    
+    <div id="add_case_popup" class="popup-main popup-hide" >
+		<form style="padding:10px 20px;" id="popup_form_main"></form>
+	</div>
+	<div id="message_popup" class="popup-message popup-hide" ><h4 id="message_title"></h4><div class="message_content"></div>
+	</div>
     <!--#endregion -->
     <div class="popup-background popup-b popup-hide"></div>
+	<div class="popup-background popup-c popup-hide"></div>
 	<div id="frame">
         <!--#region 页面头部  -->
 		<div data-role="header" style="overflow:hidden;background: #262626;color:white;text-shadow: none;height:70px;" class="header">
@@ -389,16 +412,14 @@
             <div id="page1">
                 <div id="table_with_fn">
                     <form class="ui-filterable filtertable1">
-                        <input id="filterBasic-input" data-type="search">
+                        <input id="filterBasic-input" placeholder="搜索关键字" data-type="search">
                     </form>
                 </div>
                 <!--#region 登记删除按钮  -->
                 <div data-role="controlgroup" data-type="horizontal" id="all_remove_buts">
                     <a href="#" id="add_case_but" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-left btn-icon-green">新增</a>
                     <!--#region 登记案件弹窗  -->
-                    <div data-role="popup" id="add_case_popup" data-theme="a" class="ui-corner-all ui-shadow" data-position-to="window" data-transition="pop" data-history="false" data-dismissible="false" >
-                            <form style="padding:10px 20px;" id="popup_form_main"></form>
-                    </div>
+                    
                     <!--#endregion -->
                     <a href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left btn-icon-red">删除</a>
                 </div>
@@ -414,7 +435,7 @@
             <!--#region 案件进展执行页面  -->
             <div id="page2">
                 <form class="ui-filterable filtertable">
-                    <input id="filterBasic-input2" data-type="search">
+                    <input id="filterBasic-input2" placeholder="搜索关键字" data-type="search">
                 </form>
                 <table id="table2" data-mode="columntoggle" class="ui-responsive table-stroke" data-column-btn-text="" data-role="table" data-filter="true" data-input="#filterBasic-input2">
                     
@@ -478,6 +499,7 @@
 			$("#table3").hpaging({ limit: 5 });
 			
         });
+		
     </script>
 	
 	<script src="./progress.js"></script>

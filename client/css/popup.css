@@ -26,9 +26,7 @@
     left:50%;
     transform:translate(-50%,-50%);
     background: white;
-    min-width:800px;
-    min-height:200px;
-    z-index: 99;
+    min-width:400px;
     padding:10px 30px 10px 30px;
     z-index:111;
 }
@@ -97,6 +95,9 @@
   transform: translate(-50%,-50%) scale(0.7);
   opacity: 0;
   animation: pop-up 1s cubic-bezier(0.27,0.53,0.28,1.58) forwards;
+}
+.message_content{
+    padding-bottom: 15px;;
 }
 @keyframes pop-up {
     0% { transform: translate(-50%,-50%) scale(0.7); opacity: 0; }

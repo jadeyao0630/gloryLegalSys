@@ -12,6 +12,16 @@ const TextColor="rgb(51, 51, 51)";
 const property_status=["查封","冻结"];
 const case_types=["被诉","主诉"];
 const case_catelogs=["诉讼","仲裁"];
+var caseRelatedParty={
+    "公司":["国瑞信业建筑工程设计有限公司","国瑞德恒房地产开发有限公司","国瑞信业地产股份有限公司"],
+    "个人":["张丽佳","李立","郑智"]
+}
+var projects=["北七家","大兴"]
+const case_orgnization=["大兴法院","东城法院"];
+var case_orgnizationPersonnel={
+    "法官":["李新亮 57362323","郭艳 57362676","张振 57362300"],
+    "其他":["张东莹 57362564","郑少杰 57362579","高新宇 57362335"]
+}
 const case_labels=["普通案件","重大案件300万以上","重大案件1000万以上","重大案件 群诉"];
 const case_reason=["逾期交付","逾期办证","捆绑销售","逾期付款","断供担保","断供追偿","执行异议"];
 const case_causes=["购房合同纠纷","建设工程纠纷","佣金类纠纷","断供担保纠纷","断供担保纠纷",
@@ -30,20 +40,21 @@ const columns={
     id:"INT NOT NULL,PRIMARY KEY",
     caseNo:"VARCHAR(100) NOT NULL,UNIQUE",
     caseName:"VARCHAR(100) NOT NULL",
-    caseLabel:"INT(2) NOT NULL DEFAULT '0'",
-    caseDepartment:"INT(2) NOT NULL DEFAULT '0'",
-    caseCompany:"INT(2) NOT NULL DEFAULT '0'",
-    caseProject:"INT(2) NOT NULL DEFAULT '0'",
+    caseLabel:"INT NOT NULL DEFAULT '0'",
+    caseDepartment:"INT NOT NULL DEFAULT '0'",
+    caseCompany:"INT NOT NULL DEFAULT '0'",
+    caseProject:"INT NOT NULL DEFAULT '0'",
     casePersonnel:"VARCHAR(100) NOT NULL",
     case2ndParty:"VARCHAR(100) NOT NULL",
-    caseCatelog:"INT(2) NOT NULL DEFAULT '0'",
-    caseBelongs:"INT(2) NOT NULL DEFAULT '0'",
-    caseType:"INT(2) NOT NULL DEFAULT '0'",
+    caseCatelog:"INT NOT NULL DEFAULT '0'",
+    caseBelongs:"INT NOT NULL DEFAULT '0'",
+    caseType:"INTNOT NULL DEFAULT '0'",
     caseAttachments:"varchar(1000)",
-    caseCause:"int(2) NOT NULL DEFAULT '0'",
+    caseCause:"INT NOT NULL DEFAULT '0'",
     caseDate:"datetime NOT NULL",
-    caseOrgnization:"varchar(100) NOT NULL",
-    caseReason:"INT(2) NOT NULL DEFAULT '0'",
+    caseOrgnization:"INT default '0' NOT NULL",
+    caseOrgnizationPersonnel:"varchar(100)",
+    caseReason:"INT NOT NULL DEFAULT '0'",
     caseLawsuit:"decimal(65)",
     caseCounterclaim:"decimal(65)",
     caseCounterclaimRequest:"varchar(1000)",
@@ -51,8 +62,8 @@ const columns={
     caseSum:"varchar(1000)",
     caseApplicant:"varchar(100) NOT NULL",
     caseCreateDate:"datetime NOT NULL",
+    isReadOnly:"bool NOT NULL",
 }
-var projects=["北七家","大兴"]
 var FormTemplate={
     settings:{
         templateColumn:"50% 50%",
@@ -95,8 +106,10 @@ var FormTemplate={
                 casePersonnel:{
                     placeholder:"我方当事人",
                     label:"我方当事人:",
-                    type:"text",
+                    type:"multicombobox",
                     isOptional:false,
+                    data:caseRelatedParty,
+                    isFilterable:true 
                 },
                 case2ndParty:{
                     placeholder:"对方当事人",
@@ -118,6 +131,12 @@ var FormTemplate={
                     isOptional:false,
                     data:case_types
                 },
+                caseDate:{
+                    placeholder:"立案日期",
+                    label:"立案日期:",
+                    type:"date",
+                    isOptional:false,
+                },
                 caseAttachments:{
                     placeholder:"上传文件",
                     label:"附件:",
@@ -136,19 +155,8 @@ var FormTemplate={
                     label:"案由:",
                     type:"combobox",
                     isOptional:false,
-                    data:case_causes
-                },
-                caseDate:{
-                    placeholder:"立案日期",
-                    label:"立案日期:",
-                    type:"date",
-                    isOptional:false,
-                },
-                caseOrgnization:{
-                    placeholder:"受理机构",
-                    label:"受理机构:",
-                    type:"text",
-                    isOptional:false,
+                    data:case_causes,
+                    isFilterable:true
                 },
                 caseReason:{
                     placeholder:"案发原因",
@@ -156,6 +164,21 @@ var FormTemplate={
                     type:"combobox",
                     isOptional:false,
                     data:case_reason
+                },
+                caseOrgnization:{
+                    placeholder:"受理机构",
+                    label:"受理机构:",
+                    type:"combobox",
+                    isOptional:false,
+                    data:case_orgnization
+                },
+                caseOrgnizationPersonnel:{
+                    placeholder:"受理相关人",
+                    label:"受理相关人:",
+                    type:"multicombobox",
+                    isOptional:true,
+                    data:case_orgnizationPersonnel,
+                    isFilterable:true 
                 },
                 caseLawsuit:{
                     placeholder:"本诉金额",
@@ -248,8 +271,10 @@ var regTemplate={
             case2ndParty:{
                 placeholder:"对方当事人",
                 label:"对方当事人:",
-                type:"text",
+                type:"multicombobox",
                 isOptional:false,
+                data:caseRelatedParty,
+                isFilterable:true
             },
             caseCatelog:{
                 placeholder:"案件类别",

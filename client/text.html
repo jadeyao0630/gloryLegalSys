@@ -36,11 +36,14 @@
 		
 		$('#form_parent').append(form);
 		$('#form_parent').trigger( "create" );
-		collectFormValues(FormTemplate,1,function(hasError,values){
+		cancel.on("click",function(e){
+			collectFormValues(FormTemplate,1,function(hasError,values){
 			console.log("hasError...."+hasError)
 			
 			console.log(values)
 		});
+		});
+		
 	</script>
 </body>
 </html>

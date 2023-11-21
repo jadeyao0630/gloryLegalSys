@@ -146,9 +146,10 @@ $('.popup_update_but').on("click",async function(e){
   
   
   if(e.currentTarget.id=='process_update_save_but'){
-    
-    if (progressUpdateStatus.clickedTarget!=clickedTarget.same) {
-      console.log("isUpdateOnly--"+progressUpdateStatus.clickedTarget);
+    console.log("isUpdateOnly--"+progressUpdateStatus.currentProgressButton.opt.readOnly);
+    //if(progressUpdateStatus.currentProgressButton.opt.readOnly) return;
+    if (!progressUpdateStatus.currentProgressButton.opt.readOnly && progressUpdateStatus.clickedTarget!=clickedTarget.same) {
+      
       if($(progressUpdateStatus.currentProgressTarget).data('isSelected')||progressUpdateStatus.clickedTarget==clickedTarget.sameParent){
         //console.log("确定删除之后的吗？");
         //$('.popup-b').addClass('popup-hide');
@@ -184,13 +185,7 @@ $('.ui-but-lock').on('click',function(e){
     //console.log(data[0].isReadOnly);
     data[0].isReadOnly=!data[0].isReadOnly;
     //console.log(data[0].isReadOnly);
-    if(data[0].isReadOnly){
-      $("#process_save_but").addClass('ui-state-disabled');
-      $(".ui-but-lock").removeClass('btn-icon-green').addClass('btn-icon-red');
-    }else{
-      $("#process_save_but").removeClass('ui-state-disabled');
-      $(".ui-but-lock").removeClass('btn-icon-red').addClass('btn-icon-green');
-    }
+    setElementDisableByReadonly(data[0].isReadOnly);
     progressUpdateStatus.currentParentProgressButton.switchReadyOnly();
   }
 });
@@ -247,6 +242,8 @@ function _setFlowChart(data,status,executes,updates,targetId){
   var data3=executes.filter(value=>{ return value.id==targetId});
   var data4=updates.filter(value=>{ return value.id==targetId});
   if(data1.length>0 && data2.length>0){
+    if (data1[0].isReadOnly==0) data1[0].isReadOnly=true;
+    else data1[0].isReadOnly=false;
     console.log("isReadOnly------"+data1[0].isReadOnly);
     $("#progress_status_details").html(progressDetailsPopup(data2[0]));
     
@@ -321,18 +318,13 @@ function _setFlowChart(data,status,executes,updates,targetId){
       //$("#process_update_list").listview("refresh");
       
       $("#process_update_upload_list").trigger("create");
+      
       setUpdatePopupVisisbility(true);
       
       //$('.popup-main').addClass('blur-background');
       
     });
-    if(data1[0].isReadOnly) {
-      $("#process_save_but").addClass('ui-state-disabled');
-      $(".ui-but-lock").removeClass('btn-icon-green').addClass('btn-icon-red');
-    }else{
-      $("#process_save_but").removeClass('ui-state-disabled');
-      $(".ui-but-lock").removeClass('btn-icon-red').addClass('btn-icon-green');
-    }
+    setElementDisableByReadonly(data1[0].isReadOnly);
     //$('#progress_status_details').html(progressDetailsPopup(data1[0],data2[0]));
     
   }
@@ -634,7 +626,7 @@ function addItemsToPropertyPopup(data,isReadOnly){
   return table.html();
 }
 function addItemsToUploadPopup(data,isReadOnly){
-  console.log(isReadOnly);
+  //console.log(isReadOnly);
   var table=$('<table></table>')
   var body=$('<tbody></tbody>');
  
@@ -647,7 +639,7 @@ function addItemsToUploadPopup(data,isReadOnly){
   thead.append(th);
   $.each(list_evidence,function(key,value){
     var w=setColumnWidth(value.width);
-    console.log(w);
+    //console.log(w);
     var h=$('<th'+w+'>'+value.label+'</th>');
     th.append(h);
     keys.push(key);
@@ -794,6 +786,19 @@ function progressDetailsPopup(data){
     
   });
   return container.html();
+}
+function setElementDisableByReadonly(isReadOnly){
+  if(isReadOnly){
+    $("#process_save_but").addClass('ui-state-disabled');
+    
+    $("#process_update_save_but").addClass('ui-state-disabled');
+    $(".ui-but-lock").removeClass('btn-icon-green').addClass('btn-icon-red');
+  }else{
+    $("#process_save_but").removeClass('ui-state-disabled');
+    
+    $("#process_update_save_but").removeClass('ui-state-disabled');
+    $(".ui-but-lock").removeClass('btn-icon-red').addClass('btn-icon-green');
+  }
 }
 
 

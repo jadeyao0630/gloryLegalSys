@@ -98,6 +98,7 @@ function collectFormValues(template,dataId,res){
 function dataValidation(element,itemTemplate,res){
     switch (element.nodeName.toUpperCase()){
         case "INPUT":
+            
             var val=element.value;
             //console.log(element.type);
             if(element.type.toLowerCase()=="date"||element.type.toLowerCase()=="time"||element.type.toLowerCase()=="datetime"){
@@ -112,7 +113,18 @@ function dataValidation(element,itemTemplate,res){
             }
             return val;
         case "SELECT":
-            return element.value.length==0?0:parseInt(element.value);
+            //console.log(itemTemplate.label+"-->"+$(element).find(":selected").length);
+            var val=[];
+            $.each($(element).find(":selected"),function(index,opt){
+                //console.log(itemTemplate.label+"--------->"+opt.value);
+                val.push(opt.value);
+            });
+            if(val.length==0 && !itemTemplate.isOptional) {
+                console.log(itemTemplate.label+"-- has empty value"+val);
+                res(true);
+            }
+            //console.log(itemTemplate.label+"("+val.length+")--------->"+val.join(","));
+            return val.join(",");
         case "TEXTAREA":
             return element.value;
     }
@@ -184,6 +196,10 @@ function generateForm(template,buttons){
                         case "combobox":
                             generateComboBoxItem(item_container,item,item_key);
                             break;
+                        case "multicombobox":
+                            //console.log("multicombobox..............................");
+                            generateMultiComboBoxItem(item_container,item,item_key);
+                            break;
                         case "radio":
                             generateRadioItem(item_container,item,item_key);
                             break;
@@ -234,7 +250,7 @@ function generateTextAreaItem(item_container,item,id,hasPlaceHolder){
     //var item_container=$('<div class="form_item_panel"></div>');
     var placeholder="";
     if(hasPlaceHolder) placeholder=' placeholder="'+item.placeholder+'"';
-    var textarea=$('<textarea cols="40" rows="18" name="'+id+'" id="'+id+'"'+placeholder+'" '+setRequired(item.isOptional,"此项必须填写")+'></textarea>');
+    var textarea=$('<textarea cols="40" rows="4" name="'+id+'" id="'+id+'"'+placeholder+'" '+setRequired(item.isOptional,"此项必须填写")+'></textarea>');
     
     item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
     item_container.append(textarea);
@@ -266,7 +282,8 @@ function generateRadioItem(item_container,item,id){
     //return item_container;
 }
 function generateComboBoxItem(item_container,item,id){
-    var selectItem=$('<select name="'+id+'" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+'></select>');
+    var selectItem=$('<select name="'+id+'" id="'+id+'"'+
+    (item.isFilterable?"class=\"filterSelect\" data-native-menu=\"false\"":"")+'" '+setRequired(item.isOptional,"此项必须选择")+'></select>');
     if(item.data){
         item.data.forEach((d,counter)=>{
             selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
@@ -277,6 +294,135 @@ function generateComboBoxItem(item_container,item,id){
     item_container.append(selectItem);
     //return item_container;
 }
+function generateMultiComboBoxItem(item_container,item,id){
+    var selectItem=$('<select id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="multiSelect'+
+    (item.isFilterable?" filterSelect":"")+'" multiple="multiple" data-native-menu="false"></select>');
+    if(item.data){
+        if(item.data instanceof Array){
+            item.data.forEach((d,counter)=>{
+                //console.log(d)
+                selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
+            });
+        }else{
+            var opt_tip=$('<option></option>');
+            var tips=[];
+            $.each(item.data,function (key,value) {
+                tips.push(key);
+                var grounp=$('<optgroup label="'+key+'"></optgroup>')
+                value.forEach((d,counter)=>{
+                    //console.log(d)
+                    grounp.append($('<option value="'+key+counter+'">'+d+'</option>'));
+                });
+                selectItem.append(grounp);
+            })
+            opt_tip.text("选择 "+tips.join(" 或 "));
+        }
+        
+    }
+    item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+    item_container.append(selectItem);
+    //console.log('item_container');
+    //console.log(item_container.html());
+    //return item_container;
+}
+( function( $ ) {
+    function pageIsSelectmenuDialog( page ) {
+        var isDialog = false,
+        id = page && page.attr( "id" );
+        $( ".filterSelect" ).each( function() {
+            if ( $( this ).attr( "id" ) + "-dialog" === id ) {
+                isDialog = true;
+                return false;
+            }
+        });
+        return isDialog;
+    }
+    $.mobile.document
+        // Upon creation of the select menu, we want to make use of the fact that the ID of the
+        // listview it generates starts with the ID of the select menu itself, plus the suffix "-menu".
+        // We retrieve the listview and insert a search input before it.
+        .on( "selectmenucreate", ".filterSelect", function( event ) {
+            var input,
+                selectmenu = $( event.target ),
+                list = $( "#" + selectmenu.attr( "id" ) + "-menu" ),
+                form = list.jqmData( "filter-form" );
+            // We store the generated form in a variable attached to the popup so we avoid creating a
+            // second form/input field when the listview is destroyed/rebuilt during a refresh.
+            //$("#searchInput").remove();
+           
+            if ( !form ) {
+                //$("#filterForm").remove();
+                input = $( "<input data-type='search'></input>" );
+                form = $( "<form id='searchInput'></form>" ).append( input );
+                input.textinput();
+                list
+                    .before( form )
+                    .jqmData( "filter-form", form ) ;
+                form.jqmData( "listview", list );
+            }
+            
+            console.log(form.parent().html());
+            /*
+            else{
+                $(form).remove();
+                input = $( "<input data-type='search'></input>" );
+                form = $( "<form id='searchInput'></form>" ).append( input );
+                input.textinput();
+                list
+                    .before( form )
+                    .jqmData( "filter-form", form ) ;
+                form.jqmData( "listview", list );
+            }
+            */
+            // Instantiate a filterable widget on the newly created selectmenu widget and indicate that
+            // the generated input form element is to be used for the filtering.
+            //console.log($(form).html());
+            var isOptgroup=$(selectmenu).find('optgroup').length>0;
+            selectmenu
+                .filterable({
+                    input: input,
+                    children: "> "+(isOptgroup?"optgroup":"")+" option[value]"
+                })
+                // Rebuild the custom select menu's list items to reflect the results of the filtering
+                // done on the select menu.
+                .on( "filterablefilter", function() {
+                    selectmenu.selectmenu( "refresh" );
+                });
+        })
+        // The custom select list may show up as either a popup or a dialog, depending on how much
+        // vertical room there is on the screen. If it shows up as a dialog, then the form containing
+        // the filter input field must be transferred to the dialog so that the user can continue to
+        // use it for filtering list items.
+        .on( "pagecontainerbeforeshow", function( event, data ) {
+            var listview, form;
+            // We only handle the appearance of a dialog generated by a filterable selectmenu
+            if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                //return;
+            }
+            listview = data.toPage.find( "ul" );
+            form = listview.jqmData( "filter-form" );
+            // Attach a reference to the listview as a data item to the dialog, because during the
+            // pagecontainerhide handler below the selectmenu widget will already have returned the
+            // listview to the popup, so we won't be able to find it inside the dialog with a selector.
+            data.toPage.jqmData( "listview", listview );
+            // Place the form before the listview in the dialog.
+            if($(listview).parent().find('#searchInput').length==0)
+                listview.before( form );
+        })
+        // After the dialog is closed, the form containing the filter input is returned to the popup.
+        .on( "pagecontainerhide", function( event, data ) {
+            var listview, form;
+            // We only handle the disappearance of a dialog generated by a filterable selectmenu
+            if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                //return;
+            }
+            listview = data.prevPage.jqmData( "listview" ),
+            form = listview.jqmData( "filter-form" );
+            // Put the form back in the popup. It goes ahead of the listview.
+            if($(listview).parent().find('#searchInput').length==0)
+                listview.before( form );
+        });
+    })( jQuery );
 //#endregion
 
 //#endregion 

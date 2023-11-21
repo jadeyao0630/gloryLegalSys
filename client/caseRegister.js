@@ -21,20 +21,30 @@ function _initRegTable(table_data,table_columns){
     //#region 操作按钮
     var fn_buts = document.querySelectorAll("button[name^=fn_btn]")
     fn_buts.forEach(function(fn_but) {
-        fn_but.addEventListener('click', function() {
+        fn_but.addEventListener('click', function(but) {
 
-            console.log(fn_but.dataset.item+"--"+fn_but.name);
+            console.log(but.currentTarget.dataset.item+"--"+but.currentTarget.name);
             //console.log(table_data[fn_but.dataset.item]);
-            var matchItems=table_data.filter((item) =>item.id == fn_but.dataset.item);
-            if(fn_but.name=="fn_btn_delete"){
+            var matchItems=table_data.filter((item) =>item.id == but.currentTarget.dataset.item);
+            var caseNos=[];
+            matchItems.forEach(_item=>{
+                caseNos.push(_item.caseNo);
+            });
+            if(but.currentTarget.name=="fn_btn_delete"){
                 //console.log(table_data);
-                if(matchItems.length>0){
-                    table_data.splice(table_data.indexOf(matchItems[0]),1);
-                }
+                SendMessage('提醒',"确认删除案件编号[ "+caseNos.join(',')+" ]吗？",function(e){
+                    if(e.currentTarget.id=="message_confirm_but"){
+                        if(matchItems.length>0){
+                            table_data.splice(table_data.indexOf(matchItems[0]),1);
+                        }
+                        
+                        _initRegTable(table_data,table_columns);
+                        $(document.getElementById("table1")).trigger('create');
+                    }
+                    HideMessage();
+                });
                 
-                _initRegTable(table_data,table_columns);
-                $(document.getElementById("table1")).trigger('create');
-            }else if(fn_but.name=="fn_btn_edit"){
+            }else if(but.currentTarget.name=="fn_btn_edit"){
                 if(matchItems.length>0){
                     _setData(matchItems[0]);
                     //_createNewCaseForm(regTemplate);
@@ -43,7 +53,7 @@ function _initRegTable(table_data,table_columns){
                     _setBlurBackgroundVisibility(true);
                 }
                 //console.log($("#popup_form_main"));
-            }else if(fn_but.name=="fn_btn_details"){
+            }else if(but.currentTarget.name=="fn_btn_details"){
                 if(matchItems.length>0){
                     //var data2=table_progress_status.filter(value=>{ return value.id==matchItems[0].id});
                     //var data3=table_progress_executes.filter(value=>{ return value.id==matchItems[0].id});

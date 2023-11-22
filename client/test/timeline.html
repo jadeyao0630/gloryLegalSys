@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     
+	<link rel="stylesheet" href="../css/jquery.mobile-1.4.5.min.css" />
 	<script src="../js/jquery.js"></script>
+    <script src="../js/jquery.mobile-1.4.5.min.js"></script>
+	<script src="../configs.js"></script>
+	<script src="../js/tools.js"></script>
 </head>
 <body>
-    
-    <canvas id="myCanvas" width="600" height="1200" style="border:3px double #996633;">
+    <div style="border:3px double #996633;display:grid;grid-template-columns: 400px 1fr">
+        <div data-role="collapsibleset" data-inset="false" id="summary_list"></div>
+        <canvas id="myCanvas" width="800" height="1200" >
+    </div>
     <script>
         
-        var cricles=[];
+        //var cricles=[];
         var _cricles=[];
         class pathEvent{
             constructor (x,y,type,ctx) {
@@ -67,8 +73,9 @@
                     });
                 }, false);
             }
-            this.addTarget=function(target){
-                
+            this.addTarget=function(target,ctx,data){
+                target.sourceData=data;
+                target.ctx=ctx;
                 //console.log(target);
                 if(!Object.keys(Object.getPrototypeOf(target)).includes('addListener')){
                     var _self=this;
@@ -100,11 +107,17 @@
                         var targetIndex=_self._targets[type].indexOf(this);
                         
                         if(event.ctx.isPointInPath(this, event.x, event.y)){
-                            if (!this.inBounds){
-                                this.inBounds=true;
+                            if(type=="click"){
                                 if (_self._listeners.hasOwnProperty(type))
                                     _self._listeners[type][targetIndex].call(this,event);
+                            }else{
+                                if (!this.inBounds){
+                                    this.inBounds=true;
+                                    if (_self._listeners.hasOwnProperty(type))
+                                        _self._listeners[type][targetIndex].call(this,event);
+                                }
                             }
+                            
                         }else{
                             if (this.inBounds){
                                 this.inBounds =false;
@@ -116,10 +129,6 @@
                         
                     }
                 }
-            }
-            this.hasListener=function(path,type){
-                console.log(path);
-                return this._listeners[type].indexOf(path)>-1;
             }
             this.addListener=function(type,listener){
                 if (!this._listeners.hasOwnProperty(type)) {
@@ -141,8 +150,6 @@
                 this.height=h;
             }
         }
-        var listeners={};
-        var paths=[];
         
         //de.addListener('click',function(e){
             //console.log(e);
@@ -150,59 +157,295 @@
         var canvas=document.getElementById('myCanvas');
         eventManager.setCanvas(canvas);
         var _ctx=canvas.getContext('2d');
-        
-
+        const progresses=["一审","二审","执行",["强制执行","正常执行","未执行"],"结案","再审","监督"];   
+        var _summary_template={
+            basic:{
+                label:"基本信息",
+                data:{
+                    caseNo:{
+                        label:"案件编号:",
+                    },
+                    caseName:{
+                        label:"案件名称:",
+                    },
+                    caseLabel:{
+                        placeholder:"案件标签:",
+                        label:"案件标签:",
+                        type:"combobox",
+                        isOptional:false,
+                        data:case_labels
+                    },
+                    caseBelong:{
+                        label:"所属项目:",
+                        data:projects
+                    },
+                    casePersonnel:{
+                        placeholder:"我方当事人",
+                        label:"我方当事人:",
+                        type:"multicombobox",
+                        isOptional:false,
+                        data:caseRelatedParty,
+                        isFilterable:true 
+                    },
+                    case2ndParty:{
+                        placeholder:"对方当事人",
+                        label:"对方当事人:",
+                        type:"text",
+                        isOptional:false,
+                    },
+                    caseCatelog:{
+                        placeholder:"案件类别",
+                        label:"案件类别:",
+                        type:"radio",
+                        isOptional:false,
+                        data:case_catelogs
+                    },
+                    caseType:{
+                        placeholder:"案件类型",
+                        label:"案件类型:",
+                        type:"radio",
+                        isOptional:false,
+                        data:case_types
+                    },
+                }
+                
+            },
+            legal:{
+                label:"法律相关",
+                data:{
+                    caseStatus:{
+                        label:"案件状态:",
+                        data:progresses
+                    },
+                    caseLegal:{
+                        label:"代理法务:",
+                    },
+                    courtName:{
+                        label:"法院:",
+                        data:case_orgnization
+                    },
+                }
+                
+            }
+            
+        } 
+        var summary_template={
+            caseNo:{
+                label:"案件编号:",
+            },
+            caseName:{
+                label:"案件名称:",
+            },
+            caseLabel:{
+                placeholder:"案件标签:",
+                label:"案件标签:",
+                type:"combobox",
+                isOptional:false,
+                data:case_labels
+            },
+            caseBelong:{
+                label:"所属项目:",
+                data:projects
+            },
+            casePersonnel:{
+                placeholder:"我方当事人",
+                label:"我方当事人:",
+                type:"multicombobox",
+                isOptional:false,
+                data:caseRelatedParty,
+                isFilterable:true 
+            },
+            case2ndParty:{
+                placeholder:"对方当事人",
+                label:"对方当事人:",
+                type:"text",
+                isOptional:false,
+            },
+            caseCatelog:{
+                placeholder:"案件类别",
+                label:"案件类别:",
+                type:"radio",
+                isOptional:false,
+                data:case_catelogs
+            },
+            caseType:{
+                placeholder:"案件类型",
+                label:"案件类型:",
+                type:"radio",
+                isOptional:false,
+                data:case_types
+            },
+            caseStatus:{
+                label:"案件状态:",
+                data:progresses
+            },
+            caseLegal:{
+                label:"代理法务:",
+            },
+            courtName:{
+                label:"法院:",
+                data:case_orgnization
+            },
+        }
         var _data={
             template:["立案","一审","二审","执行","结案","再审","监督"],
             basic:{
-                id:1,caseNo:"A202311110005",caseName:"管文波离职案件",caseLabel:2,caseReason:0,caseType:0,caseBelong:"北七家",applicant:"张国庆",
-                caseCause:6,createDate:"2023-11-11 14:03:19",isReadOnly:true
+                id:1,caseNo:"A202311110005",caseName:"管文波离职案件",caseLabel:2,caseReason:0,caseType:0,caseBelong:0,applicant:"张国庆",
+                caseCause:6,createDate:"2023-08-11 14:03:19",isReadOnly:true
             },
             progressStatus:{
-                id:1,caseNo:"A202311110005",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",
-                penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:3.1,courtName:"东城法院"
+                id:1,caseNo:"A202311110005",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-09-11 14:00:00",
+                penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:3.1,courtName:1
                 ,data:[
-                    {id:1,subid:0,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.9.28送达一审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00"},
-                    {id:1,subid:1,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.9.28送达一审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00"},
-                    {id:1,subid:0,caseStatusId:1,caseNo:"A202311110005",caseUpdated:"23.10.28送达二审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00"}
+                    {id:1,subid:0,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.9.28送达一审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00",dateOccur:"2023-09-28 14:00:00"},
+                    {id:1,subid:1,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.10.13送达判决书",caseDisputed:"",dateUpdated:"2023-11-02 14:00:00",dateOccur:"2023-10-13 14:00:00"},
+                    {id:1,subid:0,caseStatusId:1,caseNo:"A202311110005",caseUpdated:"23.10.28送达二审判决书",caseDisputed:"",dateUpdated:"2023-12-01 14:00:00",dateOccur:"2023-10-28 14:00:00"}
                 ]
             },
             excuteStatus:[
-                {id:1,subId:0,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张三",personContact:18612221231,purposeExecute:"财产",exexuteAmount:200,sumExecuted:"",filePath:"",dateExecuted:"2023-11-01 14:00:00"},
-                {id:1,subId:1,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张五",personContact:1572312534,purposeExecute:"",exexuteAmount:34,sumExecuted:"",filePath:"",dateExecuted:"2023-12-01 14:00:00"},
+                {id:1,subId:0,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张三",personContact:18612221231,purposeExecute:"财产",exexuteAmount:200,sumExecuted:"",filePath:"",dateExecuted:"2023-12-11 14:00:00"},
+                {id:1,subId:1,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张五",personContact:1572312534,purposeExecute:"",exexuteAmount:34,sumExecuted:"",filePath:"",dateExecuted:"2023-12-21 14:00:00"},
             ],
             propertyStatus:[
-                {id:1,subId:0,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张三",personContact:18612221231,purposeExecute:"财产",exexuteAmount:200,sumExecuted:"",filePath:"",dateExecuted:"2023-11-01 14:00:00"},
-                {id:1,subId:1,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张五",personContact:1572312534,purposeExecute:"",exexuteAmount:34,sumExecuted:"",filePath:"",dateExecuted:"2023-12-01 14:00:00"},
+                {id:1,caseNo:"A202311110005",caseStatusId:3.1,subId:0,propertyName:"未知",propertyStatus:1,dateUpdated:"2023-12-01 14:00:00",dateOccur:"2023-12-01 14:00:00"},
 
             ],
             attachments:[
                 {id:1,evidenceId:0,caseStatusId:0,caseNo:"A202311110005",numFile:2,numCPage:5,numCopy:1,numOriginal:1,fileName:"审判决书",filePath:"",dateUploaded:"2023-11-01 14:00:00"},
             ]
         }
-        var width=600;
+        var width=800;
         var stopsGap=80;
         var line2SpotDist=35;
         var textPosition=[];
         var datePosition=[];
         var listPosition=[];
         var colors=["#5E9B9F","#D66755","#E25C62","#4B9DCB","#43607A","#7C7594","#C76B8C","#65875D"];
+        Object.keys(_data).forEach(key=>{
+            if(key!="template"){
+                //_data
+            }
+        });
+        var dataList={};
+        dataList=[
+            {
+                label:"立案",
+                date:_data.basic.createDate,
+                id:0
+            },
+            {
+                label:"一审",
+                date:_data.progressStatus.courtDate,
+                id:1,
+                data:[
+                    {
+                        date:"2023-09-28 14:00:00",
+                        label:"送达一审判决书"
+                    },
+                    {
+                        date:"2023-10-13 14:00:00",
+                        label:"送达修改判决书"
+                    },
+                    {
+                        date:"2023-11-01 14:00:00",
+                        label:"上传审判决书"
+                    }
 
+                ]
+            },
+            {
+                label:"二审",
+                id:2,
+                data:[
+                    {
+                        date:"2023-10-28 14:00:00",
+                        label:"送达二审判决书"
+                    },
+                    {
+                        date:"2023-12-01 14:00:00",
+                        property:"未知",
+                        status:"查封",
+                        type:"property"
+                    }
+
+                ]
+            },
+            {
+                label:"正常执行",
+                id:3,
+                data:[
+                    {
+                        date:"2023-12-11 14:00:00",
+                        label:"执行标的【财产】",
+                        amount:"200",
+                        personal:"张三",
+                        type:"execute"
+                    },
+                    {
+                        date:"2023-12-21 14:00:00",
+                        label:"执行标的【未知】",
+                        amount:"43",
+                        personal:"张五",
+                        type:"execute"
+                    }
+
+                ]
+            }
+        ]
         drawTimeline(_data,_ctx);
         _cricles.forEach((circle)=>{
             //console.log(Object.getPrototypeOf(circle))
             //console.log(Object.keys(Object.getPrototypeOf(circle)).includes('addListener'));
             circle.addListener('click',function(e){
-                console.log(this.sourceData+"--"+e.type);
+                console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
             })
             circle.addListener('mouseover',function(e){
-                console.log(this.sourceData+"--"+e.type);
+                console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
                 $(canvas).css({cursor:"pointer"});
+                e.ctx.globalCompositeOperation = "source-over";
             })
             circle.addListener('mouseout',function(e){
-                console.log(this.sourceData+"--"+e.type);
+                console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
                 $(canvas).css({cursor:"default"});
             })
+        });
+        Object.keys(_summary_template).forEach(key=>{
+            var collapsibleset=$('<div data-role="collapsible"></div>');
+            var collapsibleLabel=$('<h3>'+_summary_template[key].label+'</h3>');
+            collapsibleset.append(collapsibleLabel);
+            var listview=$('<ul data-role="listview" data-inset="false"></ul>');
+            collapsibleset.append(listview);
+            $('#summary_list').append(collapsibleset);
+            Object.keys(_summary_template[key]).forEach(sub_key=>{
+                $.each(Object.keys(_data),function(index,data_key){
+                        console.log(data_key+"--"+sub_key);
+                    if (data_key!="template" && Object.keys(_data[data_key]).includes(sub_key)){
+                        var label=_summary_template[key][sub_key].label;
+                        var val=_data[data_key][sub_key];
+                        if(_summary_template[key][sub_key].data!=undefined){
+                            if(_summary_template[key][sub_key].data instanceof Array){
+                                var v=val.toString().split('.');
+                                if(v.length>1){
+                                    val=_summary_template[key][sub_key].data[v[0]][v[1]];
+                                }else if(v.length==1){
+                                    val=_summary_template[key][sub_key].data[v[0]];
+                                }
+                            }
+                        }
+                        //console.log(val);
+                        var li=$('<li class="ui-field-contain"></li>');
+                        var label_ele=$('<label>'+label+'</label>');
+                        var info_ele=$('<label>'+val+'</label>');
+                        li.append(label_ele);
+                        li.append(info_ele);
+                        listview.append(li);
+                        //if (sub_key=="caseNo") console.log(data_key);
+                        return false;
+                    }
+                    
+                });
+            });
+            
         });
         function drawTimeline(data,ctx){
             var from=new drawPos(width/2,20);
@@ -210,23 +453,30 @@
             var currentPos=drawLine(from,to,ctx,colors[0],16);
             var isOppsite=true;
             _data.template.forEach((label,index)=>{
-                currentPos=drawOneStop(new drawPos(width/2,currentPos+line2SpotDist),ctx,colors[index+1],16,isOppsite=!isOppsite,label);
+                currentPos=drawOneStop(new drawPos(width/2,currentPos+line2SpotDist),ctx,colors[index+1],16,isOppsite=!isOppsite,{label:label,index:index});
             });
             isOppsite=true;
             _data.template.forEach((label,index)=>{
-                drawIndicatorText(textPosition[index],label,ctx,"white");
+                drawIndicatorText(textPosition[index],{label:label,index:index},ctx,"white");
+                var data=dataList.filter(item=>{ return item.id==index});
+                if(data.length>0){
+                    var val=data[0].label;
+                    if(data[0].date!=undefined){
+                        val=new Date(data[0].date);
+                    }
+                    //console.log(val)
+                    drawDateText(datePosition[index],val,ctx,colors[index+1]);
+                    if(data[0].data!=undefined){
+                        drawListText(listPosition[index],data[0].data,ctx,"black",isOppsite=!isOppsite,label);
+                    }
+                    
+                }
                 
-                drawDateText(datePosition[index],label,ctx,"black");
-                drawListText(listPosition[index],label,ctx,"black",isOppsite=!isOppsite,label);
             });
             //var currentPos=drawOneStop(200,20,ctx);
             //drawOneStop(200,currentPos+line2SpotDist,ctx);
         }
         function drawLine(from,to,ctx,color,size,){
-
-            
-            
-
             ctx.beginPath();
             ctx.strokeStyle = color;
             ctx.lineWidth = size;
@@ -234,37 +484,73 @@
             ctx.moveTo(from.x, from.y); 
             ctx.lineTo(to.x, to.y);
             ctx.stroke();
-
-            
-
             return to.y;
         }
         
-        function drawIndicatorText(startPos,text,ctx,color){
+        function drawIndicatorText(startPos,data,ctx,color){
             ctx.font = 'bold 20px Arial';
-            let text_size = getTextSize(text,ctx); 
+            let text_size = getTextSize(data.label,ctx); 
             ctx.beginPath();
             ctx.textStyle = color;
             ctx.fillStyle = color;
-            ctx.fillText(text, startPos.x-text_size.width/2, startPos.y+text_size.height/2-4);
+            ctx.fillText(data.label, startPos.x-text_size.width/2, startPos.y+text_size.height/2-4);
         }
-        function drawDateText(startPos,text,ctx,color){
-            ctx.font = 'bold 40px Arial';
-            let text_size = getTextSize(text,ctx); 
+        function drawDateText(startPos,val,ctx,color){
+            var text=val;
+            if(val instanceof Date){
+                var offsetX=50;
+                text=val.getFullYear()+" | "+val.getMonth()+"月"+val.getDate()+"日";
+                ctx.font = 'bold 30px Arial';
+                let year_size = getTextSize(val.getFullYear(),ctx); 
+                ctx.textStyle = "black";
+                ctx.fillStyle = "black";
+                ctx.fillText(val.getFullYear(), startPos.x-offsetX-year_size.width, startPos.y-5);
+                ctx.font = '60px Arial';
+                let seperater_size = getTextSize("|",ctx); 
+                ctx.textStyle = color;
+                ctx.fillStyle = color;
+                ctx.fillText(" | ", startPos.x-offsetX-seperater_size.width, startPos.y-14);
+                ctx.font = 'bold 40px Arial';
+                let date_size = getTextSize(val.getMonth()+"月"+val.getDate()+"日",ctx); 
+                ctx.textStyle = "black";
+                ctx.fillStyle = "black";
+                ctx.fillText(val.getMonth()+"月"+val.getDate()+"日", startPos.x-offsetX+seperater_size.width, startPos.y-10);
+            }else{
+                ctx.font = 'bold 40px Arial';
+                let text_size = getTextSize(text,ctx); 
+                ctx.beginPath();
+                ctx.textStyle = color;
+                ctx.fillStyle = color;
+                ctx.fillText(text, startPos.x-text_size.width/2, startPos.y-text_size.height/2);
+            }
+            
+        }
+        function drawListText(startPos,data,ctx,color,isOppsite){
+            ctx.font = 'bold 14px 雅黑';
+            
             ctx.beginPath();
             ctx.textStyle = color;
             ctx.fillStyle = color;
-            ctx.fillText(text, startPos.x-text_size.width/2, startPos.y-text_size.height/2);
+            if (data.length>0){
+                data.forEach((item,i)=>{
+                    console.log(item);
+                    var date=formatDateTime(new Date(item.date),"MM月dd日 ");
+                    var text=date+item.label;
+                    if(item.type=="property"){
+                        text=date+item.status+" "+item.property+" 财产";
+                    }
+                    else if(item.type=="execute"){
+                        text=date+item.personal+"已"+item.label+" "+item.amount+"万元"
+                    }
+                    let text_size = getTextSize(text,ctx); 
+                    //console.log(text+"---"+text_size.width);
+                    ctx.fillText(text, !isOppsite?startPos.x-text_size.width-15:startPos.x+15, (startPos.y+20+(text_size.height+5)*i));
+                });
+            }
+            
+            
         }
-        function drawListText(startPos,text,ctx,color,isOppsite){
-            ctx.font = 'bold 14px Arial';
-            let text_size = getTextSize(text,ctx); 
-            ctx.beginPath();
-            ctx.textStyle = color;
-            ctx.fillStyle = color;
-            ctx.fillText(text, isOppsite?startPos.x-15-text_size.width:startPos.x+15, startPos.y+text_size.height+5);
-        }
-        function drawOneStop(startPos,ctx,color,size,isOppsite,text){
+        function drawOneStop(startPos,ctx,color,size,isOppsite,data){
             var insideCircleSize=size+8;
             var indicatorSize=100;
             var _fromX=startPos.x-insideCircleSize;
@@ -276,11 +562,11 @@
             ctx.lineWidth = 2;
             var iconSize=35;
             var iconStrokeSize=6;
-            var nextX=_toX-iconSize-iconStrokeSize-6;
+            var nextX=_toX-iconSize-iconStrokeSize;
             if(isOppsite) {
                 _fromX=startPos.x+insideCircleSize;
                 _toX=startPos.x+insideCircleSize+indicatorSize;
-                nextX=_toX+iconSize+iconStrokeSize+6;
+                nextX=_toX+iconSize+iconStrokeSize;
             }
             ctx.moveTo(_fromX, startPos.y); 
             ctx.lineTo(_toX, startPos.y);
@@ -288,22 +574,22 @@
             //图标大圆
             const circle = new Path2D();
             ctx.beginPath();
+            
+            ctx.lineWidth = 0;
             ctx.fillStyle = color;
+            ctx.strokeStyle = color;
             ctx.lineWidth = iconStrokeSize;
             circle.arc(nextX, startPos.y, iconSize, 0, Math.PI*2);
-            circle.sourceData=text;
-            circle.ctx=ctx;
+            
             //ctx.stroke(circle);
             ctx.fill(circle);
+            
+            //ctx.stroke(circle);
             ctx.closePath();
-            cricles.push({
-                label:text,
-                x:nextX,
-                y:startPos.y,
-                radius:iconSize
-            });
+
             _cricles.push(circle);
-            eventManager.addTarget(circle);
+            eventManager.addTarget(circle,ctx,data);
+
             textPosition.push(new drawPos(nextX,startPos.y));
             //图标小圆外框
             ctx.beginPath();
@@ -390,12 +676,20 @@
 
             
             ctx.beginPath();
+            
+            ctx.shadowColor = "black";
+            ctx.shadowOffsetY = 2;
+            
+            ctx.shadowOffsetX = 2;
+            ctx.shadowBlur = 8;
             ctx.fillStyle = "white";
             ctx.lineWidth = 1;
             ctx.arc(startPos.x, startPos.y, size/2.5, 0, Math.PI*2);
             ctx.fill();
             ctx.closePath();
-            
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
             var from=new drawPos(startPos.x,startPos.y+line2SpotDist);
             var to=new drawPos(startPos.x,startPos.y+line2SpotDist+stopsGap);
             return drawLine(from,to,ctx,color,size);

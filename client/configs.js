@@ -16,7 +16,7 @@ var caseRelatedParty={
     "公司":["国瑞信业建筑工程设计有限公司","国瑞德恒房地产开发有限公司","国瑞信业地产股份有限公司"],
     "个人":["张丽佳","李立","郑智"]
 }
-var projects=["北七家","大兴"]
+const projects=["北七家","大兴"]
 const case_orgnization=["大兴法院","东城法院"];
 var case_orgnizationPersonnel={
     "法官":["李新亮 57362323","郭艳 57362676","张振 57362300"],

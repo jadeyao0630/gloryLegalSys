@@ -13,6 +13,7 @@ var tableColumns={
     caseApplicant:{label:"申请人",},
     caseCreateDate:{label:"创建时间"},
     }
+var baseData;
 $(function(){
     $.mobile.loading( "show", {
         text: "读取中",
@@ -38,6 +39,7 @@ $(function(){
         getCasesData(function(r){
             console.log('getCasesData');
             console.log(r);
+            baseData=r;
             _initRegTable(r,tableColumns);
             $.mobile.loading( "hide");
             //$.mobile.hidePageLoadingMsg(); 
@@ -52,7 +54,29 @@ $(function(){
 
 var form_item_ids=getFormItemsId(FormTemplate);
 _createNewCaseForm(FormTemplate);
-
+$('.ui-but-lock-edit').on('click',function(e){
+    var id=sessionStorage.getItem("currentId");
+    var datas=baseData.filter(d=>d.id==id);
+    if(datas.length>0){
+        var data=datas[0];
+        console.log(data.isReadOnly);
+        if (data.isReadOnly || data.isReadOnly==1) data.isReadOnly=true;
+        else data.isReadOnly=false;
+        
+        data.isReadOnly=!data.isReadOnly;
+        
+        console.log(data.isReadOnly);
+        if(data.isReadOnly){
+            $('#caseReg_but').addClass("ui-state-disabled");
+            
+            $(".ui-but-lock-edit").removeClass('btn-icon-green').addClass('btn-icon-red');
+        }else{
+            $('#caseReg_but').removeClass("ui-state-disabled");
+            $(".ui-but-lock-edit").removeClass('btn-icon-red').addClass('btn-icon-green');
+        }
+    }
+    
+  });
 function _createNewCaseForm(template){
    
     var form=generateForm(template);
@@ -65,6 +89,10 @@ function _createNewCaseForm(template){
     //form.css({padding:"10px 20px"});
     //$("#add_case_popup").children().remove();
     $(popup_form).html('<h3 id="reg_form_title">新增案件</h3>'+form.html());
+    $(popup_form).append($('<div class="progress_lock edit-info hide">'+
+                            '<div class="ui-input-btn ui-btn ui-icon-lock ui-btn-icon-notext ui-corner-all ui-shadow btn-icon-red ui-but-lock-edit">'+
+                                '<input type="button" data-enhanced="true" value="锁">'+
+                            '</div></div>'));
     $("#add_case_popup").css({"min-width":"1000px"});
     //console.log($(popup_form).html());
     $('#add_case_but').on('click',async function(e){
@@ -123,6 +151,16 @@ function _createNewCaseForm(template){
 function _setData(data){
     sessionStorage.setItem("currentId", data.id);
     $("#reg_form_title").text("修改档案");
+    $('.progress_lock.edit-info').removeClass('hide');
+    if(data.isReadOnly){
+        $('#caseReg_but').addClass("ui-state-disabled");
+        
+        $(".ui-but-lock-edit").removeClass('btn-icon-green').addClass('btn-icon-red');
+    }else{
+        $('#caseReg_but').removeClass("ui-state-disabled");
+        $(".ui-but-lock-edit").removeClass('btn-icon-red').addClass('btn-icon-green');
+    }
+        
     var dataKeys=Object.keys(data);
     Object.keys(form_item_ids).forEach((id)=>{
         if(dataKeys.includes(id)){
@@ -158,12 +196,12 @@ async function _addEmptyData(){
 function _setBlurBackgroundVisibility(isVisible){
     if(isVisible) {
         
-        $('.popup-background.popup-a').css({"height":$("#add_case_popup").css('height')});
+        //$('.popup-background.popup-a').css({"height":$("#add_case_popup").css('height')});
         $("#popup_form_main").trigger('create');
         //console.log("calc(50%+"+($(document).height()-$("#add_case_popup").height())+"px)");
         
         //console.log($(window).height());
-        $("#add_case_popup").css({'top':"calc(50% + "+($("#add_case_popup").height()-$(window).height())/2+"px)"})
+        //$("#add_case_popup").css({'top':"calc(50% + "+($("#add_case_popup").height()-$(window).height())/2+"px)"})
         //console.log($("#add_case_popup").height());
         $('.popup-background.popup-a').removeClass('popup-hide');
         //$("#add_case_popup").popup();

@@ -237,12 +237,11 @@ ProgressesButton.prototype.init=function(arg){
             },step_item));
         }else{
             var realIndex=index;
-            if(arrayIndex.length>0&&!_this.opt.showSubSteps){
+            if(!_this.opt.showSubSteps){
 
-                var arrayId=arrayIndex.indexOf(index);
-                if(arrayId>-1){
-                    realIndex+=arrayId+1;
-                }
+                    if(realIndex>2)
+                        realIndex+=1;
+                
             }
             //#region Main Indicators
               /********************************/
@@ -252,7 +251,7 @@ ProgressesButton.prototype.init=function(arg){
                 'left':(lefts[index]-_this.opt.size)+'px',
                 'top':(middle_line+_this.opt.line_size/2-_this.opt.size)+'px',
             });
-            var indicator=getElement("progress-but-background-indicator main-indicator-index"+realIndex,{
+            var indicator=getElement("progress-but-background-indicator main-indicator-index"+realIndex+1,{
                 'background':_this.opt.background_color,
                 'width':_this.opt.size*2+'px',
                 'height':_this.opt.size*2+'px',

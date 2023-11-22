@@ -6,18 +6,37 @@
     <title>Document</title>
     
 	<link rel="stylesheet" href="../css/jquery.mobile-1.4.5.min.css" />
+	<link rel="stylesheet" href="../css/stepButton.css" />
 	<script src="../js/jquery.js"></script>
     <script src="../js/jquery.mobile-1.4.5.min.js"></script>
 	<script src="../configs.js"></script>
 	<script src="../js/tools.js"></script>
+	<script src="../js/progressesButton.js"></script>
+    <style>
+        body{
+            background-color: white;
+            height: 100%;
+        }
+    </style>
 </head>
 <body>
-    <div style="border:3px double #996633;display:grid;grid-template-columns: 400px 1fr">
-        <div data-role="collapsibleset" data-inset="false" id="summary_list"></div>
+    <div style="display:grid;grid-template-columns: 450px 1fr;background: white;">
+        <div id="summary_list"></div>
         <canvas id="myCanvas" width="800" height="1200" >
     </div>
+    <div data-role="popup" id="popupDialog" data-overlay-theme="b" data-theme="a" data-dismissible="true" style="min-width:400px;padding:15px;">
+        <h4 id="event_list_title"> </h4>
+        <div role="main" class="ui-content">
+            <ul data-role="listview" data-inset="true" id="event_list">
+
+            </ul>
+            
+        </div>
+        <div style="padding-left:15px;">
+        </div>
+    </div>
     <script>
-        
+        var deads=["未执行"]; 
         //var cricles=[];
         var _cricles=[];
         class pathEvent{
@@ -207,95 +226,83 @@
                         isOptional:false,
                         data:case_types
                     },
-                }
-                
-            },
-            legal:{
-                label:"法律相关",
-                data:{
                     caseStatus:{
                         label:"案件状态:",
                         data:progresses
                     },
+                }
+                
+            },
+            legal:{
+                label:"法律信息",
+                data:{
                     caseLegal:{
                         label:"代理法务:",
                     },
                     courtName:{
-                        label:"法院:",
+                        label:"受理法院:",
                         data:case_orgnization
+                    },
+                    caseOrgnizationPersonnel:{
+                        label:"受理相关人:",
+                        data:case_orgnizationPersonnel
+                    }
+                }
+                
+            },
+            sum:{
+                label:"金额信息",
+                data:{
+                    caseLawsuit:{
+                        label:"本诉金额:",
+                    },
+                    caseCounterclaim:{
+                        label:"反诉金额:",
+                    },
+                    penaltyAmount:{
+                        label:"判决金额:",
+                    },
+                    exexuteAmount:{
+                        label:"执行金额:",
+                    },
+                }
+            },
+            summary:{
+                label:"详细信息",
+                data:{
+                    caseLawsuitRequest:{
+                        placeholder:"本诉请求",
+                        label:"本诉请求:",
+                        type:"textarea",
+                        isOptional:true,
+                    },
+                    caseCounterclaimRequest:{
+                        placeholder:"反诉请求",
+                        label:"反诉请求:",
+                        type:"textarea",
+                        isOptional:true,
+                    },
+                    caseSum:{
+                        placeholder:"案件摘要",
+                        label:"案件摘要:",
+                        type:"textarea",
+                        isOptional:true,
                     },
                 }
                 
             }
             
         } 
-        var summary_template={
-            caseNo:{
-                label:"案件编号:",
-            },
-            caseName:{
-                label:"案件名称:",
-            },
-            caseLabel:{
-                placeholder:"案件标签:",
-                label:"案件标签:",
-                type:"combobox",
-                isOptional:false,
-                data:case_labels
-            },
-            caseBelong:{
-                label:"所属项目:",
-                data:projects
-            },
-            casePersonnel:{
-                placeholder:"我方当事人",
-                label:"我方当事人:",
-                type:"multicombobox",
-                isOptional:false,
-                data:caseRelatedParty,
-                isFilterable:true 
-            },
-            case2ndParty:{
-                placeholder:"对方当事人",
-                label:"对方当事人:",
-                type:"text",
-                isOptional:false,
-            },
-            caseCatelog:{
-                placeholder:"案件类别",
-                label:"案件类别:",
-                type:"radio",
-                isOptional:false,
-                data:case_catelogs
-            },
-            caseType:{
-                placeholder:"案件类型",
-                label:"案件类型:",
-                type:"radio",
-                isOptional:false,
-                data:case_types
-            },
-            caseStatus:{
-                label:"案件状态:",
-                data:progresses
-            },
-            caseLegal:{
-                label:"代理法务:",
-            },
-            courtName:{
-                label:"法院:",
-                data:case_orgnization
-            },
-        }
+        
         var _data={
             template:["立案","一审","二审","执行","结案","再审","监督"],
             basic:{
                 id:1,caseNo:"A202311110005",caseName:"管文波离职案件",caseLabel:2,caseReason:0,caseType:0,caseBelong:0,applicant:"张国庆",
-                caseCause:6,createDate:"2023-08-11 14:03:19",isReadOnly:true
+                caseCause:6,createDate:"2023-08-11 14:03:19",casePersonnel:"公司1,个人0",case2ndParty:"李四",isReadOnly:true,caseLawsuitRequest:"",caseCounterclaimRequest:"",caseSum:"",caseLawsuit:500,caseCounterclaim:0
             },
             progressStatus:{
                 id:1,caseNo:"A202311110005",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-09-11 14:00:00",
-                penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:3.1,courtName:1
+                penaltyAmount:500.00,exexuteAmount:243.00,caseStatus:4.1,courtName:1,caseOrgnizationPersonnel:"法官0,其他1"
                 ,data:[
                     {id:1,subid:0,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.9.28送达一审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00",dateOccur:"2023-09-28 14:00:00"},
                     {id:1,subid:1,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.10.13送达判决书",caseDisputed:"",dateUpdated:"2023-11-02 14:00:00",dateOccur:"2023-10-13 14:00:00"},
@@ -326,8 +333,7 @@
                 //_data
             }
         });
-        var dataList={};
-        dataList=[
+        var dataList=[
             {
                 label:"立案",
                 date:_data.basic.createDate,
@@ -365,7 +371,8 @@
                         date:"2023-12-01 14:00:00",
                         property:"未知",
                         status:"查封",
-                        type:"property"
+                        type:"property",
+                        label:"查封 【未知】财产"
                     }
 
                 ]
@@ -379,25 +386,48 @@
                         label:"执行标的【财产】",
                         amount:"200",
                         personal:"张三",
-                        type:"execute"
+                        type:"execute",
+                        label:"张三 执行标的【财产】 200万元"
                     },
                     {
                         date:"2023-12-21 14:00:00",
                         label:"执行标的【未知】",
                         amount:"43",
                         personal:"张五",
-                        type:"execute"
+                        type:"execute",
+                        label:"张五 执行标的【未知】 43万元"
                     }
 
                 ]
             }
         ]
         drawTimeline(_data,_ctx);
+        console.log(["Jenny", "Matilda", "Greta"].indexOf("Matilda")); // true
+
         _cricles.forEach((circle)=>{
             //console.log(Object.getPrototypeOf(circle))
             //console.log(Object.keys(Object.getPrototypeOf(circle)).includes('addListener'));
             circle.addListener('click',function(e){
                 console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
+                
+                var datas=dataList.filter((item)=>item.id==this.sourceData.index);
+                if(datas.length>0 && datas[0].data!= undefined){
+                    $('#event_list').children().remove();
+                    $('#event_list_title').text(this.sourceData.label);
+                    datas[0].data.forEach((ite)=>{
+                        var date_bar=$('<li data-role="list-divider">'+formatDateTime(new Date(ite.date),"yyyy年MM月dd日 ")+'</li>');
+                        var item_container=$('<li></li>');
+                        var list_item=$('<label>'+ite.label+'</label>');
+                        item_container.append(list_item);
+                        $('#event_list').append(date_bar);
+                        
+                        $('#event_list').append(item_container);
+                    });
+                    //$('#event_list').append();
+                    $('#event_list').listview('refresh');
+                    $('#popupDialog').popup("open");
+                }
+                
             })
             circle.addListener('mouseover',function(e){
                 console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
@@ -410,35 +440,107 @@
             })
         });
         Object.keys(_summary_template).forEach(key=>{
-            var collapsibleset=$('<div data-role="collapsible"></div>');
+            var collapsibleset=$('<div data-role="collapsible" data-theme="b" data-collapsed="false" ></div>');
             var collapsibleLabel=$('<h3>'+_summary_template[key].label+'</h3>');
             collapsibleset.append(collapsibleLabel);
-            var listview=$('<ul data-role="listview" data-inset="false"></ul>');
+            var listview=$('<ul data-role="listview" data-theme="a" data-inset="false"></ul>');
             collapsibleset.append(listview);
             $('#summary_list').append(collapsibleset);
-            Object.keys(_summary_template[key]).forEach(sub_key=>{
+            Object.keys(_summary_template[key].data).forEach(sub_key=>{
                 $.each(Object.keys(_data),function(index,data_key){
                         console.log(data_key+"--"+sub_key);
                     if (data_key!="template" && Object.keys(_data[data_key]).includes(sub_key)){
-                        var label=_summary_template[key][sub_key].label;
+                        var data=_summary_template[key].data[sub_key].data;
+                        var label=_summary_template[key].data[sub_key].label;
                         var val=_data[data_key][sub_key];
-                        if(_summary_template[key][sub_key].data!=undefined){
-                            if(_summary_template[key][sub_key].data instanceof Array){
+                        var isMultiValue=false;
+                        var multiValues=[];
+                        if(data!=undefined){
+                            
+                            if(data instanceof Array){
                                 var v=val.toString().split('.');
                                 if(v.length>1){
-                                    val=_summary_template[key][sub_key].data[v[0]][v[1]];
+                                    val=data[v[0]][v[1]];
                                 }else if(v.length==1){
-                                    val=_summary_template[key][sub_key].data[v[0]];
+                                    val=data[v[0]];
+                                }
+                            }
+                            else{
+                                var data_keys=Object.keys(data);
+                                var values=val.split(",");
+                                if(data_keys.length>0){
+                                    isMultiValue=true;
+                                    data_keys.forEach(dk=>{
+                                        values.forEach(val=>{
+                                            if(val.includes(dk)){
+                                                multiValues.push(data[dk][parseInt(val.replace(dk,""))]);
+                                            }
+                                        });
+                                    });
+                                    val=multiValues.join(", ");
                                 }
                             }
                         }
+                        if(isMultiValue){
+                            var _collapsibleset=$('<div data-role="collapsible" data-theme="a" data-iconpos="right" data-inset="false" style="border:none;margin-right:-45px;" data-collapsed-icon="carat-d" data-expanded-icon="carat-u"></div>');
+                            var _collapsibleLabel=$('<h4 class="ui-field-contain" style="margin:0px;border:none;"><div style="display:grid;grid-template-columns: auto 1fr;column-gap: 9px;margin-left:-3px"><label style="margin-top:2px;margin-bottom:-2px;">'+
+                                label+'</label><label style="margin-top:2px;margin-bottom:-2px;">'+val+'</label></div><span class="ui-li-count">'+multiValues.length+'</span></h4>');
+                            _collapsibleset.append(_collapsibleLabel);
+                            var _listview=$('<ol data-role="listview" data-theme="b" </ol>');
+                            _collapsibleset.append(_listview);
+                            multiValues.forEach(v=>{
+                                var _li=$('<li class="ui-field-contain"></li>');
+                                var _info_ele=$('<label>'+v+'</label>');
+                                _li.append(_info_ele);
+                                _listview.append(_li);
+                            });
+                            var label_ele=$('<label>'+label+'</label>');
+                            var li=$('<li class="ui-field-contain" style="padding-top:0px;padding-bottom:0px;border:none;"></li>');
+                            //li.append(label_ele);
+                            li.append(_collapsibleset);
+                            listview.append(li);
+                        }else{
+                            //console.log(val);
+                            
+                            var li=$('<li class="ui-field-contain"></li>');
+                            
+                            var label_ele=$('<label>'+label+'</label>');
+                            var info_ele=$('<label>'+val+'</label>');
+                            
+                            li.append(label_ele);
+                            if(sub_key=="caseLabel"){
+                                li.css(case_labels_colors[val]);
+                            }else if(sub_key=="caseStatus"){
+                                info_ele=$('<div id="'+sub_key+'" style="margin-left:90px;margin-top:-7px;"></div>');
+                                
+                            }
+                            li.append(info_ele);
+                            listview.append(li);
+                            if(sub_key=="caseStatus"){
+                                
+                                console.log("caseStatus................."+_data[data_key][sub_key]);
+                                var but=new ProgressesButton({
+                                    steps:progresses,
+                                    deadSteps:deads,
+                                    selected_color:"#4B9DCB",
+                                    showLabel:true,
+                                    containerId:'#'+sub_key,
+                                    currentPosition:_data[data_key][sub_key],
+                                    fontSize:12,
+                                    line_size:4,
+                                    size:12,
+                                    width:240,
+                                    isViewMode:true,
+                                    verticalGap:2,
+                                    labelPosition:"bottom",
+                                    showSubSteps:false,
+                                    readOnly:true,
+                                });
+
+                            }
+                        }
                         //console.log(val);
-                        var li=$('<li class="ui-field-contain"></li>');
-                        var label_ele=$('<label>'+label+'</label>');
-                        var info_ele=$('<label>'+val+'</label>');
-                        li.append(label_ele);
-                        li.append(info_ele);
-                        listview.append(li);
+                        
                         //if (sub_key=="caseNo") console.log(data_key);
                         return false;
                     }
@@ -467,7 +569,7 @@
                     //console.log(val)
                     drawDateText(datePosition[index],val,ctx,colors[index+1]);
                     if(data[0].data!=undefined){
-                        drawListText(listPosition[index],data[0].data,ctx,"black",isOppsite=!isOppsite,label);
+                        drawListText(listPosition[index],data[0].data,ctx,TextColor,isOppsite=!isOppsite,label);
                     }
                     
                 }
@@ -502,8 +604,8 @@
                 text=val.getFullYear()+" | "+val.getMonth()+"月"+val.getDate()+"日";
                 ctx.font = 'bold 30px Arial';
                 let year_size = getTextSize(val.getFullYear(),ctx); 
-                ctx.textStyle = "black";
-                ctx.fillStyle = "black";
+                ctx.textStyle = TextColor;
+                ctx.fillStyle = TextColor;
                 ctx.fillText(val.getFullYear(), startPos.x-offsetX-year_size.width, startPos.y-5);
                 ctx.font = '60px Arial';
                 let seperater_size = getTextSize("|",ctx); 
@@ -512,8 +614,8 @@
                 ctx.fillText(" | ", startPos.x-offsetX-seperater_size.width, startPos.y-14);
                 ctx.font = 'bold 40px Arial';
                 let date_size = getTextSize(val.getMonth()+"月"+val.getDate()+"日",ctx); 
-                ctx.textStyle = "black";
-                ctx.fillStyle = "black";
+                ctx.textStyle = TextColor;
+                ctx.fillStyle = TextColor;
                 ctx.fillText(val.getMonth()+"月"+val.getDate()+"日", startPos.x-offsetX+seperater_size.width, startPos.y-10);
             }else{
                 ctx.font = 'bold 40px Arial';
@@ -526,7 +628,7 @@
             
         }
         function drawListText(startPos,data,ctx,color,isOppsite){
-            ctx.font = 'bold 14px 雅黑';
+            ctx.font = 'bold 14px 微软雅黑';
             
             ctx.beginPath();
             ctx.textStyle = color;
@@ -540,7 +642,7 @@
                         text=date+item.status+" "+item.property+" 财产";
                     }
                     else if(item.type=="execute"){
-                        text=date+item.personal+"已"+item.label+" "+item.amount+"万元"
+                        //text=date+item.personal+"已"+item.label+" "+item.amount+"万元"
                     }
                     let text_size = getTextSize(text,ctx); 
                     //console.log(text+"---"+text_size.width);
@@ -558,7 +660,7 @@
             
             //阶段图标线
             ctx.beginPath();
-            ctx.strokeStyle = "black";
+            ctx.strokeStyle = TextColor;
             ctx.lineWidth = 2;
             var iconSize=35;
             var iconStrokeSize=6;

@@ -31,10 +31,10 @@ const case_causes=["购房合同纠纷","建设工程纠纷","佣金类纠纷","
 const case_status=["一审","二审","执行","结案","再审","审判监督程序",];
 const case_execute_status=["未执","强执","结案"];
 const case_labels_colors={
-    "普通案件":{background:"skyblue"},
-    "重大案件300万以上":{background:"orange",color:"white"},
-    "重大案件1000万以上":{background:"red",color:"white"},
-    "重大案件 群诉":{background:"blue",color:"white"}
+    "普通案件":{background:"skyblue",'text-shadow': 'none'},
+    "重大案件300万以上":{background:"orange",color:"white",'text-shadow': 'none'},
+    "重大案件1000万以上":{background:"#E25C62",color:"white",'text-shadow': 'none'},
+    "重大案件 群诉":{background:"blue",color:"white",'text-shadow': 'none'}
 }
 const columns={
     id:"INT NOT NULL,PRIMARY KEY",

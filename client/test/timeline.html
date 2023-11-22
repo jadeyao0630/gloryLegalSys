@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    
+	<script src="../js/jquery.js"></script>
 </head>
 <body>
     
@@ -37,15 +39,23 @@
                     if (_self._targets.hasOwnProperty("mouseover")) {
                         _self._targets["mouseover"].forEach((path)=>{
                             //console.log(_self.hasListener(path,"mouseover"));
-                            if (path.hasListener("mouseover")){
-                                path.fire("mouseover",new pathEvent(event.offsetX, event.offsetY,"mouseover",path.ctx));
+                            if (!path.inBounds){
+                                //dpath.inBounds=true;
+                                if (path.hasListener("mouseover")){
+                                        path.fire("mouseover",new pathEvent(event.offsetX, event.offsetY,"mouseover",path.ctx));
+                                    }
                             }
+                            
                         });
                     }
+
                     if (_self._targets.hasOwnProperty("mouseout")) {
                         _self._targets["mouseout"].forEach((path)=>{
-                            if (path.hasListener("mouseout")){
-                                path.fire("mouseout",new pathEvent(event.offsetX, event.offsetY,"mouseout",path.ctx));
+                            if (path.inBounds){
+                                //path.inBounds=false;
+                                if (path.hasListener("mouseout")){
+                                        path.fire("mouseout",new pathEvent(event.offsetX, event.offsetY,"mouseout",path.ctx));
+                                    }
                             }
                         });
                     }
@@ -90,11 +100,18 @@
                         var targetIndex=_self._targets[type].indexOf(this);
                         
                         if(event.ctx.isPointInPath(this, event.x, event.y)){
-                            if (_self._listeners.hasOwnProperty(type))
-                                _self._listeners[type][targetIndex].call(this,event);
+                            if (!this.inBounds){
+                                this.inBounds=true;
+                                if (_self._listeners.hasOwnProperty(type))
+                                    _self._listeners[type][targetIndex].call(this,event);
+                            }
                         }else{
-                            if (_self._listeners.hasOwnProperty("mouseout"))
-                                _self._listeners["mouseout"][targetIndex].call(this,event);
+                            if (this.inBounds){
+                                this.inBounds =false;
+                                if (_self._listeners.hasOwnProperty("mouseout"))
+                                    _self._listeners["mouseout"][targetIndex].call(this,event);
+                            }
+                            
                         }
                         
                     }
@@ -180,6 +197,11 @@
             })
             circle.addListener('mouseover',function(e){
                 console.log(this.sourceData+"--"+e.type);
+                $(canvas).css({cursor:"pointer"});
+            })
+            circle.addListener('mouseout',function(e){
+                console.log(this.sourceData+"--"+e.type);
+                $(canvas).css({cursor:"default"});
             })
         });
         function drawTimeline(data,ctx){
@@ -192,7 +214,7 @@
             });
             isOppsite=true;
             _data.template.forEach((label,index)=>{
-                drawIndicatorText(textPosition[index],label,ctx,colors[index+1]);
+                drawIndicatorText(textPosition[index],label,ctx,"white");
                 
                 drawDateText(datePosition[index],label,ctx,"black");
                 drawListText(listPosition[index],label,ctx,"black",isOppsite=!isOppsite,label);
@@ -266,12 +288,13 @@
             //图标大圆
             const circle = new Path2D();
             ctx.beginPath();
-            ctx.strokeStyle = color;
+            ctx.fillStyle = color;
             ctx.lineWidth = iconStrokeSize;
             circle.arc(nextX, startPos.y, iconSize, 0, Math.PI*2);
             circle.sourceData=text;
             circle.ctx=ctx;
-            ctx.stroke(circle);
+            //ctx.stroke(circle);
+            ctx.fill(circle);
             ctx.closePath();
             cricles.push({
                 label:text,

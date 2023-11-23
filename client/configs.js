@@ -365,10 +365,12 @@ var regTemplate={
     }
 }
 const progress_status_details_request={
+    /*
     courtDate:{
       type:"date",
       label:"开庭日期："
     },
+    */
     courtName:{
       type:"text",
       label:"法院："
@@ -385,4 +387,85 @@ const progress_status_details_request={
       type:"text",
       label:"判决金额(万)："
     },
+    exexuteAmount:{
+      type:"text",
+      label:"执行金额(万)："
+    },
+  }
+
+  
+var list={
+    caseUpdated:{
+      label:"进展",
+      type:"textarea"
+    },caseDisputed:{
+      label:"争议",
+      type:"textarea"
+    },dateUpdated:{
+      label:"更新日期",
+      type:"date"
+    }
+  }
+  var list_proerty={
+    propertyName:{
+      label:"资产",
+      type:"text",
+      width:550,
+    },propertyStatus:{
+      label:"状态",
+      type:"combobox",
+      data:property_status,
+      width:150,
+    },dateUpdated:{
+      label:"更新日期",
+      type:"date",
+    }
+  }
+  var list_evidence={
+    fileName:{
+      label:"证据名",
+      type:"text",
+    },numFile:{
+      label:"份数",
+      type:"text",
+      width:50,
+    },numCPage:{
+      label:"页数",
+      type:"text",
+      width:50,
+    },numOriginal:{
+      label:"原件",
+      type:"text",
+      width:50,
+    },numCopy:{
+      label:"复印件",
+      type:"text",
+      width:50,
+    }
+  }
+  var list_executed={
+    dateExecuted:{
+      label:"执行日期",
+      type:"date",
+      width:150,
+    },personExecuted:{
+      label:"执行经办人",
+      type:"text",
+      width:130,
+    },personContact:{
+      label:"经办人电话",
+      type:"tel",
+      width:130,
+    },purposeExecute:{
+      label:"执行标的",
+      type:"text",
+      width:130,
+    },exexuteAmount:{
+      label:"执行金额(万)",
+      type:"text",
+      width:100,
+    },sumExecuted:{
+      label:"说明",
+      type:"text",
+    }
   }

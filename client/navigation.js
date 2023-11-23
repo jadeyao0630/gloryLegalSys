@@ -52,6 +52,7 @@ $(function(){
 });
 
 
+var main_form;
 var form_item_ids=getFormItemsId(FormTemplate);
 _createNewCaseForm(FormTemplate);
 $('.ui-but-lock-edit').on('click',function(e){
@@ -74,12 +75,18 @@ $('.ui-but-lock-edit').on('click',function(e){
             $('#caseReg_but').removeClass("ui-state-disabled");
             $(".ui-but-lock-edit").removeClass('btn-icon-red').addClass('btn-icon-green');
         }
+        Object.keys(form_item_ids).forEach((id)=>{
+                //if(data.isReadOnly) $("#"+id).attr('readOnly',true);
+                //else $("#"+id).attr('readOnly',false);
+        });
+        
+        main_form.readOnly(data.isReadOnly);
     }
     
   });
 function _createNewCaseForm(template){
-   
-    var form=generateForm(template);
+    main_form= new mform({template:template});
+    var form=main_form.instance;
     
     const popup_form = document.getElementById("popup_form_main");
     //popup_form.innerHTML+=form.html();
@@ -165,6 +172,9 @@ function _setData(data){
     Object.keys(form_item_ids).forEach((id)=>{
         if(dataKeys.includes(id)){
             $("#"+id).val(data[id]);
+            //if(data.isReadOnly) $("#"+id).attr('readOnly',true);
+            //else $("#"+id).attr('readOnly',false);
+            
             if(form_item_ids[id].type=="radio")  {
                 $("#"+id+"-"+parseInt(data[id])).prop( "checked", true ).checkboxradio( "refresh" );
             }else if(form_item_ids[id].type=="multicombobox"){
@@ -177,18 +187,27 @@ function _setData(data){
             }else if(form_item_ids[id].type=="date"||form_item_ids[id].type=="datetime"||form_item_ids[id].type=="time")  {
                 $("#"+id).val(getDateTime(data[id]));
             }
+            //console.log(id+"--------------------->"+$("#"+id).val());
         }
     });
+    main_form.readOnly(data.isReadOnly);
 }
 async function _addEmptyData(){
     await getCaseLatestIndex().then(id=>{
         //console.log(id);
         sessionStorage.setItem("currentId", id+1);
+    $('.progress_lock.edit-info').addClass('hide');
         $("#reg_form_title").text("新增档案");
+        console.log("新增档案============================");
+        
         Object.keys(form_item_ids).forEach((id)=>{
+            console.log("id: "+id);
             $("#"+id).val("");
             if(form_item_ids[id].type=="date"||form_item_ids[id].type=="datetime"||form_item_ids[id].type=="time")  $("#"+id).val(getDateTime());
-            else if(form_item_ids[id].type=="combobox"||form_item_ids[id].type=="radio")  $("#"+id).val(0);
+            else if(form_item_ids[id].type=="radio")  $("#"+id+"-0").prop( "checked", true ).checkboxradio( "refresh" );
+            else if(form_item_ids[id].type=="multicombobox" || form_item_ids[id].type=="combobox"){
+                $("#"+id).val("").selectmenu('refresh');
+            }
         });
     });
     

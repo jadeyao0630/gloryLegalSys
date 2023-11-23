@@ -1,109 +1,11 @@
-//案件基本数据
-const table_progress_data=[
-    {id:1,caseNo:"A202311110005",caseName:"管文波离职案件",caseLabel:2,caseReason:0,caseType:0,caseBelong:"北七家",applicant:"张国庆",caseCause:6,createDate:"2023-11-11 14:03:19",isReadOnly:true},
-    {id:2,caseNo:"A202311110004",caseName:"产品商标案件",caseLabel:0,caseReason:0,caseType:0,caseBelong:"北七家",applicant:"李晓霞",caseCause:8,courtDate:"2023-12-15 14:00:00",createDate:"2023-11-11 14:03:19",isReadOnly:true}
-];
-//案件进展数据
-const table_progress_status=[
-  {id:1,caseNo:"A202311110005",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:4.1,courtName:"东城法院"},
-  {id:2,caseNo:"A202311110004",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:1,courtName:"大兴法院"}
-]
-//案件资产数据
-const table_progress_property=[
-  {id:1,caseNo:"A202311110005",caseStatusId:0,subId:0,propertyName:"未知",propertyStatus:1,dateUpdated:"2023-11-01 14:00:00"},
-  {id:2,caseNo:"A202311110004",caseStatusId:0,subId:0,propertyName:"未知",propertyStatus:0,dateUpdated:"2023-12-01 14:00:00"},
-]
-//案件进展明细数据
-const table_progress_updates=[
-  {id:1,subid:0,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.9.28送达一审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00"},
-  {id:1,subid:1,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.9.28送达一审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00"},
-  {id:1,subid:0,caseStatusId:1,caseNo:"A202311110005",caseUpdated:"23.10.28送达二审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00"},
-  {id:2,subid:0,caseStatusId:0,caseNo:"A202311110004",caseUpdated:"一审，尚未收到诉状，对方已申请查封。",caseDisputed:"",dateUpdated:"2023-11-11 14:00:00"}
-]
-//案件附件数据
-const table_progress_updates_attachments=[
-  {id:1,evidenceId:0,caseStatusId:0,caseNo:"A202311110005",numFile:2,numCPage:5,numCopy:1,numOriginal:1,fileName:"审判决书",filePath:"",dateUploaded:"2023-11-01 14:00:00"},
-]
-//案件执行明细数据
-const table_progress_executes=[
-  {id:1,subId:0,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张三",personContact:18612221231,purposeExecute:"财产",exexuteAmount:200,sumExecuted:"",dateExecuted:"2023-11-01 14:00:00"},
-  {id:1,subId:1,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张五",personContact:1572312534,purposeExecute:"",exexuteAmount:34,sumExecuted:"",dateExecuted:"2023-12-01 14:00:00"},
-]
+$(document).on('focus', 'input[readonly]', function(e) {
+  e.stopImmediatePropagation();
+});
 const clickedTarget = {
   same: 'same',
   sameParent: 'sameParent',
   notSame: 'notSame',
 };
-var list={
-  caseUpdated:{
-    label:"进展",
-    type:"textarea"
-  },caseDisputed:{
-    label:"争议",
-    type:"textarea"
-  },dateUpdated:{
-    label:"更新日期",
-    type:"date"
-  }
-}
-var list_proerty={
-  propertyName:{
-    label:"资产",
-    type:"text",
-    width:550,
-  },propertyStatus:{
-    label:"状态",
-    type:"combobox",
-    data:property_status,
-    width:150,
-  },dateUpdated:{
-    label:"更新日期",
-    type:"date",
-  }
-}
-var list_evidence={
-  fileName:{
-    label:"证据名",
-    type:"text",
-  },numFile:{
-    label:"份数",
-    type:"text",
-    width:50,
-  },numCPage:{
-    label:"页数",
-    type:"text",
-    width:50,
-  },numOriginal:{
-    label:"原件",
-    type:"text",
-    width:50,
-  },numCopy:{
-    label:"复印件",
-    type:"text",
-    width:50,
-  }
-}
-var list_executed={
-  dateExecuted:{
-    label:"执行日期",
-    type:"date",
-  },personExecuted:{
-    label:"执行经办人",
-    type:"text",
-  },personContact:{
-    label:"经办人电话",
-    type:"tel",
-  },purposeExecute:{
-    label:"执行标的",
-    type:"text",
-  },exexuteAmount:{
-    label:"执行金额(万)",
-    type:"text",
-  },sumExecuted:{
-    label:"说明",
-    type:"text",
-  }
-}
 var progressButtons={};
 var progressUpdateStatus={
   currentParentProgressButton:undefined,
@@ -247,7 +149,7 @@ function _setFlowChart(data,status,executes,updates,targetId){
     if (data1[0].isReadOnly || data1[0].isReadOnly==1) data1[0].isReadOnly=true;
     //else data1[0].isReadOnly=false;
     console.log(data1[0].id+"----isReadOnly------"+data1[0].isReadOnly);
-    $("#progress_status_details").html(progressDetailsPopup(data2[0]));
+    $("#progress_status_details").html(progressDetailsPopup(data2[0],data1[0].isReadOnly));
     
     $("#progress_status_details").trigger("create");
     $("#progress_status_container").empty();
@@ -296,6 +198,14 @@ function _setFlowChart(data,status,executes,updates,targetId){
 
       var title=progresses[e.Position.main] instanceof Array?progresses[e.Position.main][e.Position.sub]:progresses[e.Position.main];
       $("#process_updates_title").text(title);
+      if(e.Position.main<2){
+        $("#courtDate").val(getDateTime(data2[0].counterData));
+        $("#process_updates_courtDate").removeClass('hide');
+      }else{
+        $("#process_updates_courtDate").addClass('hide');
+      }
+      
+
       //$("#progress_step_update_list").html('');
       
       $("#process_update_list").html(addItemsToUpdatePopup(table_progress_updates.filter(value=>{ return value.id==data2[0].id && value.caseNo==data2[0].caseNo}),data1[0].isReadOnly) );
@@ -466,12 +376,12 @@ var table=$('<table></table>')
         if(item[key]!= undefined){
           emptyItem['subId']=item.subId+1;
         //console.log(key+": "+item[key]);
-          tr.append(SetData(list,key,item));
+          tr.append(SetData(list,key,item,isReadOnly));
           
         }
       })
       if(!isReadOnly){
-        tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"}));
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"},isReadOnly));
       }
         body.append(tr);
       
@@ -483,12 +393,12 @@ var table=$('<table></table>')
       keys.forEach(function(key){
         if(emptyItem[key]!= undefined){
         //console.log(key+": "+item[key]);
-          tr.append(SetData(list,key,emptyItem));
+          tr.append(SetData(list,key,emptyItem),isReadOnly);
           
         }
       });
       
-        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"},isReadOnly));
         body.append(tr);
     }
   //console.log(table.html());
@@ -526,12 +436,12 @@ function addItemsToExecutePopup(data,isReadOnly){
         if(item[key]!= undefined){
           emptyItem['subId']=item.subId+1;
         //console.log(key+": "+item[key]);
-          tr.append(SetData(list_executed,key,item));
+          tr.append(SetData(list_executed,key,item,isReadOnly));
           
         }
       })
       if(!isReadOnly){
-        tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"}));
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"},isReadOnly));
       }
         body.append(tr);
       
@@ -547,14 +457,14 @@ function addItemsToExecutePopup(data,isReadOnly){
           //if(key=="fileName"){
           //  tr.append(SetData("file",key,emptyItem));
           //}else{
-            tr.append(SetData(list_executed,key,emptyItem));
+            tr.append(SetData(list_executed,key,emptyItem,isReadOnly));
           //}
         //console.log(key+": "+item[key]);
           
           
         }
       });
-        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"},isReadOnly));
         body.append(tr);
       }
   //console.log(table.html());
@@ -592,12 +502,12 @@ function addItemsToPropertyPopup(data,isReadOnly){
         if(item[key]!= undefined){
           emptyItem['subId']=item.subId+1;
         //console.log(key+": "+item[key]);
-          tr.append(SetData(list_proerty,key,item));
+          tr.append(SetData(list_proerty,key,item,isReadOnly));
           
         }
       })
       if(!isReadOnly){
-        tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"}));
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:item.subId,icon:"btn-icon-red ui-icon-minus",label:"删除"},isReadOnly));
       }
         body.append(tr);
 
@@ -606,20 +516,20 @@ function addItemsToPropertyPopup(data,isReadOnly){
     
   }
   if(!isReadOnly){
-  var tr=$('<tr></tr>');
+      var tr=$('<tr></tr>');
       keys.forEach(function(key){
         if(emptyItem[key]!= undefined){
           //if(key=="fileName"){
           //  tr.append(SetData("file",key,emptyItem));
           //}else{
-            tr.append(SetData(list_proerty,key,emptyItem));
+            tr.append(SetData(list_proerty,key,emptyItem,isReadOnly));
           //}
         //console.log(key+": "+item[key]);
           
           
         }
       });
-        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"},isReadOnly));
         body.append(tr);
       }
   //console.log(table.html());
@@ -656,7 +566,7 @@ function addItemsToUploadPopup(data,isReadOnly){
         if(item[key]!= undefined){
           emptyItem['subId']=item.subId+1;
         //console.log(key+": "+item[key]);
-          tr.append(SetData(list_evidence,key,item));
+          tr.append(SetData(list_evidence,key,item,isReadOnly));
           
         }
       })
@@ -664,7 +574,11 @@ function addItemsToUploadPopup(data,isReadOnly){
         tr.append(SetData({empty:{type:"buttons"}},"empty",[
           {subid:item.subId,icon:"btn-icon-red ui-icon-minus",width:"50%",label:"删除"},
           {subid:item.subId,icon:"btn-icon-green ui-icon-eye",width:"50%",label:"查看"}
-        ]));
+        ],isReadOnly));
+      }else{
+        tr.append(SetData({empty:{type:"buttons"}},"empty",[
+          {subid:item.subId,icon:"btn-icon-green ui-icon-eye",width:"50%",label:"查看"}
+        ],isReadOnly));
       }
         body.append(tr);
 
@@ -686,7 +600,7 @@ function addItemsToUploadPopup(data,isReadOnly){
           
         }
       });
-        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"}));
+        tr.append(SetData({empty:{type:"button"}},"empty",{subid:emptyItem.subId,icon:"btn-icon-green ui-icon-plus",label:"添加"},isReadOnly));
         body.append(tr);
       }
   //console.log(table.html());
@@ -721,20 +635,22 @@ function comparePoistion(source,target){
   return source.main==target.main && source.sub==target.sub;
 }
 
-function SetData(data,key,item){
+function SetData(data,key,item,isReadOnly){
   var type=data[key].type;
   var w=setColumnWidth(data[key].width);
   var item_ele;
+  var readonly=isReadOnly?' readonly="readonly"':"";
+  var datarole=isReadOnly?' data-role="none"':"";
   if(type=="textarea"){
-    item_ele=$("<td"+w+">"+'<textarea cols="40" rows="2" name="'+key+'_'+item.subid+'" id="'+key+'_'+item.subid+'" value="'+item[key]+'">'+item[key]+'</textarea>'+"</td>");
+    item_ele=$("<td"+w+">"+'<textarea '+w+'  cols="40" rows="2" name="'+key+'_'+item.subid+'" id="'+key+'_'+item.subid+'" value="'+item[key]+'"'+readonly+'>'+item[key]+'</textarea>'+"</td>");
 
   }else if(type=="date"){
     val=item[key];
     if(val.length==0) val=new Date().toISOString().substr(0,10);
     else val=new Date(item[key]).toISOString().substr(0,10);
-    item_ele=$("<td"+w+">"+'<input type="'+type+'" id="'+key+'_'+item.subid+'" value="'+val+'">'+"</td>");
+    item_ele=$("<td"+w+">"+'<input '+w+datarole+'  type="'+type+'" id="'+key+'_'+item.subid+'" value="'+val+'"'+readonly+'>'+"</td>");
   }else if(type=="text"){
-    item_ele=$("<td"+w+">"+'<input type="'+type+'" id="'+key+'_'+item.subid+'" value="'+item[key]+'">'+"</td>");
+    item_ele=$("<td"+w+">"+'<input '+w+datarole+' type="'+type+'" id="'+key+'_'+item.subid+'" value="'+item[key]+'"'+readonly+'>'+"</td>");
   }else if(type=="button"){
     item_ele=$("<td"+w+">"+'<div class="custom-border-radius">'+
     '<a href="#" data-index="'+item.subid+'" class="ui-btn '+item.icon+' ui-btn-icon-notext ui-corner-all">'+item.label+'</a></div>'+"</td>");
@@ -748,23 +664,37 @@ function SetData(data,key,item){
     });
     item_ele=$("<td"+" style='width:"+70+"px;'"+"><div style='display:grid;grid-template-columns:"+col_style.join(" ")+";column-gap:5px;'>"+but_html+"</div></td>");
   }else if(type=="file"){
-    item_ele=$("<td"+w+">"+'<input type="'+type+'" id="'+key+'_'+item.subid+'" value="" >'+"</td>");
+    item_ele=$("<td"+w+">"+'<input  '+w+datarole+' type="'+type+'" id="'+key+'_'+item.subid+'" value=""'+readonly+'>'+"</td>");
   }else if(type=="tel"){
-    item_ele=$("<td"+w+">"+'<input type="'+type+'" id="'+key+'_'+item.subid+'" value="'+item[key]+'" >'+"</td>");
+    item_ele=$("<td"+w+">"+'<input  '+w+datarole+' type="'+type+'" id="'+key+'_'+item.subid+'" value="'+item[key]+'"'+readonly+'>'+"</td>");
   }else if(type=="combobox"){
-    var selectItem=$('<select id="'+key+'_'+item.subid+'" value='+item[key]+'></select>');
     
-    if(data[key].data){
-      data[key].data.forEach((d,counter)=>{
-        var selected='';
-        if(counter==item[key])
-          selected=' selected="selected"';
-        selectItem.append($('<option value="'+counter+'"'+selected+'>'+d+'</option>'));
-      });
-    }
-    //console.log(selectItem.html());
     item_ele=$("<td"+w+"></td>");
-    item_ele.append(selectItem);
+    if(isReadOnly){
+      val=item[key];
+      if(data[key].data){
+        data[key].data.forEach((d,counter)=>{
+          var selected='';
+          if(counter==item[key])
+            val=d;
+        });
+      };
+      item_ele.append($('<input  '+w+datarole+' type="text" id="'+key+'_'+item.subid+'" value="'+val+'"'+readonly+'>'));
+    }else{
+      var selectItem=$('<select id="'+key+'_'+item.subid+'" value='+item[key]+readonly+'></select>');
+    
+      if(data[key].data){
+        data[key].data.forEach((d,counter)=>{
+          var selected='';
+          if(counter==item[key])
+            selected=' selected="selected"';
+          selectItem.append($('<option value="'+counter+'"'+selected+'>'+d+'</option>'));
+        });
+      }
+      //console.log(selectItem.html());
+      item_ele.append(selectItem);
+    }
+    
   }
   return item_ele;
 }
@@ -774,15 +704,16 @@ function formatSatusIndex(status){
   var sub=Math.round((status-main)*10);
   return {main:main,sub:sub};
 }
-function progressDetailsPopup(data){
+function progressDetailsPopup(data,isReadOnly){
   
+  var readonly="";//isReadOnly?"data-role='none'":"";
   var container=$('<div></div>');
   Object.keys(progress_status_details_request).forEach(function(key){
     var item=progress_status_details_request[key];
     var item_label=$('<label for="'+key+'">'+item.label+'</label>');
     var val=data[key];
     if(item.type=="date"||item.type=="datetime") val=new Date(val).toISOString().substr(0,10);
-    var item_ele=$('<input type="'+item.type+'" name="'+key+'" id="'+key+'" value="'+val+'">');
+    var item_ele=$('<input type="'+item.type+'" name="'+key+'" id="'+key+'" value="'+val+'"'+readonly+'>');
     container.append(item_label);
     container.append(item_ele);
     
@@ -790,16 +721,28 @@ function progressDetailsPopup(data){
   return container.html();
 }
 function setElementDisableByReadonly(isReadOnly){
+  
   if(isReadOnly){
     $("#process_save_but").addClass('ui-state-disabled');
     
     $("#process_update_save_but").addClass('ui-state-disabled');
     $(".ui-but-lock").removeClass('btn-icon-green').addClass('btn-icon-red');
+    $("#progress_status_details").find('input').attr('readonly',true);
+    //$("#progress_status_details").find('input').jqmData('role',"none");
+    
+    //$("#progress_status_details").find('input').attr('data-role', 'none');
+    $("#progress_status_details").find('input').addClass('input-readOnly');
+    $("#progress_status_details").trigger('create');
+
   }else{
     $("#process_save_but").removeClass('ui-state-disabled');
     
     $("#process_update_save_but").removeClass('ui-state-disabled');
     $(".ui-but-lock").removeClass('btn-icon-red').addClass('btn-icon-green');
+    
+    $("#progress_status_details").find('input').attr('readonly',false);
+    $("#progress_status_details").find('input').removeClass('input-readOnly');
+    $("#progress_status_details").trigger('create');
   }
 }
 

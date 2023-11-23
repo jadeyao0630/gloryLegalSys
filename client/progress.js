@@ -21,6 +21,7 @@ table_progress.innerHTML= _createProgressTableHTML(table_progress_data,table_pro
 
 const progresses=["一审","二审","执行",["强制执行","正常执行","未执行"],"结案","再审","监督"];    
 var deads=["未执行"]; 
+var popup_details_form;
 $('.popup_status_but').on("click",function(e){
   console.log(progressUpdateStatus.currentPopupId);
   if(e.currentTarget.id=='process_save_but'){
@@ -82,12 +83,14 @@ document.querySelectorAll("a[name^='popup_progress_']").forEach((pbut)=>{
   });
 });
 $('.ui-but-lock').on('click',function(e){
-  
+  console.log("ui-but-lock clicked....");
   var data=table_progress_data.filter(item=>item.id==sessionStorage.getItem("currentId"));
+  console.log("ui-but-lock clicked...."+sessionStorage.getItem("currentId"));
   if(data.length>0){
     //console.log(data[0].isReadOnly);
     data[0].isReadOnly=!data[0].isReadOnly;
     //console.log(data[0].isReadOnly);
+    popup_details_form.readOnly(data[0].isReadOnly);
     setElementDisableByReadonly(data[0].isReadOnly);
     progressUpdateStatus.currentParentProgressButton.switchReadyOnly();
   }
@@ -149,9 +152,10 @@ function _setFlowChart(data,status,executes,updates,targetId){
     if (data1[0].isReadOnly || data1[0].isReadOnly==1) data1[0].isReadOnly=true;
     //else data1[0].isReadOnly=false;
     console.log(data1[0].id+"----isReadOnly------"+data1[0].isReadOnly);
-    $("#progress_status_details").html(progressDetailsPopup(data2[0],data1[0].isReadOnly));
+    sessionStorage.setItem("currentId",data1[0].id);
+    progressDetailsPopup(data2[0],data1[0].isReadOnly,$("#progress_status_details"));
     
-    $("#progress_status_details").trigger("create");
+    //$("#progress_status_details").trigger("create");
     $("#progress_status_container").empty();
     $('#popup_progress_title').text(data1[0].caseName+"-"+data2[0].caseNo);
     var but=new ProgressesButton({
@@ -704,21 +708,14 @@ function formatSatusIndex(status){
   var sub=Math.round((status-main)*10);
   return {main:main,sub:sub};
 }
-function progressDetailsPopup(data,isReadOnly){
-  
-  var readonly="";//isReadOnly?"data-role='none'":"";
-  var container=$('<div></div>');
-  Object.keys(progress_status_details_request).forEach(function(key){
-    var item=progress_status_details_request[key];
-    var item_label=$('<label for="'+key+'">'+item.label+'</label>');
-    var val=data[key];
-    if(item.type=="date"||item.type=="datetime") val=new Date(val).toISOString().substr(0,10);
-    var item_ele=$('<input type="'+item.type+'" name="'+key+'" id="'+key+'" value="'+val+'"'+readonly+'>');
-    container.append(item_label);
-    container.append(item_ele);
-    
-  });
-  return container.html();
+function progressDetailsPopup(data,isReadOnly,parent){
+  popup_details_form=new mform({template:progress_form_template});
+  parent.empty();
+  parent.append(popup_details_form.instance);
+  //$(popup_details_form.instance).setData(data,progress_form_template.template);
+  popup_details_form.setData(data);
+  popup_details_form.readOnly(isReadOnly);
+  parent.trigger('create');
 }
 function setElementDisableByReadonly(isReadOnly){
   
@@ -727,12 +724,12 @@ function setElementDisableByReadonly(isReadOnly){
     
     $("#process_update_save_but").addClass('ui-state-disabled');
     $(".ui-but-lock").removeClass('btn-icon-green').addClass('btn-icon-red');
-    $("#progress_status_details").find('input').attr('readonly',true);
+    //$("#progress_status_details").find('input').attr('readonly',true);
     //$("#progress_status_details").find('input').jqmData('role',"none");
     
     //$("#progress_status_details").find('input').attr('data-role', 'none');
-    $("#progress_status_details").find('input').addClass('input-readOnly');
-    $("#progress_status_details").trigger('create');
+    //$("#progress_status_details").find('input').addClass('input-readOnly');
+    //$("#progress_status_details").trigger('create');
 
   }else{
     $("#process_save_but").removeClass('ui-state-disabled');
@@ -740,9 +737,9 @@ function setElementDisableByReadonly(isReadOnly){
     $("#process_update_save_but").removeClass('ui-state-disabled');
     $(".ui-but-lock").removeClass('btn-icon-red').addClass('btn-icon-green');
     
-    $("#progress_status_details").find('input').attr('readonly',false);
-    $("#progress_status_details").find('input').removeClass('input-readOnly');
-    $("#progress_status_details").trigger('create');
+    //$("#progress_status_details").find('input').attr('readonly',false);
+    //$("#progress_status_details").find('input').removeClass('input-readOnly');
+    //$("#progress_status_details").trigger('create');
   }
 }
 

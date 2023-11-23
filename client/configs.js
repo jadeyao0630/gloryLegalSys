@@ -72,6 +72,7 @@ var FormTemplate={
         labelPosition:"left",
         width:"100%",
         textareaHeight:90,
+        isCollapsibleGrouping:true
     },
     template:{
         baseInfo:{
@@ -364,6 +365,43 @@ var regTemplate={
         }
     }
 }
+const progress_form_template={
+    settings:{
+        hasLabel:true,
+        hasPlaceHolder:true,
+        labelPosition:"top",
+        width:"100%",
+        textareaHeight:90,
+        isCollapsibleGrouping:false,
+    },
+    template:{
+        courtName:{
+        type:"text",
+        label:"法院：",
+        isOptional:true,
+        },
+        caseLegal:{
+        type:"text",
+        label:"代理法务：",
+        isOptional:true,
+        },
+        caseLawfirm:{
+        type:"text",
+        label:"代理律所：",
+        isOptional:true,
+        },
+        penaltyAmount:{
+        type:"text",
+        label:"判决金额(万)：",
+        isOptional:true,
+        },
+        exexuteAmount:{
+        type:"text",
+        label:"执行金额(万)：",
+        isOptional:true,
+        },
+    }
+  }
 const progress_status_details_request={
     /*
     courtDate:{

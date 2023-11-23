@@ -68,10 +68,14 @@ $('.ui-but-lock-edit').on('click',function(e){
         
         console.log(data.isReadOnly);
         if(data.isReadOnly){
+            
+            $("#reg_form_title").text("查看档案");
             $('#caseReg_but').addClass("ui-state-disabled");
             
             $(".ui-but-lock-edit").removeClass('btn-icon-green').addClass('btn-icon-red');
         }else{
+            
+            $("#reg_form_title").text("修改档案");
             $('#caseReg_but').removeClass("ui-state-disabled");
             $(".ui-but-lock-edit").removeClass('btn-icon-red').addClass('btn-icon-green');
         }
@@ -124,7 +128,7 @@ function _createNewCaseForm(template){
         const dateAdded = new Date();
         var hasError=false;
         result['id']=sessionStorage.getItem("currentId");
-        collectFormValues(FormTemplate,sessionStorage.getItem("currentId"),function(hasError,values){
+        main_form.instance.getValues(sessionStorage.getItem("currentId"),FormTemplate.template,function(hasError,values){
 			//console.log("hasError...."+hasError)
 			
 			//console.log(values)
@@ -157,13 +161,15 @@ function _createNewCaseForm(template){
 }
 function _setData(data){
     sessionStorage.setItem("currentId", data.id);
-    $("#reg_form_title").text("修改档案");
+    
     $('.progress_lock.edit-info').removeClass('hide');
     if(data.isReadOnly){
+        $("#reg_form_title").text("查看档案");
         $('#caseReg_but').addClass("ui-state-disabled");
         
         $(".ui-but-lock-edit").removeClass('btn-icon-green').addClass('btn-icon-red');
     }else{
+        $("#reg_form_title").text("修改档案");
         $('#caseReg_but').removeClass("ui-state-disabled");
         $(".ui-but-lock-edit").removeClass('btn-icon-red').addClass('btn-icon-green');
     }
@@ -196,6 +202,7 @@ async function _addEmptyData(){
     await getCaseLatestIndex().then(id=>{
         //console.log(id);
         sessionStorage.setItem("currentId", id+1);
+        main_form.readOnly(false);
     $('.progress_lock.edit-info').addClass('hide');
         $("#reg_form_title").text("新增档案");
         console.log("新增档案============================");

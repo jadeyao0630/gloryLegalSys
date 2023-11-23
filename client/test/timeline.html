@@ -402,7 +402,7 @@
             }
         ]
         drawTimeline(_data,_ctx);
-        console.log(["Jenny", "Matilda", "Greta"].indexOf("Matilda")); // true
+        //console.log(["Jenny", "Matilda", "Greta"].indexOf("Matilda")); // true
 
         _cricles.forEach((circle)=>{
             //console.log(Object.getPrototypeOf(circle))
@@ -486,7 +486,7 @@
                             var _collapsibleLabel=$('<h4 class="ui-field-contain" style="margin:0px;border:none;"><div style="display:grid;grid-template-columns: auto 1fr;column-gap: 9px;margin-left:-3px"><label style="margin-top:2px;margin-bottom:-2px;">'+
                                 label+'</label><label style="margin-top:2px;margin-bottom:-2px;">'+val+'</label></div><span class="ui-li-count">'+multiValues.length+'</span></h4>');
                             _collapsibleset.append(_collapsibleLabel);
-                            var _listview=$('<ol data-role="listview" data-theme="b" </ol>');
+                            var _listview=$('<ol data-role="listview" data-theme="b"> </ol>');
                             _collapsibleset.append(_listview);
                             multiValues.forEach(v=>{
                                 var _li=$('<li class="ui-field-contain"></li>');

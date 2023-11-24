@@ -525,6 +525,7 @@ $.fn.extend({
     },
     addData:function(type,id,value){
         if(value==undefined) value="";
+        var _self=$(this);
         var elements=_self.find('#'+id);
         if(elements.length>0){
             console.log(id+"--->"+value);

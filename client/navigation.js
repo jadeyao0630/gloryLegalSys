@@ -203,6 +203,7 @@ async function _addEmptyData(){
         //console.log(id);
         sessionStorage.setItem("currentId", id+1);
         main_form.readOnly(false);
+        //main_form.instance.setEmptyData(FormTemplate.template);
     $('.progress_lock.edit-info').addClass('hide');
         $("#reg_form_title").text("新增档案");
         console.log("新增档案============================");
@@ -216,6 +217,7 @@ async function _addEmptyData(){
                 $("#"+id).val("").selectmenu('refresh');
             }
         });
+        
     });
     
 }

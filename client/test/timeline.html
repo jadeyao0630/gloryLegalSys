@@ -16,7 +16,20 @@
         body{
             background-color: white;
             height: 100%;
+            border:none;
         }
+        .ui-collapsible.collapsible-listview .ui-btn{
+background-color: white !important;
+box-shadow: none;
+}
+.ui-collapsible.collapsible-listview{
+    border:none;
+box-shadow: none;
+}
+.ui-li-count{
+    color:white;
+    background: black;
+}
     </style>
 </head>
 <body>
@@ -482,7 +495,7 @@
                             }
                         }
                         if(isMultiValue){
-                            var _collapsibleset=$('<div data-role="collapsible" data-theme="a" data-iconpos="right" data-inset="false" style="border:none;margin-right:-45px;" data-collapsed-icon="carat-d" data-expanded-icon="carat-u"></div>');
+                            var _collapsibleset=$('<div data-role="collapsible" data-theme="a" data-iconpos="right" data-inset="false" class="collapsible-listview" style="border:none;margin-right:-45px;" data-collapsed-icon="carat-d" data-expanded-icon="carat-u"></div>');
                             var _collapsibleLabel=$('<h4 class="ui-field-contain" style="margin:0px;border:none;"><div style="display:grid;grid-template-columns: auto 1fr;column-gap: 9px;margin-left:-3px"><label style="margin-top:2px;margin-bottom:-2px;">'+
                                 label+'</label><label style="margin-top:2px;margin-bottom:-2px;">'+val+'</label></div><span class="ui-li-count">'+multiValues.length+'</span></h4>');
                             _collapsibleset.append(_collapsibleLabel);
@@ -499,6 +512,8 @@
                             //li.append(label_ele);
                             li.append(_collapsibleset);
                             listview.append(li);
+                            console.log('listview.html()');
+                            console.log(listview.html());
                         }else{
                             //console.log(val);
                             

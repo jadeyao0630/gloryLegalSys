@@ -1,4 +1,4 @@
-var tableColumns={
+var firstPageTableColumns={
     id:{
        label: "序号",
        width:50,
@@ -15,37 +15,37 @@ var tableColumns={
     }
 var baseData;
 $(function(){
-    $.mobile.loading( "show", {
-        text: "读取中",
-        textVisible: true,
-        textonly :true,
-        theme: $.mobile.loader.prototype.options.theme,
-        html: ""
-      });
+    showLoading("读取中....");
     if(sessionStorage.getItem("currentUser") && JSON.parse(sessionStorage.getItem("currentUser")).name){
         let user = document.getElementById("name");
         user.innerHTML=JSON.parse(sessionStorage.getItem("currentUser")).name;
         
     }else{
+        SendMessage("错误: "+error.FORM_INVALID_USER.message,"是否跳转到登录页面？",function(){
+            //HideMessage();
+            window.location.href = 'index.html';
+        });
         //document.body.innerHTML="没有登录。。。"
         //window.location.href = 'index.html';
     }
     getUserList(function(r){
         console.log('getUserList........'+(r.length));
-        sessionStorage.setItem("userList",r);
-        userList=r;
-        console.log(userList);
+        //sessionStorage.setItem("userList",JSON.stringify(r));
+        setGlobalJson("userList",r);
+        console.log(getGlobalJson("userList"));
         console.log('getUserList........');
         getCasesData(function(r){
             console.log('getCasesData');
             console.log(r);
+            setGlobalJson("mainData",r);
             baseData=r;
-            _initRegTable(r,tableColumns);
-            $.mobile.loading( "hide");
+            _initRegTable(r,firstPageTableColumns);
+            $("#frame").removeClass('hide');
+            hideLoading();
             //$.mobile.hidePageLoadingMsg(); 
         });
     });
-    console.log($('#popup_form_main'));
+    //console.log($('#popup_form_main'));
     $('#add_case_popup').resize(function(){
         console.log("size changed...");
     })
@@ -55,39 +55,7 @@ $(function(){
 var main_form;
 var form_item_ids=getFormItemsId(FormTemplate);
 _createNewCaseForm(FormTemplate);
-$('.ui-but-lock-edit').on('click',function(e){
-    var id=sessionStorage.getItem("currentId");
-    var datas=baseData.filter(d=>d.id==id);
-    if(datas.length>0){
-        var data=datas[0];
-        console.log(data.isReadOnly);
-        if (data.isReadOnly || data.isReadOnly==1) data.isReadOnly=true;
-        else data.isReadOnly=false;
-        
-        data.isReadOnly=!data.isReadOnly;
-        
-        console.log(data.isReadOnly);
-        if(data.isReadOnly){
-            
-            $("#reg_form_title").text("查看档案");
-            $('#caseReg_but').addClass("ui-state-disabled");
-            
-            $(".ui-but-lock-edit").removeClass('btn-icon-green').addClass('btn-icon-red');
-        }else{
-            
-            $("#reg_form_title").text("修改档案");
-            $('#caseReg_but').removeClass("ui-state-disabled");
-            $(".ui-but-lock-edit").removeClass('btn-icon-red').addClass('btn-icon-green');
-        }
-        Object.keys(form_item_ids).forEach((id)=>{
-                //if(data.isReadOnly) $("#"+id).attr('readOnly',true);
-                //else $("#"+id).attr('readOnly',false);
-        });
-        
-        main_form.readOnly(data.isReadOnly);
-    }
-    
-  });
+
 function _createNewCaseForm(template){
     main_form= new mform({template:template});
     var form=main_form.instance;
@@ -99,177 +67,211 @@ function _createNewCaseForm(template){
     '<div class="ui-block-b"><a id="caseReg_but_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back case-reg-but">取消</a></div></fieldset>'));
     //form.css({padding:"10px 20px"});
     //$("#add_case_popup").children().remove();
-    $(popup_form).html('<h3 id="reg_form_title">新增案件</h3>'+form.html());
+    $(popup_form).html('<h3 id="reg_form_title">新增案件</h3>');
+    $(popup_form).append(form);
     $(popup_form).append($('<div class="progress_lock edit-info hide">'+
                             '<div class="ui-input-btn ui-btn ui-icon-lock ui-btn-icon-notext ui-corner-all ui-shadow btn-icon-red ui-but-lock-edit">'+
                                 '<input type="button" data-enhanced="true" value="锁">'+
                             '</div></div>'));
     $("#add_case_popup").css({"min-width":"1000px"});
-    //console.log($(popup_form).html());
+
+    $("#popup_form_main").trigger('create');
+
+    //#region 按钮点击事件
+
+    //新增案件按钮
     $('#add_case_but').on('click',async function(e){
         //console.log("add......................");
         
-        await _addEmptyData();
-        _setBlurBackgroundVisibility(true);
+        await _showEmptyForm();
         //console.log('currentId...................'+sessionStorage.getItem("currentId"));
     });
+    //表格 提交 和 取消 按钮
     $('.case-reg-but').on('click',function(e){
         //console.log(e.currentTarget);
         if(e.currentTarget.id=="caseReg_but_cancel"){
-
             _setBlurBackgroundVisibility(false);
+        }else if(e.currentTarget.id=="caseReg_but"){
+            main_form.instance.getValues(sessionStorage.getItem("currentId"),FormTemplate.template,function(message,values){
+                if(values.success){
+                    console.log(message.message);
+                    values.data["caseCreateDate"]=getDateTime();
+                    //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
+                    if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
+                        SendMessage("错误: "+error.FORM_INVALID_USER.message,"是否跳转到登录页面？",function(){
+                            //HideMessage();
+                            window.location.href = 'index.html';
+                        });
+                    }else{
+                        values.data["caseApplicant"]=getGlobalJson("currentUser").id;
+                        values.data["isReadOnly"]=_isReadOnlyCurrentForm();
+                        
+                        showLoading("保存中...");
+                        //console.log(values);
+                        insertCase(values.data,function(r){
+                            //console.log(r);
+                            if(r.success){
+                                console.log("修改添加成功。");
+                                SendMessage("提示","保存完成。",function(){
+                                    _setBlurBackgroundVisibility(false);
+                                    location.reload();
+                                },true);
+                                
+                            }else{
+                                console.log(r);
+                                SendMessage("错误",r.error,function(){},true);
+                            }
+                            hideLoading();
+                        });
+                    }
+                    
+                    
+                }else{
+                    console.log(message.message+(message.id==0?" 但是有错误。":""));
+                }
+            });
         }
         //
     });
-    const regist_but = document.getElementById("caseReg_but");
-    const result={};
-    regist_but.addEventListener('click', async function() {
-        
-        const dateAdded = new Date();
-        var hasError=false;
-        result['id']=sessionStorage.getItem("currentId");
-        main_form.instance.getValues(sessionStorage.getItem("currentId"),FormTemplate.template,function(hasError,values){
-			//console.log("hasError...."+hasError)
-			
-			//console.log(values)
-            if(hasError){
-
+    //表格 编辑锁按钮
+    $('.ui-but-lock-edit').on('click',function(e){
+        requestPassword("提示",'这里是需要管理员密码的。',function(e){
+            //HideMessage();
+            console.log(e==auth_code);
+            if(e==auth_code){
+                var id=sessionStorage.getItem("currentId");
+                var datas=baseData.filter(d=>d.id==id);
+                if(datas.length>0){
+                    var data=datas[0];
+                    data.isReadOnly=!Boolean(data.isReadOnly);
+                    showLoading("保存中...");
+                    _setFormReadOnly(data.isReadOnly);
+                    data['caseCreateDate']=getDateTime();
+                    data['caseDate']=getDateTime(data.caseDate);
+                    insertCase(data,function(r){
+                        //console.log(r);
+                        if(r.success){
+                            console.log("修改isReadOnly为"+data.isReadOnly);
+                        }else{
+                            console.log(r);
+                            SendMessage("错误",r.error,function(){
+                                //HideMessage();
+                                
+                            },true);
+                        }
+                        hideLoading();
+                    });
+                }
             }else{
-                $.mobile.loading( "show", {
-                    text: "保存中",
-                    textVisible: true,
-                    textonly :true,
-                    theme: $.mobile.loader.prototype.options.theme,
-                    html: ""
-                  });
-                //console.log(values);
-                insertCase(values,function(r){
-                    //console.log(r);
-                    if(r.success){
-                        console.log("修改添加成功。");
-                        _setBlurBackgroundVisibility(false);
-                        location.reload();
-                        $.mobile.loading( "hide");
-                    }else{
-                        console.log(r.error);
-                    }
-                });
+                console.log("密码无效。");
+                setTimeout(function() {
+                    SendMessage("错误","密码无效。",function(){
+                        //HideMessage();
+                        
+                    },true);
+                  }, 100);
             }
-		});
+            
+        },true);
+        
+        
+    });
+      //#endregion
+}
+function _isReadOnlyCurrentForm(){
+    var datas=baseData.filter(d=>d.id==getGlobal("currentId"));
+    if(datas.length>0)
+        return datas[0].isReadOnly;
+    return true;
+}
+function _showEditForm(data){
+    setGlobal("currentId", data.id);
+    main_form.setData(data);
+    $('.progress_lock.edit-info').removeClass('hide');
+    _setFormReadOnly(data.isReadOnly);
+    _setBlurBackgroundVisibility(true);
+}
+async function _showEmptyForm(){
+    showLoading("读取中....");
+    await getCaseLatestIndex().then(id=>{
+        
+        sessionStorage.setItem("currentId", id+1);
+        //main_form.instance.setEmptyData(FormTemplate.template);
+        main_form.readOnly(false).setEmptyData();
+        $('.progress_lock.edit-info').addClass('hide');
+        $("#reg_form_title").text("新增档案");
+        hideLoading();
+        _setBlurBackgroundVisibility(true);
     });
     
 }
-function _setData(data){
-    sessionStorage.setItem("currentId", data.id);
-    
-    $('.progress_lock.edit-info').removeClass('hide');
-    if(data.isReadOnly){
+function _setFormReadOnly(isReadOnly){
+    if(isReadOnly){
         $("#reg_form_title").text("查看档案");
         $('#caseReg_but').addClass("ui-state-disabled");
-        
         $(".ui-but-lock-edit").removeClass('btn-icon-green').addClass('btn-icon-red');
     }else{
         $("#reg_form_title").text("修改档案");
         $('#caseReg_but').removeClass("ui-state-disabled");
         $(".ui-but-lock-edit").removeClass('btn-icon-red').addClass('btn-icon-green');
     }
-        
-    var dataKeys=Object.keys(data);
-    Object.keys(form_item_ids).forEach((id)=>{
-        if(dataKeys.includes(id)){
-            $("#"+id).val(data[id]);
-            //if(data.isReadOnly) $("#"+id).attr('readOnly',true);
-            //else $("#"+id).attr('readOnly',false);
-            
-            if(form_item_ids[id].type=="radio")  {
-                $("#"+id+"-"+parseInt(data[id])).prop( "checked", true ).checkboxradio( "refresh" );
-            }else if(form_item_ids[id].type=="multicombobox"){
-                if(data[id]==null) data[id]="";
-                $("#"+id).val(data[id].split(","));
-                $("#"+id).selectmenu("refresh");
-            }else if(form_item_ids[id].type=="combobox"){
-                $("#"+id).selectedIndex =parseInt(data[id]);
-                $("#"+id).selectmenu("refresh");
-            }else if(form_item_ids[id].type=="date"||form_item_ids[id].type=="datetime"||form_item_ids[id].type=="time")  {
-                $("#"+id).val(getDateTime(data[id]));
-            }
-            //console.log(id+"--------------------->"+$("#"+id).val());
-        }
-    });
-    main_form.readOnly(data.isReadOnly);
-}
-async function _addEmptyData(){
-    await getCaseLatestIndex().then(id=>{
-        //console.log(id);
-        sessionStorage.setItem("currentId", id+1);
-        main_form.readOnly(false);
-        //main_form.instance.setEmptyData(FormTemplate.template);
-    $('.progress_lock.edit-info').addClass('hide');
-        $("#reg_form_title").text("新增档案");
-        console.log("新增档案============================");
-        
-        Object.keys(form_item_ids).forEach((id)=>{
-            console.log("id: "+id);
-            $("#"+id).val("");
-            if(form_item_ids[id].type=="date"||form_item_ids[id].type=="datetime"||form_item_ids[id].type=="time")  $("#"+id).val(getDateTime());
-            else if(form_item_ids[id].type=="radio")  $("#"+id+"-0").prop( "checked", true ).checkboxradio( "refresh" );
-            else if(form_item_ids[id].type=="multicombobox" || form_item_ids[id].type=="combobox"){
-                $("#"+id).val("").selectmenu('refresh');
-            }
-        });
-        
-    });
-    
+    main_form.readOnly(isReadOnly);
 }
 function _setBlurBackgroundVisibility(isVisible){
     if(isVisible) {
-        
-        //$('.popup-background.popup-a').css({"height":$("#add_case_popup").css('height')});
-        $("#popup_form_main").trigger('create');
-        //console.log("calc(50%+"+($(document).height()-$("#add_case_popup").height())+"px)");
-        
-        //console.log($(window).height());
-        //$("#add_case_popup").css({'top':"calc(50% + "+($("#add_case_popup").height()-$(window).height())/2+"px)"})
-        //console.log($("#add_case_popup").height());
-        $('.popup-background.popup-a').removeClass('popup-hide');
-        //$("#add_case_popup").popup();
-        //$("#add_case_popup").popup("open");
-        $("#add_case_popup").removeClass('popup-hide');
-        $('#add_case_popup').removeClass('popout').addClass('popin');
-        //$('.popup-background.popup-b').css({height:"100%"})
-        //$('.popup-background.popup-b').trigger('create');
-        //console.log($('.popup-background.popup-a'));
+        $("#add_case_popup").popIn($('.popup-background.popup-a'));
     }
     else {
-        $('.popup-background.popup-a').css({"height":"100%"});
-        $('#add_case_popup').removeClass('popin').addClass('popout');
-        $('.popup-background.popup-a').addClass('popup-hide');
-        //$("#add_case_popup").addClass('popup-hide');
-        //$("#add_case_popup").popup("close");
+        $('#add_case_popup').popOut($('.popup-background.popup-a'));
     }
 }
-function SendMessage(title,message,res){
+function SendMessage(title,message,res,isComfirm){
     $("#message_title").text(title);
     $(".message_content").children().remove();
     $(".message_content").append($('<div>'+message+'</div>'));
-    $("#message_popup").removeClass('popup-hide');
-    
-    $('.popup-background.popup-c').removeClass('popup-hide');
-    $('#message_popup').removeClass('popout').addClass('popin');
-    //$('.popup_message_but').removeAttr("click");
-    
-    
-    $('#message_popup').append($('<fieldset class="ui-grid-a popup_message_buts">'+
-            '<div class="ui-block-a"><a id="message_confirm_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_message_but">确认</a></div>'+
-            '<div class="ui-block-b"><a id="message_cancel_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_message_but">取消</a></div>'+
+
+    $(".message_content").trigger('create');
+    $("#message_popup").popIn($('.popup-background.popup-c'));
+
+    $('#message_popup').append($('<fieldset class="'+(isComfirm?'':'ui-grid-a ')+'popup_message_buts">'+
+            '<div'+(isComfirm?'':' class="ui-block-a"')+'><a id="message_confirm_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_message_but">确认</a></div>'+
+            (isComfirm?'':'<div class="ui-block-b"><a id="message_cancel_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_message_but">取消</a></div>')+
         '</fieldset>'));
-    $('.popup_message_but').on('click',res);
+    $('.popup_message_but').on('click',function(e){
+        if(e.currentTarget.id=="message_confirm_but"){
+            res();
+        }
+        HideMessage();
+    });
+    //$('.popup_message_but').off('click',"**");
+}
+function requestPassword(title,message,res){
+    $("#message_title").text(title);
+    $(".message_content").children().remove();
+    $(".message_content").append($('<div>'+message+'</div>'));
+    
+    $(".message_content").append($('<input type="password" id="auth_code" value="" placeholder="请输入密码">'));
+    
+
+    $(".message_content").trigger('create');
+
+    $('#message_popup').append($('<fieldset class="ui-grid-a popup_message_buts">'+
+            '<div class="ui-block-a"><a id="pass_confirm_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_message_but">确认</a></div>'+
+            '<div class="ui-block-b"><a id="pass_cancel_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_message_but">取消</a></div>'+
+        '</fieldset>'));
+    $('.popup_message_but').on('click',function(e){
+        if(e.currentTarget.id=="pass_confirm_but"){
+            res($('#auth_code').val());
+        }
+        HideMessage();
+    });
+    $("#message_popup").popIn($('.popup-background.popup-c'));
     //$('.popup_message_but').off('click',"**");
 }
 function HideMessage(){
-    $('#message_popup').removeClass('popin').addClass('popout');
-    
-    $('.popup-background.popup-c').addClass('popup-hide');
+    $("#message_popup").popOut($('.popup-background.popup-c'));
+    $(".message_content").children().remove();
     $('.popup_message_buts').remove();
     
 }
+

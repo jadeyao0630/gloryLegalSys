@@ -40,6 +40,41 @@ function formatIndex(position){
     var sub=Math.round((position-main)*10);
     return {main:main,sub:sub};
 }
+$.fn.extend({
+    popIn:function(overlay){
+        if(overlay!=undefined) $(overlay).removeClass('popup-hide');
+        $(this).removeClass('popup-hide');
+        $(this).removeClass('popout').addClass('popin');
+    },
+    popOut:function(overlay){
+        $(this).removeClass('popin').addClass('popout');
+        if(overlay!=undefined) $(overlay).addClass('popup-hide');
+    }
+});
+function setGlobal(key,value){
+    sessionStorage.setItem(key,value);
+}
+function getGlobal(key){
+    return sessionStorage.getItem(key);
+}
+function setGlobalJson(key,value){
+    sessionStorage.setItem(key,JSON.stringify(value));
+}
+function getGlobalJson(key){
+    return JSON.parse(sessionStorage.getItem(key))
+}
+function showLoading(message){
+    $.mobile.loading( "show", {
+        text: message,
+        textVisible: true,
+        textonly :true,
+        theme: "b",
+        html: ""
+      });
+}
+function hideLoading(){
+    $.mobile.loading( "hide");
+}
 //#region 关于生成表单的功能
 function loadCssCode(code) {
     var style = document.createElement('style')
@@ -70,74 +105,5 @@ function getFormItemsId(template){
     });
     return form_item_ids;
 }
-function collectFormValues(template,dataId,res){
-    const values={"id":dataId};
-    var hasError=false;
-    var catelogs=Object.keys(template.template);
-    catelogs.forEach((catelog_key)=>{
-        var catelog=template.template[catelog_key];
-        
-        if(catelog.data!=undefined && Object.keys(catelog.data).length>0){
-            var catelog_item_keys=Object.keys(catelog.data);
-            catelog_item_keys.forEach((item_key)=>{
-                //form_item_ids[item_key]=catelog.data[item_key];
-                if(catelog.data[item_key].type.toLowerCase()=='radio'){
-                    values[item_key]=parseInt(document.querySelector('input[name="'+item_key+'"]:checked').id.replace(item_key+"-",""));
-                }else{
-                    var element=document.getElementById(item_key);
-                    values[item_key]=dataValidation(element,catelog.data[item_key],function(he){
-                        hasError=he;
-                    });
-                }
-            });
-        }
-    });
-    values["caseCreateDate"]=getDateTime();
-    //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
-    if(sessionStorage.getItem("currentUser")==undefined && sessionStorage.getItem("currentUser").id){
-        console.log("currentUser-- has error value");
-        hasError=true;
-    }
-    values["caseApplicant"]=JSON.parse(sessionStorage.getItem("currentUser")).id;
-    res(hasError,values);
-}
-function dataValidation(element,itemTemplate,res){
-    switch (element.nodeName.toUpperCase()){
-        case "INPUT":
-            
-            var val=element.value;
-            //console.log(element.type);
-            if(element.type.toLowerCase()=="date"||element.type.toLowerCase()=="time"||element.type.toLowerCase()=="datetime"){
-                val=new Date(val).toISOString().slice(0, 19).replace('T', ' ');
-            }else if(itemTemplate.numberOnly){
-                if(eval.length==0) val=0;
-                else val=parseInt(val);
-            }
-            if(val.length==0 && !itemTemplate.isOptional){
-                console.log(itemTemplate.label+"-- has error value"+val);
-                res(true);
-            }
-            return val;
-        case "SELECT":
-            //console.log(itemTemplate.label+"-->"+$(element).find(":selected").length);
-            var val=[];
-            $.each($(element).find(":selected"),function(index,opt){
-                //console.log(itemTemplate.label+"--------->"+opt.value);
-                val.push(opt.value);
-            });
-            if(val.length==0 && !itemTemplate.isOptional) {
-                console.log(itemTemplate.label+"-- has empty value"+val);
-                res(true);
-            }
-            //console.log(itemTemplate.label+"("+val.length+")--------->"+val.join(","));
-            return val.join(",");
-        case "TEXTAREA":
-            return element.value;
-    }
-    
-    res(false);
-}
-
-//#endregion
 
 //#endregion 

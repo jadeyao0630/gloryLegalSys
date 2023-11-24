@@ -685,7 +685,7 @@ function SetData(data,key,item,isReadOnly){
       };
       item_ele.append($('<input  '+w+datarole+' type="text" id="'+key+'_'+item.subid+'" value="'+val+'"'+readonly+'>'));
     }else{
-      var selectItem=$('<select id="'+key+'_'+item.subid+'" value='+item[key]+readonly+'></select>');
+      var selectItem=$('<select id="'+key+'_'+item.subid+'" value="'+item[key]+'" '+readonly+'></select>');
     
       if(data[key].data){
         data[key].data.forEach((d,counter)=>{
@@ -713,8 +713,7 @@ function progressDetailsPopup(data,isReadOnly,parent){
   parent.empty();
   parent.append(popup_details_form.instance);
   //$(popup_details_form.instance).setData(data,progress_form_template.template);
-  popup_details_form.setData(data);
-  popup_details_form.readOnly(isReadOnly);
+  popup_details_form.setData(data).readOnly(isReadOnly);
   parent.trigger('create');
 }
 function setElementDisableByReadonly(isReadOnly){

@@ -1,5 +1,6 @@
 let ip='localhost';
 let port=5555;
+var auth_code='1234';
 const mainPage="main.html";
 class Message{
     static LOGIN_IS_EMPTY='<p style="color:red;">用户名和密码不能为空</p>';

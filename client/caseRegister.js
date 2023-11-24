@@ -1,17 +1,5 @@
 
 
-
-
-
-
-
-
-//_initRegTable(table_data,table_columns);
-
-let userList=[];
-
-
-
 function _initRegTable(table_data,table_columns){
     //console.log("table created: "+table_data);
     const table = document.getElementById("table1");
@@ -46,24 +34,12 @@ function _initRegTable(table_data,table_columns){
                 
             }else if(but.currentTarget.name=="fn_btn_edit"){
                 if(matchItems.length>0){
-                    _setData(matchItems[0]);
-                    //_createNewCaseForm(regTemplate);
-                    //const popup_form = document.getElementById("popup_form_main");
-                    //$("#popup_form_main").trigger("create");
-                    _setBlurBackgroundVisibility(true);
+                    _showEditForm(matchItems[0]);//naviation.js
                 }
                 //console.log($("#popup_form_main"));
             }else if(but.currentTarget.name=="fn_btn_details"){
                 if(matchItems.length>0){
-                    //var data2=table_progress_status.filter(value=>{ return value.id==matchItems[0].id});
-                    //var data3=table_progress_executes.filter(value=>{ return value.id==matchItems[0].id});
-                    //var data4=table_progress_updates.filter(value=>{ return value.id==matchItems[0].id});
-                    //console.log(matchItems[0].id);
                     _setFlowChart(table_progress_data,table_progress_status,table_progress_executes,table_progress_updates,matchItems[0].id);
-                    //_createNewCaseForm(regTemplate);
-                    //const popup_form = document.getElementById("popup_form_main");
-                    //$("#popup_form_main").trigger("create");
-                    //_setBlurBackgroundVisibility(true);
                 }
                 //console.log($("#popup_form_main"));
             }
@@ -143,7 +119,7 @@ function _getTableHTML(data,columnData){
                         body_row_str+=`<td>${formatDateTime(new Date(item[column]),'yyyy年MM月dd日')}</td>`;
                     else if(column=="caseApplicant"){
                         console.log(parseInt(item[column]));
-                        var user=userList.filter((user)=>user.id==parseInt(item[column]));
+                        var user=getGlobalJson("userList").filter((user)=>user.id==parseInt(item[column]));
                         if(user.length>0)
                             body_row_str+=`<td>${user[0].name}</td>`;
                     }

@@ -1,3 +1,8 @@
+class error{
+    static FORM_VALIDATION_COMPLETED={message:"表格检查完毕。",id:0}
+    static FORM_INVALID_USER={message:"您还没有登录。",id:1}
+    static FORM_EMPTY_VALUE={message:"信息没有填写完整。",id:2}
+}
 
 function mform(arg){
     this.opt = {
@@ -7,6 +12,7 @@ function mform(arg){
     this.replacementIndexs={};
     this.orginalIndexs={};
     this.typeIndexs={};
+    this.isReadOnly;
     this.init(arg)
     
 }
@@ -28,7 +34,8 @@ mform.prototype={
         }
         
         //var formItemIds=[];
-        _self.instance=$('<form'+form_width+'></form>');
+        _self.instance=$('<form'+form_width+' onsubmit="javascript:return false;"></form>');
+        _self.instance.template=template.template;
         if(template.settings.isCollapsibleGrouping){
             var catelogs=Object.keys(template.template);
             catelogs.forEach((catelog_key)=>{
@@ -202,7 +209,7 @@ mform.prototype={
             //return item_container;
         }
         function generateMultiComboBoxItem(item_container,item,id){
-            var selectItem=$('<select id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="multiSelect'+
+            var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="multiSelect'+
             (item.isFilterable?" filterSelect":"")+'" multiple="multiple" data-native-menu="false"></select>');
             if(item.data){
                 if(item.data instanceof Array){
@@ -316,6 +323,8 @@ mform.prototype={
         //if(isReadOnly) this.replacementIndexs={};
         console.log("isReadOnly........................."+isReadOnly);
         if(isReadOnly==1) isReadOnly=true;
+        if(this.isReadOnly==isReadOnly) return this;
+        this.isReadOnly=isReadOnly;
         var _self=this;
         $.each(_self.elements,(k,v)=>{
             //console.log(v);
@@ -348,9 +357,12 @@ mform.prototype={
                                 //_self.replacementIndexs[k]=replacementOfMultiSelect(source);
                             }
                             parent=source.parent().parent();
+                            console.log('之前----------------------------');
+                            console.log(parent.html());
                             //source.before(_self.replacementIndexs[k]);
                             source.remove();
                             parent.append( _self.replacementIndexs[k]);
+                            console.log('之后----------------------------');
                             console.log(parent.html());
                         }
                         //单选
@@ -452,41 +464,26 @@ mform.prototype={
             });
             return val;
         }
+        return _self;
     },
-    setData:function(data){
-        console.log("setData..............");
+    setEmptyData:function(template){
         var _self=this;
-        console.log(data);
-        $.each(Object.keys(this.elements),(i,id)=>{
-            
-            var data_keys=Object.keys(data);
-            if(data_keys.includes(id)){
-                console.log(data[id]);
-                _self.instance.find('#'+id).val(data[id]);
-
-                _self.instance.find("#"+id).val(data[id]);
-                //if(data.isReadOnly) $("#"+id).attr('readOnly',true);
-                //else $("#"+id).attr('readOnly',false);
-                
-                if(_self.typeIndexs[id]=="radio")  {
-                    _self.instance.find("#"+id+"-"+parseInt(data[id])).prop( "checked", true ).checkboxradio( "refresh" );
-                }else if(_self.typeIndexs[id]=="multicombobox"){
-                    if(data[id]==null) data[id]="";
-                    _self.instance.find("#"+id).val(data[id].split(","));
-                    _self.instance.find("#"+id).selectmenu("refresh");
-                }else if(_self.typeIndexs[id]=="combobox"){
-                    _self.instance.find("#"+id).selectedIndex =parseInt(data[id]);
-                    _self.instance.find("#"+id).selectmenu("refresh");
-                }else if(_self.typeIndexs[id]=="date"||_self.typeIndexs[id]=="datetime"||_self.typeIndexs[id]=="time")  {
-                    _self.instance.find("#"+id).val(getDateTime(data[id]));
-                }
-            }
-        });
+        if(template==undefined) template=_self.instance.template;
+        _self.instance.setEmptyData(template);
+        return _self;
+    },
+    setData:function(data,template){
+        var _self=this;
+        //console.log(data);
+        if(template==undefined) template=_self.instance.template;
+        _self.instance.setData(data,template);
+        return _self;
     }
 }
 $.fn.extend({
     setEmptyData:function(template){
         var _self=$(this);
+        if(template==undefined) template=_self.template;
         $.each(template,(k,v)=>{
             if(v.hasOwnProperty('type')){
                 _self.addData(v.type,k);
@@ -503,8 +500,13 @@ $.fn.extend({
         });
     },
     setData:function(data,template){
+        
+        console.log("setData....")
+        
         var data_keys=Object.keys(data);
         var _self=$(this);
+        if(template==undefined) template=_self.template;
+        console.log(template)
         $.each(template,(k,v)=>{
             if(v.hasOwnProperty('type')){
                 if(data_keys.includes(k)){
@@ -526,58 +528,88 @@ $.fn.extend({
     addData:function(type,id,value){
         if(value==undefined) value="";
         var _self=$(this);
-        var elements=_self.find('#'+id);
-        if(elements.length>0){
-            console.log(id+"--->"+value);
-            _self.find("#"+id).val(value);
+        var element=_self.find('#'+id);
+        if(element.length>0){
             if(type=="radio")  {
                 if(value=="") value=0;
-                _self.instance.find("#"+id+"-"+parseInt(value)).prop( "checked", true ).checkboxradio( "refresh" );
+                _self.find("#"+id+"-"+parseInt(value)).prop( "checked", true ).checkboxradio( "refresh" );
             }else if(type=="multicombobox"){
-                if(value==null) value="";
-                _self.find("#"+id).val(value.split(","));
-                _self.find("#"+id).selectmenu("refresh");
+                if(value!=null&&value!=undefined&&value.length>0){
+                    value.split(",").forEach((v)=>{
+                        $(element).find("option[value="+v+"]").prop('selected',true);
+                    });
+                }else{
+                    $(element).find("option").prop('selected',false);
+                }
+                
+                //element.val(value.split(","));
+                element.selectmenu("refresh");
             }else if(type=="combobox"){
                 if(value=="") value=0;
-                _self.find("#"+id).selectedIndex =parseInt(value);
-                _self.find("#"+id).selectmenu("refresh");
+                element.selectedIndex =parseInt(value);
+                element.selectmenu("refresh");
             }else if(type=="date"||type=="datetime"||type=="time")  {
                 if(value=="") value=new Date();
-                _self.find("#"+id).val(getDateTime(value));
+                element.val(getDateTime(value));
+            }else{
+                element.val(value);
             }
         }
     },
     getValues:function(dataId,template,response){
+        
+        if(template==undefined) template=this.template;
         const values={"id":dataId};
-        var hasError=false;
         var catelogs=Object.keys(template);
-        catelogs.forEach((catelog_key)=>{
+        var _hasError=false;
+        loop1:
+        for(var catelog_key of catelogs){
             var catelog=template[catelog_key];
             
             if(catelog.data!=undefined && Object.keys(catelog.data).length>0){
                 var catelog_item_keys=Object.keys(catelog.data);
-                catelog_item_keys.forEach((item_key)=>{
+                loop2:
+                for(var item_key of catelog_item_keys){
                     //form_item_ids[item_key]=catelog.data[item_key];
+                    var hasError=false;
                     if(catelog.data[item_key].type.toLowerCase()=='radio'){
                         values[item_key]=parseInt(document.querySelector('input[name="'+item_key+'"]:checked').id.replace(item_key+"-",""));
                     }else{
                         var element=document.getElementById(item_key);
-                        values[item_key]=dataValidation(element,catelog.data[item_key],function(he){
-                            hasError=he;
+                        values[item_key]= dataValidation(element,catelog.data[item_key],function(he){
+                            if(he) {
+                                response(error.FORM_EMPTY_VALUE,{data:values,success:!he});
+                                _hasError=true;
+                                hasError=true;
+                                return;
+                            }
+                            //console.log(item_key+"-->"+hasError);
                         });
                     }
-                });
+                    console.log(item_key+"-->"+hasError);
+                    if(hasError) {
+                        break loop1;
+                    }
+                };
             }
-        });
+            //if(_hasError) return false;
+        };
+        /*
         values["caseCreateDate"]=getDateTime();
         //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
-        if(sessionStorage.getItem("currentUser")==undefined && sessionStorage.getItem("currentUser").id){
+        if(getGlobal("currentUser")==null || getGlobal("currentUser")==undefined){
             console.log("currentUser-- has error value");
-            hasError=true;
+            response(error.FORM_INVALID_USER,values);
+            return;
+        }else{
+            values["caseApplicant"]=JSON.parse(getGlobal("currentUser")).id;
         }
-        values["caseApplicant"]=JSON.parse(sessionStorage.getItem("currentUser")).id;
-        response(hasError,values);
+        */
+        //response(hasError,values);
+        
+        response(error.FORM_VALIDATION_COMPLETED,{data:values,success:!_hasError});
         function dataValidation(element,itemTemplate,res){
+            var hasError=false;
             switch (element.nodeName.toUpperCase()){
                 case "INPUT":
                     
@@ -591,8 +623,9 @@ $.fn.extend({
                     }
                     if(val.length==0 && !itemTemplate.isOptional){
                         console.log(itemTemplate.label+"-- has error value"+val);
-                        res(true);
+                        hasError=true;
                     }
+                    res(hasError);
                     return val;
                 case "SELECT":
                     //console.log(itemTemplate.label+"-->"+$(element).find(":selected").length);
@@ -603,15 +636,22 @@ $.fn.extend({
                     });
                     if(val.length==0 && !itemTemplate.isOptional) {
                         console.log(itemTemplate.label+"-- has empty value"+val);
-                        res(true);
+                        hasError=true;
                     }
+                    res(hasError);
                     //console.log(itemTemplate.label+"("+val.length+")--------->"+val.join(","));
                     return val.join(",");
                 case "TEXTAREA":
+                    var val=element.value;
+                    if(val.length==0 && !itemTemplate.isOptional){
+                        console.log(itemTemplate.label+"-- has error value"+val);
+                        hasError=true;
+                    }
+                    res(hasError);
                     return element.value;
             }
             
-            res(false);
+            
         }
     }
 

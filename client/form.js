@@ -163,7 +163,7 @@ mform.prototype={
             
             item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
             item_container.append(textarea);
-            item_container.find(".ui-input-text").css({"min-height":"90px"});
+            //item_container.find(".ui-input-text").css({"min-height":"60px"});
             return textarea;
             //console.log(item_container);
             //return item_container;
@@ -205,6 +205,7 @@ mform.prototype={
             //var item_container=$('<div class="form_item_panel"></div>');
             item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
             item_container.append(selectItem);
+            //selectItem.selectmenu().selectmenu('refresh');
             return selectItem;
             //return item_container;
         }
@@ -235,10 +236,22 @@ mform.prototype={
             }
             item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
             item_container.append(selectItem);
+            //selectItem.selectmenu().selectmenu('refresh');
             return selectItem;
             //console.log('item_container');
             //console.log(item_container.html());
             //return item_container;
+        }
+        function pageIsSelectmenuDialog( page ) {
+            var isDialog = false,
+            id = page && page.attr( "id" );
+            $( ".filterable-select" ).each( function() {
+                if ( $( this ).attr( "id" ) + "-dialog" === id ) {
+                    isDialog = true;
+                    return false;
+                }
+            });
+            return isDialog;
         }
         $.mobile.document
             // Upon creation of the select menu, we want to make use of the fact that the ID of the
@@ -252,7 +265,8 @@ mform.prototype={
                 // We store the generated form in a variable attached to the popup so we avoid creating a
                 // second form/input field when the listview is destroyed/rebuilt during a refresh.
                 //$("#searchInput").remove();
-            
+                console.log("listview.......................");
+                
                 if ( !form ) {
                     //$("#filterForm").remove();
                     input = $( "<input data-type='search'></input>" );
@@ -262,21 +276,9 @@ mform.prototype={
                         .before( form )
                         .jqmData( "filter-form", form ) ;
                     form.jqmData( "listview", list );
+                    //list.listview( "refresh" );
                 }
                 
-                console.log(form.parent().html());
-                /*
-                else{
-                    $(form).remove();
-                    input = $( "<input data-type='search'></input>" );
-                    form = $( "<form id='searchInput'></form>" ).append( input );
-                    input.textinput();
-                    list
-                        .before( form )
-                        .jqmData( "filter-form", form ) ;
-                    form.jqmData( "listview", list );
-                }
-                */
                 // Instantiate a filterable widget on the newly created selectmenu widget and indicate that
                 // the generated input form element is to be used for the filtering.
                 //console.log($(form).html());
@@ -297,7 +299,11 @@ mform.prototype={
             // the filter input field must be transferred to the dialog so that the user can continue to
             // use it for filtering list items.
             .on( "pagecontainerbeforeshow", function( event, data ) {
+                console.log("pagecontainerbeforeshow.............");
                 var listview, form;
+                if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                    //return;
+                }
                 listview = data.toPage.find( "ul" );
                 form = listview.jqmData( "filter-form" );
                 // Attach a reference to the listview as a data item to the dialog, because during the
@@ -310,8 +316,13 @@ mform.prototype={
             })
             // After the dialog is closed, the form containing the filter input is returned to the popup.
             .on( "pagecontainerhide", function( event, data ) {
+                console.log("pagecontainerhide.............");
                 var listview, form;
+                if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                    return;
+                }
                 listview = data.prevPage.jqmData( "listview" ),
+                console.log(data);
                 form = listview.jqmData( "filter-form" );
                 // Put the form back in the popup. It goes ahead of the listview.
                 if($(listview).parent().find('#searchInput').length==0)
@@ -321,7 +332,7 @@ mform.prototype={
     },
     readOnly:function(isReadOnly){
         //if(isReadOnly) this.replacementIndexs={};
-        console.log("isReadOnly........................."+isReadOnly);
+        console.log("isReadOnly........................."+isReadOnly+"--"+this.isReadOnly);
         if(isReadOnly==1) isReadOnly=true;
         if(this.isReadOnly==isReadOnly) return this;
         this.isReadOnly=isReadOnly;
@@ -370,8 +381,10 @@ mform.prototype={
                             //console.log(parent.parent().parent().html());
                             source.remove();
                             parent.append( _self.replacementIndexs[k]);
+                            
                         }
                         parent.trigger('create');
+                        //source.selectmenu("refresh");
                     }else {
                         var parent=$("#_"+k).parent();
                         replaceElement($("#_"+k),_self.orginalIndexs[k]);
@@ -393,11 +406,14 @@ mform.prototype={
                             source.after(_self.replacementIndexs[k]);
                             source.remove();
                             parent.trigger('create');
+                            //source_children.checkboxradio( "refresh" );
                             //parent.append( _self.replacementIndexs[k]);
                         }
                         
                     }else{
                         var parent=$("#_"+k).parent();
+                        console.log('listview-----------------------')
+                        console.log($( "#" + k + "-menu" ))
                         replaceElement($("#_"+k),_self.orginalIndexs[k]);
                         parent.trigger('create');
                     }
@@ -482,7 +498,7 @@ mform.prototype={
 }
 $.fn.extend({
     setEmptyData:function(template){
-        var _self=$(this);
+        var _self=this;
         if(template==undefined) template=_self.template;
         $.each(template,(k,v)=>{
             if(v.hasOwnProperty('type')){
@@ -524,6 +540,7 @@ $.fn.extend({
                 }
             }
         });
+        //_self.trigger('create');
     },
     addData:function(type,id,value){
         if(value==undefined) value="";
@@ -532,7 +549,7 @@ $.fn.extend({
         if(element.length>0){
             if(type=="radio")  {
                 if(value=="") value=0;
-                _self.find("#"+id+"-"+parseInt(value)).prop( "checked", true ).checkboxradio( "refresh" );
+                _self.find("#"+id+"-"+parseInt(value)).prop( "checked", true ).checkboxradio().checkboxradio( "refresh" );
             }else if(type=="multicombobox"){
                 if(value!=null&&value!=undefined&&value.length>0){
                     value.split(",").forEach((v)=>{
@@ -543,11 +560,12 @@ $.fn.extend({
                 }
                 
                 //element.val(value.split(","));
-                element.selectmenu("refresh");
+                element.selectmenu().selectmenu("refresh");
             }else if(type=="combobox"){
+                console.log(id+"---->"+value);
                 if(value=="") value=0;
-                element.selectedIndex =parseInt(value);
-                element.selectmenu("refresh");
+                $(element).find("option[value="+value+"]").prop('selected',true);
+                element.selectmenu().selectmenu("refresh");
             }else if(type=="date"||type=="datetime"||type=="time")  {
                 if(value=="") value=new Date();
                 element.val(getDateTime(value));

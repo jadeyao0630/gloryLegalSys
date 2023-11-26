@@ -5,8 +5,8 @@ const table_progress_data=[
 ];
 //案件进展数据
 const table_progress_status=[
-  {id:1,caseNo:"A202311110005",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:4.1,courtName:"东城法院"},
-  {id:2,caseNo:"A202311110004",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-12-11 14:00:00",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:1,courtName:"大兴法院"}
+  {id:1,caseNo:"A202311110005",caseLegal:1,caseLawfirm:"",caseAttorney:"",FristCounterData:"2023-12-11 14:00:00",SecondCounterData:"",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:4.1,courtName:"东城法院"},
+  {id:2,caseNo:"A202311110004",caseLegal:0,caseLawfirm:1,caseAttorney:"",FristCounterData:"2023-12-11 14:00:00",SecondCounterData:"",penaltyAmount:500.00,exexuteAmount:300.00,caseStatus:1,courtName:"大兴法院"}
 ]
 //案件资产数据
 const table_progress_property=[

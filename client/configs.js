@@ -1,6 +1,7 @@
-let ip='localhost';
+let ip='cn.luyao.site';
 let port=5555;
 var auth_code='1234';
+var enableConsoleLog=true;
 const mainPage="main.html";
 class Message{
     static LOGIN_IS_EMPTY='<p style="color:red;">用户名和密码不能为空</p>';
@@ -17,7 +18,10 @@ var caseRelatedParty={
     "公司":["国瑞信业建筑工程设计有限公司","国瑞德恒房地产开发有限公司","国瑞信业地产股份有限公司"],
     "个人":["张丽佳","李立","郑智"]
 }
-const projects=["北七家","大兴"]
+var legalAffairs=["无","贺璐璐","李俊峰","王培斯"];
+var lawFirms=["无","君合","白朗"];
+var Attorneys={"君合":["李海孚"],"白朗":["崔瀚文"]};
+const projects=["北七家","大兴"];
 const case_orgnization=["大兴法院","东城法院"];
 var case_orgnizationPersonnel={
     "法官":["李新亮 57362323","郭艳 57362676","张振 57362300"],
@@ -65,6 +69,22 @@ const columns={
     caseCreateDate:"datetime NOT NULL",
     isReadOnly:"bool NOT NULL",
 }
+
+var firstPageTableColumns={
+    id:{
+    label: "序号",
+    width:50,
+    },
+    caseNo:{
+        label:"案件编号"
+    },
+    caseName:{label:"案件名称"},
+    caseReason:{label:"案由",data:case_causes},
+    caseType:{label:"案件类型",data:case_types},
+    caseBelong:{label:"所属项目",data:projects},
+    caseApplicant:{label:"申请人",},
+    caseCreateDate:{label:"创建时间"},
+}
 var FormTemplate={
     settings:{
         templateColumn:"50% 50%",
@@ -72,7 +92,7 @@ var FormTemplate={
         hasPlaceHolder:true,
         labelPosition:"left",
         width:"100%",
-        textareaHeight:90,
+        textareaHeight:50,
         isCollapsibleGrouping:true
     },
     template:{
@@ -218,151 +238,156 @@ var FormTemplate={
         }
     }
 }
-var regTemplate={
-    baseInfo:{
-        label:"基础信息",
-        data:{
-            caseNo:{
-                placeholder:"案件编号",
-                label:"案件编号:",
-                type:"text",
-                isOptional:false,
-            },
-            caseName:{
-                placeholder:"案件名称",
-                label:"案件名称:",
-                type:"text",
-                isOptional:false,
-            },
-            caseLabel:{
-                placeholder:"案件标签",
-                label:"案件标签:",
-                type:"combobox",
-                isOptional:false,
-                data:case_labels
-            },
-            /*
-            caseDepartment:{
-                placeholder:"所属业务单元",
-                label:"所属业务单元:",
-                type:"combobox",
-                isOptional:false,
-                data:["无"]
-            },
-            caseCompany:{
-                placeholder:"所属地区公司",
-                label:"所属地区公司:",
-                type:"combobox",
-                isOptional:false,
-                data:["无"]
-            },
-            */
-            caseProject:{
-                placeholder:"所属项目",
-                label:"所属项目:",
-                type:"combobox",
-                isOptional:false,
-                data:projects
-            },
-            casePersonnel:{
-                placeholder:"我方当事人",
-                label:"我方当事人:",
-                type:"text",
-                isOptional:false,
-            },
-            case2ndParty:{
-                placeholder:"对方当事人",
-                label:"对方当事人:",
-                type:"multicombobox",
-                isOptional:false,
-                data:caseRelatedParty,
-                isFilterable:true
-            },
-            caseCatelog:{
-                placeholder:"案件类别",
-                label:"案件类别:",
-                type:"radio",
-                isOptional:false,
-                data:case_catelogs
-            },
-            caseType:{
-                placeholder:"案件类型",
-                label:"案件类型:",
-                type:"radio",
-                isOptional:false,
-                data:case_types
-            },
-            caseAttachments:{
-                placeholder:"上传文件",
-                label:"附件:",
-                type:"file",
-                isOptional:true,
-                data:"支持扩展名：rar. zip. doc. docx. pdf. jpg… 单个文件不超过200MB"
-            }
-        }
-        
+var FormTemplate3={
+    settings:{
+        templateColumn:"33.3% 33.3% 33.3%",
+        hasLabel:true,
+        hasPlaceHolder:true,
+        labelPosition:"left",
+        width:"100%",
+        textareaHeight:50,
+        isCollapsibleGrouping:true
     },
-    caseInfo:{
-        label:"案件信息",
-        data:{
-            caseCause:{
-                placeholder:"案由",
-                label:"案由:",
-                type:"combobox",
-                isOptional:false,
-                data:case_causes
-            },
-            caseDate:{
-                placeholder:"立案日期",
-                label:"立案日期:",
-                type:"date",
-                isOptional:false,
-            },
-            caseOrgnization:{
-                placeholder:"受理机构",
-                label:"受理机构:",
-                type:"text",
-                isOptional:false,
-            },
-            caseReason:{
-                placeholder:"案发原因",
-                label:"案发原因:",
-                type:"combobox",
-                isOptional:false,
-                data:case_reason
-            },
-            caseLawsuit:{
-                placeholder:"本诉金额",
-                label:"本诉金额(万元);",
-                type:"text",
-                isOptional:true,
-                numberOnly:true
-            },
-            caseCounterclaim:{
-                placeholder:"反诉金额",
-                label:"反诉金额(万元):",
-                type:"text",
-                isOptional:true,
-                numberOnly:true
-            },
-            caseLawsuitRequest:{
-                placeholder:"本诉请求",
-                label:"本诉请求:",
-                type:"textarea",
-                isOptional:true,
-            },
-            caseCounterclaimRequest:{
-                placeholder:"反诉请求",
-                label:"反诉请求:",
-                type:"textarea",
-                isOptional:true,
-            },
-            caseSum:{
-                placeholder:"案件摘要",
-                label:"案件摘要:",
-                type:"textarea",
-                isOptional:true,
-            },
+    template:{
+        baseInfo:{
+            label:"基础信息",
+            data:{
+                caseNo:{
+                    placeholder:"案件编号",
+                    label:"案件编号:",
+                    type:"text",
+                    isOptional:false,
+                },
+                caseName:{
+                    placeholder:"案件名称",
+                    label:"案件名称:",
+                    type:"text",
+                    isOptional:false,
+                },
+                caseLabel:{
+                    placeholder:"案件标签",
+                    label:"案件标签:",
+                    type:"combobox",
+                    isOptional:false,
+                    data:case_labels
+                },
+                caseProject:{
+                    placeholder:"所属项目",
+                    label:"所属项目:",
+                    type:"combobox",
+                    isOptional:false,
+                    data:projects
+                },
+                casePersonnel:{
+                    placeholder:"我方当事人",
+                    label:"我方当事人:",
+                    type:"multicombobox",
+                    isOptional:false,
+                    data:caseRelatedParty,
+                    isFilterable:true 
+                },
+                case2ndParty:{
+                    placeholder:"对方当事人",
+                    label:"对方当事人:",
+                    type:"text",
+                    isOptional:false,
+                },
+                caseCatelog:{
+                    placeholder:"案件类别",
+                    label:"案件类别:",
+                    type:"radio",
+                    isOptional:false,
+                    data:case_catelogs
+                },
+                caseType:{
+                    placeholder:"案件类型",
+                    label:"案件类型:",
+                    type:"radio",
+                    isOptional:false,
+                    data:case_types
+                },
+                caseDate:{
+                    placeholder:"立案日期",
+                    label:"立案日期:",
+                    type:"date",
+                    isOptional:false,
+                },
+                caseAttachments:{
+                    placeholder:"上传文件",
+                    label:"附件:",
+                    type:"file",
+                    isOptional:true,
+                    data:"支持扩展名：rar. zip. doc. docx. pdf. jpg… 单个文件不超过200MB"
+                }
+            }
+            
+        },
+        caseInfo:{
+            label:"案件信息",
+            data:{
+                caseCause:{
+                    placeholder:"案由",
+                    label:"案由:",
+                    type:"combobox",
+                    isOptional:false,
+                    data:case_causes,
+                    isFilterable:true
+                },
+                caseReason:{
+                    placeholder:"案发原因",
+                    label:"案发原因:",
+                    type:"combobox",
+                    isOptional:false,
+                    data:case_reason
+                },
+                caseOrgnization:{
+                    placeholder:"受理机构",
+                    label:"受理机构:",
+                    type:"combobox",
+                    isOptional:false,
+                    data:case_orgnization
+                },
+                caseOrgnizationPersonnel:{
+                    placeholder:"受理相关人",
+                    label:"受理相关人:",
+                    type:"multicombobox",
+                    isOptional:true,
+                    data:case_orgnizationPersonnel,
+                    isFilterable:true 
+                },
+                caseLawsuit:{
+                    placeholder:"本诉金额",
+                    label:"本诉金额(万元);",
+                    type:"text",
+                    isOptional:true,
+                    numberOnly:true
+                },
+                caseCounterclaim:{
+                    placeholder:"反诉金额",
+                    label:"反诉金额(万元):",
+                    type:"text",
+                    isOptional:true,
+                    numberOnly:true
+                },
+                caseLawsuitRequest:{
+                    placeholder:"本诉请求",
+                    label:"本诉请求:",
+                    type:"textarea",
+                    isOptional:true,
+                },
+                caseCounterclaimRequest:{
+                    placeholder:"反诉请求",
+                    label:"反诉请求:",
+                    type:"textarea",
+                    isOptional:true,
+                },
+                caseSum:{
+                    placeholder:"案件摘要",
+                    label:"案件摘要:",
+                    type:"textarea",
+                    isOptional:true,
+                },
+            }
         }
     }
 }
@@ -377,18 +402,27 @@ const progress_form_template={
     },
     template:{
         courtName:{
-        type:"text",
+            type:"combobox",
+            data:case_orgnization,
         label:"法院：",
         isOptional:true,
         },
         caseLegal:{
-        type:"text",
+            type:"combobox",
+            data:legalAffairs,
         label:"代理法务：",
         isOptional:true,
         },
         caseLawfirm:{
-        type:"text",
+            type:"combobox",
+            data:lawFirms,
         label:"代理律所：",
+        isOptional:true,
+        },
+        caseAttorney:{
+            type:"multicombobox",
+            data:Attorneys,
+        label:"代理律师：",
         isOptional:true,
         },
         penaltyAmount:{
@@ -415,8 +449,9 @@ const progress_status_details_request={
       label:"法院："
     },
     caseLegal:{
-      type:"text",
-      label:"代理法务："
+      label:"代理法务：",
+      type:"combobox",
+      data:legalAffairs,
     },
     caseLawfirm:{
       type:"text",
@@ -449,12 +484,12 @@ var list={
     propertyName:{
       label:"资产",
       type:"text",
-      width:550,
+      width:'70%',
     },propertyStatus:{
       label:"状态",
       type:"combobox",
-      data:property_status,
       width:150,
+      data:property_status,
     },dateUpdated:{
       label:"更新日期",
       type:"date",
@@ -508,3 +543,9 @@ var list={
       type:"text",
     }
   }
+
+const PopupBottomYesNo='<fieldset class="ui-grid-a popup_message_buts">'+
+'<div class="ui-block-a"><a id="{0}" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_message_but">{2}</a></div>'+
+'<div class="ui-block-b"><a id="{1}" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_message_but">{3}</a></div>'+
+'</fieldset>';
+const PopupBottomYes='<div class="popup_message_buts"><a id="{0}" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_message_but">{1}</a></div>';

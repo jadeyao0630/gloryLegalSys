@@ -14,6 +14,12 @@ var firstPageTableColumns={
     caseCreateDate:{label:"创建时间"},
     }
 var baseData;
+const resizeObserver = new ResizeObserver(entries => 
+    console.log('Body height changed:', entries[0].target.clientHeight)
+  )
+  
+  // start observing a DOM node
+  resizeObserver.observe(document.body)
 $(function(){
     showLoading("读取中....");
     if(sessionStorage.getItem("currentUser") && JSON.parse(sessionStorage.getItem("currentUser")).name){
@@ -218,8 +224,13 @@ function _setFormReadOnly(isReadOnly){
     main_form.readOnly(isReadOnly);
 }
 function _setBlurBackgroundVisibility(isVisible){
+    //$("#add_case_popup").css({width:"100%",height:"100%"});
     if(isVisible) {
         $("#add_case_popup").popIn($('.popup-background.popup-a'));
+        setTimeout(function() {
+            //$("#add_case_popup").addClass('popup-fullscreen');
+          }, 1000);
+    //$("#add_case_popup").css({width:"100%",height:"100%"});
     }
     else {
         $('#add_case_popup').popOut($('.popup-background.popup-a'));
@@ -232,11 +243,9 @@ function SendMessage(title,message,res,isComfirm){
 
     $(".message_content").trigger('create');
     $("#message_popup").popIn($('.popup-background.popup-c'));
-
-    $('#message_popup').append($('<fieldset class="'+(isComfirm?'':'ui-grid-a ')+'popup_message_buts">'+
-            '<div'+(isComfirm?'':' class="ui-block-a"')+'><a id="message_confirm_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_message_but">确认</a></div>'+
-            (isComfirm?'':'<div class="ui-block-b"><a id="message_cancel_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_message_but">取消</a></div>')+
-        '</fieldset>'));
+    var but_html=PopupBottomYesNo.format('pass_confirm_but','pass_cancel_but','确认','取消');
+    if (isComfirm) but_html=PopupBottomYes.format('pass_confirm_but','确认');
+    $('#message_popup').append($(but_html));
     $('.popup_message_but').on('click',function(e){
         if(e.currentTarget.id=="message_confirm_but"){
             res();
@@ -254,11 +263,8 @@ function requestPassword(title,message,res){
     
 
     $(".message_content").trigger('create');
-
-    $('#message_popup').append($('<fieldset class="ui-grid-a popup_message_buts">'+
-            '<div class="ui-block-a"><a id="pass_confirm_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_message_but">确认</a></div>'+
-            '<div class="ui-block-b"><a id="pass_cancel_but" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_message_but">取消</a></div>'+
-        '</fieldset>'));
+    //console.log();
+    $('#message_popup').append($(PopupBottomYesNo.format('pass_confirm_but','pass_cancel_but','确认','取消')));
     $('.popup_message_but').on('click',function(e){
         if(e.currentTarget.id=="pass_confirm_but"){
             res($('#auth_code').val());

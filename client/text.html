@@ -5,44 +5,258 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
 	<link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
+	<link rel="stylesheet" href="./css/all.css" />
 	<link rel="stylesheet" href="./css/form.css" />
+	<link rel="stylesheet" href="./css/popup.css" />
+	<link rel="stylesheet" href="./css/color.css" />
 	<script src="./js/jquery.js"></script>
 	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
 	<script src="./configs.js"></script>
 	<script src="./js/db.js"></script>
 	<script type="text/javascript" src="./js/tools.js"></script>
+	
+	<script type="text/javascript" src="./form.js"></script>
+	<script type="text/javascript" src="./utilities/tables.js"></script>
+	<script type="text/javascript" src="./utilities/events.js"></script>
+	<style>
+		.fixedHeader{
+			overflow:hidden;background: #262626;color:white;text-shadow: none;padding:0px;
+		}
+		.ui-content{
+			border: none;
+		}
+		.navbar{
+            background: #262626;
+            text-align: center;
+            vertical-align: middle;
+			width:100%;
+			margin:0px;
+			border: none;
+        }
+        .nav-but{
+            height:50px;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 20px;
+        }
+        .nav-but::after {
+            background-size: 20px !important;
+            border-radius: 16px;
+            width: 32px !important;
+            height: 32px !important;
+            margin-bottom: 10px;
+            margin-left: 20px;
+            margin-top: -15px;
+			
+        }
+		.hide{
+			display: none;
+		}
+		#name{
+			text-align: right;
+			margin-right: 20px;
+			margin-top: 3px;
+			line-height: 20px;
+			height: 20px;
+            width: 80px;
+            font-size: 16px;
+		}
+		#main-container{
+			position: absolute;
+			top:0;
+			left:0;
+			height: 100%;
+			width:100%;
+			background: whitesmoke;
+			z-index: 1002;
+			text-align: center;
+			vertical-align: middle;
+			
+		}
+		#main-container h1{
+			margin-top: 25%;
+			margin-left: 50%;
+			vertical-align: middle;
+    		transform:translate(-50%,-50%);
+		}
+		.grid2Column{
+			display:grid;
+			grid-template-columns: auto auto;
+		}
+		/* page1  */
+		#pageOneTable{
+			margin: 0px 10px;
+			width:100%;
+		}
+		#pageOneTable tbody tr td{
+            text-align: center;
+            vertical-align: middle;
+        }
+        #pageOneTable thead tr th{
+            text-align: center;
+            vertical-align: middle;
+        }
+		#pone_fun_buts{
+			top:195px;
+            left:15px;
+			position: absolute;
+		}
+		/* page1  */
+		.ui-selectmenu.ui-popup .ui-input-search {
+    margin-left: .5em;
+    margin-right: .5em;
+}
+.ui-selectmenu.ui-dialog .ui-content {
+    padding-top: 0;
+}
+.ui-selectmenu.ui-dialog .ui-selectmenu-list {
+    margin-top: 0;
+    background: white;
+}
+.ui-selectmenu.ui-popup .ui-selectmenu-list li.ui-first-child .ui-btn {
+    border-top-width: 1px;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+}
+.ui-selectmenu.ui-dialog .ui-header {
+    border-bottom-width: 1px;
+}
+.progress_lock{
+			z-index: 99;
+			margin-right:10px;
+			margin-top: -5px;
+			margin-bottom: -5px;
+		}
+		.ui-but-lock-edit:after{
+			background-size: 20px !important;
+            border-radius: 16px;
+            width: 32px !important;
+            height: 32px !important;
+			left:9px;
+			top:8px;
+		}
+		.edit-lock{
+			margin-right: 10px;
+			cursor: pointer;
+		}
+	</style>
 </head>
 <body>
-	<div id="form_parent">test</div>
-	<script>
-		getCaseLatestIndex().then(id=>{console.log(id);});
+	
+	<div data-role="page" id="main">
 		
-		console.log("generateForm");
-		console.log(FormTemplate);
-		var fieldset=$('<fieldset class="ui-grid-a"></fieldset>');
-		var ba=$('<div class="ui-block-a"></div>');
-		var bb=$('<div class="ui-block-b"></div>');
-		var submit=$('<button type="submit" id="caseReg_but" class="ui-btn ui-corner-all ui-shadow ui-icon-check case-reg-but">提交</button>');
-		var cancel=$('<a id="caseReg_but_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back case-reg-but">取消</a>');
-		ba.append(submit);
-		bb.append(cancel);
-		fieldset.append(ba);
-		
-		fieldset.append(bb);
-		var form=generateForm(FormTemplate,fieldset);
-		//form.append();
-		
-		$('#form_parent').children().remove();
-		
-		$('#form_parent').append(form);
-		$('#form_parent').trigger( "create" );
-		cancel.on("click",function(e){
-			collectFormValues(FormTemplate,1,function(hasError,values){
-			console.log("hasError...."+hasError)
+		<div data-role="header" style="overflow:hidden;background: #262626;color:white;text-shadow: none;padding:0px;" data-position="fixed">
+			<h1 style="font-size: 30px;display: flex;margin: 0 0 0 15px;padding:10px;">国瑞法务管理系统</h1>
+			<a id="name" href="#popupMenu" data-rel="popup" data-transition="slideup" data-icon="user" class="ui-btn-right">登录</a>
+            <div data-role="popup" id="popupMenu" data-theme="b" data-history="false">
+                <ul data-role="listview" data-inset="true" style="min-width:210px;">
+                    <li data-role="list-divider"></li>
+                    <li style="margin:0;padding:0px;"><button class="ui-btn ui-shadow ui-btn-b ui-btn-icon-left ui-icon-power noMargin" onclick='location.href=("index.html")'>退出</button></li>
+                </ul>
+            </div>
+
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#page1" class="ui-btn-active ui-btn ui-icon-bullets ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><h2>案件登记查询</h2></a></li>
+                    	<li><a href="#page2" class="ui-btn ui-icon-star ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><h2>案件进展执行</h2></a></li>
+                    	<li><a href="#page3" class="ui-btn ui-icon-gear ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><h2>设置</h2></a></li>
+					</ul>
+				</div><!-- /navbar -->
+		</div><!-- /header -->
+	
+	<div id="page1" class="ui-body-d ui-content">
+		<div id="table_with_fn">
+			<form class="ui-filterable filtertable1">
+				<input id="filterBasic-input" placeholder="搜索关键字" data-type="search">
+			</form>
+		</div>
+		<div data-role="controlgroup" data-type="horizontal" id="pone_fun_buts">
+			<a href="#fullscreenPage" id="case_reg_but_add" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-left btn-icon-green case_reg_but">新增</a>
+			<!--#region 登记案件弹窗  -->
 			
-			console.log(values)
+			<!--#endregion -->
+			<a href="#" id="case_reg_but_remove" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left btn-icon-red case_reg_but">删除</a>
+		</div>
+		<table id="pageOneTable" data-mode="columntoggle" class="ui-responsive table-stroke" data-role="table" data-column-btn-text="列" data-filter="true" data-input="#filterBasic-input"></table>
+	</div>
+	<div id="page2" class="hide">
+	</div>
+	<div id="page3" class="ui-body-d ui-content hide">
+		<h1>设置</h1>
+	</div>
+		<div data-role="footer"  data-position="fixed">
+			<h4>Page Footer</h4>
+		</div><!-- /footer -->
+	</div><!-- /page -->
+	
+	<!-- Start of second page -->
+	<div data-role="page" id="fullscreenPage">
+	
+		<div data-role="header" data-position="fixed">
+				<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-btn-icon-left ui-icon-back btn-icon-red" data-rel="back">返回</a>
+			<h1 id="reg_form_title">My App</h1>
+			<button class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green">保存</button>
+		</div><!-- /header -->
+	
+		
+			<form role="main" id="case_reg_page">
+
+			</form>
+		
+
+	</div><!-- /page -->
+	<div data-role="page" id="loginPage">
+		<h4>登录页面</h4>
+		<form>
+			<a href="#" class="ui-shadow ui-btn ui-corner-all">登录</a>
+		</form>
+	</div>
+	<div id="main-container">
+		<h1>国瑞法务管理系统</h1>
+		<div style="display: inline;">
+			<div class="fa fa-spinner fa-spin" style="font-size: 40px;color:steelblue;vertical-align:middle;"></div>
+			<h3 style="display: inline;margin-left: 10px;vertical-align:middle;">读取中</h3>
+		</div>
+	</div>
+	<script>
+		var main_form
+		//$.mobile.page.prototype.options.domCache = true;
+		//$.mobile.changePage.defaults.reloadPage = true
+		getCasesData(function(r){
+            output('getCasesData: ');
+            output(r);
+            setGlobalJson("mainData",r);
+			main_form=_createNewCaseForm(FormTemplate3,"case_reg_page");
+            _initRegTable(r,firstPageTableColumns,"pageOneTable");
+			
+			
+            //$("#frame").removeClass('hide');
+            $('#main-container').addClass('hide');
+            //$.mobile.hidePageLoadingMsg(); 
+			addClickEvents(main_form,r);
 		});
+
+		var currentPage="#page1";
+		$(".nav-but").on("click",function(e){
+			e.preventDefault();
+			$($(this).attr( "href" )).removeClass('hide');
+			$(currentPage).addClass('hide');
+			currentPage=$(this).attr( "href" );
 		});
+		
+		
+		function logingStatus(){
+			//setGlobalJson("currentUser","{}");
+			if(getGlobalJson("currentUser") && getGlobalJson("currentUser").name){
+				$('#name').text(getGlobalJson("currentUser").name);
+				
+			}else{
+				$().minfo('show',{title:"错误",message:"自动跳转到登录页面？"});
+				setTimeout(function() {
+					window.location.href = 'index.html';
+				}, 2000);
+			}
+		}
 		
 	</script>
 </body>

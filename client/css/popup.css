@@ -58,6 +58,19 @@
     padding:10px 30px 10px 30px;
     opacity: 0;
 }
+.popup-fullscreen{
+    position:absolute;
+    left:0;
+    right:0;
+    width:100%;
+    height:100%;
+    background:white;
+}
+/*
+.popup_form_main{
+    margin: 0px 30px 10px 30px;
+}
+*/
 .popup-hide{
     display:none;
 }
@@ -76,6 +89,7 @@
 #popupBasic{
     min-width: 800px;
     padding: 20px;
+    
 }
 .popout { 
   transform: translate(-50%,-50%) scale(1);

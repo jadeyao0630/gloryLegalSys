@@ -90,9 +90,12 @@ $('.ui-but-lock').on('click',function(e){
     //console.log(data[0].isReadOnly);
     data[0].isReadOnly=!data[0].isReadOnly;
     //console.log(data[0].isReadOnly);
+    
     popup_details_form.readOnly(data[0].isReadOnly);
     setElementDisableByReadonly(data[0].isReadOnly);
     progressUpdateStatus.currentParentProgressButton.switchReadyOnly();
+    if(data[0].isReadOnly) $("#popup_progress_main").css({"min-width":"900px"})
+    else $("#popup_progress_main").css({"min-width":"1200px"});
   }
 });
 document.querySelectorAll("td[name='progress_but']").forEach((pbut)=>{
@@ -203,7 +206,7 @@ function _setFlowChart(data,status,executes,updates,targetId){
       var title=progresses[e.Position.main] instanceof Array?progresses[e.Position.main][e.Position.sub]:progresses[e.Position.main];
       $("#process_updates_title").text(title);
       if(e.Position.main<2){
-        $("#courtDate").val(getDateTime(data2[0].counterData));
+        $("#courtDate").val(getDateTime(data2[0].FristCounterData));
         $("#process_updates_courtDate").removeClass('hide');
       }else{
         $("#process_updates_courtDate").addClass('hide');
@@ -236,7 +239,7 @@ function _setFlowChart(data,status,executes,updates,targetId){
       $("#process_update_upload_list").trigger("create");
       
       setUpdatePopupVisisbility(true);
-      
+      console.log($("#popupBasic").html());
       //$('.popup-main').addClass('blur-background');
       
     });
@@ -550,7 +553,7 @@ function addItemsToUploadPopup(data,isReadOnly){
  
   var keys=[];
   var emptyItem={};
-  var th=$('<tr></tr>');
+  var th=$('<tr style="width:100%;"></tr>');
   var thead=$('<thead></thead>');
   thead.append(th);
   $.each(list_evidence,function(key,value){
@@ -561,11 +564,11 @@ function addItemsToUploadPopup(data,isReadOnly){
     keys.push(key);
     emptyItem[key]=key=="fileName"?"":0;
   });
-  var h=$('<th></th>');
+  var h=$('<th style="width:auto;"></th>');
   th.append(h);
   if(filtedData.length>0){
     filtedData.forEach(function(item){
-      var tr=$('<tr></tr>');
+      var tr=$('<tr style="width:100%;"></tr>');
       keys.forEach(function(key){
         if(item[key]!= undefined){
           emptyItem['subId']=item.subId+1;
@@ -625,7 +628,9 @@ function setProgressPopupVisisbility(isVisible){
 }
 function setUpdatePopupVisisbility(isVisible){
   if (isVisible){
-    $("#popupBasic").popup("open");
+    $("#popupBasic").popup("open",{
+      positionTo:"window"
+    });
     $('.popup-background.popup-a').addClass('popup-b');
   }else{
     $('#popupBasic').popup("close");
@@ -633,7 +638,7 @@ function setUpdatePopupVisisbility(isVisible){
   }
 }
 function setColumnWidth(width){
-  return width!=undefined?" style='width:"+width+"px;'":"";
+  return width!=undefined?" style='width:"+(typeof(width) == 'number'?width+"px":width)+";'":"";
 }
 function comparePoistion(source,target){
   return source.main==target.main && source.sub==target.sub;
@@ -712,6 +717,8 @@ function progressDetailsPopup(data,isReadOnly,parent){
   popup_details_form=new mform({template:progress_form_template});
   parent.empty();
   parent.append(popup_details_form.instance);
+  console.log("formatSatusIndex.........................");
+  console.log(data);
   //$(popup_details_form.instance).setData(data,progress_form_template.template);
   popup_details_form.setData(data).readOnly(isReadOnly);
   parent.trigger('create');

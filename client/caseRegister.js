@@ -48,21 +48,21 @@ function _initRegTable(table_data,table_columns){
     });
     var checkboxes = document.querySelectorAll("input[type=checkbox][name=item_checkbox]")
     checkboxes.forEach(function(checkbox) {
-    checkbox.addEventListener('change', function() {
+        checkbox.addEventListener('change', function() {
 
-        console.log(checkbox.dataset.item);
+            console.log(checkbox.dataset.item);
 
-    
-    })
-});
+        
+        })
+    });
 
-var checkbox_main = document.querySelector(".reg-checkbox-all")
-checkbox_main.addEventListener('change', function() {
+    var checkbox_main = document.querySelector(".reg-checkbox-all")
+    checkbox_main.addEventListener('change', function() {
 
         console.log(document.querySelectorAll("input[type=checkbox][name=item_checkbox]:checked"));
 
     
-});
+    });
     //#endregion
 }
 function _getTableHTML(data,columnData){

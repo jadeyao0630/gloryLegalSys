@@ -1,15 +1,110 @@
+
+function pageTable(arg){
+    this.opt={
+        data:undefined,
+        template:undefined,
+        containerId:undefined,
+        rowButtons:undefined,
+    }
+    this.init(arg)
+}
+
+pageTable.prototype.init=function(arg){
+    var _this=this;
+    extend(this.opt,arg);
+    if(_this.opt.containerId==undefined || _this.opt.template==undefined || _this.opt.data==undefined) {
+        console.log("args [data, template and containerId] have to be defined...");
+        return;
+    }
+    _this.buildTableColumns(_this.opt.template);
+    _this.addTableData(_this.opt.template,_this.opt.data);
+    function extend(opt1,opt2){
+        for(var attr in opt2){
+            //console.log(attr+": "+opt1[attr]+"-->"+opt2[attr]);
+            opt1[attr] = opt2[attr];
+        }
+    }
+}
+pageTable.prototype.buildTableColumns=function(columnTemplate){
+    var _this=this;
+    var thead=$('<thead></thead>');
+    var tr=$('<tr></tr>');
+    thead.append(tr);
+    var ids=Object.keys(columnTemplate);
+    var hiddenList={};
+    $.each(ids,function(index,id){
+        var columnData=columnTemplate[id];
+        var ws=columnData.width!=undefined?" style='width:"+(Number(columnData.width)?columnData.width+"px;'":columnData.width+"'"):"";
+        var th;
+        if(columnData.type=="checkbox"){
+            th=$('<th'+ws+'><input class="reg-checkbox-all" type="checkbox" data-mini="true"></th>');
+        }else{
+            if(columnData.isFilterable){
+                th=$(`<th${ws} data-priority="1">${columnData.label}</th>`);
+            }else{
+                th=$(`<th>${columnData.label}</th>`);
+            }
+
+        }
+        hiddenList[columnData.label]=columnData.isHidden;
+        //th.jqmData('isHidden',columnData.isHidden);
+    });
+    tr.append(th);
+    $("#"+_this.opt.containerId).append(thead);
+    $.each($("#"+_this.opt.containerId+"-popup [type=checkbox]"),function(index,checkbox){
+        var label=$(checkbox).prev().text();
+        if(hiddenList.hasOwnProperty(label)){
+            $(checkbox).prop("checked", hiddenList[label])
+                .checkboxradio("refresh")
+                .trigger("change");
+        }                   
+    });
+}
+pageTable.prototype.addTableData=function(columnTemplate,data){
+    var _this=this;
+    var tbody=$('<tbody></tbody>');
+    var tr=$('<tr></tr>');
+    tbody.append(tr);
+    var ids=Object.keys(columnTemplate);
+    $.each(ids,function(index,id){
+        if(data.hasOwnProperty(id)){
+            tr.append(getTdElement(columnTemplate[id],data[id]));
+        }else{
+            tr.append(getTdElement(columnTemplate[id],id));
+        }
+    });
+    $("#"+_this.opt.containerId).append(tbody);
+    function getTdElement(columnSettings,value){
+        var td=$('<td></td>');
+        if(columnSettings.type=="checkbox"){
+            var item=$('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+id+'>');
+            td.append(item);
+        }else if(columnSettings.type=="buttons"){
+            if(_this.opt.rowButtons!=undefined){
+                td.append($(_this.opt.rowButtons));
+            }
+        }else if(columnSettings.type=="date"){
+            var val=getDateTime(value);
+            td.text(val);
+        }else if(columnSettings.type=="label"){
+            td.text(value);
+        }
+        return td;
+    }
+}
 function _initRegTable(table_data,table_columns,containerId){
     //console.log("table created: "+table_data);
     const container = document.getElementById(containerId);
-    container.innerHTML=_getTableHTML(table_data,table_columns);
-    $(container).trigger('create');
-    
+    _getTableHTML(table_data,table_columns,$('#'+containerId));
+    $(container).table().table("refresh");
+    $(container).trigger("create");
+    //console.log($(container).html());
     //#region 操作按钮
     
     
 //#endregion
 }
-function _getTableHTML(data,columnData){
+function _getTableHTML(data,columnData,container){
     //if(data.length==0) return "";
     var keys=data.length==0?Object.keys(columnData):Object.keys(data[0]);
     var columns_keys=Object.keys(columnData);
@@ -33,20 +128,23 @@ function _getTableHTML(data,columnData){
                 }
                 header_str+=`<th${ws}>${columnData[column].label}</th>`;
             }else{
-                header_str+=`<th${ws} data-priority="${counter-1}">${columnData[column].label}</th>`;
+                
+                header_str+=`<th${ws} data-priority="1">${columnData[column].label}</th>`;
+                
             }
             if (counter==keys.length-1-offset){
                 header_str+=`<th${ws}>操作</th>`;
             }
         
     });
-    table_body_str+='<thead><tr>'+header_str+'</thead></tr>';
+    container.append($('<thead><tr>'+header_str+'</tr></thead>'));
+    table_body_str+='<thead><tr>'+header_str+'</tr></thead>';
     data.forEach((item)=>{
         body_row_str="";
         var counter=0;
         columns_keys.forEach((column)=>{
-            console.log(column+"---"+keys.includes(column));
-            console.log(columnData[column]);
+            //console.log(column+"---"+keys.includes(column));
+            //console.log(columnData[column]);
             if(keys.includes(column)){
                 
                 if (counter==0){
@@ -84,7 +182,11 @@ function _getTableHTML(data,columnData){
         body_str+='<tr>'+body_row_str+'</tr>';
         counter=0;
     });
+    
+    container.append($('<tbody>'+body_str+'</tbody>'));
     table_body_str+='<tbody>'+body_str+'</tbody>';
+    
+    //console.log(body_str);
     return table_body_str;
 }
 function _createNewCaseForm(template, constainerId){
@@ -112,7 +214,7 @@ function _createNewCaseForm(template, constainerId){
 
     $(constainerId).trigger('create');
 
-    //#region 按钮点击事件
+
 
 /*
     //表格 提交 和 取消 按钮

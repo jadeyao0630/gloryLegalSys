@@ -5,19 +5,22 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Document</title>
 	<link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
+	<link rel="stylesheet" href="./css/paging.css"/>
 	<link rel="stylesheet" href="./css/all.css" />
 	<link rel="stylesheet" href="./css/form.css" />
 	<link rel="stylesheet" href="./css/popup.css" />
 	<link rel="stylesheet" href="./css/color.css" />
 	<script src="./js/jquery.js"></script>
 	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
+
+	<script src="./js/jquery.table.hpaging.js"></script>
 	<script src="./configs.js"></script>
 	<script src="./js/db.js"></script>
 	<script type="text/javascript" src="./js/tools.js"></script>
 	
 	<script type="text/javascript" src="./form.js"></script>
 	<script type="text/javascript" src="./utilities/tables.js"></script>
-	<script type="text/javascript" src="./utilities/events.js"></script>
+	
 	<style>
 		.fixedHeader{
 			overflow:hidden;background: #262626;color:white;text-shadow: none;padding:0px;
@@ -58,7 +61,7 @@
 			margin-top: 3px;
 			line-height: 20px;
 			height: 20px;
-            width: 80px;
+            min-width: 40px;
             font-size: 16px;
 		}
 		#main-container{
@@ -140,6 +143,7 @@
 			cursor: pointer;
 		}
 	</style>
+	<script type="text/javascript" src="./utilities/events.js"></script>
 </head>
 <body>
 	
@@ -149,9 +153,11 @@
 			<h1 style="font-size: 30px;display: flex;margin: 0 0 0 15px;padding:10px;">国瑞法务管理系统</h1>
 			<a id="name" href="#popupMenu" data-rel="popup" data-transition="slideup" data-icon="user" class="ui-btn-right">登录</a>
             <div data-role="popup" id="popupMenu" data-theme="b" data-history="false">
-                <ul data-role="listview" data-inset="true" style="min-width:210px;">
+                <ul data-role="listview" data-inset="true" style="min-width:160px;" data-theme="a">
                     <li data-role="list-divider"></li>
-                    <li style="margin:0;padding:0px;"><button class="ui-btn ui-shadow ui-btn-b ui-btn-icon-left ui-icon-power noMargin" onclick='location.href=("index.html")'>退出</button></li>
+                    <li><a class="ui-btn ui-btn-b ui-btn-icon-left ui-icon-power" onclick='location.href=("index.html")'>退出</a></li>
+					
+					<li><a class="ui-btn ui-btn-b ui-btn-icon-left ui-icon-plus">添加一条记录</a></li>
                 </ul>
             </div>
 
@@ -177,12 +183,15 @@
 			<!--#endregion -->
 			<a href="#" id="case_reg_but_remove" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left btn-icon-red case_reg_but">删除</a>
 		</div>
-		<table id="pageOneTable" data-mode="columntoggle" class="ui-responsive table-stroke" data-role="table" data-column-btn-text="列" data-filter="true" data-input="#filterBasic-input"></table>
+		<table id="pageOneTable" data-role="table" id="table-column-toggle" data-mode="columntoggle" class="ui-responsive table-stroke" data-column-btn-text="列" data-filter="true" data-input="#filterBasic-input"></table>
 	</div>
 	<div id="page2" class="hide">
 	</div>
 	<div id="page3" class="ui-body-d ui-content hide">
 		<h1>设置</h1>
+		<table data-role="table" id="table-column-toggle" data-mode="columntoggle" class="ui-responsive table-stroke" data-column-btn-text="列" data-filter="true" data-input="#filterBasic-input">
+			     <thead><tr><th><div class=" ui-checkbox"><input class="reg-checkbox-all" type="checkbox" data-mini="true"></div></th><th>序号</th><th>案件编号</th><th data-priority="1">案件名称</th><th data-priority="2">案由</th><th data-priority="3">案件类型</th><th data-priority="4">所属项目</th><th data-priority="5">申请人</th><th data-priority="6">创建时间</th><th>操作</th></tr></thead><tbody><tr><td><div class=" ui-checkbox"><input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item="2"></div></td><td>2</td><td>A202311110004</td><td>产品商标案件</td><td>购房合同纠纷</td><td>被诉</td><td>北七家</td><td>Luke</td><td>2023年11月27日</td><td><div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-controlgroup ui-controlgroup-horizontal ui-corner-all ui-mini"><div class="ui-controlgroup-controls "><button name="fn_btn_details" class="btn-icon-green ui-btn ui-icon-eye ui-btn-icon-notext ui-shadow ui-corner-all ui-first-child" data-icon="eye" data-iconpos="notext" data-item="2">查看</button><button href="#fullscreenPage" name="fn_btn_edit" class="btn-icon-blue ui-btn ui-icon-edit ui-btn-icon-notext ui-shadow ui-corner-all" data-icon="edit" data-iconpos="notext" data-item="2">修改</button><button name="fn_btn_delete" class="btn-icon-red ui-btn ui-icon-delete ui-btn-icon-notext ui-shadow ui-corner-all ui-last-child" data-icon="delete" data-iconpos="notext" data-item="2">删除</button></div></div></td></tr><tr><td><div class=" ui-checkbox"><input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item="27"></div></td><td>27</td><td>A202311110006</td><td>管文波离职案件</td><td>购房合同纠纷</td><td>被诉</td><td>北七家</td><td>Luke</td><td>2023年11月26日</td><td><div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-controlgroup ui-controlgroup-horizontal ui-corner-all ui-mini"><div class="ui-controlgroup-controls "><button name="fn_btn_details" class="btn-icon-green ui-btn ui-icon-eye ui-btn-icon-notext ui-shadow ui-corner-all ui-first-child" data-icon="eye" data-iconpos="notext" data-item="27">查看</button><button href="#fullscreenPage" name="fn_btn_edit" class="btn-icon-blue ui-btn ui-icon-edit ui-btn-icon-notext ui-shadow ui-corner-all" data-icon="edit" data-iconpos="notext" data-item="27">修改</button><button name="fn_btn_delete" class="btn-icon-red ui-btn ui-icon-delete ui-btn-icon-notext ui-shadow ui-corner-all ui-last-child" data-icon="delete" data-iconpos="notext" data-item="27">删除</button></div></div></td></tr><tr><td><div class=" ui-checkbox"><input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item="28"></div></td><td>28</td><td>A202311110005</td><td>管文波离职案件</td><td>购房合同纠纷</td><td>主诉</td><td>北七家</td><td>Luke</td><td>2023年11月20日</td><td><div data-role="controlgroup" data-type="horizontal" data-mini="true" class="ui-controlgroup ui-controlgroup-horizontal ui-corner-all ui-mini"><div class="ui-controlgroup-controls "><button name="fn_btn_details" class="btn-icon-green ui-btn ui-icon-eye ui-btn-icon-notext ui-shadow ui-corner-all ui-first-child" data-icon="eye" data-iconpos="notext" data-item="28">查看</button><button href="#fullscreenPage" name="fn_btn_edit" class="btn-icon-blue ui-btn ui-icon-edit ui-btn-icon-notext ui-shadow ui-corner-all" data-icon="edit" data-iconpos="notext" data-item="28">修改</button><button name="fn_btn_delete" class="btn-icon-red ui-btn ui-icon-delete ui-btn-icon-notext ui-shadow ui-corner-all ui-last-child" data-icon="delete" data-iconpos="notext" data-item="28">删除</button></div></div></td></tr></tbody>
+			   </table>
 	</div>
 		<div data-role="footer"  data-position="fixed">
 			<h4>Page Footer</h4>
@@ -193,13 +202,13 @@
 	<div data-role="page" id="fullscreenPage">
 	
 		<div data-role="header" data-position="fixed">
-				<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-btn-icon-left ui-icon-back btn-icon-red" data-rel="back">返回</a>
+				<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
 			<h1 id="reg_form_title">My App</h1>
-			<button class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green">保存</button>
+			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
 		</div><!-- /header -->
 	
 		
-			<form role="main" id="case_reg_page">
+			<form role="main" data-ajax="false" id="case_reg_page">
 
 			</form>
 		
@@ -222,6 +231,8 @@
 		var main_form
 		//$.mobile.page.prototype.options.domCache = true;
 		//$.mobile.changePage.defaults.reloadPage = true
+		$.mobile.navigate( '#');
+		//window.location.href = 'text.html';
 		getCasesData(function(r){
             output('getCasesData: ');
             output(r);
@@ -234,6 +245,18 @@
             $('#main-container').addClass('hide');
             //$.mobile.hidePageLoadingMsg(); 
 			addClickEvents(main_form,r);
+			$("#pageOneTable").hpaging({ limit: 10 });
+			logingStatus();
+			$.each($("#pageOneTable-popup [type=checkbox]"),function(index,checkbox){
+				if(index<2){
+					console.log($(checkbox).prev().text())
+					$(checkbox).prop("checked", false)            /* uncheck it */
+								.checkboxradio("refresh")          /* refresh UI */
+								.trigger("change");
+										}
+			});
+           
+			//console.log($("#pageOneTable .ui-checkbox"));
 		});
 
 		var currentPage="#page1";
@@ -243,7 +266,6 @@
 			$(currentPage).addClass('hide');
 			currentPage=$(this).attr( "href" );
 		});
-		
 		
 		function logingStatus(){
 			//setGlobalJson("currentUser","{}");

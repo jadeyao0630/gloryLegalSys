@@ -27,10 +27,10 @@ $(function(){
         user.innerHTML=JSON.parse(sessionStorage.getItem("currentUser")).name;
         
     }else{
-        SendMessage("错误: "+error.FORM_INVALID_USER.message,"是否跳转到登录页面？",function(){
+        //SendMessage("错误: "+error.FORM_INVALID_USER.message,"是否跳转到登录页面？",function(){
             //HideMessage();
-            window.location.href = 'index.html';
-        });
+            //window.location.href = 'index.html';
+        //});
         //document.body.innerHTML="没有登录。。。"
         //window.location.href = 'index.html';
     }

@@ -51,6 +51,51 @@ function formatIndex(position){
     return {main:main,sub:sub};
 }
 $.fn.extend({
+    removeTableItem:function(sourceDate,itemData){
+        var index=sourceDate.indexOf(itemData);
+        var trs=$(this).find('tbody tr');
+        if(trs.length>0){
+            //console.log('width: '+parseInt($(trs[index]).css('width'))*-1);
+            $(trs[index]).find('td').animate({
+                padding: 0
+                }).wrapInner('<div />').children().slideUp(function() {
+                    $(this).closest('tr').remove();
+                });
+            }
+        
+            sourceDate.splice(index,1);
+            $(this).trigger('create');
+    },
+    removeTableItems:function(sourceDate,itemDatas){
+        var _self=this;
+        var counter=0;
+        $.each(itemDatas,function(index,data){
+            var index=sourceDate.indexOf(data);
+            var trs=$(_self).find('tbody tr');
+            //console.log($(_self));
+            if(trs.length>0){
+                var duration=500;
+                setTimeout(function() {
+					$(trs[index]).find('td').animate({
+                        'padding-top': 0,
+                        'padding-bottom':0,
+                        }).wrapInner('<div />').children().slideUp({ duration: duration, queue: true },function() {
+                            $(this).closest('tr').remove();
+                            sourceDate.splice(index,1);
+                        });
+				}, duration*counter);
+                counter++;
+                //console.log('width: '+parseInt($(trs[index]).css('width'))*-1);
+                
+            }
+                
+                
+        });
+        $(this).trigger('create');
+        
+    }
+})
+$.fn.extend({
     popIn:function(overlay){
         if(overlay!=undefined) $(overlay).removeClass('popup-hide');
         $(this).removeClass('popup-hide');
@@ -87,6 +132,21 @@ $.fn.extend({
             $().hideMessage("popup-fullscreen");
         }
     },
+    requestPassword:function(response){
+        $().requestDialog({
+            title:'提示',
+            message:'此操作需要管理员密码的。',
+            content:$('<input type="password" data-theme="a" value="" placeholder="请输入密码">')
+        },function(form){
+            if($(form).find('input').val()==auth_code){
+                console.log("登陆成功。。")
+                response({success:true});
+            }else{
+
+                response({success:false});
+            }
+        });
+    },
     requestDialog:function(arg,response){
         
             var title="";
@@ -110,9 +170,9 @@ $.fn.extend({
             if(title.length>0) popup.append(title);
             if(message.length>0) popup.append($('<div>'+message+'</div>'));
             popup.append(content);
-            var popup_buts=$('<fieldset class="ui-grid-a">'+
-            '<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-check popup_message_but">确认</a></div>'+
-            '<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back popup_message_but">取消</a></div>'+
+            var popup_buts=$('<fieldset class="ui-grid-a" style="margin-top:10px;">'+
+            '<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-btn-icon-left ui-shadow ui-btn-a ui-icon-check popup_message_but btn-icon-green">确认</a></div>'+
+            '<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-btn-icon-left ui-shadow ui-btn-b ui-icon-delete popup_message_but btn-icon-red">取消</a></div>'+
             '</fieldset>');
             popup.append(popup_buts);
             var popup_background=$('<div class="popup-background popup-c"></div>');
@@ -135,7 +195,7 @@ $.fn.extend({
         
     },
     mloader:function(visibility,arg){
-        console.log(visibility);
+        //console.log(visibility);
         console.log(arg);
         if(visibility.toLowerCase()=="show"){
             var title="";
@@ -152,8 +212,8 @@ $.fn.extend({
                     '</div>';
                 }
             }
-            var popup=$('<div class="popup-message popup-window"'+popup_style+'>'+title+arg.message+'</div>');
-            var popup_background=$('<div class="popup-background popup-c"></div>');
+            var popup=$('<div class="popup-message popup-loader"'+popup_style+'>'+title+arg.message+'</div>');
+            var popup_background=$('<div class="popup-background popup-c popup-loader-background"></div>');
             $('body').append(popup_background);
             $('body').append(popup);
             popup.trigger('create');
@@ -174,9 +234,13 @@ $.fn.extend({
             var title="";
             var popup_style=' style="padding-top:40px;"';
             var message="";
+            var icon='<i class="fa fa-info-circle text-green"></i>';
             if (arg!=undefined){
+                if(arg.hasOwnProperty('type')){
+                    if(arg.type=="alert") icon='<i class="fas fa-exclamation-triangle text-red" />';
+                }
                 if(arg.hasOwnProperty('title')){
-                    title='<h4><i class="fa fa-info-circle text-green"></i> '+arg.title+'</h4>';
+                    title='<h4>'+icon+' '+arg.title+'</h4>';
                     popup_style='';
                 }
                 if(arg.hasOwnProperty('message')){
@@ -205,9 +269,9 @@ $.fn.extend({
         }
     },
     hideMessage:function(popupWindow,background){
-        var popup=$('body').find('.popup-window');
+        var popup=$('body').find('.popup-loader');
         if(popupWindow!=undefined) popup=popupWindow;
-        var popup_background=$('body').find('.popup-background');
+        var popup_background=$('body').find('.popup-loader-background');
         if(background!=undefined) popup_background=background;
         popup.popOut(popup_background);
         setTimeout(function() {

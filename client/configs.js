@@ -1,4 +1,5 @@
-let ip='cn.luyao.site';
+var isRunLocal=true;
+let ip=isRunLocal?'localhost':'cn.luyao.site';
 let port=5555;
 var auth_code='1234';
 var enableConsoleLog=true;
@@ -69,7 +70,27 @@ const columns={
     caseCreateDate:"datetime NOT NULL",
     isReadOnly:"bool NOT NULL",
 }
-
+var _firstPageTableColumns={
+    checkallbox:{
+        width:50
+    },
+    id:{
+    label: "序号",
+    width:50,
+    },
+    caseNo:{
+        label:"案件编号"
+    },
+    caseName:{label:"案件名称"},
+    caseReason:{label:"案由",data:case_causes, isFilterable:true},
+    caseType:{label:"案件类型",data:case_types, isFilterable:true},
+    caseBelong:{label:"所属项目",data:projects, isFilterable:true},
+    caseApplicant:{label:"申请人", isFilterable:true,isHidden:true},
+    caseCreateDate:{label:"创建时间", isFilterable:true},
+    rowButtons:{
+        label:"操作"
+    }
+}
 var firstPageTableColumns={
     id:{
     label: "序号",

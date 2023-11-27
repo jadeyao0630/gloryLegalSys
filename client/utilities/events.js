@@ -1,63 +1,20 @@
 function addClickEvents(main_form,r){
+    //#region page 1 table 的 checkbox 和 按钮 事件
     var checkboxes = document.querySelectorAll("input[type=checkbox][name=item_checkbox]")
     checkboxes.forEach(function(checkbox) {
         checkbox.addEventListener('change', function() {
-
-            console.log(checkbox.dataset.item);
-
+            $('.reg-checkbox-all').prop("checked",
+            $('#pageOneTable > tbody > tr').not(':hidden').length==$('#pageOneTable > tbody > tr').not(':hidden').find('input[type="checkbox"]:checked').length);
         
         })
     });
 
     var checkbox_main = document.querySelector(".reg-checkbox-all")
     checkbox_main.addEventListener('change', function() {
-
-        console.log(document.querySelectorAll("input[type=checkbox][name=item_checkbox]:checked"));
-
+        $('#pageOneTable > tbody > tr').not(':hidden').find('input[type="checkbox"]').prop( "checked", $(this).prop('checked') );
 
     });
-    $("#reg_form_title").on('click',function(e){
-        console.log(e);
-        $().requestDialog({
-            title:'提示',
-            message:'这里是需要管理员密码的。',
-            content:$('<input type="password" value="" placeholder="请输入密码">')
-        },function(form){
-            if($(form).find('input').val()==auth_code){
-                console.log("登陆成功。。")
-                var id=getGlobal("currentId");
-                var datas=r.filter(d=>d.id==id);
-                if(datas.length>0){
-                    console.log(Boolean(datas[0].isReadOnly));
-                    datas[0].isReadOnly=!Boolean(datas[0].isReadOnly);
-                    console.log(datas[0].isReadOnly);
-                    if(datas[0].isReadOnly) $("#reg_form_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+"查看档案");
-                    else $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
-                    $().mloader("show",{message:"保存中..."});
-                    //_setFormReadOnly(data.isReadOnly);
-                    console.log(getGlobalJson('mainData'));
-                    main_form.readOnly(datas[0].isReadOnly);
-                    datas[0]['caseCreateDate']=getDateTime();
-                    datas[0]['caseDate']=getDateTime(datas[0].caseDate);
-                    insertCase(datas[0],function(r){
-                        //console.log(r);
-                        if(r.success){
-                            console.log("修改isReadOnly为"+datas[0].isReadOnly);
-                        }else{
-                            console.log(r);
-                            //SendMessage("错误",r.error,function(){
-                                //HideMessage();
-                                
-                            //},true);
-                        }
-                        $().mloader("hide");
-                    });
-                }
-            }else{
-                $().minfo("show",{message:'密码无效。'});
-            }
-        });
-    })
+    //表格内每行的功能按钮事件
     var fn_buts = document.querySelectorAll("button[name^=fn_btn]")
     fn_buts.forEach(function(fn_but) {
         fn_but.addEventListener('click', function(but) {
@@ -70,20 +27,21 @@ function addClickEvents(main_form,r){
                 caseNos.push(_item.caseNo);
             });
             if(but.currentTarget.name=="fn_btn_delete"){
-                //console.log(table_data);
-                /*
-                SendMessage('提醒',"确认删除案件编号[ "+caseNos.join(',')+" ]吗？",function(e){
-                    if(e.currentTarget.id=="message_confirm_but"){
-                        if(matchItems.length>0){
-                            table_data.splice(table_data.indexOf(matchItems[0]),1);
-                        }
+                $().requestDialog({
+                    title:'提示',
+                    message:"确认删除案件编号[ "+caseNos.join(',')+" ]吗？",
+                },function(form){
+                    console.log("删除");
+                    if(matchItems.length>0){
+                        $('#pageOneTable').removeTableItem(r,matchItems[0]);
                         
-                        _initRegTable(table_data,table_columns);
-                        $(document.getElementById("table1")).trigger('create');
                     }
-                    HideMessage();
+                    
+                    //_initRegTable(r,firstPageTableColumns,"pageOneTable");
+                    
+                    //$("#pageOneTable").hpaging({ limit: 5 });
+                    //$("#pageOneTable").trigger('create');
                 });
-                */
                 
             }else if(but.currentTarget.name=="fn_btn_edit"){
                 if(matchItems.length>0){
@@ -95,9 +53,16 @@ function addClickEvents(main_form,r){
                     //_setBlurBackgroundVisibility(true);
                     $.mobile.navigate( $(this).attr( "href" ));
                     setTimeout(function() {
-                        main_form.readOnly(matchItems[0].isReadOnly).setData(matchItems[0]);
-                        if(matchItems[0].isReadOnly) $("#reg_form_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+"查看档案");
-                        else $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
+                        main_form.setData(matchItems[0]).readOnly(matchItems[0].isReadOnly);
+                        console.log("data-role------"+$('.edit-header-btn[name="save_btn"').jqmData('role'));
+                        if(matchItems[0].isReadOnly) {
+                            $("#reg_form_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+"查看档案");
+                            $('.edit-header-btn[name="save_btn"').hide();
+                        }
+                        else {
+                            $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
+                            $('.edit-header-btn[name="save_btn"').show();
+                        }
                         $().mloader("hide");
                     }, 500);
                     
@@ -109,6 +74,7 @@ function addClickEvents(main_form,r){
                 //console.log($("#popup_form_main"));
             }else if(but.currentTarget.name=="fn_btn_details"){
                 if(matchItems.length>0){
+                    window.location="./test/timeline.html"
                     //_setFlowChart(table_progress_data,table_progress_status,table_progress_executes,table_progress_updates,matchItems[0].id);
                 }
                 //console.log($("#popup_form_main"));
@@ -116,6 +82,7 @@ function addClickEvents(main_form,r){
         
         })
     });
+    //表格上添加删除按钮事件
     $('.case_reg_but').on('click',async function(e){
         e.preventDefault();
         if(this.id=="case_reg_but_add"){
@@ -137,6 +104,8 @@ function addClickEvents(main_form,r){
                 
                 //_setBlurBackgroundVisibility(true);
                 $.mobile.navigate( $(this).attr( "href" ));
+               // main_form.readOnly(false).setEmptyData();
+                    //$().mloader("hide");
                 setTimeout(function() {
                     main_form.readOnly(false).setEmptyData();
                     $().mloader("hide");
@@ -146,6 +115,140 @@ function addClickEvents(main_form,r){
                 //main_form.instance.trigger('create');
             });
             
+        }else if(this.id=="case_reg_but_remove"){
+            //console.log($('#pageOneTable').find('input[type="checkbox"][name="item_checkbox"]:checked'));
+            var checked=$('#pageOneTable').find('input[type="checkbox"][name="item_checkbox"]:checked');
+            if(checked.length>0){
+                $().requestDialog({
+                    title:'提示',
+                    message:"确认删除所选案件吗？",
+                },function(form){
+                    console.log("删除");
+                    var matcheds=[];
+                    $.each($('#pageOneTable').find('input[type="checkbox"][name="item_checkbox"]:checked'),function(index,check){
+                        //console.log($(check).data('item'));
+                        var matched=r.filter((d)=>{return d.id==$(check).data('item')});
+                        if(matched.length>0){
+                            matcheds.push(matched[0]);
+                        }
+                        
+                    });
+                    if(matcheds.length>0){
+                        $('#pageOneTable').removeTableItems(r,matcheds);
+                        $('.reg-checkbox-all').prop("checked",false);
+                    }
+                    //_initRegTable(r,firstPageTableColumns,"pageOneTable");
+                    
+                    //$("#pageOneTable").hpaging({ limit: 5 });
+                    //$("#pageOneTable").trigger('create');
+                });
+            }
+            
+           
         }
     })
+    //#endregion
+
+    //#region 查看信息页面的按钮事件
+
+    //只读锁按钮事件
+    $("#reg_form_title").on('click',function(e){
+        //console.log(e);
+        $().requestPassword(function(res){
+            if(res.success){
+                console.log("登陆成功。。")
+                var id=getGlobal("currentId");
+                var datas=r.filter(d=>d.id==id);
+                if(datas.length>0){
+                    //console.log(Boolean(datas[0].isReadOnly));
+                    datas[0].isReadOnly=!Boolean(datas[0].isReadOnly);
+                    //console.log(datas[0].isReadOnly);
+                    if(datas[0].isReadOnly) {
+                        $("#reg_form_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+"查看档案");
+                        $('.edit-header-btn[name="save_btn"').hide();
+                    }
+                    else {
+                        $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
+                        $('.edit-header-btn[name="save_btn"').show();
+                    }
+                    $().mloader("show",{message:"保存中..."});
+                    //_setFormReadOnly(data.isReadOnly);
+                    //console.log(getGlobalJson('mainData'));
+                    main_form.readOnly(datas[0].isReadOnly);
+                    datas[0]['caseCreateDate']=getDateTime();
+                    datas[0]['caseDate']=getDateTime(datas[0].caseDate);
+                    insertCase(datas[0],function(r){
+                        //console.log(r);
+                        if(r.success){
+                            console.log("修改isReadOnly为"+datas[0].isReadOnly);
+                        }else{
+                            console.log(r);
+                            //SendMessage("错误",r.error,function(){
+                                //HideMessage();
+                                
+                            //},true);
+                        }
+                        $().mloader("hide");
+                    });
+                }
+            }else{
+                $().minfo("show",{message:'密码无效。',type:'alert',title:'错误'});
+            }
+            
+        });
+        
+    })
+    //保存按钮事件
+    $('.edit-header-btn').on('click',function(e){
+        if($(this).text()=="保存"){
+            //console.log("保存");
+            main_form.instance.getValues(getGlobal("currentId"),FormTemplate.template,function(message,values){
+                if(values.success){
+                    console.log(message.message);
+                    values.data["caseCreateDate"]=getDateTime();
+                    //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
+                    if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
+                        $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
+                            //HideMessage();
+                            window.location.href = 'index.html';
+                        });
+                    }else{
+                        values.data["caseApplicant"]=getGlobalJson("currentUser").id;
+                        values.data["isReadOnly"]=_isReadOnlyCurrentForm();
+                        
+                        $().mloader('show',{message:"保存中..."});
+                        //console.log(values);
+                        insertCase(values.data,function(r){
+                            //console.log(r);
+                            if(r.success){
+                                console.log("修改添加成功。");
+                                $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
+                                
+                            }else{
+                                console.log(r);
+                                $().minfo('show',{title:"错误",message:r.error});
+                            }
+                            $().mloader('hide');
+                        });
+                    }
+                    
+                    
+                }else{
+                    console.log(message.message+(message.id==0?" 但是有错误。":""));
+                }
+            });
+        
+        }
+    })
+    //#endregion
+
+    function _isReadOnlyCurrentForm(){
+        var datas=r.filter(d=>d.id==getGlobal("currentId"));
+        if(datas.length>0)
+            return datas[0].isReadOnly;
+        return true;
+    }
+    
+    
+    
 }

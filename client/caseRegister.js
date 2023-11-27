@@ -4,6 +4,7 @@ function _initRegTable(table_data,table_columns){
     //console.log("table created: "+table_data);
     const table = document.getElementById("table1");
     table.innerHTML=_getTableHTML(table_data,table_columns);
+    $(table).table('refresh');
     $(table).trigger('create');
     
     //#region 操作按钮

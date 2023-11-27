@@ -276,6 +276,7 @@ mform.prototype={
                         .before( form )
                         .jqmData( "filter-form", form ) ;
                     form.jqmData( "listview", list );
+                    list.jqmData('theme','a');
                     //list.listview( "refresh" );
                 }
                 
@@ -360,7 +361,7 @@ mform.prototype={
                     if(isReadOnly) {
                         var source=$("#"+k);
                         var parent=source.parent().parent().parent();
-                        _self.replacementIndexs[k].html(getSelectValue(source).join("<br/>"));
+                        _self.replacementIndexs[k].html(getSelectValue(source).join("<br/>"))
                         _self.orginalIndexs[k]=source;
                         //如果是多选或者data-native-menu=false
                         if(source.attr('data-native-menu')!=undefined && source.attr('data-native-menu')=='false'){
@@ -368,7 +369,7 @@ mform.prototype={
                                 //_self.replacementIndexs[k]=replacementOfMultiSelect(source);
                             }
                             parent=source.parent().parent();
-                            console.log('之前----------------------------');
+                            console.log('之前----------------------------'+getSelectValue(source).join("<br/>"));
                             console.log(parent.html());
                             //source.before(_self.replacementIndexs[k]);
                             source.remove();
@@ -383,12 +384,12 @@ mform.prototype={
                             parent.append( _self.replacementIndexs[k]);
                             
                         }
-                        parent.trigger('create');
+                        parent.trigger('create').trigger("change");
                         //source.selectmenu().selectmenu("refresh");
                     }else {
                         var parent=$("#_"+k).parent();
                         replaceElement($("#_"+k),_self.orginalIndexs[k]);
-                        parent.trigger('create');
+                        parent.trigger('create').trigger("change");
                     }
                     break;
                 case "fieldset":
@@ -405,7 +406,7 @@ mform.prototype={
                             //console.log(_self.replacementIndexs[k].text());
                             source.after(_self.replacementIndexs[k]);
                             source.remove();
-                            parent.trigger('create');
+                            parent.trigger('create').trigger("change");
                             //source_children.checkboxradio( "refresh" );
                             //parent.append( _self.replacementIndexs[k]);
                         }
@@ -415,7 +416,7 @@ mform.prototype={
                         console.log('listview-----------------------')
                         console.log($( "#" + k + "-menu" ))
                         replaceElement($("#_"+k),_self.orginalIndexs[k]);
-                        parent.trigger('create');
+                        parent.trigger('create').trigger("change");
                     }
                     break;
                 case "textarea":
@@ -549,7 +550,7 @@ $.fn.extend({
         if(element.length>0){
             if(type=="radio")  {
                 if(value=="") value=0;
-                _self.find("#"+id+"-"+parseInt(value)).prop( "checked", true ).checkboxradio().checkboxradio( "refresh" );
+                _self.find("#"+id+"-"+parseInt(value)).prop( "checked", true ).checkboxradio().checkboxradio( "refresh" ).trigger("change");
             }else if(type=="multicombobox"){
                 if(value!=null&&value!=undefined&&value.length>0){
                     value.split(",").forEach((v)=>{
@@ -560,12 +561,12 @@ $.fn.extend({
                 }
                 
                 //element.val(value.split(","));
-                element.selectmenu().selectmenu("refresh");
+                element.selectmenu().selectmenu("refresh").trigger("change");
             }else if(type=="combobox"){
                 console.log(id+"---->"+value);
                 if(value=="") value=0;
                 $(element).find("option[value="+value+"]").prop('selected',true);
-                element.selectmenu().selectmenu("refresh");
+                element.selectmenu().selectmenu("refresh").trigger("change");
             }else if(type=="date"||type=="datetime"||type=="time")  {
                 if(value=="") value=new Date();
                 element.val(getDateTime(value));

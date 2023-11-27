@@ -384,7 +384,7 @@ mform.prototype={
                             
                         }
                         parent.trigger('create');
-                        //source.selectmenu("refresh");
+                        //source.selectmenu().selectmenu("refresh");
                     }else {
                         var parent=$("#_"+k).parent();
                         replaceElement($("#_"+k),_self.orginalIndexs[k]);

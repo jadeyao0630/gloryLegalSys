@@ -26,14 +26,14 @@ function addClickEvents(main_form,r){
             if($(form).find('input').val()==auth_code){
                 console.log("登陆成功。。")
                 var id=getGlobal("currentId");
-                var datas=getGlobalJson('mainData').filter(d=>d.id==id);
+                var datas=r.filter(d=>d.id==id);
                 if(datas.length>0){
                     console.log(Boolean(datas[0].isReadOnly));
                     datas[0].isReadOnly=!Boolean(datas[0].isReadOnly);
                     console.log(datas[0].isReadOnly);
                     if(datas[0].isReadOnly) $("#reg_form_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+"查看档案");
                     else $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
-                    $().mloader("show","保存中...");
+                    $().mloader("show",{message:"保存中..."});
                     //_setFormReadOnly(data.isReadOnly);
                     console.log(getGlobalJson('mainData'));
                     main_form.readOnly(datas[0].isReadOnly);

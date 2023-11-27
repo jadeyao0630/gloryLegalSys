@@ -1,4 +1,50 @@
+function tableColumnToggle(columnTemplate,container,target){
+    var ids=Object.keys(columnTemplate);
+    var filterables={};
+    var hiddenList={};
 
+    var filterBtn=$('<a href="#'+target+'-columnFilter" data-rel="popup" data-position-to="origin" class="ui-btn-right footerBtn ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-bullets ui-btn-icon-left ui-btn-a" data-transition="pop">列</a>');
+    var filterPopup=$('<div data-role="popup" id="'+target+'-columnFilter" data-theme="a" class="ui-corner-all"></div>');
+    
+    var filterForm=$('<form></form>');
+    var filterFielset=$('<fieldset data-role="controlgroup" style="margin:0px;"></fieldset>');
+    filterForm.append(filterFielset);
+    filterPopup.append(filterForm);
+    
+    $("#"+container).append(filterBtn);
+    $("#"+container).append(filterPopup);
+
+    $.each(ids,function(index,id){
+        var columnData=columnTemplate[id];
+        if(columnData.isFilterable){
+            filterables[id]=columnData.label;
+            hiddenList[id]=columnData.isHidden;
+            var checked=!columnData.isHidden?" checked='checked'":"";
+            var input=$('<input type="checkbox" name="'+id+'" id="'+id+'-column'+'"'+checked+'>');
+            var label=$('<label for="'+id+'-column'+'">'+columnData.label+'</label>');
+            filterFielset.append(input);
+            filterFielset.append(label);
+            input.on("click",function(e){
+                //console.log( $('td[name="'+input.prop('name')+'"]'));
+                if(!input.prop('checked')){
+                    $("#"+target).find('th[name="'+input.prop('name')+'"]').hide(1000);
+                    $("#"+target).find('td[name="'+input.prop('name')+'"]').hide(1000);
+                }else{
+                    $("#"+target).find('th[name="'+input.prop('name')+'"]').show(1000);
+                    $("#"+target).find('td[name="'+input.prop('name')+'"]').show(1000);
+                }
+            });
+            if(columnData.isHidden){
+                $("#"+target).find('th[name="'+id+'"]').hide(1000);
+                $("#"+target).find('td[name="'+id+'"]').hide(1000);
+            }
+        }
+        //hiddenList[columnData.label]=columnData.isHidden;
+        //th.jqmData('isHidden',columnData.isHidden);
+    });
+    filterPopup.trigger('create');filterPopup.trigger('change');
+    $("#"+container).trigger('create');
+}
 function pageTable(arg){
     this.opt={
         data:undefined,
@@ -12,12 +58,18 @@ function pageTable(arg){
 pageTable.prototype.init=function(arg){
     var _this=this;
     extend(this.opt,arg);
-    if(_this.opt.containerId==undefined || _this.opt.template==undefined || _this.opt.data==undefined) {
+    if(_this.opt.containerId==undefined || _this.opt.template==undefined) {
         console.log("args [data, template and containerId] have to be defined...");
         return;
     }
+    
     _this.buildTableColumns(_this.opt.template);
-    _this.addTableData(_this.opt.template,_this.opt.data);
+    //console.log($("#"+_this.opt.containerId).html());
+    
+    if(_this.opt.data!=undefined) _this.addTableData(_this.opt.data);
+    $("#"+_this.opt.containerId).table().table("refresh");
+    $("#"+_this.opt.containerId).trigger("create");
+
     function extend(opt1,opt2){
         for(var attr in opt2){
             //console.log(attr+": "+opt1[attr]+"-->"+opt2[attr]);
@@ -25,288 +77,158 @@ pageTable.prototype.init=function(arg){
         }
     }
 }
-pageTable.prototype.buildTableColumns=function(columnTemplate){
+pageTable.prototype.buildTableColumns=function(){
     var _this=this;
-    var thead=$('<thead></thead>');
-    var tr=$('<tr></tr>');
-    thead.append(tr);
-    var ids=Object.keys(columnTemplate);
-    var hiddenList={};
-    $.each(ids,function(index,id){
-        var columnData=columnTemplate[id];
-        var ws=columnData.width!=undefined?" style='width:"+(Number(columnData.width)?columnData.width+"px;'":columnData.width+"'"):"";
-        var th;
-        if(columnData.type=="checkbox"){
-            th=$('<th'+ws+'><input class="reg-checkbox-all" type="checkbox" data-mini="true"></th>');
-        }else{
-            if(columnData.isFilterable){
-                th=$(`<th${ws} data-priority="1">${columnData.label}</th>`);
+    var columnTemplate=_this.opt.template;
+    if(!(columnTemplate instanceof Array)){
+        var thead=$('<thead></thead>');
+        var tr=$('<tr></tr>');
+        thead.append(tr);
+        var ids=Object.keys(columnTemplate);
+        $.each(ids,function(index,id){
+            var columnData=columnTemplate[id];
+            var ws=columnData.width!=undefined?" style='width:"+(Number(columnData.width)?columnData.width+"px;'":columnData.width+"'"):"";
+            var th;
+            if(columnData.type=="checkbox"){
+                th=$('<th'+ws+'><input class="reg-checkbox-all" type="checkbox" data-mini="true"></th>');
             }else{
-                th=$(`<th>${columnData.label}</th>`);
+                if(columnData.isFilterable){
+                    th=$(`<th${ws} name="${id}" data-priority="1">${columnData.label}</th>`);
+                }else{
+                    th=$(`<th name="${id}">${columnData.label}</th>`);
+                }
+    
             }
+            
+            tr.append(th);
+            //th.jqmData('isHidden',columnData.isHidden);
+        });
+        
+        $("#"+_this.opt.containerId).append(thead);
+    }else{
+        var thead=$('<thead></thead>');
+        var tr=$('<tr></tr>');
+        tr.hide();
+        thead.append(tr);
+        $("#"+_this.opt.containerId).append(thead);
+    }
+    
 
-        }
-        hiddenList[columnData.label]=columnData.isHidden;
-        //th.jqmData('isHidden',columnData.isHidden);
-    });
-    tr.append(th);
-    $("#"+_this.opt.containerId).append(thead);
-    $.each($("#"+_this.opt.containerId+"-popup [type=checkbox]"),function(index,checkbox){
-        var label=$(checkbox).prev().text();
-        if(hiddenList.hasOwnProperty(label)){
-            $(checkbox).prop("checked", hiddenList[label])
-                .checkboxradio("refresh")
-                .trigger("change");
-        }                   
-    });
 }
-pageTable.prototype.addTableData=function(columnTemplate,data){
+pageTable.prototype.addTableData=function(data){
     var _this=this;
+    var columnTemplate=_this.opt.template;
     var tbody=$('<tbody></tbody>');
-    var tr=$('<tr></tr>');
-    tbody.append(tr);
-    var ids=Object.keys(columnTemplate);
-    $.each(ids,function(index,id){
-        if(data.hasOwnProperty(id)){
-            tr.append(getTdElement(columnTemplate[id],data[id]));
-        }else{
-            tr.append(getTdElement(columnTemplate[id],id));
-        }
-    });
+    if(!(columnTemplate instanceof Array)){
+        var ids=Object.keys(columnTemplate);
+    
+        $.each(data,function(i,d){
+            var tr=$('<tr></tr>');
+            $.each(ids,function(index,id){
+                var td;
+                if(d.hasOwnProperty(id)){
+                    td=getTdElement(columnTemplate[id],d[id],id);
+                    
+                }else{
+                    console.log("id.........."+d.id);
+                    td=getTdElement(columnTemplate[id],d.id,id);
+                }
+                tr.append(td);
+            })
+            tbody.append(tr);
+        });
+    }else{
+        $.each(data,function(i,d){
+            var tr=$('<tr></tr>');
+            columnTemplate.forEach(template => {
+                if(template.hasOwnProperty('data')){
+                    var ids=Object.keys(template.data);
+                
+                    var td=$('<td></td>');
+                    $.each(ids,function(index,id){
+                        var labelValueContainer=$('<div style="display:grid;grid-template-columns: auto auto ;"></div>');
+                        td.append(labelValueContainer);
+                        if(template.data[id].hasOwnProperty('label')){
+                            labelValueContainer.append($('<label>'+template.data[id].label+'</label>'));
+                        }
+                        if(d.hasOwnProperty(id)){
+                            console.log('d.hasOwnProperty');
+                            console.log(template.data[id]);
+                            console.log(d[id]);
+                            
+                            labelValueContainer.append($(getTdElement(template.data[id],d[id],id).html()));
+                        }else{
+
+                            labelValueContainer.append($(getTdElement(template.data[id],d.id,id).html()));
+                        }
+                    });
+                    
+                    tr.append(td);
+                };
+            });
+            tbody.append(tr);
+        });
+    }
+    
+    //console.log(tbody);
     $("#"+_this.opt.containerId).append(tbody);
-    function getTdElement(columnSettings,value){
-        var td=$('<td></td>');
+    
+    function getTdElement(columnSettings,value,key){
+        var td=$('<td name="'+key+'"></td>');
         if(columnSettings.type=="checkbox"){
-            var item=$('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+id+'>');
+            var item=$('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+value+'>');
+            console.log('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+value+'>');
             td.append(item);
         }else if(columnSettings.type=="buttons"){
             if(_this.opt.rowButtons!=undefined){
-                td.append($(_this.opt.rowButtons));
+                td.append($(formatString(_this.opt.rowButtons,value)));
             }
         }else if(columnSettings.type=="date"){
-            var val=getDateTime(value);
-            td.text(val);
-        }else if(columnSettings.type=="label"){
-            td.text(value);
+            console.log(value);
+            val=getDateTime(value);
+            if(columnSettings.dateFormat!=null) val=formatDateTime(new Date(value),columnSettings.dateFormat);
+            var label=$('<label>'+val+'</label>')
+            td.append(label);
+        }else{ //if(columnSettings.type=="label"){
+            var val=value;
+            if(columnSettings.data!=undefined){
+                if(columnSettings.valueKey!=undefined && 
+                    columnSettings.matchKey!=undefined){
+                        //console.log(columnSettings.data);
+                        var itemD=columnSettings.data.filter((_itemD)=>{return _itemD.hasOwnProperty(columnSettings.matchKey) && _itemD[columnSettings.matchKey]==val});
+                        if(itemD.length>0 && itemD[0].hasOwnProperty(columnSettings.valueKey)){
+                            val=itemD[0][columnSettings.valueKey];
+                        }
+                    
+                }else{
+                    val=columnSettings.data[val];
+                }
+                
+            }
+            var label=$('<label>'+val+'</label>')
+            td.append(label);
         }
         return td;
     }
 }
-function _initRegTable(table_data,table_columns,containerId){
-    //console.log("table created: "+table_data);
-    const container = document.getElementById(containerId);
-    _getTableHTML(table_data,table_columns,$('#'+containerId));
-    $(container).table().table("refresh");
-    $(container).trigger("create");
-    //console.log($(container).html());
-    //#region 操作按钮
-    
-    
-//#endregion
-}
-function _getTableHTML(data,columnData,container){
-    //if(data.length==0) return "";
-    var keys=data.length==0?Object.keys(columnData):Object.keys(data[0]);
-    var columns_keys=Object.keys(columnData);
-    var hasHeaderSet=false;
-    var table_body_str="";
-    var body_row_str="";
-    var body_str="";
-    
-    var function_buts='<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
-                    '<button name="fn_btn_details" class="btn-icon-green" data-icon="eye" data-iconpos="notext" data-item={0}>查看</button>'+
-                    '<button href="#fullscreenPage" name="fn_btn_edit" class="btn-icon-blue" data-icon="edit" data-iconpos="notext" data-item={0}>修改</button>'+
-                    '<button name="fn_btn_delete" class="btn-icon-red" data-icon="delete" data-iconpos="notext" data-item={0}>删除</button>'+
-                '</div>';
-    var offset=keys.length-columns_keys.length;
-    let header_str="";
-    columns_keys.forEach((column,counter)=>{
-        var ws=column.width!=undefined?" style='width:"+column.width+"px;'":"";
-            if(counter<2){
-                if(counter==0){
-                    header_str+=`<th${ws}><input class="reg-checkbox-all" type="checkbox" data-mini="true"></th>`;
-                }
-                header_str+=`<th${ws}>${columnData[column].label}</th>`;
-            }else{
-                
-                header_str+=`<th${ws} data-priority="1">${columnData[column].label}</th>`;
-                
-            }
-            if (counter==keys.length-1-offset){
-                header_str+=`<th${ws}>操作</th>`;
-            }
-        
-    });
-    container.append($('<thead><tr>'+header_str+'</tr></thead>'));
-    table_body_str+='<thead><tr>'+header_str+'</tr></thead>';
-    data.forEach((item)=>{
-        body_row_str="";
-        var counter=0;
-        columns_keys.forEach((column)=>{
-            //console.log(column+"---"+keys.includes(column));
-            //console.log(columnData[column]);
-            if(keys.includes(column)){
-                
-                if (counter==0){
-                    body_row_str+=`<td><input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item=${item["id"]}></td>`;
-                } 
-                if(columnData[column].data){
-                    if(column=="caseApplicant"){
-                        console.log(columnData[column].data[parseInt(item[column])]);
-                        body_row_str+=`<td>${columnData[column].data[parseInt(item[column])].name}</td>`;
-                    }else
-                        body_row_str+=`<td>${columnData[column].data[parseInt(item[column])]}</td>`;
-                }else{
-                    if(column=="caseCreateDate")
-                        body_row_str+=`<td>${formatDateTime(new Date(item[column]),'yyyy年MM月dd日')}</td>`;
-                    else if(column=="caseApplicant"){
-                        console.log(parseInt(item[column]));
-                        var user=getGlobalJson("userList").filter((user)=>user.id==parseInt(item[column]));
-                        if(user.length>0)
-                            body_row_str+=`<td>${user[0].name}</td>`;
-                    }
-                    else
-                        body_row_str+=`<td>${item[column]}</td>`;
-                }
-                //console.log(keys);
-                //console.log(counter+"=="+(keys.length-1));
-                if (counter==keys.length-1-offset){
-                    //console.log(formatString(function_buts,item["id"]));
-                    body_row_str+=`<td>${formatString(function_buts,item["id"])}</td>`;
-                }
-                counter++;
-            }
-    
-            
-        }); 
-        body_str+='<tr>'+body_row_str+'</tr>';
-        counter=0;
-    });
-    
-    container.append($('<tbody>'+body_str+'</tbody>'));
-    table_body_str+='<tbody>'+body_str+'</tbody>';
-    
-    //console.log(body_str);
-    return table_body_str;
+pageTable.prototype.pageTable=function(command){
+    var _this=this;
+    if(command=="refresh"){
+        $("#"+_this.opt.containerId).table().table("refresh");
+        $("#"+_this.opt.containerId).trigger("create");
+    }
 }
 function _createNewCaseForm(template, constainerId){
+    
+    console.log("_createNewCaseForm template");
+    console.log(template);
     var main_form= new mform({template:template});
     var form=main_form.instance;
     
     const popup_form = document.getElementById(constainerId);
-    //popup_form.innerHTML+=form.html();
-    /*
-    form.append($('<fieldset class="ui-grid-a">'+
-    '<div class="ui-block-a"><button type="submit" id="caseReg_but" class="ui-btn ui-corner-all ui-shadow ui-icon-check case-reg-but">提交</button></div>'+
-    '<div class="ui-block-b"><a id="caseReg_but_cancel" href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-icon-back case-reg-but">取消</a></div></fieldset>'));
-    */
-    //form.css({padding:"10px 20px"});
-    //$("#add_case_popup").children().remove();
-    //$(popup_form).html('<h3 id="reg_form_title">新增案件</h3>');
     $(popup_form).append(form);
-    /*
-    $(popup_form).append($('<div class="progress_lock edit-info hide">'+
-                            '<div class="ui-input-btn ui-btn ui-icon-lock ui-btn-icon-notext ui-corner-all ui-shadow btn-icon-red ui-but-lock-edit">'+
-                                '<input type="button" data-enhanced="true" value="锁">'+
-                            '</div></div>'));
-                            */
-    //$("#add_case_popup").css({"min-width":"1000px"});
-
     $(constainerId).trigger('create');
 
 
-
-/*
-    //表格 提交 和 取消 按钮
-    $('.case-reg-but').on('click',function(e){
-        //console.log(e.currentTarget);
-        if(e.currentTarget.id=="caseReg_but_cancel"){
-            //_setBlurBackgroundVisibility(false);
-        }else if(e.currentTarget.id=="caseReg_but"){
-            /*
-            main_form.instance.getValues(sessionStorage.getItem("currentId"),FormTemplate.template,function(message,values){
-                if(values.success){
-                    console.log(message.message);
-                    values.data["caseCreateDate"]=getDateTime();
-                    //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
-                    if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
-                        SendMessage("错误: "+error.FORM_INVALID_USER.message,"是否跳转到登录页面？",function(){
-                            //HideMessage();
-                            window.location.href = 'index.html';
-                        });
-                    }else{
-                        values.data["caseApplicant"]=getGlobalJson("currentUser").id;
-                        values.data["isReadOnly"]=_isReadOnlyCurrentForm();
-                        
-                        showLoading("保存中...");
-                        //console.log(values);
-                        insertCase(values.data,function(r){
-                            //console.log(r);
-                            if(r.success){
-                                console.log("修改添加成功。");
-                                SendMessage("提示","保存完成。",function(){
-                                    _setBlurBackgroundVisibility(false);
-                                    location.reload();
-                                },true);
-                                
-                            }else{
-                                console.log(r);
-                                SendMessage("错误",r.error,function(){},true);
-                            }
-                            hideLoading();
-                        });
-                    }
-                    
-                    
-                }else{
-                    console.log(message.message+(message.id==0?" 但是有错误。":""));
-                }
-            });
-            
-        
-        }
-    });
-    */
-    //表格 编辑锁按钮
-    $('.ui-but-lock-edit').on('click',function(e){
-        requestPassword("提示",'这里是需要管理员密码的。',function(e){
-            //HideMessage();
-            console.log(e==auth_code);
-            if(e==auth_code){
-                var id=sessionStorage.getItem("currentId");
-                var datas=baseData.filter(d=>d.id==id);
-                if(datas.length>0){
-                    var data=datas[0];
-                    data.isReadOnly=!Boolean(data.isReadOnly);
-                    $().mloder("show",{message:"保存中..."});
-                    _setFormReadOnly(data.isReadOnly);
-                    data['caseCreateDate']=getDateTime();
-                    data['caseDate']=getDateTime(data.caseDate);
-                    insertCase(data,function(r){
-                        //console.log(r);
-                        if(r.success){
-                            console.log("修改isReadOnly为"+data.isReadOnly);
-                        }else{
-                            console.log(r);
-                            $().minfo("show",{title:"错误",message:r.error});
-                        }
-                        $().mloder("hide");
-                    });
-                }
-            }else{
-                console.log("密码无效。");
-                setTimeout(function() {
-                    SendMessage("错误","密码无效。",function(){
-                        //HideMessage();
-                        
-                    },true);
-                  }, 100);
-            }
-            
-        },true);
-        
-        
-    });
-      //#endregion
     return main_form;
 }

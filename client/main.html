@@ -575,10 +575,10 @@
 	<script type="text/javascript">
 		
         $(function () {
-            $("#table1").hpaging({ limit: 5 });
-			$("#table2").hpaging({ limit: 5 });
-			$("#table3").hpaging({ limit: 5 });
-			
+            $("#table1").hpaging({ limit: 2 });
+			$("#table2").hpaging({ limit: 1 });
+			$("#table3").hpaging({ limit: 1 });
+			console.log($("#table1").find('tr:hidden'));
         });
 		
     </script>

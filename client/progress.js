@@ -19,7 +19,7 @@ var progressUpdateStatus={
 const table_progress = document.getElementById("table2");
 table_progress.innerHTML= _createProgressTableHTML(table_progress_data,table_progress_status,table_progress_updates);
 
-const progresses=["一审","二审","执行",["强制执行","正常执行","未执行"],"结案","再审","监督"];    
+  
 var deads=["未执行"]; 
 var popup_details_form;
 $('.popup_status_but').on("click",function(e){

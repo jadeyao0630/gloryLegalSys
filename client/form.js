@@ -25,6 +25,7 @@ mform.prototype={
             _self.opt[attr] = arg[attr];
         }
         var template=_self.opt.template;
+        console.log(_self.opt.template);
         if(template.settings.textareaHeight != undefined){
             loadCssCode('textarea.ui-input-text {min-height: '+template.settings.textareaHeight+'px;}')
         }
@@ -438,6 +439,8 @@ mform.prototype={
                 
             }
         });
+        if(this.isReadOnly) _self.instance.find('.optionMark').addClass('hide');
+        else _self.instance.find('.optionMark').removeClass('hide');
         _self.instance.trigger('create');
         function replaceElement(from,to){
             
@@ -501,14 +504,20 @@ $.fn.extend({
     setEmptyData:function(template){
         var _self=this;
         if(template==undefined) template=_self.template;
+        
         $.each(template,(k,v)=>{
+            var val=undefined;
             if(v.hasOwnProperty('type')){
-                _self.addData(v.type,k);
+                if(v.defaultValue!=undefined) val=v.defaultValue;
+                _self.addData(v.type,k,val);
             }else{
                 if(v.hasOwnProperty('data')){
+                    
                     $.each(v.data,(kk,vv)=>{
+                        var _val=undefined;
                         if(vv.hasOwnProperty('type')){
-                            _self.addData(vv.type,kk);
+                            if(vv.defaultValue!=undefined) _val=vv.defaultValue;
+                            _self.addData(vv.type,kk,_val);
                             
                         }
                     })
@@ -526,15 +535,19 @@ $.fn.extend({
         console.log(template)
         $.each(template,(k,v)=>{
             if(v.hasOwnProperty('type')){
+                var val=data[k];
                 if(data_keys.includes(k)){
-                    _self.addData(v.type,k,data[k]);
+                    if(v.defaultValue!=undefined && (val==undefined || val.length==0)) val=v.defaultValue;
+                    _self.addData(v.type,k,val);
                 }
             }else{
                 if(v.hasOwnProperty('data')){
                     $.each(v.data,(kk,vv)=>{
                         if(vv.hasOwnProperty('type')){
+                            var _val=data[kk];
                             if(data_keys.includes(kk)){
-                                _self.addData(vv.type,kk,data[kk]);
+                                if(vv.defaultValue!=undefined && (_val==undefined || _val.length==0)) _val=vv.defaultValue;
+                                _self.addData(vv.type,kk,_val);
                             }
                         }
                     })

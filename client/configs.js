@@ -1,4 +1,4 @@
-var isRunLocal=true;
+var isRunLocal=false;
 let ip=isRunLocal?'localhost':'cn.luyao.site';
 let port=5555;
 var auth_code='1234';
@@ -10,7 +10,7 @@ class Message{
     static LOGIN_WELCOME_F='<p style="color:red;">欢迎{0}回来</p>';
     static PROGRESS_DELETE_WARNING_F='确定删除此流程点[{0}]后已存在其它流程点吗？';
 }
-
+const progresses=["一审","二审","执行",["强制执行","正常执行","未执行"],"结案","再审","监督"];  
 const TextColor="rgb(51, 51, 51)";
 const property_status=["查封","冻结"];
 const case_types=["被诉","主诉"];
@@ -72,25 +72,98 @@ const columns={
 }
 var _firstPageTableColumns={
     checkallbox:{
-        width:50
+        width:50,
+        type:"checkbox"
     },
     id:{
     label: "序号",
     width:50,
+    type:"label"
     },
     caseNo:{
-        label:"案件编号"
+        label:"案件编号",
+        type:"label"
     },
-    caseName:{label:"案件名称"},
-    caseReason:{label:"案由",data:case_causes, isFilterable:true},
-    caseType:{label:"案件类型",data:case_types, isFilterable:true},
-    caseBelong:{label:"所属项目",data:projects, isFilterable:true},
-    caseApplicant:{label:"申请人", isFilterable:true,isHidden:true},
-    caseCreateDate:{label:"创建时间", isFilterable:true},
+    caseName:{label:"案件名称",
+    type:"label"},
+    caseReason:{label:"案由",
+    type:"label",data:case_causes, isFilterable:true},
+    caseType:{label:"案件类型",
+    type:"label",data:case_types, isFilterable:true},
+    caseBelong:{label:"所属项目",
+    type:"label",data:projects, isFilterable:true},
+    caseApplicant:{label:"申请人",matchKey:"id",valueKey:"name",
+    type:"label", isFilterable:true,isHidden:true},
+    caseCreateDate:{label:"创建时间",
+    type:"date", dateFormat:'yyyy年MM月dd日', isFilterable:true},
     rowButtons:{
-        label:"操作"
+        label:"操作",
+        type:"buttons"
     }
 }
+var _progressTableTemplate=[
+    {
+        data:{
+            checkallbox:{
+                type:"checkbox"
+            },
+        }
+    },
+    {
+      width:Number.NaN,
+      data:{
+        caseLabel:{
+            type:"backgroundColorLabel",
+            data:case_labels_colors
+        }
+      }
+    },
+    {
+      width:Number.NaN,
+      data:{
+        caseReason:{
+          label:"案发原因：",
+          data:case_reason
+        },
+        createDate:{
+          label:"提交日期：",
+        }
+      }
+    },
+    {
+      width:Number.NaN,
+      data:{
+        caseCause:{
+          label:"案由：",
+          data:case_causes
+        },
+        caseStatus:{
+          label:"状态：",
+          data:progresses
+        }
+      }
+    },
+    {
+      width:Number.NaN,
+      data:{
+        penaltyAmount:{
+          label:"判决金额(万)：",
+        },
+        exexuteAmount:{
+          label:"执行金额(万)：",
+        }
+      }
+    },
+    {
+        data:{
+            
+            rowButtons:{
+                label:"操作",
+                type:"buttons"
+            }
+        }
+    }
+  ]
 var firstPageTableColumns={
     id:{
     label: "序号",
@@ -106,6 +179,52 @@ var firstPageTableColumns={
     caseApplicant:{label:"申请人",},
     caseCreateDate:{label:"创建时间"},
 }
+var progressTableTemplate=[
+    {
+      width:Number.NaN,
+      data:{
+        caseLabel:{
+  
+        }
+      }
+    },
+    {
+      width:Number.NaN,
+      data:{
+        caseReason:{
+          label:"案发原因：",
+          data:case_reason
+        },
+        createDate:{
+          label:"提交日期：",
+        }
+      }
+    },
+    {
+      width:Number.NaN,
+      data:{
+        caseCause:{
+          label:"案由：",
+          data:case_causes
+        },
+        caseStatus:{
+          label:"状态：",
+          data:progresses
+        }
+      }
+    },
+    {
+      width:Number.NaN,
+      data:{
+        penaltyAmount:{
+          label:"判决金额(万)：",
+        },
+        exexuteAmount:{
+          label:"执行金额(万)：",
+        }
+      }
+    }
+  ]
 var FormTemplate={
     settings:{
         templateColumn:"50% 50%",
@@ -225,17 +344,19 @@ var FormTemplate={
                 },
                 caseLawsuit:{
                     placeholder:"本诉金额",
-                    label:"本诉金额(万元);",
+                    label:"本诉金额(万元):",
                     type:"text",
                     isOptional:true,
-                    numberOnly:true
+                    numberOnly:true,
+                    defaultValue:0.0
                 },
                 caseCounterclaim:{
                     placeholder:"反诉金额",
                     label:"反诉金额(万元):",
                     type:"text",
                     isOptional:true,
-                    numberOnly:true
+                    numberOnly:true,
+                    defaultValue:0.0
                 },
                 caseLawsuitRequest:{
                     placeholder:"本诉请求",
@@ -378,17 +499,19 @@ var FormTemplate3={
                 },
                 caseLawsuit:{
                     placeholder:"本诉金额",
-                    label:"本诉金额(万元);",
+                    label:"本诉金额(万元):",
                     type:"text",
                     isOptional:true,
-                    numberOnly:true
+                    numberOnly:true,
+                    defaultValue:0.0
                 },
                 caseCounterclaim:{
                     placeholder:"反诉金额",
                     label:"反诉金额(万元):",
                     type:"text",
                     isOptional:true,
-                    numberOnly:true
+                    numberOnly:true,
+                    defaultValue:0.0
                 },
                 caseLawsuitRequest:{
                     placeholder:"本诉请求",

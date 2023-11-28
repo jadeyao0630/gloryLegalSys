@@ -37,10 +37,10 @@ const case_causes=["购房合同纠纷","建设工程纠纷","佣金类纠纷","
 const case_status=["一审","二审","执行","结案","再审","审判监督程序",];
 const case_execute_status=["未执","强执","结案"];
 const case_labels_colors={
-    "普通案件":{background:"skyblue",'text-shadow': 'none'},
-    "重大案件300万以上":{background:"orange",color:"white",'text-shadow': 'none'},
-    "重大案件1000万以上":{background:"#E25C62",color:"white",'text-shadow': 'none'},
-    "重大案件 群诉":{background:"blue",color:"white",'text-shadow': 'none'}
+    "普通案件":{background:"skyblue",'text-shadow': 'none','text-align': 'center','font-weight':'700'},
+    "重大案件300万以上":{background:"orange",color:"white",'text-shadow': 'none','text-align': 'center','font-weight':'700'},
+    "重大案件1000万以上":{background:"#E25C62",color:"white",'text-shadow': 'none','text-align': 'center','font-weight':'700'},
+    "重大案件 群诉":{background:"blue",color:"white",'text-shadow': 'none','text-align': 'center','font-weight':'700'}
 }
 const columns={
     id:"INT NOT NULL,PRIMARY KEY",
@@ -69,6 +69,19 @@ const columns={
     caseApplicant:"varchar(100) NOT NULL",
     caseCreateDate:"datetime NOT NULL",
     isReadOnly:"bool NOT NULL",
+}
+const caseStatus={
+  id:"INT NOT NULL,PRIMARY KEY",
+  caseNo:"VARCHAR(100) NOT NULL,UNIQUE",
+  caseStatus:"INT NOT NULL",
+  legalPersonnel:"INT NOT NULL",
+  lawFirm:"INT NOT NULL",
+  attorney:"INT NOT NULL",
+  FirstInstance:"datetime",
+  SecondInstance:"datetime",
+  court:"VARCHAR(100)",
+  penalty:"VARCHAR(255) default '0.00'",
+  paidAmount:"VARCHAR(255) default '0.00'",
 }
 var _firstPageTableColumns={
     checkallbox:{
@@ -115,7 +128,8 @@ var _progressTableTemplate=[
         caseLabel:{
             type:"backgroundColorLabel",
             data:case_labels,
-            backgroundData:case_labels_colors
+            backgroundData:case_labels_colors,
+            style:{'font-weight':'700','font-size':'18px'}
         }
       }
     },
@@ -124,7 +138,8 @@ var _progressTableTemplate=[
       data:{
         caseReason:{
           label:"案发原因：",
-          data:case_reason
+          data:case_reason,
+          style:{'font-weight':'700','font-size':'18px'}
         },
         caseCreateDate:{
           label:"提交日期：", type:"date",dateFormat:'yyyy年MM月dd日'
@@ -147,10 +162,10 @@ var _progressTableTemplate=[
     {
       width:Number.NaN,
       data:{
-        penaltyAmount:{
+        penalty:{
           label:"判决金额(万)：",
         },
-        exexuteAmount:{
+        paidAmount:{
           label:"执行金额(万)：",
         }
       }

@@ -29,6 +29,20 @@ async function getCasesData(res){
     });
     res(_data);
 }
+async function getCasesStatus(res){
+    var _data=undefined;
+    var query="SELECT * FROM caseStatus ORDER BY id ASC"
+    await fetch("http://"+ip+":"+port+"/select",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ query: query})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data['data'].length>0) _data=data['data'];
+    });
+    res(_data);
+}
 async function getUserList(res){
     var _data=undefined;
     await fetch('http://'+ip+':'+port+'/getAll')
@@ -41,6 +55,24 @@ async function insertCase(data,res){
         headers:headers,
         method: 'POST',
         body: JSON.stringify({ table: "cases", data:data})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.data.success){
+            console.log(data.data.id);
+        }else{
+            console.log(data.data.error);
+        }
+        res(data.data);
+    });
+}
+async function createTable(table,template,res){
+    await fetch("http://"+ip+":"+port+"/createTable",{
+        headers:{
+            'Content-Type': 'application/json'
+        },
+        method: 'POST',
+        body: JSON.stringify({ table: table, columns:template})
     })
     .then(response => response.json())
     .then(data => {

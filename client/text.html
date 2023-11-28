@@ -10,6 +10,7 @@
 	<link rel="stylesheet" href="./css/form.css" />
 	<link rel="stylesheet" href="./css/popup.css" />
 	<link rel="stylesheet" href="./css/color.css" />
+	<link rel="stylesheet" href="./css/stepButton.css" />
 	<script src="./js/jquery.js"></script>
 	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
 
@@ -20,6 +21,7 @@
 	
 	<script type="text/javascript" src="./form.js"></script>
 	<script type="text/javascript" src="./utilities/tables.js"></script>
+	<script type="text/javascript" src="./js/progressesButton.js"></script>
 	
 	<style>
 		.fixedHeader{
@@ -50,7 +52,6 @@
             margin-bottom: 10px;
             margin-left: 20px;
             margin-top: -15px;
-			
         }
 		.hide{
 			display: none;
@@ -117,6 +118,28 @@
 			margin-right:80px;
 		}
 		/* page1  */
+
+		/* page2  */
+		#pageSecondTable{
+			margin: 10px 10px;
+			width:100%;
+		}
+		#pageSecondTable tbody tr td{
+            text-align: left;
+            vertical-align:middle;
+			white-space: nowrap; 
+			overflow: hidden;
+			text-overflow: ellipsis;
+			
+        }
+        #pageSecondTable thead tr th{
+            text-align: left;
+            vertical-align: middle;
+			white-space: nowrap; 
+			overflow: hidden;
+			text-overflow: ellipsis;
+        }
+		/* page2  */
 		.ui-selectmenu.ui-popup .ui-input-search {
     margin-left: .5em;
     margin-right: .5em;
@@ -165,15 +188,16 @@
 			<h1 style="font-size: 30px;display: flex;margin: 0 0 0 15px;padding:10px;">国瑞法务管理系统</h1>
 			<a id="name" href="#popupMenu" data-rel="popup" data-transition="slideup" data-icon="user" class="ui-btn-right">登录</a>
             <div data-role="popup" id="popupMenu" data-theme="b" data-history="false">
-                <ul data-role="listview" data-inset="true" style="min-width:160px;" data-theme="a">
-                    <li data-role="list-divider"></li>
-                    <li><a class="ui-btn ui-btn-b ui-btn-icon-left ui-icon-power" onclick='location.href=("index.html")'>退出</a></li>
-					
-					<li><a class="ui-btn ui-btn-b ui-btn-icon-left ui-icon-plus">添加一条记录</a></li>
+                <ul data-role="listview" data-inset="true" style="min-width:160px;" data-theme="b">
+                    <li data-role="list-divider">操作</li>
+                    <li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-power" onclick='location.href=("index.html")'>退出</a></li>
+					<li data-role="list-divider">添加</li>
+					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-add-row">添加一条记录</a></li>
+					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-add-table">添加一条表</a></li>
                 </ul>
             </div>
 
-				<div data-role="navbar">
+				<div data-role="navbar" id="main_nav">
 					<ul>
 						<li><a href="#page1" class="ui-btn-active ui-btn ui-icon-bullets ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><h2>案件登记查询</h2></a></li>
                     	<li><a href="#page2" class="ui-btn ui-icon-star ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><h2>案件进展执行</h2></a></li>
@@ -243,6 +267,9 @@
 		//$.mobile.changePage.defaults.reloadPage = true
 		$.mobile.navigate( '#');
 		//window.location.href = 'text.html';
+		getCasesStatus(function(r){
+			setGlobalJson("mainDataStatus",r);
+		});
 		getCasesData(function(r){
             output('getCasesData: ');
             output(r);
@@ -268,10 +295,12 @@
 						'<button name="fn_btn_delete" class="btn-icon-red" data-icon="delete" data-iconpos="notext" data-item={0}>删除</button>'+
 					'</div>'
 				});
+				console.log('mainDataStatus');
+				console.log(getGlobalJson('mainDataStatus'));
 				pageSeTable=new pageTable({
 					containerId:"pageSecondTable",
 					template:_progressTableTemplate,
-					data:r,
+					data:{0:r,1:getGlobalJson("mainDataStatus")}
 					//filterParent:"mainFooter",
 				});
 				tableColumnToggle(_firstPageTableColumns,"mainFooter","pageOneTable");
@@ -297,13 +326,16 @@
 			//console.log($("#pageOneTable .ui-checkbox"));
 		});
 
-		var currentPage="#page1";
+		setGlobal('currentPage',"#page1");
 		$(".nav-but").on("click",function(e){
 			e.preventDefault();
+			if(getGlobal('currentPage') == $(this).attr( "href" )) return;
+			$(getGlobal('currentPage')).addClass('hide');
 			$($(this).attr( "href" )).removeClass('hide');
-			$(currentPage).addClass('hide');
-			currentPage=$(this).attr( "href" );
-			if(currentPage!="#page1"){
+			
+			//currentPage=$(this).attr( "href" );
+			setGlobal('currentPage',$(this).attr( "href" ));
+			if(getGlobal('currentPage')!="#page1"){
 				$('#searchbar1').animate({'margin-left':"10px",'margin-right':"10px"});
 				$('.footerBtn').hide();
 			}else{
@@ -312,8 +344,8 @@
 				});
 				
 			}
-			$("#pageSecondTable").jqmData('filter',currentPage=="#page2");
-			$("#pageOneTable").jqmData('filter',currentPage=="#page1");
+			$("#pageSecondTable").jqmData('filter',getGlobal('currentPage')=="#page2");
+			$("#pageOneTable").jqmData('filter',getGlobal('currentPage')=="#page1");
 		});
 		
 		function logingStatus(){

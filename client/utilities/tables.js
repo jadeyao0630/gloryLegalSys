@@ -13,6 +13,11 @@ function tableColumnToggle(columnTemplate,container,target){
     
     $("#"+container).append(filterBtn);
     $("#"+container).append(filterPopup);
+    filterPopup.popup({
+        afterclose: function( event, ui ) {
+            console.log(getGlobal('currentPage'));
+        }
+      });
 
     $.each(ids,function(index,id){
         var columnData=columnTemplate[id];
@@ -81,6 +86,7 @@ pageTable.prototype.buildTableColumns=function(){
     var _this=this;
     var columnTemplate=_this.opt.template;
     if(!(columnTemplate instanceof Array)){
+        //console.log('buildTableColumns...........');
         var thead=$('<thead></thead>');
         var tr=$('<tr></tr>');
         thead.append(tr);
@@ -89,6 +95,7 @@ pageTable.prototype.buildTableColumns=function(){
             var columnData=columnTemplate[id];
             var ws=columnData.width!=undefined?" style='width:"+(Number(columnData.width)?columnData.width+"px;'":columnData.width+"'"):"";
             var th;
+            //console.log(id+": "+ws);
             if(columnData.type=="checkbox"){
                 th=$('<th'+ws+'><input class="reg-checkbox-all" type="checkbox" data-mini="true"></th>');
             }else{
@@ -119,6 +126,36 @@ pageTable.prototype.addTableData=function(data){
     var _this=this;
     var columnTemplate=_this.opt.template;
     var tbody=$('<tbody></tbody>');
+    
+    //console.log('data instanceof Array');
+    //console.log(data instanceof Array);
+    //console.log(data);
+    //console.log('data instanceof Array');
+    if(!(data instanceof Array)){
+        console.log('data instanceof Array');
+        console.log(data);
+        var collect={};
+        var mergedData=[];
+        $.each(data,(index,d)=>{
+            $.each(d,(id,val)=>{
+                if(!collect.hasOwnProperty(id)) collect[id]=[];
+                collect[id].push(val);
+            })
+            //mergedData=Object.assign({}, mergedData,d);
+        });
+        console.log(collect);
+        $.each(collect,(id,vals)=>{
+            var merge={};
+            $.each(vals,(index,val)=>{
+                merge=Object.assign({}, merge,val);
+            });
+            mergedData.push(merge);
+        })
+        console.log('mergedData');
+        console.log(mergedData);
+        data=mergedData;
+    }
+    
     if(!(columnTemplate instanceof Array)){
         var ids=Object.keys(columnTemplate);
     
@@ -130,7 +167,7 @@ pageTable.prototype.addTableData=function(data){
                     td=getTdElement(columnTemplate[id],d[id],id);
                     
                 }else{
-                    console.log("id.........."+d.id);
+                    //console.log("id.........."+d.id);
                     td=getTdElement(columnTemplate[id],d.id,id);
                 }
                 tr.append(td);
@@ -143,18 +180,38 @@ pageTable.prototype.addTableData=function(data){
             columnTemplate.forEach(template => {
                 if(template.hasOwnProperty('data')){
                     var ids=Object.keys(template.data);
-                
-                    var td=$('<td></td>');
+                    var ws=template.width!=undefined?" style='width:"+(Number(template.width)?template.width+"px;'":template.width+"'"):"";
+                    
+                    var td=$('<td'+ws+'></td>');
+                    var columnTemplate=[];
                     $.each(ids,function(index,id){
-                        var labelValueContainer=$('<div style="display:grid;grid-template-columns: auto auto ;"></div>');
-                        td.append(labelValueContainer);
+                        if(index==ids.length-1){
+                            columnTemplate.push("1fr");
+                        }else{
+                            columnTemplate.push("auto");
+                        }
+                        
+                    });
+                    var gridStyle=' style="display:grid;grid-template-columns:'+columnTemplate.join(" ")+';"';
+                    if(ids.length==1) gridStyle="";
+                    var labelValueContainer=$('<div'+gridStyle+'></div>');
+                    td.append(labelValueContainer);
+                    $.each(ids,function(index,id){
+                        
+                        
+                        if(template.data[id].type=="backgroundColorLabel"){
+                            //console.log('backgroundData: '+template.data[id].backgroundData[template.data[id].data[d[id]]]+"--"+template.data[id].data[d[id]]);
+                            td.css(template.data[id].backgroundData[template.data[id].data[d[id]]])
+                        }
                         if(template.data[id].hasOwnProperty('label')){
-                            labelValueContainer.append($('<label>'+template.data[id].label+'</label>'));
+                            var label=$('<label>'+template.data[id].label+'</label>');
+                            if(template.data[id].style!=undefined) label.css(template.data[id].style);
+                            labelValueContainer.append(label);
                         }
                         if(d.hasOwnProperty(id)){
-                            console.log('d.hasOwnProperty');
-                            console.log(template.data[id]);
-                            console.log(d[id]);
+                            //console.log('d.hasOwnProperty');
+                            //console.log(template.data[id]);
+                            //console.log(d[id]);
                             
                             labelValueContainer.append($(getTdElement(template.data[id],d[id],id).html()));
                         }else{
@@ -175,16 +232,17 @@ pageTable.prototype.addTableData=function(data){
     
     function getTdElement(columnSettings,value,key){
         var td=$('<td name="'+key+'"></td>');
+        if(columnSettings.style!=undefined) td.css(columnSettings.style);
         if(columnSettings.type=="checkbox"){
             var item=$('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+value+'>');
-            console.log('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+value+'>');
+            //console.log('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+value+'>');
             td.append(item);
         }else if(columnSettings.type=="buttons"){
             if(_this.opt.rowButtons!=undefined){
                 td.append($(formatString(_this.opt.rowButtons,value)));
             }
         }else if(columnSettings.type=="date"){
-            console.log(value);
+            //console.log(value);
             val=getDateTime(value);
             if(columnSettings.dateFormat!=null) val=formatDateTime(new Date(value),columnSettings.dateFormat);
             var label=$('<label>'+val+'</label>')
@@ -215,6 +273,7 @@ pageTable.prototype.addTableData=function(data){
             var label=$('<label>'+val+'</label>')
             td.append(label);
         }
+        if(columnSettings.style!=undefined) td.children().css(columnSettings.style);
         return td;
     }
 }
@@ -227,8 +286,8 @@ pageTable.prototype.pageTable=function(command){
 }
 function _createNewCaseForm(template, constainerId){
     
-    console.log("_createNewCaseForm template");
-    console.log(template);
+    //console.log("_createNewCaseForm template");
+    //console.log(template);
     var main_form= new mform({template:template});
     var form=main_form.instance;
     

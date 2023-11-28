@@ -1,4 +1,12 @@
 function addClickEvents(main_form,r){
+    //#region 全局功能按钮
+
+    $('.popup-add-table').on('click',async function(e){
+        await createTable('caseStatus',caseStatus,function(res){
+            console.log(res);
+        });
+    });
+    //#endregion
     //#region page 1 table 的 checkbox 和 按钮 事件
     var checkboxes = document.querySelectorAll("input[type=checkbox][name=item_checkbox]")
     checkboxes.forEach(function(checkbox) {
@@ -241,14 +249,16 @@ function addClickEvents(main_form,r){
         }
     })
     //#endregion
-
+    //$('#pageOneTable-columnFilter"')
     function _isReadOnlyCurrentForm(){
         var datas=r.filter(d=>d.id==getGlobal("currentId"));
         if(datas.length>0)
             return datas[0].isReadOnly;
         return true;
     }
-    
+    function _reactiveCurrentTab(){
+
+    }
     
     
 }

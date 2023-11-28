@@ -114,7 +114,8 @@ var _progressTableTemplate=[
       data:{
         caseLabel:{
             type:"backgroundColorLabel",
-            data:case_labels_colors
+            data:case_labels,
+            backgroundData:case_labels_colors
         }
       }
     },
@@ -125,8 +126,8 @@ var _progressTableTemplate=[
           label:"案发原因：",
           data:case_reason
         },
-        createDate:{
-          label:"提交日期：",
+        caseCreateDate:{
+          label:"提交日期：", type:"date",dateFormat:'yyyy年MM月dd日'
         }
       }
     },

@@ -189,6 +189,13 @@ pageTable.prototype.addTableData=function(data){
             if(columnSettings.dateFormat!=null) val=formatDateTime(new Date(value),columnSettings.dateFormat);
             var label=$('<label>'+val+'</label>')
             td.append(label);
+        }else if(columnSettings.type=="backgroundColorLabel"){
+            var val=value;
+            if(columnSettings.data!=undefined){
+                val=columnSettings.data[val];
+            }
+            var label=$('<label>'+val+'</label>')
+            td.append(label);
         }else{ //if(columnSettings.type=="label"){
             var val=value;
             if(columnSettings.data!=undefined){

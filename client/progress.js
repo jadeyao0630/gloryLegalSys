@@ -20,7 +20,7 @@ const table_progress = document.getElementById("table2");
 table_progress.innerHTML= _createProgressTableHTML(table_progress_data,table_progress_status,table_progress_updates);
 
   
-var deads=["未执行"]; 
+
 var popup_details_form;
 $('.popup_status_but').on("click",function(e){
   console.log(progressUpdateStatus.currentPopupId);

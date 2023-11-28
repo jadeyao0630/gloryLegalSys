@@ -24,6 +24,23 @@
 	<script type="text/javascript" src="./js/progressesButton.js"></script>
 	
 	<style>
+		#main_nav ul li button{
+			vertical-align: middle;
+			text-align: center;
+			line-height: 30px;
+			height:60px;
+		}
+		#main_nav ul li button{
+			font-size: 20px;
+		}
+		.tab-active div{
+			font-size: 25px;
+			vertical-align: middle;
+			text-align: center;
+		}
+		.tab-active::after{
+			background-color: #1362B7;
+		}
 		.fixedHeader{
 			overflow:hidden;background: #262626;color:white;text-shadow: none;padding:0px;
 		}
@@ -199,9 +216,9 @@
 
 				<div data-role="navbar" id="main_nav">
 					<ul>
-						<li><a href="#page1" class="ui-btn-active ui-btn ui-icon-bullets ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><h2>案件登记查询</h2></a></li>
-                    	<li><a href="#page2" class="ui-btn ui-icon-star ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><h2>案件进展执行</h2></a></li>
-                    	<li><a href="#page3" class="ui-btn ui-icon-gear ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><h2>设置</h2></a></li>
+						<li><button href="#page1" data-theme="b" class="tab-active ui-btn ui-icon-bullets ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><div>案件登记查询</div></button></li>
+                    	<li><button href="#page2" data-theme="b" class="ui-btn ui-icon-star ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><div>案件进展执行</div></button></li>
+                    	<li><button href="#page3" data-theme="b" class="ui-btn ui-icon-gear ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><div>设置</div></button></li>
 					</ul>
 				</div><!-- /navbar -->
 		</div><!-- /header -->
@@ -220,10 +237,15 @@
 		
 	</div>
 		<div data-role="footer"  data-position="fixed" id="mainFooter">
-			<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-left footerBtn ui-shadow">
-				<a href="#fullscreenPage" id="case_reg_but_add" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but">新增</a>
-				<a href="#" id="case_reg_but_remove" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but">删除</a>
-			</div>
+
+				<input type="checkbox" data-mini="true" class="hide" style="margin-top: 8px;margin-left:5px;">
+				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
+					
+					<a href="#fullscreenPage" id="case_reg_but_add" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn">新增</a>
+					<a href="#" id="case_reg_but_remove" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but">删除</a>
+				</div>
+
+			
 			<div id="searchbar1">
 				<form class="ui-filterable filtertable1">
 					<input id="filterBasic-input" placeholder="搜索关键字" data-type="search">
@@ -325,29 +347,42 @@
            
 			//console.log($("#pageOneTable .ui-checkbox"));
 		});
-
+		
 		setGlobal('currentPage',"#page1");
 		$(".nav-but").on("click",function(e){
-			e.preventDefault();
+			//e.preventDefault();
 			if(getGlobal('currentPage') == $(this).attr( "href" )) return;
 			$(getGlobal('currentPage')).addClass('hide');
 			$($(this).attr( "href" )).removeClass('hide');
-			
+			$(getCurrentPageTabBtn(getGlobal('currentPage'))).removeClass('tab-active');
+			$(this).addClass('tab-active');
+			$(this).find('h2').css({'font-szie':'30px','font-weight':"700"})
+			//$(this).parent().addClass('tab-active');
 			//currentPage=$(this).attr( "href" );
 			setGlobal('currentPage',$(this).attr( "href" ));
 			if(getGlobal('currentPage')!="#page1"){
-				$('#searchbar1').animate({'margin-left':"10px",'margin-right':"10px"});
+				$('#searchbar1').animate({'margin-left':"120px",'margin-right':"10px"});
 				$('.footerBtn').hide();
+				$('#mainFooter').find('input[type="checkbox"]').removeClass('hide');
+				$('.ui-footer-btns').animate({'margin-left':'38px'});
 			}else{
 				$('#searchbar1').animate({'margin-left':"160px",'margin-right':"80px"},function(){
 					$('.footerBtn').show();
+					$('#mainFooter').find('input[type="checkbox"]').addClass('hide');
+					$('.ui-footer-btns').animate({'margin-left':'10px'},function(){
+						
+					});
 				});
 				
 			}
 			$("#pageSecondTable").jqmData('filter',getGlobal('currentPage')=="#page2");
-			$("#pageOneTable").jqmData('filter',getGlobal('currentPage')=="#page1");
+			$("#pageOneTable").jqmData('filter',getGlobal('currentPage')=="#page1");			
 		});
-		
+		function getCurrentPageTabBtn(pageId){
+			var btns=$('#main_nav').find('button[href="'+pageId+'"]');
+			if(btns.length>0) return btns[0];
+			return undefined;
+		}
 		function logingStatus(){
 			//setGlobalJson("currentUser","{}");
 			if(getGlobalJson("currentUser") && getGlobalJson("currentUser").name){

@@ -215,7 +215,7 @@ pageTable.prototype.addTableData=function(data){
                             
                             labelValueContainer.append($(getTdElement(template.data[id],d[id],id).html()));
                         }else{
-
+                            //console.log(template.data[id]);
                             labelValueContainer.append($(getTdElement(template.data[id],d.id,id).html()));
                         }
                     });
@@ -240,6 +240,25 @@ pageTable.prototype.addTableData=function(data){
         }else if(columnSettings.type=="buttons"){
             if(_this.opt.rowButtons!=undefined){
                 td.append($(formatString(_this.opt.rowButtons,value)));
+            }else{
+                if(columnSettings.data!=undefined){
+                    var container=$('<div data-role="controlgroup" data-mini="true" data-type="horizontal"></div>');
+                    columnSettings.data.forEach(but=>{
+                        var cls="";
+                        var text="";
+                        if(but.hasOwnProperty('clss')){
+                            cls=but.clss;
+                        }
+                        if(but.hasOwnProperty('label')){
+                            text=but.label;
+                        }
+                        var btn=$('<a href="#" data-index="'+value+'" class="ui-btn ui-corner-all ui-shadow '+cls+'">'+text+'</a>');
+                        container.append(btn);
+                        
+                        console.log(container.html());
+                    })
+                    td.append(container);
+                }
             }
         }else if(columnSettings.type=="date"){
             //console.log(value);
@@ -254,7 +273,41 @@ pageTable.prototype.addTableData=function(data){
             }
             var label=$('<label>'+val+'</label>')
             td.append(label);
-        }else{ //if(columnSettings.type=="label"){
+        }else if(columnSettings.type=="progresses"){
+            var val=value;
+            if(columnSettings.data!=undefined){
+                var index=formatIndex(val);
+                console.log('val....');
+                val=columnSettings.data[index.main];
+                //console.log(columnSettings.data);
+                if(val instanceof Array){
+                    val=val[index.sub];
+                    console.log(val);
+                }
+            }
+            var label=$('<label>'+val+'</label>')
+            td.append(label);
+        }else if(columnSettings.type=="progressesButton"){
+            var but=new ProgressesButton({
+                steps:progresses,
+                deadSteps:deads,
+                showLabel:true,
+                //containerId:'#'+pbut.id,
+                currentPosition:Number(value),
+                fontSize:12,
+                line_size:4,
+                size:12,
+                width:240,
+                isViewMode:true,
+                verticalGap:2,
+                labelPosition:"bottom",
+                showSubSteps:false,
+                readOnly:true,
+              });
+              td.append(but.instance);
+              but.instance.css({'margin-top':"-25px"})
+        }
+        else{ //if(columnSettings.type=="label"){
             var val=value;
             if(columnSettings.data!=undefined){
                 if(columnSettings.valueKey!=undefined && 

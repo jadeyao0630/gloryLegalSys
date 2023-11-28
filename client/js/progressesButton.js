@@ -18,7 +18,7 @@ function ProgressesButton(arg){
         size:10,
         fontSize:12,
         line_size:4,
-        containerId:'#test1',
+        containerId:undefined,
         showLabel:true,
         dataId:-1,
         duration:300,
@@ -39,7 +39,7 @@ ProgressesButton.prototype.init=function(arg){
     var _this=this;
     extend(this.opt,arg);
     this.dataId=this.opt.dataId;
-    this.parent=$(_this.opt.containerId);
+    if (_this.opt.containerId!=undefined) this.parent=$(_this.opt.containerId);
     //if(this.instance!=null) this.instance.remove();
     //console.log(_this.opt.containerId);
     
@@ -347,7 +347,8 @@ ProgressesButton.prototype.init=function(arg){
     });  
     //console.log("this items length..........."+_this.items.length);
     _this.instance.append(_this.outter_frame); 
-    this.parent.append(this.instance);
+    if(this.parent!=undefined) this.parent.append(this.instance);
+    //return this;
     async function clickedEvent(e){
         
         if(_this.opt.isViewMode&&$(e.currentTarget).data('canSelect')){

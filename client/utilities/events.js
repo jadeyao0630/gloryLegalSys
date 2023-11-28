@@ -7,21 +7,14 @@ function addClickEvents(main_form,r){
         });
     });
     //#endregion
+    
     //#region page 1 table 的 checkbox 和 按钮 事件
-    var checkboxes = document.querySelectorAll("input[type=checkbox][name=item_checkbox]")
-    checkboxes.forEach(function(checkbox) {
-        checkbox.addEventListener('change', function() {
-            $('.reg-checkbox-all').prop("checked",
-            $('#pageOneTable > tbody > tr').not(':hidden').length==$('#pageOneTable > tbody > tr').not(':hidden').find('input[type="checkbox"]:checked').length);
-        
-        })
-    });
+    setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
+    //#endregion
 
-    var checkbox_main = document.querySelector(".reg-checkbox-all")
-    checkbox_main.addEventListener('change', function() {
-        $('#pageOneTable > tbody > tr').not(':hidden').find('input[type="checkbox"]').prop( "checked", $(this).prop('checked') );
-
-    });
+    //#region page 2 checkbox
+    setCheckAllBox($('#mainFooter').find('input[type="checkbox"]'),'pageSecondTable');
+    //#endregion
     //表格内每行的功能按钮事件
     var fn_buts = document.querySelectorAll("button[name^=fn_btn]")
     fn_buts.forEach(function(fn_but) {
@@ -259,6 +252,23 @@ function addClickEvents(main_form,r){
     function _reactiveCurrentTab(){
 
     }
+    function setCheckAllBox(checkboxAll,targetTable){
+        var _this=checkboxAll;
+        var tr=$('#'+targetTable+' > tbody > tr');
+        $.each($('#'+targetTable).find("input[type=checkbox][name=item_checkbox]"),function(index,checkbox) {
+            //console.log()
+            $(checkbox).on('change', function() {
+                
+                $(_this).prop("checked",
+                tr.not(':hidden').length==tr.not(':hidden').find('input[type="checkbox"]:checked').length);
+            
+            })
+        });
+        $(_this).on('change',function() {
+            //console.log('change');
+            tr.not(':hidden').find('input[type="checkbox"]').prop( "checked", $(this).prop('checked') );
     
+        });
+    }
     
 }

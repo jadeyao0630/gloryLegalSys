@@ -219,7 +219,7 @@ const counselTitles={//受理人职务
     type:"VARCHAR(255)",//受理人职务名称
     descriptions:"VARCHAR(255)",//受理人职务说明
 }
-const lawFirms={//代理律所列表
+const _lawFirms={//代理律所列表
     id:"INT NOT NULL,PRIMARY KEY",//代理律所唯一序列号
     name:"VARCHAR(255)",//代理律所名称
     contact:"VARCHAR(255)",//代理律所联系方式

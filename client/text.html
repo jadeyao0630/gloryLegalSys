@@ -157,26 +157,42 @@
 			text-overflow: ellipsis;
         }
 		/* page2  */
+
+		/* page4  */
+		ui-collapsible.collapsible-listview .ui-btn{
+			background-color: white !important;
+			box-shadow: none;
+		}
+		.ui-collapsible.collapsible-listview{
+			border:none;
+			box-shadow: none;
+		}
+		.ui-li-count{
+			color:white;
+			background: black;
+		}
+		/* page4  */
+
 		.ui-selectmenu.ui-popup .ui-input-search {
-    margin-left: .5em;
-    margin-right: .5em;
-}
-.ui-selectmenu.ui-dialog .ui-content {
-    padding-top: 0;
-}
-.ui-selectmenu.ui-dialog .ui-selectmenu-list {
-    margin-top: 0;
-    background: white;
-}
-.ui-selectmenu.ui-popup .ui-selectmenu-list li.ui-first-child .ui-btn {
-    border-top-width: 1px;
-    -webkit-border-radius: 0;
-    border-radius: 0;
-}
-.ui-selectmenu.ui-dialog .ui-header {
-    border-bottom-width: 1px;
-}
-.progress_lock{
+			margin-left: .5em;
+			margin-right: .5em;
+		}
+		.ui-selectmenu.ui-dialog .ui-content {
+			padding-top: 0;
+		}
+		.ui-selectmenu.ui-dialog .ui-selectmenu-list {
+			margin-top: 0;
+			background: white;
+		}
+		.ui-selectmenu.ui-popup .ui-selectmenu-list li.ui-first-child .ui-btn {
+			border-top-width: 1px;
+			-webkit-border-radius: 0;
+			border-radius: 0;
+		}
+		.ui-selectmenu.ui-dialog .ui-header {
+			border-bottom-width: 1px;
+		}
+		.progress_lock{
 			z-index: 99;
 			margin-right:10px;
 			margin-top: -5px;
@@ -196,6 +212,8 @@
 		}
 	</style>
 	<script type="text/javascript" src="./utilities/events.js"></script>
+	<script type="text/javascript" src="./utilities/eventManager.js"></script>
+	<script type="text/javascript" src="./utilities/timeline.js"></script>
 </head>
 <body>
 	
@@ -236,6 +254,8 @@
 		<h1>设置</h1>
 		
 	</div>
+	
+	
 		<div data-role="footer"  data-position="fixed" id="mainFooter">
 
 				<input type="checkbox" data-mini="true" class="hide" style="margin-top: 8px;margin-left:5px;">
@@ -276,6 +296,27 @@
 			<a href="#" class="ui-shadow ui-btn ui-corner-all">登录</a>
 		</form>
 	</div>
+	<div data-role="page" id="timeline" >
+		<div data-role="header">
+				<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left btn-icon-blue ui-icon-back" data-rel="back">返回</a>
+			<h1>A202311110005</h1>
+			</div>
+		<div style="display:grid;grid-template-columns: 450px 1fr;background: white;">
+			<div id="summary_list"></div>
+			<canvas id="myCanvas" width="800" height="1200" >
+		</div>
+		<div data-role="popup" id="popupDialog" data-overlay-theme="b" data-theme="a" data-dismissible="true" style="min-width:400px;padding:15px;">
+			<h4 id="event_list_title"> </h4>
+			<div role="main" class="ui-content">
+				<ul data-role="listview" data-inset="true" id="event_list">
+	
+				</ul>
+				
+			</div>
+			<div style="padding-left:15px;">
+			</div>
+		</div>
+	</div>
 	<div id="main-container">
 		<h1>国瑞法务管理系统</h1>
 		<div style="display: inline;">
@@ -283,6 +324,7 @@
 			<h3 style="display: inline;margin-left: 10px;vertical-align:middle;">读取中</h3>
 		</div>
 	</div>
+	<script type="text/javascript" src="./timelinePage.js"></script>
 	<script>
 		var main_form,pageOnTable,pageSeTable;
 		//$.mobile.page.prototype.options.domCache = true;

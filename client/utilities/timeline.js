@@ -130,7 +130,7 @@ var datePosition=[];
 var listPosition=[];
 var colors=["#5E9B9F","#D66755","#E25C62","#4B9DCB","#43607A","#7C7594","#C76B8C","#65875D"];
 
-function drawTimeline(data,ctx){
+function drawTimeline(_data,ctx){
     var from={x:width/2,y:20};
     var to={x:width/2,y:20+60};
     var currentPos=drawLine(from,to,ctx,colors[0],16);

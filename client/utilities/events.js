@@ -7,7 +7,7 @@ function addClickEvents(main_form,r){
         });
     });
     //#endregion
-    
+
     //#region page 1 table 的 checkbox 和 按钮 事件
     setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
     //#endregion
@@ -75,7 +75,10 @@ function addClickEvents(main_form,r){
                 //console.log($("#popup_form_main"));
             }else if(but.currentTarget.name=="fn_btn_details"){
                 if(matchItems.length>0){
-                    window.location="./test/timeline.html"
+                    //window.location="./test/timeline.html"
+                    $.mobile.navigate( "#timeline");
+                    //$("#page4").removeClass('hide');
+                    //$(getGlobal('currentPage')).addClass('hide');
                     //_setFlowChart(table_progress_data,table_progress_status,table_progress_executes,table_progress_updates,matchItems[0].id);
                 }
                 //console.log($("#popup_form_main"));

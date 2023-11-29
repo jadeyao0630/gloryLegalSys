@@ -7,7 +7,7 @@ var _data={
     },
     progressStatus:{
         id:1,caseNo:"A202311110005",caseLegal:"贺璐璐",caseLawfirm:"",caseAttorney:"",courtDate:"2023-09-11 14:00:00",
-        penaltyAmount:500.00,exexuteAmount:243.00,caseStatus:4.1,courtName:1,caseOrgnizationPersonnel:"法官0,其他1"
+        penaltyAmount:500.00,exexuteAmount:243.00,caseStatus:4.1,courtName:1,caseOrgnizationPersonnel:"法官1,其他0"
         ,data:[
             {id:1,subid:0,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.9.28送达一审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00",dateOccur:"2023-09-28 14:00:00"},
             {id:1,subid:1,caseStatusId:0,caseNo:"A202311110005",caseUpdated:"23.10.13送达判决书",caseDisputed:"",dateUpdated:"2023-11-02 14:00:00",dateOccur:"2023-10-13 14:00:00"},
@@ -181,7 +181,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
         $(containerId).append(collapsibleset);
         Object.keys(_summary_template[key].data).forEach(sub_key=>{
             $.each(Object.keys(_data),function(index,data_key){
-                    console.log(data_key+"--"+sub_key);
+                    //console.log(data_key+"--"+sub_key);
                 if (data_key!="template" && Object.keys(_data[data_key]).includes(sub_key)){
                     var data=_summary_template[key].data[sub_key].data;
                     var label=_summary_template[key].data[sub_key].label;
@@ -232,8 +232,8 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                         //li.append(label_ele);
                         li.append(_collapsibleset);
                         listview.append(li);
-                        console.log('listview.html()');
-                        console.log(listview.html());
+                        //console.log('listview.html()');
+                        //console.log(listview.html());
                     }else{
                         //console.log(val);
                         
@@ -244,7 +244,9 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                         
                         li.append(label_ele);
                         if(sub_key=="caseLabel"){
-                            li.css(case_labels_colors[val]);
+                            console.log(val);
+                            console.log(resourceDatas['caseLabelsColors']);
+                            li.css(resourceDatas['caseLabelsColors'][resourceDatas['caseLabels'][val]]);
                         }else if(sub_key=="caseStatus"){
                             info_ele=$('<div id="'+sub_key+'" style="margin-left:90px;margin-top:-7px;"></div>');
                             

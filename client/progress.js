@@ -266,7 +266,7 @@ function _createProgressTableHTML(data,data1,data2){
         var style=" style='max-width:100px;{0}'";
         var background="";
         var color="";
-        
+        console.log(case_labels_colors);
         if(case_labels_colors[case_labels[item.caseLabel]].background){
             
             background="background:"+case_labels_colors[case_labels[item.caseLabel]].background+";";

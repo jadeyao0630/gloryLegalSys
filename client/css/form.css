@@ -46,6 +46,9 @@
 .ui-selectmenu.ui-dialog .ui-header {
     border-bottom-width: 1px;
 }
+.multiSelect{
+    max-width: 320px;;
+}
 /*
 #caseOrgnizationPersonnel-button{
     background: white;

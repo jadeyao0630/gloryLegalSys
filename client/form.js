@@ -21,11 +21,11 @@ mform.prototype={
         var _self=this;
         _self.elements={};
         for(var attr in arg){
-            console.log(attr+": "+_self.opt[attr]+"-->"+arg[attr]);
+            //console.log(attr+": "+_self.opt[attr]+"-->"+arg[attr]);
             _self.opt[attr] = arg[attr];
         }
         var template=_self.opt.template;
-        console.log(_self.opt.template);
+        //console.log(_self.opt.template);
         if(template.settings.textareaHeight != undefined){
             loadCssCode('textarea.ui-input-text {min-height: '+template.settings.textareaHeight+'px;}')
         }
@@ -345,14 +345,14 @@ mform.prototype={
                 case "input":
                     if(!_self.replacementIndexs.hasOwnProperty(k)) _self.replacementIndexs[k]=replacementOfInput($(v));
                     if(isReadOnly) {
-                        var source=$("#"+k);
+                        var source=$(_self.instance).find("#"+k);
                         var parent=source.parent();
                         _self.replacementIndexs[k].text(source.val());
                         _self.orginalIndexs[k]=source;
                         replaceElement(source,_self.replacementIndexs[k]);
                         parent.trigger('create');
                     }else {
-                        var parent=$("#_"+k).parent();
+                        var parent=$(_self.instance).find("#_"+k).parent();
                         replaceElement($("#_"+k),_self.orginalIndexs[k]);
                         parent.trigger('create');
                     }
@@ -360,7 +360,9 @@ mform.prototype={
                 case "select":
                     if(!_self.replacementIndexs.hasOwnProperty(k)) _self.replacementIndexs[k]=replacementOfInput(v);
                     if(isReadOnly) {
-                        var source=$("#"+k);
+                        var source=v;
+                        //console.log($(_self.instance).html());
+                        //_self.instance.addData("multicombobox",k,_self.data[k],source);
                         var parent=source.parent().parent().parent();
                         _self.replacementIndexs[k].html(getSelectValue(source).join("<br/>"))
                         _self.orginalIndexs[k]=source;
@@ -369,14 +371,19 @@ mform.prototype={
                             if(source.attr('multiple')!=undefined && source.attr('multiple')=='multiple'){
                                 //_self.replacementIndexs[k]=replacementOfMultiSelect(source);
                             }
+                            //_self.instance.addData("multicombobox",k,_self.data[k],source);
                             parent=source.parent().parent();
-                            console.log('之前----------------------------'+getSelectValue(source).join("<br/>"));
-                            console.log(parent.html());
+                            //console.log('之前----------------------------'+getSelectValue(source).join("<br/>"));
+                            //console.log(parent.html());
                             //source.before(_self.replacementIndexs[k]);
                             source.remove();
                             parent.append( _self.replacementIndexs[k]);
                             console.log('之后----------------------------');
-                            console.log(parent.html());
+                            console.log(source.val())
+                            //console.log(_self.data)
+                            _self.replacementIndexs[k].trigger('create');
+                            //console.log('之后----------------------------');
+                            //console.log(parent.html());
                         }
                         //单选
                         else{
@@ -388,7 +395,7 @@ mform.prototype={
                         parent.trigger('create').trigger("change");
                         //source.selectmenu().selectmenu("refresh");
                     }else {
-                        var parent=$("#_"+k).parent();
+                        var parent=$(_self.instance).find("#_"+k).parent();
                         replaceElement($("#_"+k),_self.orginalIndexs[k]);
                         parent.trigger('create').trigger("change");
                     }
@@ -397,7 +404,7 @@ mform.prototype={
                     if(!_self.replacementIndexs.hasOwnProperty(k)) _self.replacementIndexs[k]=replacementOfInput(v);
 
                     if(isReadOnly) {
-                        var source=$("#"+k);
+                        var source=$(_self.instance).find("#"+k);
                         //判断是否是radio控件
                         var source_children=source.find('input[type="radio"]');
                         if (source_children.length>0){
@@ -413,7 +420,7 @@ mform.prototype={
                         }
                         
                     }else{
-                        var parent=$("#_"+k).parent();
+                        var parent=$(_self.instance).find("#_"+k).parent();
                         console.log('listview-----------------------')
                         console.log($( "#" + k + "-menu" ))
                         replaceElement($("#_"+k),_self.orginalIndexs[k]);
@@ -424,15 +431,15 @@ mform.prototype={
                     //var testStr='sdfasdfassadafsd sddfsa s山豆根地方翻跟斗翻跟斗是 豆腐干山豆根施工方士大夫发给士大夫发给士大夫发给当时法国的书法风格士大夫发给是的方法感到十分告诉对方';
                     if(!_self.replacementIndexs.hasOwnProperty(k)) _self.replacementIndexs[k]=replacementOfInput(v);
                     if(isReadOnly) {
-                        var source=$("#"+k);
+                        var source=$(_self.instance).find("#"+k);
                         var parent=source.parent();
                         _self.replacementIndexs[k].text(source.val());
                         _self.orginalIndexs[k]=source;
                         replaceElement(source,_self.replacementIndexs[k]);
                         parent.trigger('create');
                     }else {
-                        var parent=$("#_"+k).parent();
-                        replaceElement($("#_"+k),_self.orginalIndexs[k]);
+                        var parent=$(_self.instance).find("#_"+k).parent();
+                        replaceElement($(_self.instance).find("#_"+k),_self.orginalIndexs[k]);
                         parent.trigger('create');
                     }
                     break;
@@ -494,6 +501,8 @@ mform.prototype={
     },
     setData:function(data,template){
         var _self=this;
+        
+        this.data=data;
         //console.log(data);
         if(template==undefined) template=_self.instance.template;
         _self.instance.setData(data,template);
@@ -556,16 +565,17 @@ $.fn.extend({
         });
         //_self.trigger('create');
     },
-    addData:function(type,id,value){
+    addData:function(type,id,value,element){
         if(value==undefined) value="";
         var _self=$(this);
-        var element=_self.find('#'+id);
+        if(element==undefined) element=_self.find('#'+id);
         if(element.length>0){
             if(type=="radio")  {
                 if(value=="") value=0;
                 _self.find("#"+id+"-"+parseInt(value)).prop( "checked", true ).checkboxradio().checkboxradio( "refresh" ).trigger("change");
             }else if(type=="multicombobox"){
                 if(value!=null&&value!=undefined&&value.length>0){
+                    console.log(id+"---->"+value);
                     value.split(",").forEach((v)=>{
                         $(element).find("option[value="+v+"]").prop('selected',true);
                     });
@@ -576,7 +586,7 @@ $.fn.extend({
                 //element.val(value.split(","));
                 element.selectmenu().selectmenu("refresh").trigger("change");
             }else if(type=="combobox"){
-                console.log(id+"---->"+value);
+                
                 if(value=="") value=0;
                 $(element).find("option[value="+value+"]").prop('selected',true);
                 element.selectmenu().selectmenu("refresh").trigger("change");

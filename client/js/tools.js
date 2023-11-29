@@ -53,11 +53,26 @@ function formatIndex(position){
 
 function getKeyValues(object,key){
     var collector=[];
-    object.forEach((value)=>{
-        if(value.hasOwnProperty(key)){
-            collector.push(value[key]);
-        }
-    });
+    if(object instanceof Array){
+        object.forEach((value)=>{
+            if(value.hasOwnProperty(key)){
+                collector.push(value[key]);
+            }else{
+                var _collector=[];
+                if(value instanceof Array){
+                    value.forEach((_value)=>{
+                        if(_value.hasOwnProperty(key)){
+                            _collector.push(_value[key]);
+                        }
+                    });
+                }
+                collector.push(_collector);
+            }
+        });
+    }else{
+
+    }
+    
     return collector;
 }
 $.fn.extend({

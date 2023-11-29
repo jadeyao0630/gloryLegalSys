@@ -61,8 +61,11 @@ function addClickEvents(main_form,r){
                     //_setBlurBackgroundVisibility(true);
                     $.mobile.navigate( $(this).attr( "href" ));
                     setTimeout(function() {
-                        main_form.setData(matchItems[0]).readOnly(matchItems[0].isReadOnly);
-                        console.log("data-role------"+$('.edit-header-btn[name="save_btn"').jqmData('role'));
+                        console.log(matchItems[0]);
+                        main_form.setData(matchItems[0]);
+                        main_form.readOnly(false);
+                        //
+                        //console.log("data-role------"+$('.edit-header-btn[name="save_btn"').jqmData('role'));
                         if(matchItems[0].isReadOnly) {
                             $("#reg_form_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+"查看档案");
                             $('.edit-header-btn[name="save_btn"').hide();
@@ -71,9 +74,12 @@ function addClickEvents(main_form,r){
                             $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
                             $('.edit-header-btn[name="save_btn"').show();
                         }
+                    }, 500);
+                    setTimeout(function() {
+                        main_form.setData(matchItems[0]);
+                        main_form.readOnly(matchItems[0].isReadOnly);
                         $().mloader("hide");
                     }, 500);
-                    
                     //$('.progress_lock.edit-info').removeClass('hide');
                     //_setFormReadOnly(data.isReadOnly);
                     //_setBlurBackgroundVisibility(true);
@@ -182,10 +188,12 @@ function addClickEvents(main_form,r){
                         $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
                         $('.edit-header-btn[name="save_btn"').show();
                     }
-                    $().mloader("show",{message:"保存中..."});
+                    
                     //_setFormReadOnly(data.isReadOnly);
                     //console.log(getGlobalJson('mainData'));
                     main_form.readOnly(datas[0].isReadOnly);
+                    /*
+                    $().mloader("show",{message:"保存中..."});
                     datas[0]['caseCreateDate']=getDateTime();
                     datas[0]['caseDate']=getDateTime(datas[0].caseDate);
                     insertCase(datas[0],function(r){
@@ -201,6 +209,7 @@ function addClickEvents(main_form,r){
                         }
                         $().mloader("hide");
                     });
+                    */
                 }
             }else{
                 $().minfo("show",{message:'密码无效。',type:'alert',title:'错误'});

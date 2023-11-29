@@ -59,8 +59,10 @@ $(function(){
 
 
 var main_form;
-var form_item_ids=getFormItemsId(FormTemplate);
+//var form_item_ids=getFormItemsId(FormTemplate);
+$('body').on('completed',function(data){
 _createNewCaseForm(FormTemplate);
+});
 
 function _createNewCaseForm(template){
     main_form= new mform({template:template});

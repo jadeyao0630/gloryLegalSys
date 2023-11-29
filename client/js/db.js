@@ -164,6 +164,8 @@ async function getBasicDatabaseData(list){
                 .then(data => {
                     if(data['data'].length>0) {
                         datas[k]=formatDatabaseData(k,data['data'])
+
+                        
                         var event = jQuery.Event( "dataLoaded" );
                         event.key = k;
                         event.value = formatDatabaseData(k,data['data']);
@@ -171,7 +173,9 @@ async function getBasicDatabaseData(list){
                         $('body').trigger(event);
                         if(k=='attorneys') {
                             var _event = jQuery.Event( "dataLoaded" );
-                            _event.value = "completed";
+                            _event.status = "completed";
+                            _event.value = datas;
+                            //console.log(datas);
                             //console.log(event.value);
                             $('body').trigger(_event);
                         }
@@ -291,13 +295,16 @@ function formatDatabaseData(key,data){
             }
         });
         return _data;
-    }else if(key=="caseLabels"){
+    }
+    /*
+    else if(key=="caseLabels"){
         var _data={};
         $.each(data,(i,element) => {
             _data[element.label]=JSON.parse(element.labelStyle);
         });
         return _data;
-    }else{
+    }*/
+    else{
         var _data=[];
         $.each(data,(i,element) => {
             _data.push(element);

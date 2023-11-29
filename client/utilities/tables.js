@@ -132,8 +132,8 @@ pageTable.prototype.addTableData=function(data){
     //console.log(data);
     //console.log('data instanceof Array');
     if(!(data instanceof Array)){
-        console.log('data instanceof Array');
-        console.log(data);
+        //console.log('data instanceof Array');
+        //console.log(data);
         var collect={};
         var mergedData=[];
         $.each(data,(index,d)=>{
@@ -143,7 +143,7 @@ pageTable.prototype.addTableData=function(data){
             })
             //mergedData=Object.assign({}, mergedData,d);
         });
-        console.log(collect);
+        //console.log(collect);
         $.each(collect,(id,vals)=>{
             var merge={};
             $.each(vals,(index,val)=>{
@@ -151,8 +151,8 @@ pageTable.prototype.addTableData=function(data){
             });
             mergedData.push(merge);
         })
-        console.log('mergedData');
-        console.log(mergedData);
+        //console.log('mergedData');
+        //console.log(mergedData);
         data=mergedData;
     }
     
@@ -255,7 +255,7 @@ pageTable.prototype.addTableData=function(data){
                         var btn=$('<a href="#" data-index="'+value+'" class="ui-btn ui-corner-all ui-shadow '+cls+'">'+text+'</a>');
                         container.append(btn);
                         
-                        console.log(container.html());
+                        //console.log(container.html());
                     })
                     td.append(container);
                 }
@@ -277,12 +277,12 @@ pageTable.prototype.addTableData=function(data){
             var val=value;
             if(columnSettings.data!=undefined){
                 var index=formatIndex(val);
-                console.log('val....');
+                //console.log('val....');
                 val=columnSettings.data[index.main];
                 //console.log(columnSettings.data);
                 if(val instanceof Array){
                     val=val[index.sub];
-                    console.log(val);
+                    //console.log(val);
                 }
             }
             var label=$('<label>'+val+'</label>')

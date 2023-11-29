@@ -218,7 +218,7 @@ function drawListText(startPos,data,ctx,color,isOppsite){
     ctx.fillStyle = color;
     if (data.length>0){
         data.forEach((item,i)=>{
-            console.log(item);
+            //console.log(item);
             var date=formatDateTime(new Date(item.date),"MM月dd日 ");
             var text=date+item.label;
             if(item.type=="property"){

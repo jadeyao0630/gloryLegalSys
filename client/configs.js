@@ -16,9 +16,11 @@ const TextColor="rgb(51, 51, 51)";
 const property_status=["查封","冻结"];
 const case_types=["被诉","主诉"];
 const case_catelogs=["诉讼","仲裁"];
+var corporate_companies=["国瑞信业建筑工程设计有限公司","国瑞德恒房地产开发有限公司","国瑞信业地产股份有限公司"];
+var corporate_partners=["张丽佳","李立","郑智"];
 var caseRelatedParty={
-    "公司":["国瑞信业建筑工程设计有限公司","国瑞德恒房地产开发有限公司","国瑞信业地产股份有限公司"],
-    "个人":["张丽佳","李立","郑智"]
+    "公司":corporate_companies,
+    "个人":corporate_partners
 }
 var legalAffairs=["无","贺璐璐","李俊峰","王培斯"];
 var lawFirms=["无","君合","白朗"];
@@ -110,7 +112,7 @@ const caseExcutes={//案件执行数据
     sumExecuted:"VARCHAR(1000)",//执行概要
     dateExecuted:"datetime",//执行日期
 }
-const propertyStatus={//资产状态数据
+const properties={//资产状态数据
     id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
     caseNo:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
     subId:"INT NOT NULL default '0'",//案件序号子序列号
@@ -134,7 +136,8 @@ const attachments={//案件相关文件
     dateUploaded:"datetime",//上传日期
 }
 const _caseStatus={//案件状态
-    id:"INT NOT NULL,PRIMARY KEY",//案件状态唯一序列号
+    id:"FLOAT NOT NULL,PRIMARY KEY",//案件状态唯一序列号
+    hasSub:"bool default '0'",//案件状态子序列号
     name:"VARCHAR(255)",//案件状态名称
     descriptions:"VARCHAR(255)",//案件类型说明
 }
@@ -164,10 +167,10 @@ const caseReason={//案发原因
     type:"VARCHAR(255)",//案发原因类型
     descriptions:"VARCHAR(255)",//案发原因类型说明
 }
-const _propertyStatus={//资产列表
-    id:"INT NOT NULL,PRIMARY KEY",//资产列表唯一序列号
-    name:"VARCHAR(255)",//资产名称
-    descriptions:"VARCHAR(255)",//资产说明
+const _propertyStatus={//资产状态
+    id:"INT NOT NULL,PRIMARY KEY",//资产状态唯一序列号
+    name:"VARCHAR(255)",//资产状态名称
+    descriptions:"VARCHAR(255)",//资产状态说明
 }
 const project={//项目列表
     id:"INT NOT NULL,PRIMARY KEY",//项目列表唯一序列号
@@ -231,6 +234,25 @@ const attorneys={//代理律师列表
     name:"VARCHAR(255)",//代理律师名字
     contact:"VARCHAR(255)",//代理律师联系方式
     descriptions:"VARCHAR(255)",//代理律师说明
+}
+const basicTableList={
+    caseStatus:{tablename:"case_status",data:progresses,template:_caseStatus},
+    caseLabels:{tablename:"case_labels",data:case_labels_colors,template:caseLabels},
+    caseTypes:{tablename:"case_types",data:case_types,template:caseTypes},
+    caseCatelogs:{tablename:"case_catelogs",data:case_catelogs,template:caseCatelogs},
+    caseCauses:{tablename:"case_causes",data:case_causes,template:caseCauses},
+    caseReason:{tablename:"case_reasons",data:case_reason,template:caseReason},
+    propertyStatus:{tablename:"property_status",data:property_status,template:_propertyStatus},
+    project:{tablename:"projects",data:projects,template:project},
+    corporateCompanies:{tablename:"corporate_companies",data:corporate_companies,template:corporateCompanies},
+    corporatePartners:{tablename:"corporate_artners",data:corporate_partners,template:corporatePartners},
+    legalAgencies:{tablename:"legal_agencies",data:legalAffairs,template:legalAgencies},
+    //authLevels,
+    legalInstitution:{tablename:"legal_institution",data:case_orgnization,template:legalInstitution},
+    legalCounsel:{tablename:"legal_counsel",data:Attorneys,template:legalCounsel},
+    counselTitles:{tablename:"counsel_titles",data:case_orgnizationPersonnel,template:counselTitles},
+    lawFirms:{tablename:"law_firms",data:lawFirms,template:_lawFirms},
+    attorneys:{tablename:"attorneys",data:Attorneys,template:attorneys},
 }
 var _firstPageTableColumns={
     checkallbox:{

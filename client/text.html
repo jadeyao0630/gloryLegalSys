@@ -76,9 +76,9 @@
 		#name{
 			text-align: right;
 			margin-right: 20px;
-			margin-top: 3px;
-			line-height: 20px;
-			height: 20px;
+			margin-top: 8px;
+			line-height: 15px;
+			height: 15px;
             min-width: 40px;
             font-size: 16px;
 		}
@@ -296,26 +296,35 @@
 			<a href="#" class="ui-shadow ui-btn ui-corner-all">登录</a>
 		</form>
 	</div>
-	<div data-role="page" id="timeline" >
-		<div data-role="header">
+	<div data-role="page" id="timeline">
+		
+		<div data-role="header" data-position="fixed">
 				<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left btn-icon-blue ui-icon-back" data-rel="back">返回</a>
-			<h1>A202311110005</h1>
+			<h1 id="timelineTitle">A202311110005</h1>
 			</div>
-		<div style="display:grid;grid-template-columns: 450px 1fr;background: white;">
-			<div id="summary_list"></div>
-			<canvas id="myCanvas" width="800" height="1200" >
-		</div>
-		<div data-role="popup" id="popupDialog" data-overlay-theme="b" data-theme="a" data-dismissible="true" style="min-width:400px;padding:15px;">
-			<h4 id="event_list_title"> </h4>
-			<div role="main" class="ui-content">
-				<ul data-role="listview" data-inset="true" id="event_list">
-	
-				</ul>
+			<div id="page1" class="ui-body-d ui-content">
+				<div data-role="panel" id="event_panel" data-position="right" data-display="overlay" data-position-fixed="true" data-theme="b" style="width:300px;">
+					<h4 id="event_list_title"> </h4>
+					<ul data-role="listview" data-inset="true" id="event_list" data-theme="a">
+			
+					</ul>
+				</div><!-- /panel -->
+				<div style="display:grid;grid-template-columns: 450px 1fr;background: white;">
+					<div id="summary_list"></div>
+					<canvas id="myCanvas" width="800" height="1200" >
+				</div>
 				
+				<div data-role="popup" id="popupDialog" data-overlay-theme="b" data-theme="a" data-dismissible="true" style="min-width:400px;padding:15px;">
+					<h4 id="event_list_title"> </h4>
+					<div role="main" class="ui-content">
+						<ul data-role="listview" data-inset="true" id="event_list">
+			
+						</ul>
+						
+					</div>
+				</div>
 			</div>
-			<div style="padding-left:15px;">
-			</div>
-		</div>
+		
 	</div>
 	<div id="main-container">
 		<h1>国瑞法务管理系统</h1>
@@ -354,7 +363,7 @@
 					data:r,
 					//filterParent:"mainFooter",
 					rowButtons:'<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
-						'<button name="fn_btn_details" class="btn-icon-green" data-icon="eye" data-iconpos="notext" data-item={0}>查看</button>'+
+						'<a href="#timeline" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-eye ui-btn-icon-notext" data-transition="slidefade" data-item={0}>查看</a>'+
 						'<button href="#fullscreenPage" name="fn_btn_edit" class="btn-icon-blue" data-icon="edit" data-iconpos="notext" data-item={0}>修改</button>'+
 						'<button name="fn_btn_delete" class="btn-icon-red" data-icon="delete" data-iconpos="notext" data-item={0}>删除</button>'+
 					'</div>'
@@ -383,7 +392,10 @@
 				});
 			});
 			
-			
+			var canvas=document.getElementById('myCanvas');
+			eventManager.setCanvas(canvas);
+			//var _ctx=canvas.getContext('2d');
+			new timelinePage({template:_summary_template,data:_data,summaryListContainer:"#summary_list",canvas:canvas});
             //$("#frame").removeClass('hide');
             
            

@@ -1,3 +1,4 @@
+
 var _cricles=[];
 
 //#region 画图板点击事件
@@ -156,6 +157,7 @@ function drawTimeline(_data,ctx){
         }
         
     });
+    return _cricles;
     //var currentPos=drawOneStop(200,20,ctx);
     //drawOneStop(200,currentPos+line2SpotDist,ctx);
 }
@@ -381,124 +383,6 @@ function getTextSize(text,ctx){
     let metrics = ctx.measureText(text); 
     let actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent; 
     return {width:metrics.width,height:actualHeight};
-}
-
-//#endregion
-
-//#region 总结列表
-function setSummaryList(_summary_template,_data,containerId){
-    Object.keys(_summary_template).forEach(key=>{
-        var collapsibleset=$('<div data-role="collapsible" data-theme="b" data-collapsed="false" ></div>');
-        var collapsibleLabel=$('<h3>'+_summary_template[key].label+'</h3>');
-        collapsibleset.append(collapsibleLabel);
-        var listview=$('<ul data-role="listview" data-theme="a" data-inset="false"></ul>');
-        collapsibleset.append(listview);
-        $(containerId).append(collapsibleset);
-        Object.keys(_summary_template[key].data).forEach(sub_key=>{
-            $.each(Object.keys(_data),function(index,data_key){
-                    console.log(data_key+"--"+sub_key);
-                if (data_key!="template" && Object.keys(_data[data_key]).includes(sub_key)){
-                    var data=_summary_template[key].data[sub_key].data;
-                    var label=_summary_template[key].data[sub_key].label;
-                    var val=_data[data_key][sub_key];
-                    var isMultiValue=false;
-                    var multiValues=[];
-                    if(data!=undefined){
-                        
-                        if(data instanceof Array){
-                            var v=val.toString().split('.');
-                            if(v.length>1){
-                                val=data[v[0]][v[1]];
-                            }else if(v.length==1){
-                                val=data[v[0]];
-                            }
-                        }
-                        else{
-                            var data_keys=Object.keys(data);
-                            var values=val.split(",");
-                            if(data_keys.length>0){
-                                isMultiValue=true;
-                                data_keys.forEach(dk=>{
-                                    values.forEach(val=>{
-                                        if(val.includes(dk)){
-                                            multiValues.push(data[dk][parseInt(val.replace(dk,""))]);
-                                        }
-                                    });
-                                });
-                                val=multiValues.join(", ");
-                            }
-                        }
-                    }
-                    if(isMultiValue){
-                        var _collapsibleset=$('<div data-role="collapsible" data-theme="a" data-iconpos="right" data-inset="false" class="collapsible-listview" style="border:none;margin-right:-45px;" data-collapsed-icon="carat-d" data-expanded-icon="carat-u"></div>');
-                        var _collapsibleLabel=$('<h4 class="ui-field-contain" style="margin:0px;border:none;"><div style="display:grid;grid-template-columns: auto 1fr;column-gap: 9px;margin-left:-3px"><label style="margin-top:2px;margin-bottom:-2px;">'+
-                            label+'</label><label style="margin-top:2px;margin-bottom:-2px;">'+val+'</label></div><span class="ui-li-count">'+multiValues.length+'</span></h4>');
-                        _collapsibleset.append(_collapsibleLabel);
-                        var _listview=$('<ol data-role="listview" data-theme="b"> </ol>');
-                        _collapsibleset.append(_listview);
-                        multiValues.forEach(v=>{
-                            var _li=$('<li class="ui-field-contain"></li>');
-                            var _info_ele=$('<label>'+v+'</label>');
-                            _li.append(_info_ele);
-                            _listview.append(_li);
-                        });
-                        var label_ele=$('<label>'+label+'</label>');
-                        var li=$('<li class="ui-field-contain" style="padding-top:0px;padding-bottom:0px;border:none;"></li>');
-                        //li.append(label_ele);
-                        li.append(_collapsibleset);
-                        listview.append(li);
-                        console.log('listview.html()');
-                        console.log(listview.html());
-                    }else{
-                        //console.log(val);
-                        
-                        var li=$('<li class="ui-field-contain"></li>');
-                        
-                        var label_ele=$('<label>'+label+'</label>');
-                        var info_ele=$('<label>'+val+'</label>');
-                        
-                        li.append(label_ele);
-                        if(sub_key=="caseLabel"){
-                            li.css(case_labels_colors[val]);
-                        }else if(sub_key=="caseStatus"){
-                            info_ele=$('<div id="'+sub_key+'" style="margin-left:90px;margin-top:-7px;"></div>');
-                            
-                        }
-                        li.append(info_ele);
-                        listview.append(li);
-                        if(sub_key=="caseStatus"){
-                            
-                            console.log("caseStatus................."+_data[data_key][sub_key]);
-                            var but=new ProgressesButton({
-                                steps:progresses,
-                                deadSteps:deads,
-                                selected_color:"#4B9DCB",
-                                showLabel:true,
-                                containerId:'#'+sub_key,
-                                currentPosition:_data[data_key][sub_key],
-                                fontSize:12,
-                                line_size:4,
-                                size:12,
-                                width:240,
-                                isViewMode:true,
-                                verticalGap:2,
-                                labelPosition:"bottom",
-                                showSubSteps:false,
-                                readOnly:true,
-                            });
-    
-                        }
-                    }
-                    //console.log(val);
-                    
-                    //if (sub_key=="caseNo") console.log(data_key);
-                    return false;
-                }
-                
-            });
-        });
-        
-    });
 }
 
 //#endregion

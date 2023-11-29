@@ -2,9 +2,12 @@ function addClickEvents(main_form,r){
     //#region 全局功能按钮
 
     $('.popup-add-table').on('click',async function(e){
-        await createTable('caseStatus',caseStatus,function(res){
-            console.log(res);
-        });
+        //await createTable('caseStatus',caseStatus,function(res){
+            //console.log(res);
+        //});
+        //await createBasicDatabase();
+        //await insertBasicDatabaseData(['caseStatus']);
+        getBasicDatabaseData(['caseStatus']);
     });
     //#endregion
 
@@ -16,8 +19,10 @@ function addClickEvents(main_form,r){
     setCheckAllBox($('#mainFooter').find('input[type="checkbox"]'),'pageSecondTable');
     //#endregion
     //表格内每行的功能按钮事件
-    var fn_buts = document.querySelectorAll("button[name^=fn_btn]")
+    var fn_buts = document.querySelectorAll("[name^=fn_btn]")
     fn_buts.forEach(function(fn_but) {
+        //console.log($(fn_but));
+        //if(fn_but.name=="fn_btn_details") $(fn_but).jqmData('transition','slidefade');
         fn_but.addEventListener('click', function(but) {
 
             console.log(but.currentTarget.dataset.item+"--"+but.currentTarget.name);

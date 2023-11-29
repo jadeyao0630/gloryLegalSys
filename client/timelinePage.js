@@ -1,6 +1,4 @@
-var canvas=document.getElementById('myCanvas');
-eventManager.setCanvas(canvas);
-var _ctx=canvas.getContext('2d');
+
 var _data={
     template:["立案","一审","二审","执行","结案","再审","监督"],
     basic:{
@@ -98,42 +96,192 @@ var dataList=[
         ]
     }
 ]
-drawTimeline(_data,_ctx);
-        //console.log(["Jenny", "Matilda", "Greta"].indexOf("Matilda")); // true
-
-_cricles.forEach((circle)=>{
-    //console.log(Object.getPrototypeOf(circle))
-    //console.log(Object.keys(Object.getPrototypeOf(circle)).includes('addListener'));
-    circle.addListener('click',function(e){
-        console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
-        
-        var datas=dataList.filter((item)=>item.id==this.sourceData.index);
-        if(datas.length>0 && datas[0].data!= undefined){
-            $('#event_list').children().remove();
-            $('#event_list_title').text(this.sourceData.label);
-            datas[0].data.forEach((ite)=>{
-                var date_bar=$('<li data-role="list-divider">'+formatDateTime(new Date(ite.date),"yyyy年MM月dd日 ")+'</li>');
-                var item_container=$('<li></li>');
-                var list_item=$('<label>'+ite.label+'</label>');
-                item_container.append(list_item);
-                $('#event_list').append(date_bar);
-                
-                $('#event_list').append(item_container);
-            });
-            //$('#event_list').append();
-            $('#event_list').listview('refresh');
-            $('#popupDialog').popup("open");
+function timelinePage(arg){
+    this.opt = {
+        template:undefined,
+        data:undefined,
+        canvas:undefined,
+        summaryListContainer:undefined
+    }
+    extend(this.opt,arg);
+    
+    if(this.opt.data!=undefined && this.opt.canvas!=undefined){
+        this.ctx=this.opt.canvas.getContext('2d');
+        this.setTimeline(this.opt.data,this.opt.canvas);
+    }
+    
+    if(this.opt.template!=undefined && this.opt.data!=undefined && this.opt.summaryListContainer!=undefined){
+        this.setSumList(this.opt.template,this.opt.data,this.opt.summaryListContainer);
+    }
+    
+    function extend(opt1,opt2){
+        for(var attr in opt2){
+            //console.log(attr+": "+opt1[attr]+"-->"+opt2[attr]);
+            opt1[attr] = opt2[attr];
         }
+    }
+}
+timelinePage.prototype.setTimeline=function(data,canvas){
+    if (data==undefined) data=this.opt.data;
+    if (canvas==undefined) canvas=this.opt.canvas;
+    
+    if (this.ctx==undefined) this.ctx=this.opt.canvas.getContext('2d');
+    drawTimeline(data,this.ctx).forEach((circle)=>{
+        //console.log(Object.getPrototypeOf(circle))
+        //console.log(Object.keys(Object.getPrototypeOf(circle)).includes('addListener'));
+        circle.addListener('click',function(e){
+            console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
+            
+            var datas=dataList.filter((item)=>item.id==this.sourceData.index);
+            if(datas.length>0 && datas[0].data!= undefined){
+                $('#event_list').children().remove();
+                $('#event_list_title').text(this.sourceData.label);
+                datas[0].data.forEach((ite)=>{
+                    var date_bar=$('<li data-role="list-divider">'+formatDateTime(new Date(ite.date),"yyyy年MM月dd日 ")+'</li>');
+                    var item_container=$('<li></li>');
+                    var list_item=$('<label>'+ite.label+'</label>');
+                    item_container.append(list_item);
+                    $('#event_list').append(date_bar);
+                    
+                    $('#event_list').append(item_container);
+                });
+                //$('#event_list').append();
+                //$('#event_list').remove();
+                //$('#event_panel').append($('#event_list'));
+                $( "#event_panel" ).trigger( "updatelayout" );
+                $('#event_list').listview('refresh');
+                $( "#event_panel" ).panel( "open" );
+                //$.mobile.navigate( '#event_panel');
+                //$('#popupDialog').popup("open");
+            }
+            
+        })
+        circle.addListener('mouseover',function(e){
+            console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
+            $(canvas).css({cursor:"pointer"});
+            e.ctx.globalCompositeOperation = "source-over";
+        })
+        circle.addListener('mouseout',function(e){
+            console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
+            $(canvas).css({cursor:"default"});
+        })
+    });
+}
+timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
+    
+    if (_summary_template==undefined) _summary_template=this.opt.template;
+    if (_data==undefined) _data=this.opt.data;
+    if (containerId==undefined) containerId=this.opt.summaryListContainer;
+    Object.keys(_summary_template).forEach(key=>{
+        var collapsibleset=$('<div data-role="collapsible" data-theme="b" data-collapsed="false" ></div>');
+        var collapsibleLabel=$('<h3>'+_summary_template[key].label+'</h3>');
+        collapsibleset.append(collapsibleLabel);
+        var listview=$('<ul data-role="listview" data-theme="a" data-inset="false"></ul>');
+        collapsibleset.append(listview);
+        $(containerId).append(collapsibleset);
+        Object.keys(_summary_template[key].data).forEach(sub_key=>{
+            $.each(Object.keys(_data),function(index,data_key){
+                    console.log(data_key+"--"+sub_key);
+                if (data_key!="template" && Object.keys(_data[data_key]).includes(sub_key)){
+                    var data=_summary_template[key].data[sub_key].data;
+                    var label=_summary_template[key].data[sub_key].label;
+                    var val=_data[data_key][sub_key];
+                    var isMultiValue=false;
+                    var multiValues=[];
+                    if(data!=undefined){
+                        
+                        if(data instanceof Array){
+                            var v=val.toString().split('.');
+                            if(v.length>1){
+                                val=data[v[0]][v[1]];
+                            }else if(v.length==1){
+                                val=data[v[0]];
+                            }
+                        }
+                        else{
+                            var data_keys=Object.keys(data);
+                            var values=val.split(",");
+                            if(data_keys.length>0){
+                                isMultiValue=true;
+                                data_keys.forEach(dk=>{
+                                    values.forEach(val=>{
+                                        if(val.includes(dk)){
+                                            multiValues.push(data[dk][parseInt(val.replace(dk,""))]);
+                                        }
+                                    });
+                                });
+                                val=multiValues.join(", ");
+                            }
+                        }
+                    }
+                    if(isMultiValue){
+                        var _collapsibleset=$('<div data-role="collapsible" data-theme="a" data-iconpos="right" data-inset="false" class="collapsible-listview" style="border:none;margin-right:-45px;" data-collapsed-icon="carat-d" data-expanded-icon="carat-u"></div>');
+                        var _collapsibleLabel=$('<h4 class="ui-field-contain" style="margin:0px;border:none;"><div style="display:grid;grid-template-columns: auto 1fr;column-gap: 9px;margin-left:-3px"><label style="margin-top:2px;margin-bottom:-2px;">'+
+                            label+'</label><label style="margin-top:2px;margin-bottom:-2px;">'+val+'</label></div><span class="ui-li-count">'+multiValues.length+'</span></h4>');
+                        _collapsibleset.append(_collapsibleLabel);
+                        var _listview=$('<ol data-role="listview" data-theme="b"> </ol>');
+                        _collapsibleset.append(_listview);
+                        multiValues.forEach(v=>{
+                            var _li=$('<li class="ui-field-contain"></li>');
+                            var _info_ele=$('<label>'+v+'</label>');
+                            _li.append(_info_ele);
+                            _listview.append(_li);
+                        });
+                        var label_ele=$('<label>'+label+'</label>');
+                        var li=$('<li class="ui-field-contain" style="padding-top:0px;padding-bottom:0px;border:none;"></li>');
+                        //li.append(label_ele);
+                        li.append(_collapsibleset);
+                        listview.append(li);
+                        console.log('listview.html()');
+                        console.log(listview.html());
+                    }else{
+                        //console.log(val);
+                        
+                        var li=$('<li class="ui-field-contain"></li>');
+                        
+                        var label_ele=$('<label>'+label+'</label>');
+                        var info_ele=$('<label>'+val+'</label>');
+                        
+                        li.append(label_ele);
+                        if(sub_key=="caseLabel"){
+                            li.css(case_labels_colors[val]);
+                        }else if(sub_key=="caseStatus"){
+                            info_ele=$('<div id="'+sub_key+'" style="margin-left:90px;margin-top:-7px;"></div>');
+                            
+                        }
+                        li.append(info_ele);
+                        listview.append(li);
+                        if(sub_key=="caseStatus"){
+                            
+                            console.log("caseStatus................."+_data[data_key][sub_key]);
+                            var but=new ProgressesButton({
+                                steps:progresses,
+                                deadSteps:deads,
+                                selected_color:"#4B9DCB",
+                                showLabel:true,
+                                containerId:'#'+sub_key,
+                                currentPosition:_data[data_key][sub_key],
+                                fontSize:12,
+                                line_size:4,
+                                size:12,
+                                width:240,
+                                isViewMode:true,
+                                verticalGap:2,
+                                labelPosition:"bottom",
+                                showSubSteps:false,
+                                readOnly:true,
+                            });
+    
+                        }
+                    }
+                    //console.log(val);
+                    
+                    //if (sub_key=="caseNo") console.log(data_key);
+                    return false;
+                }
+                
+            });
+        });
         
-    })
-    circle.addListener('mouseover',function(e){
-        console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
-        $(canvas).css({cursor:"pointer"});
-        e.ctx.globalCompositeOperation = "source-over";
-    })
-    circle.addListener('mouseout',function(e){
-        console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
-        $(canvas).css({cursor:"default"});
-    })
-});
-setSummaryList(_summary_template,_data,'#summary_list');
+    });
+}

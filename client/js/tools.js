@@ -50,6 +50,16 @@ function formatIndex(position){
     var sub=Math.round((position-main)*10);
     return {main:main,sub:sub};
 }
+
+function getKeyValues(object,key){
+    var collector=[];
+    object.forEach((value)=>{
+        if(value.hasOwnProperty(key)){
+            collector.push(value[key]);
+        }
+    });
+    return collector;
+}
 $.fn.extend({
     removeTableItem:function(sourceDate,itemData){
         var index=sourceDate.indexOf(itemData);

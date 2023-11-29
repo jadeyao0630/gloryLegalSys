@@ -22,11 +22,32 @@ var caseRelatedParty={
     "公司":corporate_companies,
     "个人":corporate_partners
 }
+var auth_levels=["一般","主管","管理员"];
 var legalAffairs=["无","贺璐璐","李俊峰","王培斯"];
+var legal_agencies=[
+    {name:'贺璐璐',contact:'',authLevel:1},
+    {name:'李俊峰',contact:'',authLevel:1},
+    {name:'王培斯',contact:'',authLevel:0},
+]
 var lawFirms=["无","君合","白朗"];
+var law_firms=["君合","白朗"];
+
+var _attorneys=[
+    {name:'李海孚',contact:'57362323',lawFirm:0},
+    {name:'崔瀚文',contact:'57362676',lawFirm:1},
+]
 var Attorneys={"君合":["李海孚"],"白朗":["崔瀚文"]};
-const projects=["北七家","大兴"];
+var projects=["北七家","大兴","test"];
 const case_orgnization=["大兴法院","东城法院"];
+var counsel_titles=["其他","书记员","法官"];
+var legal_counsels=[
+    {name:'李新亮',contact:'57362323',title:2,institution:0},
+    {name:'郭艳',contact:'57362676',title:2,institution:0},
+    {name:'张振',contact:'57362300',title:2,institution:0},
+    {name:'张东莹',contact:'57362564',title:0,institution:1},
+    {name:'郑少杰',contact:'57362579',title:1,institution:0},
+    {name:'高新宇',contact:'57362335',title:1,institution:0}
+]
 var case_orgnizationPersonnel={
     "法官":["李新亮 57362323","郭艳 57362676","张振 57362300"],
     "其他":["张东莹 57362564","郑少杰 57362579","高新宇 57362335"]
@@ -137,7 +158,7 @@ const attachments={//案件相关文件
 }
 const _caseStatus={//案件状态
     id:"FLOAT NOT NULL,PRIMARY KEY",//案件状态唯一序列号
-    hasSub:"bool default '0'",//案件状态子序列号
+    isMain:"bool default '1'",//案件状态子序列号
     name:"VARCHAR(255)",//案件状态名称
     descriptions:"VARCHAR(255)",//案件类型说明
 }
@@ -164,12 +185,12 @@ const caseCauses={//案由
 }
 const caseReason={//案发原因
     id:"INT NOT NULL,PRIMARY KEY",//案发原因唯一序列号
-    type:"VARCHAR(255)",//案发原因类型
+    label:"VARCHAR(255)",//案发原因类型
     descriptions:"VARCHAR(255)",//案发原因类型说明
 }
 const _propertyStatus={//资产状态
     id:"INT NOT NULL,PRIMARY KEY",//资产状态唯一序列号
-    name:"VARCHAR(255)",//资产状态名称
+    label:"VARCHAR(255)",//资产状态名称
     descriptions:"VARCHAR(255)",//资产状态说明
 }
 const project={//项目列表
@@ -178,6 +199,7 @@ const project={//项目列表
     address:"VARCHAR(255)",//项目地址
     region:"VARCHAR(255)",//项目地区
     descriptions:"VARCHAR(255)",//项目说明
+    isInactived:"bool default '0'",//是否标为禁用
 }
 const corporateCompanies={//案件当事公司
     id:"INT NOT NULL,PRIMARY KEY",//当事公司唯一序列号
@@ -185,12 +207,14 @@ const corporateCompanies={//案件当事公司
     address:"VARCHAR(255)",//当事公司地址
     region:"VARCHAR(255)",//当事公司地区
     descriptions:"VARCHAR(255)",//当事公司说明
+    isInactived:"bool default '0'",//是否标为禁用
 }
 const corporatePartners={//案件当事人
     id:"INT NOT NULL,PRIMARY KEY",//当事人唯一序列号
     name:"VARCHAR(255)",//当事人名字
     contact:"VARCHAR(255)",//当事联系方式
     descriptions:"VARCHAR(255)",//当事人说明
+    isInactived:"bool default '0'",//是否标为禁用
 }
 const legalAgencies={//法务
     id:"INT NOT NULL,PRIMARY KEY",//法务唯一序列号
@@ -198,6 +222,7 @@ const legalAgencies={//法务
     contact:"VARCHAR(255)",//法务联系方式
     authLevel:"INT NOT NULL default '0'",//法务权限->authLevels*
     descriptions:"VARCHAR(255)",//法务说明
+    isInactived:"bool default '0'",//是否标为禁用
 }
 const authLevels={//应用权限
     id:"INT NOT NULL,PRIMARY KEY",//应用权限唯一序列号
@@ -209,17 +234,20 @@ const legalInstitution={//受理机构
     contact:"VARCHAR(255)",//受理机构联系方式
     address:"VARCHAR(255)",//受理机构地址
     descriptions:"VARCHAR(255)",//受理机构说明
+    isInactived:"bool default '0'",//是否标为禁用
 }
 const legalCounsel={//受理人
     id:"INT NOT NULL,PRIMARY KEY",//受理人唯一序列号
     name:"VARCHAR(255)",//受理人名字
     contact:"VARCHAR(255)",//受理人联系方式
-    title:"INT NOT NULL default '-1'",//受理人职务->counselTitles*
+    title:"INT NOT NULL default '0'",//受理人职务->counselTitles*
+    institution:"INT NOT NULL default '-1'",//受理人所属机构
     descriptions:"VARCHAR(255)",//受理人说明
+    isInactived:"bool default '0'",//是否标为禁用
 }
 const counselTitles={//受理人职务
     id:"INT NOT NULL,PRIMARY KEY",//受理人职务唯一序列号
-    type:"VARCHAR(255)",//受理人职务名称
+    label:"VARCHAR(255)",//受理人职务名称
     descriptions:"VARCHAR(255)",//受理人职务说明
 }
 const _lawFirms={//代理律所列表
@@ -228,12 +256,15 @@ const _lawFirms={//代理律所列表
     contact:"VARCHAR(255)",//代理律所联系方式
     address:"VARCHAR(255)",//代理律所地址
     descriptions:"VARCHAR(255)",//代理律所说明
+    isInactived:"bool default '0'",//是否标为禁用
 }
 const attorneys={//代理律师列表
     id:"INT NOT NULL,PRIMARY KEY",//代理律师唯一序列号
     name:"VARCHAR(255)",//代理律师名字
     contact:"VARCHAR(255)",//代理律师联系方式
+    lawFirm:"INT NOT NULL default '-1'",//代理律师所属机构
     descriptions:"VARCHAR(255)",//代理律师说明
+    isInactived:"bool default '0'",//是否标为禁用
 }
 const basicTableList={
     caseStatus:{tablename:"case_status",data:progresses,template:_caseStatus},
@@ -243,16 +274,16 @@ const basicTableList={
     caseCauses:{tablename:"case_causes",data:case_causes,template:caseCauses},
     caseReason:{tablename:"case_reasons",data:case_reason,template:caseReason},
     propertyStatus:{tablename:"property_status",data:property_status,template:_propertyStatus},
-    project:{tablename:"projects",data:projects,template:project},
+    projects:{tablename:"projects",data:projects,template:project},
     corporateCompanies:{tablename:"corporate_companies",data:corporate_companies,template:corporateCompanies},
-    corporatePartners:{tablename:"corporate_artners",data:corporate_partners,template:corporatePartners},
-    legalAgencies:{tablename:"legal_agencies",data:legalAffairs,template:legalAgencies},
-    //authLevels,
+    corporatePartners:{tablename:"corporate_partners",data:corporate_partners,template:corporatePartners},
+    legalAgencies:{tablename:"legal_agencies",data:legal_agencies,template:legalAgencies},
+    authLevels:{tablename:"auth_levels",data:auth_levels,template:authLevels},
     legalInstitution:{tablename:"legal_institution",data:case_orgnization,template:legalInstitution},
-    legalCounsel:{tablename:"legal_counsel",data:Attorneys,template:legalCounsel},
-    counselTitles:{tablename:"counsel_titles",data:case_orgnizationPersonnel,template:counselTitles},
-    lawFirms:{tablename:"law_firms",data:lawFirms,template:_lawFirms},
-    attorneys:{tablename:"attorneys",data:Attorneys,template:attorneys},
+    legalCounsels:{tablename:"legal_counsels",data:legal_counsels,template:legalCounsel},
+    counselTitles:{tablename:"counsel_titles",data:counsel_titles,template:counselTitles},
+    lawFirms:{tablename:"law_firms",data:law_firms,template:_lawFirms},
+    attorneys:{tablename:"attorneys",data:_attorneys,template:attorneys},
 }
 var _firstPageTableColumns={
     checkallbox:{
@@ -580,161 +611,7 @@ var FormTemplate={
         }
     }
 }
-var FormTemplate3={
-    settings:{
-        templateColumn:"33.3% 33.3% 33.3%",
-        hasLabel:true,
-        hasPlaceHolder:true,
-        labelPosition:"left",
-        width:"100%",
-        textareaHeight:50,
-        isCollapsibleGrouping:true
-    },
-    template:{
-        baseInfo:{
-            label:"基础信息",
-            data:{
-                caseNo:{
-                    placeholder:"案件编号",
-                    label:"案件编号:",
-                    type:"text",
-                    isOptional:false,
-                },
-                caseName:{
-                    placeholder:"案件名称",
-                    label:"案件名称:",
-                    type:"text",
-                    isOptional:false,
-                },
-                caseLabel:{
-                    placeholder:"案件标签",
-                    label:"案件标签:",
-                    type:"combobox",
-                    isOptional:false,
-                    data:case_labels
-                },
-                caseProject:{
-                    placeholder:"所属项目",
-                    label:"所属项目:",
-                    type:"combobox",
-                    isOptional:false,
-                    data:projects
-                },
-                casePersonnel:{
-                    placeholder:"我方当事人",
-                    label:"我方当事人:",
-                    type:"multicombobox",
-                    isOptional:false,
-                    data:caseRelatedParty,
-                    isFilterable:true 
-                },
-                case2ndParty:{
-                    placeholder:"对方当事人",
-                    label:"对方当事人:",
-                    type:"text",
-                    isOptional:false,
-                },
-                caseCatelog:{
-                    placeholder:"案件类别",
-                    label:"案件类别:",
-                    type:"radio",
-                    isOptional:false,
-                    data:case_catelogs
-                },
-                caseType:{
-                    placeholder:"案件类型",
-                    label:"案件类型:",
-                    type:"radio",
-                    isOptional:false,
-                    data:case_types
-                },
-                caseDate:{
-                    placeholder:"立案日期",
-                    label:"立案日期:",
-                    type:"date",
-                    isOptional:false,
-                },
-                caseAttachments:{
-                    placeholder:"上传文件",
-                    label:"附件:",
-                    type:"file",
-                    isOptional:true,
-                    data:"支持扩展名：rar. zip. doc. docx. pdf. jpg… 单个文件不超过200MB"
-                }
-            }
-            
-        },
-        caseInfo:{
-            label:"案件信息",
-            data:{
-                caseCause:{
-                    placeholder:"案由",
-                    label:"案由:",
-                    type:"combobox",
-                    isOptional:false,
-                    data:case_causes,
-                    isFilterable:true
-                },
-                caseReason:{
-                    placeholder:"案发原因",
-                    label:"案发原因:",
-                    type:"combobox",
-                    isOptional:false,
-                    data:case_reason
-                },
-                caseOrgnization:{
-                    placeholder:"受理机构",
-                    label:"受理机构:",
-                    type:"combobox",
-                    isOptional:false,
-                    data:case_orgnization
-                },
-                caseOrgnizationPersonnel:{
-                    placeholder:"受理相关人",
-                    label:"受理相关人:",
-                    type:"multicombobox",
-                    isOptional:true,
-                    data:case_orgnizationPersonnel,
-                    isFilterable:true 
-                },
-                caseLawsuit:{
-                    placeholder:"本诉金额",
-                    label:"本诉金额(万元):",
-                    type:"text",
-                    isOptional:true,
-                    numberOnly:true,
-                    defaultValue:0.0
-                },
-                caseCounterclaim:{
-                    placeholder:"反诉金额",
-                    label:"反诉金额(万元):",
-                    type:"text",
-                    isOptional:true,
-                    numberOnly:true,
-                    defaultValue:0.0
-                },
-                caseLawsuitRequest:{
-                    placeholder:"本诉请求",
-                    label:"本诉请求:",
-                    type:"textarea",
-                    isOptional:true,
-                },
-                caseCounterclaimRequest:{
-                    placeholder:"反诉请求",
-                    label:"反诉请求:",
-                    type:"textarea",
-                    isOptional:true,
-                },
-                caseSum:{
-                    placeholder:"案件摘要",
-                    label:"案件摘要:",
-                    type:"textarea",
-                    isOptional:true,
-                },
-            }
-        }
-    }
-}
+
 const progress_form_template={
     settings:{
         hasLabel:true,

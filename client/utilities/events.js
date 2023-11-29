@@ -1,13 +1,15 @@
 function addClickEvents(main_form,r){
     //#region 全局功能按钮
-
-    $('.popup-add-table').on('click',async function(e){
-        //await createTable('caseStatus',caseStatus,function(res){
-            //console.log(res);
-        //});
-        //await createBasicDatabase();
-        //await insertBasicDatabaseData(['caseStatus']);
-        getBasicDatabaseData(['caseStatus']);
+    var list=['caseStatus','caseLabels','caseTypes','caseCatelogs','caseCauses','caseReason','propertyStatus','counselTitles','projects'];
+    list=undefined;
+    $('.popup-add-table').on('click',function(e){
+        createBasicDatabase();
+    });
+    $('.popup-read-table').on('click', function(e){
+        getBasicDatabaseData(list).then(res=>console.log(res));
+    });
+    $('.popup-add-row').on('click', function(e){
+        insertBasicDatabaseData(list);
     });
     //#endregion
 

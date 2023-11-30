@@ -3,7 +3,7 @@ let ip=isRunLocal?'localhost':'cn.luyao.site';
 let port=5555;
 var auth_code='1234';
 var enableConsoleLog=true;
-const mainPage="main.html";
+const mainPage="text.html";
 class Message{
     static LOGIN_IS_EMPTY='<p style="color:red;">用户名和密码不能为空</p>';
     static LOGIN_ISNOT_MATCH='<p style="color:red;">用户名和密码不匹配</p>';

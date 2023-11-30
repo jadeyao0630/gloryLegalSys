@@ -50,6 +50,22 @@ async function getUserList(res){
     .then(data => {if(data['data'].length>0) _data=data['data'];});
     res(_data);
 }
+async function removeCase(id,table,res){
+    await fetch("http://"+ip+":"+port+"/delete",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ table: table, id:id})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.data.success){
+            console.log(data.data.id);
+        }else{
+            console.log(data.data.error);
+        }
+        res(data.data);
+    });
+}
 async function insertCase(data,res){
     await fetch("http://"+ip+":"+port+"/insertCase",{
         headers:headers,
@@ -97,7 +113,7 @@ async function createTable(table,template,res){
         }else{
             console.log(data.data.error);
         }
-        res(data.data);
+        if(res!=undefined) res(data.data);
     });
 }
 async function getData(table,res){

@@ -53,7 +53,8 @@ mform.prototype={
         }else{
             _self.instance.append(setMainForm(template.template));
         }
-        
+        //_self.instance.find('.ui-input-text').addClass('form-original');
+        //_self.instance.find('.ui-select').addClass('form-original');
         /*
         $.each(_self.elements,(k,v)=>{
             console.log(k+"------------------------");
@@ -125,6 +126,9 @@ mform.prototype={
                                 _self.elements[item_key]=generateFileItem(item_container,item,item_key);
                                 break;
                         }
+                        var replacement=replacementOfInput(item_key);
+                        item_container.append(replacement);
+                        replacement.hide();
                         row_grid.append(item_container);
                     }
                     stepControler++;
@@ -136,14 +140,18 @@ mform.prototype={
             if(item.isOptional){
                 return "";
             }else{
-                return '<span class="optionMark">*</span>';
+                return '<span class="optionMark form-original">*</span>';
             }
         }
         function setRequired(isOptional,message){
             return isOptional?"":"required oninvalid='setCustomValidity(\""+message+"\")' oninput='setCustomValidity(\"\")'";
         }
         //#region 创建表单元素
-
+        function replacementOfInput(id){
+            
+            var input=$('<label class="form-replacement" id="_'+id+'" style="min-height:25px;">test</label>');
+            return input;
+        }
         function generateInputTypeBase(item_container,item,id,hasPlaceHolder){
             //var item_container=$('<div class="form_item_panel"></div>');
             var placeholder="";
@@ -151,7 +159,7 @@ mform.prototype={
             var val="";
             if(item.type.toLowerCase()=="date"||item.type.toLowerCase()=="time"||item.type.toLowerCase()=="datetime") val=getDateTime();
             item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
-            var input=$('<input type="'+item.type+'" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'" '+setRequired(item.isOptional,"此项必须填写")+'>');
+            var input=$('<input type="'+item.type+'" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'" '+setRequired(item.isOptional,"此项必须填写")+'>');
             item_container.append(input);
             return input;
             //return item_container;
@@ -160,7 +168,7 @@ mform.prototype={
             //var item_container=$('<div class="form_item_panel"></div>');
             var placeholder="";
             if(hasPlaceHolder&&item.placeholder!=undefined) placeholder=' placeholder="'+item.placeholder+'"';
-            var textarea=$('<textarea cols="40" rows="4" name="'+id+'" id="'+id+'"'+placeholder+'" '+setRequired(item.isOptional,"此项必须填写")+'></textarea>');
+            var textarea=$('<textarea class="form-original" cols="40" rows="4" name="'+id+'" id="'+id+'"'+placeholder+'" '+setRequired(item.isOptional,"此项必须填写")+'></textarea>');
             
             item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
             item_container.append(textarea);
@@ -172,13 +180,13 @@ mform.prototype={
         function generateFileItem(item_container,item,id){
             //var item_container=$('<div class="form_item_panel"></div>');
             item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
-            var input=$('<input type="file" name="'+id+'" id="'+id+'" value="" '+setRequired(item.isOptional,"此项必须填写")+'>');
+            var input=$('<input class="form-original" type="file" name="'+id+'" id="'+id+'" value="" '+setRequired(item.isOptional,"此项必须填写")+'>');
             item_container.append(input);
             return input;
             //return item_container;
         }
         function generateRadioItem(item_container,item,id){
-            var radio_container=$('<fieldset id="'+id+'" data-role="controlgroup" data-type="horizontal" data-mini="true"></fieldset>');
+            var radio_container=$('<fieldset class="form-original" id="'+id+'" data-role="controlgroup" data-type="horizontal" data-mini="true"></fieldset>');
             if(item.data){
                 item.data.forEach((d,counter)=>{
                     var check="";
@@ -196,7 +204,7 @@ mform.prototype={
             //return item_container;
         }
         function generateComboBoxItem(item_container,item,id){
-            var selectItem=$('<select name="'+id+'" id="'+id+'"'+
+            var selectItem=$('<select class="form-original" name="'+id+'" id="'+id+'"'+
             (item.isFilterable?"class=\"filterSelect\" data-native-menu=\"false\"":"")+'" '+setRequired(item.isOptional,"此项必须选择")+'></select>');
             if(item.data){
                 item.data.forEach((d,counter)=>{
@@ -211,7 +219,7 @@ mform.prototype={
             //return item_container;
         }
         function generateMultiComboBoxItem(item_container,item,id){
-            var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="multiSelect'+
+            var selectItem=$('<select class="form-original" name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="multiSelect'+
             (item.isFilterable?" filterSelect":"")+'" multiple="multiple" data-native-menu="false"></select>');
             if(item.data){
                 if(item.data instanceof Array){
@@ -301,7 +309,7 @@ mform.prototype={
             // the filter input field must be transferred to the dialog so that the user can continue to
             // use it for filtering list items.
             .on( "pagecontainerbeforeshow", function( event, data ) {
-                console.log("pagecontainerbeforeshow.............");
+                //console.log("pagecontainerbeforeshow.............");
                 var listview, form;
                 if ( !pageIsSelectmenuDialog( data.toPage ) ) {
                     //return;
@@ -318,13 +326,13 @@ mform.prototype={
             })
             // After the dialog is closed, the form containing the filter input is returned to the popup.
             .on( "pagecontainerhide", function( event, data ) {
-                console.log("pagecontainerhide.............");
+                //console.log("pagecontainerhide.............");
                 var listview, form;
                 if ( !pageIsSelectmenuDialog( data.toPage ) ) {
                     return;
                 }
                 listview = data.prevPage.jqmData( "listview" ),
-                console.log(data);
+                //console.log(data);
                 form = listview.jqmData( "filter-form" );
                 // Put the form back in the popup. It goes ahead of the listview.
                 if($(listview).parent().find('#searchInput').length==0)
@@ -339,142 +347,45 @@ mform.prototype={
         if(this.isReadOnly==isReadOnly) return this;
         this.isReadOnly=isReadOnly;
         var _self=this;
-        $.each(_self.elements,(k,v)=>{
-            //console.log(v);
-            switch ($(v).prop("tagName").toLowerCase()){
-                case "input":
-                    if(!_self.replacementIndexs.hasOwnProperty(k)) _self.replacementIndexs[k]=replacementOfInput($(v));
-                    if(isReadOnly) {
-                        var source=$(_self.instance).find("#"+k);
-                        var parent=source.parent();
-                        _self.replacementIndexs[k].text(source.val());
-                        _self.orginalIndexs[k]=source;
-                        replaceElement(source,_self.replacementIndexs[k]);
-                        parent.trigger('create');
-                    }else {
-                        var parent=$(_self.instance).find("#_"+k).parent();
-                        replaceElement($("#_"+k),_self.orginalIndexs[k]);
-                        parent.trigger('create');
-                    }
-                    break;
-                case "select":
-                    if(!_self.replacementIndexs.hasOwnProperty(k)) _self.replacementIndexs[k]=replacementOfInput(v);
-                    if(isReadOnly) {
-                        var source=v;
-                        //console.log($(_self.instance).html());
-                        //_self.instance.addData("multicombobox",k,_self.data[k],source);
-                        var parent=source.parent().parent().parent();
-                        _self.replacementIndexs[k].html(getSelectValue(source).join("<br/>"))
-                        _self.orginalIndexs[k]=source;
-                        //如果是多选或者data-native-menu=false
-                        if(source.attr('data-native-menu')!=undefined && source.attr('data-native-menu')=='false'){
-                            if(source.attr('multiple')!=undefined && source.attr('multiple')=='multiple'){
-                                //_self.replacementIndexs[k]=replacementOfMultiSelect(source);
-                            }
-                            //_self.instance.addData("multicombobox",k,_self.data[k],source);
-                            parent=source.parent().parent();
-                            //console.log('之前----------------------------'+getSelectValue(source).join("<br/>"));
-                            //console.log(parent.html());
-                            //source.before(_self.replacementIndexs[k]);
-                            source.remove();
-                            parent.append( _self.replacementIndexs[k]);
-                            console.log('之后----------------------------');
-                            console.log(source.val())
-                            //console.log(_self.data)
-                            _self.replacementIndexs[k].trigger('create');
-                            //console.log('之后----------------------------');
-                            //console.log(parent.html());
-                        }
-                        //单选
-                        else{
-                            //console.log(parent.parent().parent().html());
-                            source.remove();
-                            parent.append( _self.replacementIndexs[k]);
-                            
-                        }
-                        parent.trigger('create').trigger("change");
-                        //source.selectmenu().selectmenu("refresh");
-                    }else {
-                        var parent=$(_self.instance).find("#_"+k).parent();
-                        replaceElement($("#_"+k),_self.orginalIndexs[k]);
-                        parent.trigger('create').trigger("change");
-                    }
-                    break;
-                case "fieldset":
-                    if(!_self.replacementIndexs.hasOwnProperty(k)) _self.replacementIndexs[k]=replacementOfInput(v);
-
-                    if(isReadOnly) {
-                        var source=$(_self.instance).find("#"+k);
-                        //判断是否是radio控件
-                        var source_children=source.find('input[type="radio"]');
-                        if (source_children.length>0){
-                            _self.orginalIndexs[k]=source;
-                            var parent=source.parent();
-                            _self.replacementIndexs[k].html(getRadioValue(source).join("<br/>"));
-                            //console.log(_self.replacementIndexs[k].text());
-                            source.after(_self.replacementIndexs[k]);
-                            source.remove();
-                            parent.trigger('create').trigger("change");
-                            //source_children.checkboxradio( "refresh" );
-                            //parent.append( _self.replacementIndexs[k]);
-                        }
-                        
-                    }else{
-                        var parent=$(_self.instance).find("#_"+k).parent();
-                        console.log('listview-----------------------')
-                        console.log($( "#" + k + "-menu" ))
-                        replaceElement($("#_"+k),_self.orginalIndexs[k]);
-                        parent.trigger('create').trigger("change");
-                    }
-                    break;
-                case "textarea":
-                    //var testStr='sdfasdfassadafsd sddfsa s山豆根地方翻跟斗翻跟斗是 豆腐干山豆根施工方士大夫发给士大夫发给士大夫发给当时法国的书法风格士大夫发给是的方法感到十分告诉对方';
-                    if(!_self.replacementIndexs.hasOwnProperty(k)) _self.replacementIndexs[k]=replacementOfInput(v);
-                    if(isReadOnly) {
-                        var source=$(_self.instance).find("#"+k);
-                        var parent=source.parent();
-                        _self.replacementIndexs[k].text(source.val());
-                        _self.orginalIndexs[k]=source;
-                        replaceElement(source,_self.replacementIndexs[k]);
-                        parent.trigger('create');
-                    }else {
-                        var parent=$(_self.instance).find("#_"+k).parent();
-                        replaceElement($(_self.instance).find("#_"+k),_self.orginalIndexs[k]);
-                        parent.trigger('create');
-                    }
-                    break;
-                
-            }
-        });
-        if(this.isReadOnly) _self.instance.find('.optionMark').addClass('hide');
-        else _self.instance.find('.optionMark').removeClass('hide');
-        _self.instance.trigger('create');
-        function replaceElement(from,to){
-            
-            from.after(to);
-            from.remove();
-        }
-        function replacementOfMultiSelect(sourceElement){
-            var multiValues=getSelectValue(sourceElement);
-            var _collapsibleset=$('<div data-role="collapsible" data-theme="a" data-iconpos="right" data-inset="true" style="border:none;padding:0px;background:white;" data-collapsed-icon="carat-d" data-expanded-icon="carat-u"></div>');
-            var _collapsibleLabel=$('<h4 class="ui-field-contain" style="margin:0px;border:none;">'+
-            '<div><label>'+multiValues.join(",")+'</label><span class="ui-li-count" style="margin-right:30px;background:white;border-color:grey;">'+multiValues.length+'</span></div></h4>');
-            _collapsibleset.append(_collapsibleLabel);
-            var _listview=$('<ol data-role="listview" data-theme="b" ></ol>');
-            _collapsibleset.append(_listview);
-            multiValues.forEach(v=>{
-                var _li=$('<li class="ui-field-contain"></li>');
-                var _info_ele=$('<label>'+v+'</label>');
-                _li.append(_info_ele);
-                _listview.append(_li);
+        if(isReadOnly){
+            $.each(_self.instance.find('.form-original'),(i,ele)=>{
+                //console.log(ele.nodeName+"-->"+ele.id);
+                //console.log(ele);
+                var id=ele.id;
+                switch(ele.nodeName.toUpperCase()){
+                    case "INPUT":
+                        //console.log($(ele).prop('type'));
+                        _self.instance.find('#_'+id).text($(ele).val());
+                        break;
+                    case "TEXTAREA":
+                        _self.instance.find('#_'+id).text($(ele).val());
+                        break;
+                    case "SELECT":
+                        _self.instance.find('#_'+id).html(getSelectValue(ele).join('<br/>'));
+                        break;
+                    case "FIELDSET":
+                        _self.instance.find('#_'+id).html(getRadioValue(ele).join('<br/>'));
+                        break;
+                }
             });
-            return _collapsibleset;
         }
-        function replacementOfInput(sourceElement){
-            
-            var input=$('<label id="_'+sourceElement.attr('id')+'" style="min-height:25px;">test</label>');
-            return input;
+        
+        if(this.isReadOnly){
+            _self.instance.find(".form-replacement").show();
+            _self.instance.find('.form-original').hide();
+            _self.instance.find('.ui-input-text').hide();
+            _self.instance.find('.ui-select').hide();
+        }else{
+            _self.instance.find(".form-replacement").hide();
+            _self.instance.find('.form-original').show();
+            _self.instance.find('.ui-input-text').show();
+            _self.instance.find('.ui-select').show();
         }
+        
+        //if(this.isReadOnly) _self.instance.find('.optionMark').addClass('hide');
+        //else _self.instance.find('.optionMark').removeClass('hide');
+        _self.instance.trigger('create');
+
         function getSelectValue(element){
             var val=[];
             $.each($(element).find(":selected"),function(index,opt){
@@ -541,7 +452,7 @@ $.fn.extend({
         var data_keys=Object.keys(data);
         var _self=$(this);
         if(template==undefined) template=_self.template;
-        console.log(template)
+        console.log(data)
         $.each(template,(k,v)=>{
             if(v.hasOwnProperty('type')){
                 var val=data[k];
@@ -572,35 +483,46 @@ $.fn.extend({
         if(element.length>0){
             if(type=="radio")  {
                 if(value=="") value=0;
-                _self.find("#"+id+"-"+parseInt(value)).prop( "checked", true ).checkboxradio().checkboxradio( "refresh" ).trigger("change");
-            }else if(type=="multicombobox"){
-                if(value!=null&&value!=undefined&&value.length>0){
-                    console.log(id+"---->"+value);
-                    value.split(",").forEach((v)=>{
-                        $(element).find("option[value="+v+"]").prop('selected',true);
-                    });
-                }else{
-                    $(element).find("option").prop('selected',false);
+                var ele=_self.find("#"+id+"-"+parseInt(value)).prop( "checked", true );
+                ele.checkboxradio().checkboxradio( "refresh" ).trigger("change");
+                if(ele.length>0){
+                    _self.find("#_"+id).text(ele.val());
                 }
-                
-                //element.val(value.split(","));
+                    
+            }else if(type=="multicombobox"){
+                var _values=[];
+                $(element).find("option").prop('selected',false);
+                if(value!=null&&value!=undefined&&value.length>0){
+                    value.split(",").forEach((v)=>{
+                        var ele=$(element).find("option[value="+v+"]");
+                        ele.prop('selected',true);
+                        _values.push(ele.text());
+                    });
+                }
+                _self.find("#_"+id).html(_values.join("<br/>"));
                 element.selectmenu().selectmenu("refresh").trigger("change");
             }else if(type=="combobox"){
                 
                 if(value=="") value=0;
-                $(element).find("option[value="+value+"]").prop('selected',true);
+                var ele=$(element).find("option[value="+value+"]");
+                ele.prop('selected',true);
+                if(ele.length>0)
+                    _self.find("#_"+id).text(ele.text());
                 element.selectmenu().selectmenu("refresh").trigger("change");
             }else if(type=="date"||type=="datetime"||type=="time")  {
                 if(value=="") value=new Date();
                 element.val(getDateTime(value));
+                _self.find("#_"+id).text(getDateTime(value));
             }else{
                 element.val(value);
+                _self.find("#_"+id).text(value);
             }
         }
     },
     getValues:function(dataId,template,response){
         
         if(template==undefined) template=this.template;
+        var _Self=$(this);
         const values={"id":dataId};
         var catelogs=Object.keys(template);
         var _hasError=false;
@@ -615,7 +537,9 @@ $.fn.extend({
                     //form_item_ids[item_key]=catelog.data[item_key];
                     var hasError=false;
                     if(catelog.data[item_key].type.toLowerCase()=='radio'){
-                        values[item_key]=parseInt(document.querySelector('input[name="'+item_key+'"]:checked').id.replace(item_key+"-",""));
+                        //console.log(item_key);
+                        //console.log(_Self.find('input[name="'+item_key+'"]:checked'));
+                        values[item_key]=parseInt(_Self.find('input[name="'+item_key+'"]:checked').prop('id').replace(item_key+"-",""));
                     }else{
                         var element=document.getElementById(item_key);
                         values[item_key]= dataValidation(element,catelog.data[item_key],function(he){

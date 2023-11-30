@@ -6,6 +6,10 @@ var matches={
 }
 var keys=Object.keys(matches);
 var casePersonnel={"公司":[],"个人":[]};
+//createTable('caseUpdates',caseUpdates);
+//createTable('caseExcutes',caseExcutes);
+//createTable('caseProperties',properties,(r)=>{console.log(r.error);});
+//createTable('caseAttachments',attachments,(r)=>{console.log(r);});
 $('body').on('dataLoaded',function(data){
     
     if(data.key=="projects"){

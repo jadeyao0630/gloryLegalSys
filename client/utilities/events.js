@@ -61,11 +61,13 @@ function addClickEvents(main_form,r){
                     //_setBlurBackgroundVisibility(true);
                     $.mobile.navigate( $(this).attr( "href" ));
                     setTimeout(function() {
-                        console.log(matchItems[0]);
-                        main_form.setData(matchItems[0]);
-                        main_form.readOnly(false);
+                        //console.log(matchItems[0]);
+                        //main_form.setData(matchItems[0]);
+                        //main_form.readOnly(false);
                         //
                         //console.log("data-role------"+$('.edit-header-btn[name="save_btn"').jqmData('role'));
+                        main_form.setData(matchItems[0]);
+                        main_form.readOnly(matchItems[0].isReadOnly);
                         if(matchItems[0].isReadOnly) {
                             $("#reg_form_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+"查看档案");
                             $('.edit-header-btn[name="save_btn"').hide();
@@ -74,10 +76,6 @@ function addClickEvents(main_form,r){
                             $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
                             $('.edit-header-btn[name="save_btn"').show();
                         }
-                    }, 500);
-                    setTimeout(function() {
-                        main_form.setData(matchItems[0]);
-                        main_form.readOnly(matchItems[0].isReadOnly);
                         $().mloader("hide");
                     }, 500);
                     //$('.progress_lock.edit-info').removeClass('hide');
@@ -118,7 +116,7 @@ function addClickEvents(main_form,r){
                 $('.progress_lock.edit-info').addClass('hide');
                 //console.log($('.progress_lock.edit-info'));
                 $("#reg_form_title").html("新增档案");
-                
+                $('.edit-header-btn[name="save_btn"').show();
                 //_setBlurBackgroundVisibility(true);
                 $.mobile.navigate( $(this).attr( "href" ));
                // main_form.readOnly(false).setEmptyData();
@@ -222,6 +220,7 @@ function addClickEvents(main_form,r){
     $('.edit-header-btn').on('click',function(e){
         if($(this).text()=="保存"){
             //console.log("保存");
+            console.log($(pageOnTable).html())
             main_form.instance.getValues(getGlobal("currentId"),FormTemplate.template,function(message,values){
                 if(values.success){
                     console.log(message.message);
@@ -237,12 +236,14 @@ function addClickEvents(main_form,r){
                         values.data["isReadOnly"]=_isReadOnlyCurrentForm();
                         
                         $().mloader('show',{message:"保存中..."});
-                        //console.log(values);
+                        console.log(values.data);
                         insertCase(values.data,function(r){
                             //console.log(r);
                             if(r.success){
                                 console.log("修改添加成功。");
-                                $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
+                                $().minfo('show',{title:"提示",message:"保存完成。"},function(){
+                                    history.back();
+                                });
                                 
                             }else{
                                 console.log(r);

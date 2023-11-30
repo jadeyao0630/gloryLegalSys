@@ -236,7 +236,7 @@ function addClickEvents(main_form,r){
                         values.data["isReadOnly"]=_isReadOnlyCurrentForm();
                         
                         $().mloader('show',{message:"保存中..."});
-                        console.log(values.data);
+                        //console.log(values.data);
                         insertCase(values.data,function(r){
                             //console.log(r);
                             if(r.success){

@@ -144,7 +144,7 @@ mform.prototype={
             }
         }
         function setRequired(isOptional,message){
-            return isOptional?"":"required oninvalid='setCustomValidity(\""+message+"\")' oninput='setCustomValidity(\"\")'";
+            return isOptional?"":" data-message='"+message+"' required oninvalid='setCustomValidity(\""+message+"\")' oninput='setCustomValidity(\"\")'";
         }
         //#region 创建表单元素
         function replacementOfInput(id){
@@ -576,10 +576,10 @@ $.fn.extend({
         response(error.FORM_VALIDATION_COMPLETED,{data:values,success:!_hasError});
         function dataValidation(element,itemTemplate,res){
             var hasError=false;
+            var val=element.value;
             switch (element.nodeName.toUpperCase()){
                 case "INPUT":
                     
-                    var val=element.value;
                     //console.log(element.type);
                     if(element.type.toLowerCase()=="date"||element.type.toLowerCase()=="time"||element.type.toLowerCase()=="datetime"){
                         val=new Date(val).toISOString().slice(0, 19).replace('T', ' ');
@@ -592,31 +592,38 @@ $.fn.extend({
                         hasError=true;
                     }
                     res(hasError);
-                    return val;
+                    break;
                 case "SELECT":
                     //console.log(itemTemplate.label+"-->"+$(element).find(":selected").length);
-                    var val=[];
+                    var _val=[];
                     $.each($(element).find(":selected"),function(index,opt){
                         //console.log(itemTemplate.label+"--------->"+opt.value);
-                        val.push(opt.value);
+                        _val.push(opt.value);
                     });
-                    if(val.length==0 && !itemTemplate.isOptional) {
-                        console.log(itemTemplate.label+"-- has empty value"+val);
+                    if(_val.length==0 && !itemTemplate.isOptional) {
+                        console.log(itemTemplate.label+"-- has empty value"+_val.join(","));
                         hasError=true;
                     }
                     res(hasError);
                     //console.log(itemTemplate.label+"("+val.length+")--------->"+val.join(","));
-                    return val.join(",");
+                    val=_val.join(",");
+                    break;
                 case "TEXTAREA":
-                    var val=element.value;
                     if(val.length==0 && !itemTemplate.isOptional){
                         console.log(itemTemplate.label+"-- has error value"+val);
                         hasError=true;
                     }
                     res(hasError);
-                    return element.value;
+                    break;
             }
-            
+            if(hasError) {
+                $('#popupArrow').popup('open',{
+                    positionTo: "#"+element.id,
+                    arrow:true
+                });
+                $('#popupArrow').text($(element).jqmData('message'));
+            }
+            return val;
             
         }
     }

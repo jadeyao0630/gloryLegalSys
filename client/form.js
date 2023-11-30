@@ -204,8 +204,8 @@ mform.prototype={
             //return item_container;
         }
         function generateComboBoxItem(item_container,item,id){
-            var selectItem=$('<select class="form-original" name="'+id+'" id="'+id+'"'+
-            (item.isFilterable?"class=\"filterSelect\" data-native-menu=\"false\"":"")+'" '+setRequired(item.isOptional,"此项必须选择")+'></select>');
+            var selectItem=$('<select name="'+id+'" id="'+id+'"'+
+            (item.isFilterable?"class=\"filterSelect\" data-native-menu=\"false\"":"class=\"form-original\"")+'" '+setRequired(item.isOptional,"此项必须选择")+'></select>');
             if(item.data){
                 item.data.forEach((d,counter)=>{
                     selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
@@ -219,7 +219,8 @@ mform.prototype={
             //return item_container;
         }
         function generateMultiComboBoxItem(item_container,item,id){
-            var selectItem=$('<select class="form-original" name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="multiSelect'+
+            
+            var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="form-original multiSelect'+
             (item.isFilterable?" filterSelect":"")+'" multiple="multiple" data-native-menu="false"></select>');
             if(item.data){
                 if(item.data instanceof Array){
@@ -245,6 +246,7 @@ mform.prototype={
             }
             item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
             item_container.append(selectItem);
+            //console.log(item_container.html());
             //selectItem.selectmenu().selectmenu('refresh');
             return selectItem;
             //console.log('item_container');
@@ -263,10 +265,27 @@ mform.prototype={
             return isDialog;
         }
         $.mobile.document
+        .on("pagecreate", function () {
+            $("#multiselect").selectmenu({
+                create: function (event, ui) {
+                    var popup = $(this).data("mobile-selectmenu").menuType;
+                    popup.on("popupafteropen", function () {
+                        // 在每个选项中添加列表视图
+                        popup.find("li a").each(function () {
+                            var listItem = $(this);
+                            var list = $("<ul data-role='listview'><li>List item 1</li><li>List item 2</li></ul>");
+                            listItem.append(list);
+                            list.listview();
+                        });
+                    });
+                }
+            });
+        })
             // Upon creation of the select menu, we want to make use of the fact that the ID of the
             // listview it generates starts with the ID of the select menu itself, plus the suffix "-menu".
             // We retrieve the listview and insert a search input before it.
             .on( "selectmenucreate", ".filterSelect", function( event ) {
+                console.log(" filterSelect--->");
                 var input,
                     selectmenu = $( event.target ),
                     list = $( "#" + selectmenu.attr( "id" ) + "-menu" ),
@@ -286,9 +305,11 @@ mform.prototype={
                         .jqmData( "filter-form", form ) ;
                     form.jqmData( "listview", list );
                     list.jqmData('theme','a');
+                    
                     //list.listview( "refresh" );
                 }
                 
+                //console.log(list.html());
                 // Instantiate a filterable widget on the newly created selectmenu widget and indicate that
                 // the generated input form element is to be used for the filtering.
                 //console.log($(form).html());
@@ -309,12 +330,13 @@ mform.prototype={
             // the filter input field must be transferred to the dialog so that the user can continue to
             // use it for filtering list items.
             .on( "pagecontainerbeforeshow", function( event, data ) {
-                //console.log("pagecontainerbeforeshow.............");
+                console.log("pagecontainerbeforeshow.............");
                 var listview, form;
                 if ( !pageIsSelectmenuDialog( data.toPage ) ) {
                     //return;
                 }
                 listview = data.toPage.find( "ul" );
+                //console.log(listview.html());
                 form = listview.jqmData( "filter-form" );
                 // Attach a reference to the listview as a data item to the dialog, because during the
                 // pagecontainerhide handler below the selectmenu widget will already have returned the
@@ -323,10 +345,32 @@ mform.prototype={
                 // Place the form before the listview in the dialog.
                 if($(listview).parent().find('#searchInput').length==0)
                     listview.before( form );
+/*
+                var controlgroup=$('<div data-role="controlgroup" data-type="horizontal"></div>');
+                var select=$('<select>'+
+                                '<option selected>无</option>'+
+                                '<option>原告</option>'+
+                                '<option>被告</option>'+
+                                '<option>被执行人</option>'+
+                                '<option>执行人</option>'+
+                            '</select>');
+                
+                var li = listview.find('li[role="option"]');
+                $.each(li,(index,l)=>{
+                    //$(l).append(select);
+                    $(l).find('a').append(select);
+                    //controlgroup.append(select);
+                    //$(l).find('a').wrapAll(controlgroup);
+                    //controlgroup.append(a);
+                    console.log($(l).html());
+                });
+                
+                listview.trigger('create').listview( "refresh" );
+                */
             })
             // After the dialog is closed, the form containing the filter input is returned to the popup.
             .on( "pagecontainerhide", function( event, data ) {
-                //console.log("pagecontainerhide.............");
+                console.log("pagecontainerhide.............");
                 var listview, form;
                 if ( !pageIsSelectmenuDialog( data.toPage ) ) {
                     return;
@@ -577,6 +621,7 @@ $.fn.extend({
         function dataValidation(element,itemTemplate,res){
             var hasError=false;
             var val=element.value;
+            $('#popupArrow').css({'margin-top':'20px;'})
             switch (element.nodeName.toUpperCase()){
                 case "INPUT":
                     
@@ -619,7 +664,7 @@ $.fn.extend({
             if(hasError) {
                 $('#popupArrow').popup('open',{
                     positionTo: "#"+element.id,
-                    arrow:true
+                    arrow:"true"
                 });
                 $('#popupArrow').text($(element).jqmData('message'));
             }

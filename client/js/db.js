@@ -58,12 +58,9 @@ async function removeCase(id,table,res){
     })
     .then(response => response.json())
     .then(data => {
-        if (data.data.success){
-            console.log(data.data.id);
-        }else{
-            console.log(data.data.error);
-        }
-        res(data.data);
+        console.log(data.error);
+        
+        res(data);
     });
 }
 async function insertCase(data,res){

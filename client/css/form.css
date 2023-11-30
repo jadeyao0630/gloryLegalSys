@@ -49,6 +49,12 @@
 .multiSelect{
     max-width: 320px;;
 }
+#popupArrow {
+    position: absolute !important;
+    min-width:100px;
+    margin: 10px auto auto auto;
+  }
+
 /*
 #caseOrgnizationPersonnel-button{
     background: white;

@@ -48,6 +48,7 @@ var main_form,pageOnTable,pageSeTable;
 					//$.mobile.hidePageLoadingMsg(); 
 					addClickEvents(main_form,r);
 					$("#pageOneTable").hpaging({ limit: 10 });
+					$("#pageSecondTable").hpaging({ limit: 10 });
 					logingStatus();
 					$.each($("#pageOneTable-popup [type=checkbox]"),function(index,checkbox){
 						if(index<2){

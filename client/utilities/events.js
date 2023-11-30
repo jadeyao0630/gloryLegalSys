@@ -1,7 +1,7 @@
 function addClickEvents(main_form,r){
     //#region 全局功能按钮
-    var list=['caseStatus','caseLabels','caseTypes','caseCatelogs','caseCauses','caseReason','propertyStatus','counselTitles','projects'];
-    list=undefined;
+    var list=['corporateCompanies'];
+    //list=undefined;
     $('.popup-add-table').on('click',function(e){
         createBasicDatabase();
     });
@@ -42,7 +42,7 @@ function addClickEvents(main_form,r){
                     console.log("删除");
                     if(matchItems.length>0){
                         $('#pageOneTable').removeTableItem(r,matchItems[0]);
-                        
+                        removeCase(matchItems[0].id,'cases',(r)=>{console.log});
                     }
                     
                     //_initRegTable(r,firstPageTableColumns,"pageOneTable");
@@ -151,6 +151,7 @@ function addClickEvents(main_form,r){
                     if(matcheds.length>0){
                         $('#pageOneTable').removeTableItems(r,matcheds);
                         $('.reg-checkbox-all').prop("checked",false);
+
                     }
                     //_initRegTable(r,firstPageTableColumns,"pageOneTable");
                     
@@ -242,7 +243,7 @@ function addClickEvents(main_form,r){
                             if(r.success){
                                 console.log("修改添加成功。");
                                 $().minfo('show',{title:"提示",message:"保存完成。"},function(){
-                                    history.back();
+                                    $.mobile.navigate('#');
                                 });
                                 
                             }else{

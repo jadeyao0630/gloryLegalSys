@@ -3,7 +3,10 @@ var progresses=["一审","二审","执行",["强制执行","正常执行","未�
 var property_status=["查封","冻结"];
 var case_types=["被诉","主诉"];
 var case_catelogs=["诉讼","仲裁"];
-var corporate_companies=["国瑞信业建筑工程设计有限公司","国瑞德恒房地产开发有限公司","国瑞信业地产股份有限公司"];
+var corporate_companies=["国瑞兴业建筑工程设计有限公司","国瑞德恒房地产开发有限公司","国瑞兴业地产股份有限公司",
+"益万家文化传播有限公司","国瑞兴业健康科技有限公司","大兴区保障性住房建设投资有限公司","浩业环宇装饰工程有限公司",
+"文华盛达房地产开发有限公司"
+];
 var corporate_partners=["张丽佳","李立","郑智"];
 var caseRelatedParty={
     "公司":corporate_companies,

@@ -6,6 +6,7 @@ var matches={
 }
 var keys=Object.keys(matches);
 var casePersonnel={"公司":[],"个人":[]};
+
 //createTable('caseUpdates',caseUpdates);
 //createTable('caseExcutes',caseExcutes);
 //createTable('caseProperties',properties,(r)=>{console.log(r.error);});
@@ -56,7 +57,7 @@ $('body').on('dataLoaded',function(data){
     else if(data.key=="corporateCompanies"){
         corporate_companies=getKeyValues(data.value,"name")
         resourceDatas[data.key]=corporate_companies;
-
+        
         casePersonnel["公司"]=corporate_companies;
     }
     else if(data.key=="corporatePartners"){

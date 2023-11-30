@@ -6,7 +6,8 @@ function addClickEvents(main_form,r){
         createBasicDatabase();
     });
     $('.popup-read-table').on('click', function(e){
-        getBasicDatabaseData(list).then(res=>console.log(res));
+        //getBasicDatabaseData(list).then(res=>console.log(res));
+
     });
     $('.popup-add-row').on('click', function(e){
         insertBasicDatabaseData(list);
@@ -87,6 +88,16 @@ function addClickEvents(main_form,r){
             }else if(but.currentTarget.name=="fn_btn_details"){
                 if(matchItems.length>0){
                     //window.location="./test/timeline.html"
+                    $("#summary_list").children().remove();
+                    if(matchItems.length>0){
+                        _data.basic=matchItems[0];
+                    }
+                    var canvas=document.getElementById('myCanvas');
+                    eventManager.setCanvas(canvas);
+                    var _ctx=canvas.getContext('2d');
+                    _ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    new timelinePage({template:_summary_template,data:_data,summaryListContainer:"#summary_list",canvas:canvas});
+                    $("#summary_list").trigger('create');
                     $.mobile.navigate( "#timeline");
                     //$("#page4").removeClass('hide');
                     //$(getGlobal('currentPage')).addClass('hide');

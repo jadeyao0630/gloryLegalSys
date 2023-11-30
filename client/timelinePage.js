@@ -185,7 +185,10 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                 if (data_key!="template" && Object.keys(_data[data_key]).includes(sub_key)){
                     var data=_summary_template[key].data[sub_key].data;
                     var label=_summary_template[key].data[sub_key].label;
+                    
                     var val=_data[data_key][sub_key];
+                    console.log(_data);
+                    console.log(data_key+"-->"+sub_key+"--->"+val);
                     var isMultiValue=false;
                     var multiValues=[];
                     if(data!=undefined){
@@ -200,6 +203,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                         }
                         else{
                             var data_keys=Object.keys(data);
+                            
                             var values=val.split(",");
                             if(data_keys.length>0){
                                 isMultiValue=true;
@@ -246,7 +250,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                         if(sub_key=="caseLabel"){
                             console.log(val);
                             console.log(resourceDatas['caseLabelsColors']);
-                            li.css(resourceDatas['caseLabelsColors'][resourceDatas['caseLabels'][val]]);
+                            li.css(resourceDatas['caseLabelsColors'][val]);
                         }else if(sub_key=="caseStatus"){
                             info_ele=$('<div id="'+sub_key+'" style="margin-left:90px;margin-top:-7px;"></div>');
                             

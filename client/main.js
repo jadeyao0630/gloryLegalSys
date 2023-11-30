@@ -9,10 +9,15 @@ var main_form,pageOnTable,pageSeTable;
 			console.log(resourceDatas)
 			getCasesStatus(function(r){
 				setGlobalJson("mainDataStatus",r);
+				//console.log(r);
+				
 			});
 			getCasesData(function(r){
 				output('getCasesData: ');
+				//r=formatCasesData(r);
 				output(r);
+				
+				//console.log(r);
 				setGlobalJson("mainData",r);
 				//console.log(FormTemplate3);
 				main_form=_createNewCaseForm(FormTemplate3,"case_reg_page");
@@ -118,4 +123,66 @@ var main_form,pageOnTable,pageSeTable;
 					window.location.href = 'index.html';
 				}, 2000);
 			}
+		}
+		function formatCasesData(data){
+			$.each(data,(index,cas)=>{
+				var personnel=cas['casePersonnel'];
+				var val=[];
+				if(personnel.indexOf('；')>-1 || personnel.indexOf('、')>-1){
+					var peronnels=[];
+					if(personnel.indexOf('；')>-1)
+						peronnels=personnel.split('；');
+					else
+					peronnels=personnel.split('、');
+					//console.log(peronnels);
+					$.each(corporate_companies,(index,company)=>{
+						//console.log(company+"--"+peronnels.filter(p => p.indexOf(company)>-1));
+						peronnels.forEach((p)=>{
+							if(p.indexOf(company)>-1){
+								//console.log(index+"--"+company);
+								val.push('公司'+index);
+							}
+						})
+					});
+					$.each(corporate_partners,(index,partner)=>{
+						//console.log(company+"--"+peronnels.filter(p => p.indexOf(company)>-1));
+						peronnels.forEach((p)=>{
+							if(p.indexOf(partner)>-1){
+								//console.log(index+"--"+partner);
+								val.push('个人'+index);
+							}
+						})
+					});
+				}
+				if(val.length==0){
+					//console.log(cas['id']+"---"+cas['casePersonnel']);
+					$.each(corporate_companies,(index,company)=>{
+						//console.log(company+"--"+peronnels.filter(p => p.indexOf(company)>-1));
+							if(cas['casePersonnel'].indexOf(company)>-1){
+								//console.log(index+"--"+company);
+								val.push('公司'+index);
+							}
+					});
+					$.each(corporate_partners,(index,partner)=>{
+						//console.log(company+"--"+peronnels.filter(p => p.indexOf(company)>-1));
+							if(cas['casePersonnel'].indexOf(partner)>-1){
+								//console.log(index+"--"+partner);
+								val.push('个人'+index);
+							}
+					});
+				}
+				if(val.length==0){
+					console.log(cas['id']+"---"+cas['casePersonnel']);
+				}else{
+					cas['casePersonnel']=val.join(',');
+					cas['caseDate']=getDateTime();
+					cas['caseCreateDate']=getDateTime();
+					//console.log(cas['id']+"---"+val.join(','));
+					insert('cases',cas,(e)=>{
+						console.log(e);
+					})	
+				}
+				
+			});
+			return data;
 		}

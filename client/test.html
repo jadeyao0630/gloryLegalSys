@@ -2,83 +2,195 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Document</title>
-    <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
-	<script src="./js/jquery.js"></script>
-	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <style>
         .ui-controlgroup{
             padding:0px;
             background-color: aqua;
-            margin:-20px;
+            margin:-20px 0px;
             border:none;
-        }
-        .ui-body-inherit{
-            padding:0px;
-            background-color: aqua;
-            margin:-20px;
-            border:none;
+            width:100%;
         }
         .ui-listview > .ui-li-static{
             padding:0px;
             background-color: aqua;
             margin:0px;
             border:none;
+            width:100%;
         }
-        .ui-field-contain::before{
-            background-color: blue;
-            margin:0px;
-            padding:0px;
-            border:none;
-        }
-
+        
+        .sub-selectmenu {
+      border-radius: 0;
+      width:80px;
+    }
     </style>
 </head>
 <body>
-    <ul data-role="listview" data-inset="true">
-    <li data-role="list-divider" role="heading" tabindex="-1" class="ui-li-divider ui-bar-inherit ui-first-child">其他</li>
-    <li data-option-index="0" data-icon="false" class="ui-field-contain" role="option" aria-selected="false">
-        
-            <a href="#" tabindex="-1" class="ui-btn ui-checkbox-off ui-btn-icon-right"><select style="width: 100px;;">
-                    <option selected>无</option>
-                    <option>原告</option>
-                    <option>被告</option>
-                    <option>被执行人</option>
-                    <option>执行人</option>
-                </select>张东莹 57362564 东城法院</a>
-    </li>
-    <li data-role="list-divider" role="heading" tabindex="-1" class="ui-li-divider ui-bar-inherit">书记员</li>
-    <li data-option-index="1" data-icon="false" class="" role="option" aria-selected="false">
-        <a href="#" tabindex="-1" class="ui-btn ui-checkbox-off ui-btn-icon-right">郑少杰 57362579 大兴法院</a>
-    </li>
-    <li data-option-index="2" data-icon="false" class="" role="option" aria-selected="false">
-        <a href="#" tabindex="-1" class="ui-btn ui-checkbox-off ui-btn-icon-right">高新宇 57362335 大兴法院</a>
-    </li>
-    <li data-role="list-divider" role="heading" tabindex="-1" class="ui-li-divider ui-bar-inherit">法官</li>
-    <li data-option-index="3" data-icon="false" class="" role="option" aria-selected="false">
-        <a href="#" tabindex="-1" class="ui-btn ui-checkbox-off ui-btn-icon-right">李新亮 57362323 大兴法院</a>
-    </li>
-    <li data-option-index="4" data-icon="false" class="" role="option" aria-selected="false">
-        <a href="#" tabindex="-1" class="ui-btn ui-checkbox-off ui-btn-icon-right">郭艳 57362676 大兴法院</a>
-    </li>
-    <li data-option-index="5" data-icon="false" class="ui-last-child" role="option" aria-selected="false">
-        <a href="#" tabindex="-1" class="ui-btn ui-checkbox-off ui-btn-icon-right">张振 57362300 大兴法院</a>
-    </li>
-</ul>
+
 <div data-role="fieldcontain">
     <label for="multiselect">Choose options:</label>
     <select name="multiselect" id="multiselect" data-native-menu="false" multiple="multiple">
-        <option value="option1">Option 1</option>
-        <option value="option2">Option 2</option>
-        <option value="option3">Option 3</option>
+        <optgroup label="test1">
+            <option value="option1" selected>Option 1safasd fasddfsdsdf as</option>
+            <option value="option2">Option 2</option>
+            <option value="option3">Option 3</option>
+        </optgroup>
+        
+        <optgroup label="test2">
+            <option value="option2">Option 4 asddf asdf asdd ff sda</option>
+            <option value="option3">Option 5</option>
+        </optgroup>
+        
     </select>
 </div>
+
+
 <script>
+function getValue(element){
+
+    var id=$(element).attr('id');
+    var listbox_popup=$('#'+id+'-listbox');
+    var button_span=$('#'+id+'-button')
+    //var datas=[];
+    var values=[];
+    $.each(listbox_popup.find('li[aria-selected="true"]'),function(i,l){
+        //console.log($(l).find('select').val());
+        var index=$(l).jqmData('option-index');
+        var subOptVal=$(l).find('select').val();
+        var subOpt=$(l).find('select > option:selected').text();
+        $.each($(element).find('option'),function(ii,opt){
+            if(index==ii) {
+                //datas.push("("+subOpt+") "+$(opt).text())
+                values.push({
+                    status:subOpt,
+                    statusId:subOptVal,
+                    value:$(opt).text(),
+                    valueId:$(opt).val(),
+                    catelog:$(l).jqmData('group'),
+                    catelogId:$(l).jqmData('group-id')
+                })
+            }
+        });
+    });
+    console.log(values);
+    return values;
+    //button_span.find('span').text(datas.join(','));
+
+}
     $(document).on("pagecreate", function () {
+
+        console.log($('#multiselect-listbox'));
+            var _this=$('#multiselect-listbox');
+            _this.popup({
+  afterclose: function( event, ui ) {
+    console.log("closed");
+    var datas=getValue($('#multiselect'));
+
+    datas.forEach((data)=>{
+
+    });
+  }
+});
+            console.log(_this.html());
+            var aList=$(this).find("li");
+            _this.children().remove();
+            //aList.remove();
+        var count=0;
+        var catelog_count=-1;
+        var catelog="";
+                aList.each(function () {
+                    var listItem = $(this);
+                    console.log(listItem.find('a'));
+                    if(listItem.hasClass('ui-li-divider')){
+                        _this.append(listItem);
+                        catelog=listItem.text();
+                        catelog_count++;
+                    }else{
+                        var a=listItem.find('a');
+                        var li=$('<li data-option-index="'+count+'" data-group="'+catelog+'" data-group-id="'+catelog_count+'" data-icon="false" class="" role="option" aria-selected="false"></li>');
+                        var controlgroup=$('<div style="display:grid;grid-template-columns:auto 1fr;padding:0px;margin:-8px 0px;" ></div>');
+                        var select=$('<select data-option-index="'+count+'" class="sub-selectmenu" data-corners="false">'+
+                                '<option class="sub-option" value=0 selected>无</option>'+
+                                '<option class="sub-option" value=1 >原告</option>'+
+                                '<option class="sub-option" value=2 >被告</option>'+
+                                '<option class="sub-option" value=3 >被执行人</option>'+
+                                '<option class="sub-option" value=4 >执行人</option>'+
+                            '</select>');
+                        controlgroup.append(select);
+                        select.trigger('create').selectmenu().selectmenu('refresh');
+                        controlgroup.append(a);
+                        li.append(controlgroup);
+                        _this.append(li);
+                        a.on('click',function(e){
+                           
+                           //_this.trigger('create').listview().listview( "refresh" );
+                           $('#multiselect').selectmenu().trigger('create');
+                           //console.log(li.attr("aria-selected"));
+                            //$('#multiselect-button > span').text();
+                            if($(this).hasClass('ui-checkbox-on')){
+                                $(this).removeClass('ui-checkbox-on').addClass('ui-checkbox-off');
+                                li.attr("aria-selected" , false);
+
+                            }else{
+                                $(this).removeClass('ui-checkbox-off').addClass('ui-checkbox-on');
+                                
+                                li.attr("aria-selected" , true);
+                            }
+                            //console.log($('#multiselect').find(':selected').text().join(","));
+                            var datas=getValue($('#multiselect'));
+                            var collector=[];
+                            datas.forEach((data)=>{
+                                collector.push(`[${data.catelog}] ${data.value} (${data.status})`);
+                            });
+                            if(collector.length>0)
+                                $('#multiselect-button').find('span').text(collector.join(','));
+                            else
+                            $('#multiselect-button').find('span').html('');
+                            //console.log(datas.join(','));
+                            //console.log(collector.join(','));
+                        })
+                        select.change(function () {
+                            var optionSelected = $(this).find('option:selected');
+                            //var optTextSelected = optionSelected.text();
+                            var optValueSelected = optionSelected.val();
+                            console.log(_this.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]'));
+                            if(_this.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]').attr('aria-selected')){
+                                var datas=getValue($('#multiselect'));
+                                var collector=[];
+                            datas.forEach((data)=>{
+                                collector.push(`[${data.catelog}] ${data.value} (${data.status})`);
+                            });
+                            if(collector.length>0)
+                                $('#multiselect-button').find('span').text(collector.join(','));
+                            else
+                            $('#multiselect-button').find('span').html('');
+                                //$('#multiselect-button').find('span').text(datas.join(','));
+                            }
+                            //console.log(optValueSelected);
+                        });
+                        count++;
+                    }
+                    
+                });
+                _this.trigger('create').listview().listview( "refresh" );
+                console.log(_this.html());
+                $('#multiselect-listbox').find("a").on("click", function (event) {
+                    
+                    //$('#multiselect').selectmenu().trigger('change');
+                    //event.preventDefault();
+                });
+                
+            
+        /*
     $("#multiselect").selectmenu({
         create: function (event, ui) {
+            console.log(event);
             var popup = $(this).data("mobile-selectmenu").menuType;
+            
             popup.on("popupafteropen", function () {
                 // 在每个选项中添加列表视图
                 popup.find("li a").each(function () {
@@ -90,6 +202,7 @@
             });
         }
     });
+    */
 });
 </script>
 </body>

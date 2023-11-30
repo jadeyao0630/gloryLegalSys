@@ -267,7 +267,7 @@ var _summary_template;
         type:"label",data:case_causes, isFilterable:true},
         caseType:{label:"案件类型",
         type:"label",data:case_types, isFilterable:true},
-        caseBelong:{label:"所属项目",
+        caseProject:{label:"所属项目",
         type:"label",data:projects, isFilterable:true},
         caseApplicant:{label:"申请人",matchKey:"id",valueKey:"name",
         type:"label", isFilterable:true,isHidden:true},
@@ -290,7 +290,7 @@ var _summary_template;
         caseName:{label:"案件名称"},
         caseReason:{label:"案由",data:resourceDatas.caseReason},
         caseType:{label:"案件类型",data:resourceDatas.caseType},
-        caseBelong:{label:"所属项目",data:resourceDatas.projects},
+        caseProject:{label:"所属项目",data:resourceDatas.projects},
         caseApplicant:{label:"申请人",},
         caseCreateDate:{label:"创建时间"},
     }
@@ -663,9 +663,9 @@ var _summary_template;
                     label:"案件标签:",
                     type:"combobox",
                     isOptional:false,
-                    data:resourceDatas.caseLabel
+                    data:resourceDatas.caseLabels
                 },
-                caseBelong:{
+                caseProject:{
                     label:"所属项目:",
                     data:resourceDatas.projects
                 },

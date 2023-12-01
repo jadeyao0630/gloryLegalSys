@@ -95,7 +95,8 @@ $('body').on('dataLoaded',function(data){
             resourceDatas['lawFirms'].forEach((lawFirms,index)=>{
                 var _d=[];
                 data.value['attorneys'].filter((attorney) => attorney.lawFirm==index).forEach((attorney)=>{
-                    _d.push(attorney.name);
+                    attorney['value']=lawFirms+attorney.id;
+                    _d.push(attorney);
                 });
                 _data[lawFirms]=_d;
             });
@@ -106,16 +107,16 @@ $('body').on('dataLoaded',function(data){
             resourceDatas['counselTitles'].forEach((title,index)=>{
                 var _d=[];
                 data.value['legalCounsels'].filter((counsels) => counsels.title==index).forEach((counsel)=>{
-                    _d.push(counsel.name+
-                        " "+counsel.contact+
-                    " "+resourceDatas['legalInstitution'][counsel.institution]);
+                    counsel['value']=title+counsel.id;
+                    _d.push(counsel);
                 });
                 _data[title]=_d;//data.value['legalCounsels'].filter((counsels) => counsels.title==index);
             });
             
             case_orgnizationPersonnel=_data;
             resourceDatas['legalCounsels']=_data;
-
+            console.log('legalCounsels');
+            console.log(_data);
             
             caseRelatedParty=casePersonnel;
             //console.log(casePersonnel);

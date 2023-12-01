@@ -187,55 +187,88 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                     var label=_summary_template[key].data[sub_key].label;
                     
                     var val=_data[data_key][sub_key];
-                    console.log(_data);
-                    console.log(data_key+"-->"+sub_key+"--->"+val);
+                    //console.log(_data);
+                    
                     var isMultiValue=false;
                     var multiValues=[];
                     if(data!=undefined){
-                        
+                        //console.log(data);
                         if(data instanceof Array){
                             var v=val.toString().split('.');
+                            //console.log(v);
                             if(v.length>1){
                                 val=data[v[0]][v[1]];
                             }else if(v.length==1){
+                                
                                 val=data[v[0]];
                             }
                         }
                         else{
-                            var data_keys=Object.keys(data);
-                            
+                            isMultiValue=true;
                             var values=val.split(",");
-                            if(data_keys.length>0){
-                                isMultiValue=true;
-                                data_keys.forEach(dk=>{
-                                    values.forEach(val=>{
-                                        if(val.includes(dk)){
-                                            multiValues.push(data[dk][parseInt(val.replace(dk,""))]);
+                            $.each(data,(k,v)=>{
+                                console.log(v);
+                                
+                                if(v instanceof Array){
+                                    v.forEach((_val,index)=>{
+                                        if(_val instanceof Object){
+                                            if(values.includes(_val.value)){
+                                                multiValues.push(_val.name);
+                                            }
+                                        }else{
+                                            
+                                            
                                         }
                                     });
-                                });
-                                val=multiValues.join(", ");
-                            }
+                                    if(multiValues.length==0){
+                                        values.forEach(_v=>{
+                                            console.log(_v.indexOf(k));
+                                            if(_v.indexOf(k)>-1){
+                                                multiValues.push(data[k][parseInt(_v.replace(k,""))]);
+                                                return false;
+                                            }
+                                               
+                                        });
+                                    }
+                                    //console.log(values);
+                                    
+                                }else{
+                                    //console.log();
+                                    
+                                }
+                                
+                            })
+                            
                         }
                     }
+                    console.log(data_key+"-->"+sub_key+"--->"+multiValues+"------------------");
                     if(isMultiValue){
                         var _collapsibleset=$('<div data-role="collapsible" data-theme="a" data-iconpos="right" data-inset="false" class="collapsible-listview" style="border:none;margin-right:-45px;" data-collapsed-icon="carat-d" data-expanded-icon="carat-u"></div>');
                         var _collapsibleLabel=$('<h4 class="ui-field-contain" style="margin:0px;border:none;"><div style="display:grid;grid-template-columns: auto 1fr;column-gap: 9px;margin-left:-3px"><label style="margin-top:2px;margin-bottom:-2px;">'+
-                            label+'</label><label style="margin-top:2px;margin-bottom:-2px;">'+val+'</label></div><span class="ui-li-count">'+multiValues.length+'</span></h4>');
+                            label+'</label><label style="margin-top:2px;margin-bottom:-2px;">'+multiValues.join(",")+'</label></div><span class="ui-li-count">'+multiValues.length+'</span></h4>');
                         _collapsibleset.append(_collapsibleLabel);
                         var _listview=$('<ol data-role="listview" data-theme="b"> </ol>');
                         _collapsibleset.append(_listview);
-                        multiValues.forEach(v=>{
-                            var _li=$('<li class="ui-field-contain"></li>');
-                            var _info_ele=$('<label>'+v+'</label>');
-                            _li.append(_info_ele);
-                            _listview.append(_li);
-                        });
-                        var label_ele=$('<label>'+label+'</label>');
-                        var li=$('<li class="ui-field-contain" style="padding-top:0px;padding-bottom:0px;border:none;"></li>');
-                        //li.append(label_ele);
-                        li.append(_collapsibleset);
-                        listview.append(li);
+                        if(multiValues.length>1){
+                            multiValues.forEach(v=>{
+                                var _li=$('<li class="ui-field-contain"></li>');
+                                var _info_ele=$('<label>'+v+'</label>');
+                                _li.append(_info_ele);
+                                _listview.append(_li);
+                            });
+                            var label_ele=$('<label>'+label+'</label>');
+                            var li=$('<li class="ui-field-contain" style="padding-top:0px;padding-bottom:0px;border:none;"></li>');
+                            //li.append(label_ele);
+                            li.append(_collapsibleset);
+                            listview.append(li);
+                        }else{
+                            var label_ele=$('<label>'+label+'</label>');
+                            var li=$('<li class="ui-field-contain"></li>');
+                            li.append(label_ele);
+                            li.append('<label>'+multiValues[0]+'</label>');
+                            listview.append(li);
+                        }
+                        
                         //console.log('listview.html()');
                         //console.log(listview.html());
                     }else{

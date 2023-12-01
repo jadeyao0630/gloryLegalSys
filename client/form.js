@@ -252,8 +252,32 @@ mform.prototype={
                             tips.push(key);
                             var grounp=$('<optgroup label="'+key+'"></optgroup>')
                             value.forEach((d,counter)=>{
-                                //console.log(d)
-                                grounp.append($('<option value="'+key+counter+'">'+d+'</option>'));
+                                console.log(d)
+                                console.log((d.constructor === Object))
+                                if(d.constructor === Object){//'{name} {contact} {institution}'
+                                    var label="";
+                                    if(item.hasOwnProperty('displayFormat')){
+                                        var displayFormat=item.displayFormat;
+                                        $.each(d,(kk,vv)=>{
+                                            console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                                            if(item.displayFormat.indexOf(kk)>-1){
+                                                displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                            }
+                                        })
+                                        label=displayFormat;
+                                    }else{
+                                        var collector=[];
+                                        $.each(d,(kk,vv)=>{
+                                            collector.push(vv);
+                                        })
+                                        label=collector.join(" ");
+                                    }
+                                    var _value=d.hasOwnProperty('value')?d.value:key+counter;
+                                    grounp.append($('<option value="'+_value+'">'+label+'</option>'));
+                                }else{
+
+                                    grounp.append($('<option value="'+key+counter+'">'+d+'</option>'));
+                                }
                             });
                             selectItem.append(grounp);
                         }
@@ -563,7 +587,7 @@ $.fn.extend({
                 //console.log(id+"--->"+value+"--"+(value!=undefined));
                 //console.log(id+"--->"+value+"--"+(Number.isInteger(value)||value.length>0));
                 if(value!=null&&value!=undefined&&(Number.isInteger(value)||value.length>0)){
-                    console.log(id+"--->"+Number(value));
+                    //console.log(id+"--->"+Number.isInteger(value));
                     if(Number.isInteger(value)){
                         var ele=$(element).find("option[value="+value+"]");
                         if(ele.length>0){
@@ -573,7 +597,10 @@ $.fn.extend({
                             
                     }else{
                         value.split(",").forEach((v)=>{
+                            //console.log(id+"--->"+v);
                             var ele=$(element).find("option[value="+v+"]");
+                            //console.log($(element).html());
+                            //console.log(ele);
                             ele.prop('selected',true);
                             _values.push(ele.text());
                         });
@@ -612,6 +639,7 @@ $.fn.extend({
         if(template==undefined) template=this.template;
         var _Self=$(this);
         const values={"id":dataId};
+        var vals={};
         var catelogs=Object.keys(template);
         var _hasError=false;
         loop1:
@@ -627,10 +655,20 @@ $.fn.extend({
                     if(catelog.data[item_key].type.toLowerCase()=='radio'){
                         //console.log(item_key);
                         //console.log(_Self.find('input[name="'+item_key+'"]:checked'));
-                        values[item_key]=parseInt(_Self.find('input[name="'+item_key+'"]:checked').prop('id').replace(item_key+"-",""));
+                        var val=parseInt(_Self.find('input[name="'+item_key+'"]:checked').prop('id').replace(item_key+"-",""));
+                        if(catelog.data[item_key].table!=undefined){
+                            if(!vals.hasOwnProperty(catelog.data[item_key].table)){
+                                vals[catelog.data[item_key].table]={};
+                            }
+                            vals[catelog.data[item_key].table][item_key]=val;
+                        }else{
+                            values[item_key]=val;
+                        }
+                        
                     }else{
+                        console.log(item_key);
                         var element=document.getElementById(item_key);
-                        values[item_key]= dataValidation(element,catelog.data[item_key],function(he){
+                        var val = dataValidation(element,catelog.data[item_key],function(he){
                             if(he) {
                                 response(error.FORM_EMPTY_VALUE,{data:values,success:!he});
                                 _hasError=true;
@@ -639,6 +677,15 @@ $.fn.extend({
                             }
                             //console.log(item_key+"-->"+hasError);
                         });
+                        console.log(item_key+"--->>"+catelog.data[item_key].table);
+                        if(catelog.data[item_key].table!=undefined){
+                            if(!vals.hasOwnProperty(catelog.data[item_key].table)){
+                                vals[catelog.data[item_key].table]={};
+                            }
+                            vals[catelog.data[item_key].table][item_key]=val;
+                        }else{
+                            values[item_key]=val;
+                        }
                     }
                     console.log(item_key+"-->"+hasError);
                     if(hasError) {
@@ -660,8 +707,8 @@ $.fn.extend({
         }
         */
         //response(hasError,values);
-        
-        response(error.FORM_VALIDATION_COMPLETED,{data:values,success:!_hasError});
+        vals.values=values;
+        response(error.FORM_VALIDATION_COMPLETED,{data:vals,success:!_hasError});
         function dataValidation(element,itemTemplate,res){
             var hasError=false;
             var val=element.value;

@@ -92,7 +92,8 @@ var _summary_template;
                         label:"附件:",
                         type:"file",
                         isOptional:true,
-                        data:"支持扩展名：rar. zip. doc. docx. pdf. jpg… 单个文件不超过200MB"
+                        data:"支持扩展名：rar. zip. doc. docx. pdf. jpg… 单个文件不超过200MB",
+                        table:'caseAttachments'
                     }
                 }
                 
@@ -115,54 +116,62 @@ var _summary_template;
                         isOptional:false,
                         data:resourceDatas.caseReason
                     },
-                    caseOrgnization:{
+                    legalInstitution:{
                         placeholder:"受理机构",
                         label:"受理机构:",
                         type:"combobox",
                         isOptional:false,
-                        data:resourceDatas.legalInstitution
+                        data:resourceDatas.legalInstitution,
+                        table:'caseStatus'
                     },
-                    caseOrgnizationPersonnel:{
+                    legalCounsel:{
                         placeholder:"受理相关人",
                         label:"受理相关人:",
                         type:"multicombobox",
                         isOptional:true,
                         data:resourceDatas.legalCounsels,
-                        isFilterable:true 
+                        isFilterable:true,
+                        table:'caseStatus',
+                        displayFormat:'{name} {contact}'//'{name} {contact} {institution}'
                     },
-                    caseLawsuit:{
+                    requestAmount:{
                         placeholder:"本诉金额",
                         label:"本诉金额(万元):",
                         type:"text",
                         isOptional:true,
                         numberOnly:true,
-                        defaultValue:0.0
+                        defaultValue:0.0,
+                        table:'caseStatus'
                     },
-                    caseCounterclaim:{
+                    appealAmount:{
                         placeholder:"反诉金额",
                         label:"反诉金额(万元):",
                         type:"text",
                         isOptional:true,
                         numberOnly:true,
-                        defaultValue:0.0
+                        defaultValue:0.0,
+                        table:'caseStatus'
                     },
                     caseLawsuitRequest:{
                         placeholder:"本诉请求",
                         label:"本诉请求:",
                         type:"textarea",
                         isOptional:true,
+                        table:'caseStatus'
                     },
                     caseCounterclaimRequest:{
                         placeholder:"反诉请求",
                         label:"反诉请求:",
                         type:"textarea",
                         isOptional:true,
+                        table:'caseStatus'
                     },
                     caseSum:{
                         placeholder:"案件摘要",
                         label:"案件摘要:",
                         type:"textarea",
                         isOptional:true,
+                        table:'caseStatus'
                     },
                 }
             }
@@ -443,14 +452,14 @@ var _summary_template;
                         isOptional:false,
                         data:resourceDatas.caseReason
                     },
-                    caseOrgnization:{
+                    legalInstitution:{
                         placeholder:"受理机构",
                         label:"受理机构:",
                         type:"combobox",
                         isOptional:false,
                         data:resourceDatas.legalInstitution
                     },
-                    caseOrgnizationPersonnel:{
+                    legalCounsel:{
                         placeholder:"受理相关人",
                         label:"受理相关人:",
                         type:"multicombobox",
@@ -507,13 +516,13 @@ var _summary_template;
             isCollapsibleGrouping:false,
         },
         template:{
-          court:{
+          legalInstitution:{
                 type:"combobox",
                 data:resourceDatas.legalInstitution,
                 label:"法院：",
                 isOptional:true,
             },
-            legalPersonnel:{
+            legalAgencies:{
                 type:"combobox",
                 data:resourceDatas.legalAgencies,
                 label:"代理法务：",
@@ -552,18 +561,24 @@ var _summary_template;
           label:"开庭日期："
         },
         */
-        courtName:{
+        legalInstitution:{
           type:"text",
           label:"法院："
         },
-        caseLegal:{
+        legalAgencies:{
           label:"代理法务：",
           type:"combobox",
           data:resourceDatas.legalAgencies,
         },
-        caseLawfirm:{
+        lawFirm:{
           type:"text",
-          label:"代理律所："
+          label:"代理律所：",
+          data:resourceDatas.lawFirms,
+        },
+        attorney:{
+          type:"text",
+          label:"代理律所：",
+          data:resourceDatas.attorneys,
         },
         penaltyAmount:{
           type:"text",
@@ -710,16 +725,25 @@ var _summary_template;
         legal:{
             label:"法律信息",
             data:{
-                caseLegal:{
+              legalAgencies:{
                     label:"代理法务:",
+                    data:resourceDatas.legalAgencies,
                 },
-                courtName:{
+                legalInstitution:{
                     label:"受理法院:",
                     data:resourceDatas.legalInstitution
                 },
-                caseOrgnizationPersonnel:{
+                legalCounsel:{
                     label:"受理相关人:",
                     data:resourceDatas.legalCounsels
+                },
+                lawFirm:{
+                    label:"代理律所:",
+                    data:resourceDatas.lawFirms
+                },
+                attorney:{
+                    label:"代理律师:",
+                    data:resourceDatas.attorneys
                 }
             }
             
@@ -727,16 +751,16 @@ var _summary_template;
         sum:{
             label:"金额信息",
             data:{
-                caseLawsuit:{
+              appealAmount:{
                     label:"本诉金额:",
                 },
-                caseCounterclaim:{
+                requestAmount:{
                     label:"反诉金额:",
                 },
-                penaltyAmount:{
+                penalty:{
                     label:"判决金额:",
                 },
-                exexuteAmount:{
+                paidAmount:{
                     label:"执行金额:",
                 },
             }
@@ -744,7 +768,7 @@ var _summary_template;
         summary:{
             label:"详细信息",
             data:{
-                caseLawsuitRequest:{
+              caseLawsuitRequest:{
                     placeholder:"本诉请求",
                     label:"本诉请求:",
                     type:"textarea",

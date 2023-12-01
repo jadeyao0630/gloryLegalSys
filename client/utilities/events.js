@@ -116,6 +116,8 @@ function addClickEvents(main_form,r){
                 
                 break;
             case '查看':
+                console.log('查看');
+                console.log(matchedData);
                 showProgressDetails(matchedMainData,matchedData);
                 break;
         }
@@ -363,10 +365,11 @@ function addClickEvents(main_form,r){
         if($(this).text()=="保存"){
             //console.log("保存");
             console.log($(pageOnTable).html())
-            main_form.instance.getValues(getGlobal("currentId"),FormTemplate.template,function(message,values){
+            main_form.instance.getValues(getGlobal("currentId"),FormTemplate3.template,function(message,values){
                 if(values.success){
                     console.log(message.message);
-                    values.data["caseCreateDate"]=getDateTime();
+                    console.log(values.data);
+                    values.data.values["caseCreateDate"]=getDateTime();
                     //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
                     if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
                         $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
@@ -374,12 +377,12 @@ function addClickEvents(main_form,r){
                             window.location.href = 'index.html';
                         });
                     }else{
-                        values.data["caseApplicant"]=getGlobalJson("currentUser").id;
-                        values.data["isReadOnly"]=_isReadOnlyCurrentForm();
+                        values.data.values["caseApplicant"]=getGlobalJson("currentUser").id;
+                        values.data.values["isReadOnly"]=_isReadOnlyCurrentForm();
                         
                         $().mloader('show',{message:"保存中..."});
                         //console.log(values.data);
-                        insertCase(values.data,function(r){
+                        insertCase(values.data.values,function(r){
                             //console.log(r);
                             if(r.success){
                                 console.log("修改添加成功。");

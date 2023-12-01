@@ -510,36 +510,38 @@ var _summary_template;
           court:{
                 type:"combobox",
                 data:resourceDatas.legalInstitution,
-            label:"法院：",
-            isOptional:true,
+                label:"法院：",
+                isOptional:true,
             },
             legalPersonnel:{
                 type:"combobox",
                 data:resourceDatas.legalAgencies,
-            label:"代理法务：",
-            isOptional:true,
+                label:"代理法务：",
+                isOptional:true,
             },
             lawFirm:{
                 type:"combobox",
                 data:resourceDatas.lawFirms,
-            label:"代理律所：",
-            isOptional:true,
+                label:"代理律所：",
+                isOptional:true,
             },
             attorney:{
                 type:"multicombobox",
                 data:resourceDatas.attorneys,
-            label:"代理律师：",
-            isOptional:true,
+                label:"代理律师：",
+                isOptional:true,
             },
             penalty:{
-            type:"text",
-            label:"判决金额(万)：",
-            isOptional:true,
+                type:"text",
+                label:"判决金额(万)：",
+                isOptional:true,
+                defaultValue:0.0
             },
-            paidAmount:{
-            type:"text",
-            label:"执行金额(万)：",
-            isOptional:true,
+                paidAmount:{
+                type:"text",
+                label:"执行金额(万)：",
+                isOptional:true,
+                defaultValue:0.0
             },
         }
       }

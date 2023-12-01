@@ -344,18 +344,18 @@
 			<div id="progress_diagram" style="display: inline;text-align: center;vertical-align: middle;margin-top: 20px;"></div>
 			
 		</div>
-		<div data-role="popup" id="progress_popupMenu" data-theme="a" style="z-index: 99;">
-			<ul data-role="listview" data-inset="true" style="min-width:210px;">
-				<li data-role="list-divider">请选择操作</li>
+		<div data-role="popup" id="progress_popupMenu" data-theme="a">
+			<ul data-role="listview" data-inset="false" style="min-width:210px;">
+				<li data-role="list-divider" id="progress_popupMenu_title">请选择操作</li>
 				<li><a href="#">查看</a></li>
-				<li>
-					<div data-role="collapsible" data-inset="false" style="margin:0px;">
+				<li style="margin:0px 0px;" id="progress_popupMenu_add">
+					<div data-role="collapsible" data-inset="false"  style="margin:-20px;" data-iconpos="right" data-theme="b" data-content-theme="a">
 						<h2>添加</h2>
 						<ul data-role="listview">
-							<li><a href="#" data-rel="dialog">进展</a></li>
-							<li><a href="#" data-rel="dialog">执行</a></li>
-							<li><a href="#" data-rel="dialog">财产</a></li>
-							<li><a href="#" data-rel="dialog">附件</a></li>
+							<li><a href="#">进展</a></li>
+							<li><a href="#">执行</a></li>
+							<li><a href="#">财产</a></li>
+							<li><a href="#">附件</a></li>
 						</ul>
 					</div>
 				</li>

@@ -107,6 +107,13 @@ var main_form,pageOnTable,pageSeTable;
 			$("#pageSecondTable").jqmData('filter',getGlobal('currentPage')=="#page2");
 			$("#pageOneTable").jqmData('filter',getGlobal('currentPage')=="#page1");			
 		});
+		$("#progress_popupMenu").popup({
+			afterclose:function(event,ui){
+				$(this).find('[data-role="collapsible"]').collapsible({
+					collapsed: true
+				  });
+			}
+		})
 		function getCurrentPageTabBtn(pageId){
 			var btns=$('#main_nav').find('button[href="'+pageId+'"]');
 			if(btns.length>0) return btns[0];
@@ -178,13 +185,28 @@ var main_form,pageOnTable,pageSeTable;
 					
 				}
 				cas['isReadOnly']=true;
+				//cas['isReadOnly']=true;
 				cas['caseDate']=getDateTime();
 				cas['caseCreateDate']=getDateTime();
 				//console.log(cas['id']+"---"+val.join(','));
-				insert('cases',cas,(e)=>{
+				//insert('cases',cas,(e)=>{
+					//console.log(e);
+				//})	
+				var status_data={
+					id:cas.id,
+					caseNo:cas.caseNo,
+					caseStatus:cas.id<67?2.0:4.1,
+					legalPersonnel:1,
+					lawFirm:0,
+					attorney:"无0",
+					FirstInstance:getDateTime(),
+					SecondInstance:getDateTime(),
+					court:1,
+
+				}
+				insert('caseStatus',status_data,(e)=>{
 					console.log(e);
 				})	
-				
 			});
 			return data;
 		}

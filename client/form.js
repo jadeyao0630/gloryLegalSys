@@ -246,13 +246,18 @@ mform.prototype={
                     var opt_tip=$('<option></option>');
                     var tips=[];
                     $.each(item.data,function (key,value) {
-                        tips.push(key);
-                        var grounp=$('<optgroup label="'+key+'"></optgroup>')
-                        value.forEach((d,counter)=>{
-                            //console.log(d)
-                            grounp.append($('<option value="'+key+counter+'">'+d+'</option>'));
-                        });
-                        selectItem.append(grounp);
+                        if(key=="无"){
+                            selectItem.append($('<option value="'+key+0+'">'+key+'</option>'));
+                        }else{
+                            tips.push(key);
+                            var grounp=$('<optgroup label="'+key+'"></optgroup>')
+                            value.forEach((d,counter)=>{
+                                //console.log(d)
+                                grounp.append($('<option value="'+key+counter+'">'+d+'</option>'));
+                            });
+                            selectItem.append(grounp);
+                        }
+                        
                     })
                     opt_tip.text("选择 "+tips.join(" 或 "));
                 }
@@ -362,6 +367,9 @@ mform.prototype={
                 // Place the form before the listview in the dialog.
                 if($(listview).parent().find('#searchInput').length==0)
                     listview.before( form );
+                
+                //listview.trigger('create').listview().listview( "refresh" );
+                //listview.parent().trigger('create');
 /*
                 var controlgroup=$('<div data-role="controlgroup" data-type="horizontal"></div>');
                 var select=$('<select>'+
@@ -551,12 +559,33 @@ $.fn.extend({
             }else if(type=="multicombobox"){
                 var _values=[];
                 $(element).find("option").prop('selected',false);
-                if(value!=null&&value!=undefined&&value.length>0){
-                    value.split(",").forEach((v)=>{
-                        var ele=$(element).find("option[value="+v+"]");
-                        ele.prop('selected',true);
-                        _values.push(ele.text());
-                    });
+                //console.log(id+"--->"+value+"--"+(value!=null));
+                //console.log(id+"--->"+value+"--"+(value!=undefined));
+                //console.log(id+"--->"+value+"--"+(Number.isInteger(value)||value.length>0));
+                if(value!=null&&value!=undefined&&(Number.isInteger(value)||value.length>0)){
+                    console.log(id+"--->"+Number(value));
+                    if(Number.isInteger(value)){
+                        var ele=$(element).find("option[value="+value+"]");
+                        if(ele.length>0){
+                            ele.prop('selected',true);
+                            _values.push(ele.text());
+                        }
+                            
+                    }else{
+                        value.split(",").forEach((v)=>{
+                            var ele=$(element).find("option[value="+v+"]");
+                            ele.prop('selected',true);
+                            _values.push(ele.text());
+                        });
+
+                    }
+                    
+                }else{
+                    var ele=$(element).find("option[value='无0']");
+                        if(ele.length>0){
+                            ele.prop('selected',true);
+                            _values.push(ele.text());
+                        }
                 }
                 _self.find("#_"+id).html(_values.join("<br/>"));
                 element.selectmenu().selectmenu("refresh").trigger("change");

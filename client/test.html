@@ -24,7 +24,6 @@
         }
         .ui-listview > .ui-li-static{
             padding:0px;
-            background-color: aqua;
             margin:0px;
             border:none;
             width:100%;
@@ -36,6 +35,9 @@
       border-radius: 0;
       width:80px;
     }
+    .spaceSpan::after {
+  content: "\00a0"; /* Unicode character for non-breaking space */
+}
     </style>
 </head>
 <body>
@@ -87,7 +89,8 @@ function getValue(element){
                     valueId:$(opt).val(),
                     catelog:$(l).jqmData('group'),
                     catelogId:$(l).jqmData('group-id')
-                })
+                });
+                //if(isSetData2MainSelect) $(opt)
             }
         });
     });
@@ -95,6 +98,31 @@ function getValue(element){
     return values;
     //button_span.find('span').text(datas.join(','));
 
+}
+function formatValue(element,format){//"[{catelog}] {value} ({status})"
+    var datas=getValue($(element));
+    var collector=[];
+    
+    datas.forEach((data)=>{
+        var catelog=data.catelog;
+        var value=data.value;
+        var status=data.status;
+        if(format!=undefined){
+            if(format.indexOf('{catelog}')>-1) format=format.replace('{catelog}',catelog);
+            if(format.indexOf('{value}')>-1) format=format.replace('{value}',value);
+            if(format.indexOf('{status}')>-1) format=format.replace('{status}',status);
+        }else{
+            format=`[${data.catelog}] ${data.value} (${data.status})`;
+        }
+        collector.push(format);
+    });
+    if(collector.length>0){
+        $(element+'-button').find('span').first().text(collector.join(','));
+        $(element+'-button').find('span').last().text(collector.length);
+    }else{
+        $(element+'-button').find('span').first().html('&nbsp;');
+        $(element+'-button').find('span').last().text(collector.length);
+    }
 }
 function checkIfMainSelectChecked(element,id4check){
     var val=false;
@@ -112,16 +140,23 @@ function checkIfMainSelectChecked(element,id4check){
         console.log($('#multiselect-listbox'));
             var _this=$('#multiselect-listbox');
             _this.popup({
-  afterclose: function( event, ui ) {
-    console.log("closed");
-    var datas=getValue($('#multiselect'));
-
-    datas.forEach((data)=>{
-
-    });
-  }
-});
-            console.log(_this.html());
+                afterclose: function( event, ui ) {
+                    console.log("closed");
+                    var datas=getValue($('#multiselect'));
+                    var options=$('#multiselect').find('option');
+                    options.prop('selected',false);
+                    datas.forEach((data)=>{
+                        $.each(options,function(ii,opt){
+                            if(data.valueId==$(opt).val()) {
+                                $(opt).prop('selected',true);
+                                console.log($(opt));
+                            }
+                        });
+                    });
+                    console.log($('#multiselect').html());
+                }
+            });
+            //console.log(_this.html());
             var aList=$(this).find("li");
             _this.children().remove();
             //aList.remove();
@@ -147,12 +182,15 @@ function checkIfMainSelectChecked(element,id4check){
                                 '<option class="sub-option" value=4 >执行人</option>'+
                             '</select>');
                         controlgroup.append(select);
+                        
                         select.trigger('create').selectmenu().selectmenu('refresh');
                         controlgroup.append(a);
                         if(checkIfMainSelectChecked('#multiselect',count)){
-                            $(this).removeClass('ui-checkbox-off').addClass('ui-checkbox-on');
+                            $(a).removeClass('ui-checkbox-off').addClass('ui-checkbox-on');
+                            select.prop('disabled',false);
                         }else{
                             $(a).removeClass('ui-checkbox-on').addClass('ui-checkbox-off');
+                            select.prop('disabled',true);
                         }
                         li.append(controlgroup);
                         _this.append(li);
@@ -166,26 +204,15 @@ function checkIfMainSelectChecked(element,id4check){
                                 $(this).removeClass('ui-checkbox-on').addClass('ui-checkbox-off');
                                 li.attr("aria-selected" , false);
 
+                                select.prop('disabled',true);
                             }else{
                                 $(this).removeClass('ui-checkbox-off').addClass('ui-checkbox-on');
-                                
+                                select.prop('disabled',false);
                                 li.attr("aria-selected" , true);
                             }
                             //console.log($('#multiselect').find(':selected').text().join(","));
-                            var datas=getValue($('#multiselect'));
-                            var collector=[];
-                            datas.forEach((data)=>{
-                                collector.push(`[${data.catelog}] ${data.value} (${data.status})`);
-                            });
-                            if(collector.length>0){
-                                $('#multiselect-button').find('span').first().text(collector.join(','));
-                                $('#multiselect-button').find('span').last().text(collector.length);
-                            }else{
-                                $('#multiselect-button').find('span').first().html('');
-                                $('#multiselect-button').find('span').last().text(collector.length);
-                            }
-                            //console.log(datas.join(','));
-                            //console.log(collector.join(','));
+                            formatValue('#multiselect',"{value} ({status})");
+                            
                         })
                         select.change(function () {
                             var optionSelected = $(this).find('option:selected');
@@ -193,18 +220,7 @@ function checkIfMainSelectChecked(element,id4check){
                             var optValueSelected = optionSelected.val();
                             console.log(_this.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]'));
                             if(_this.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]').attr('aria-selected')){
-                                var datas=getValue($('#multiselect'));
-                                var collector=[];
-                                datas.forEach((data)=>{
-                                    collector.push(`[${data.catelog}] ${data.value} (${data.status})`);
-                                });
-                                if(collector.length>0){
-                                    $('#multiselect-button').find('span').first().text(collector.join(','));
-                                    $('#multiselect-button').find('span').last().text(collector.length);
-                                }else{
-                                    $('#multiselect-button').find('span').first().html('');
-                                    $('#multiselect-button').find('span').last().text(collector.length);
-                                }//$('#multiselect-button').find('span').text(datas.join(','));
+                                formatValue('#multiselect',"{value} ({status})");
                             }
                             //console.log(optValueSelected);
                         });
@@ -213,18 +229,7 @@ function checkIfMainSelectChecked(element,id4check){
                     
                 });
                 _this.attr("aria-labelledby" ,"multiselect-button");
-                var datas=getValue($('#multiselect'));
-                var collector=[];
-                datas.forEach((data)=>{
-                    collector.push(`[${data.catelog}] ${data.value} (${data.status})`);
-                });
-                if(collector.length>0){
-                    $('#multiselect-button').find('span').first().text(collector.join(','));
-                    $('#multiselect-button').find('span').last().text(collector.length);
-                }else{
-                    $('#multiselect-button').find('span').first().html('');
-                    $('#multiselect-button').find('span').last().text(collector.length);
-                }
+                formatValue('#multiselect',"{value} ({status})");
                 _this.trigger('create').listview().listview( "refresh" );
                 console.log(_this.html());
                 $('#multiselect-listbox').find("a").on("click", function (event) {

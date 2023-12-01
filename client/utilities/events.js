@@ -1,5 +1,6 @@
 function addClickEvents(main_form,r){
-    var progressInfoForm, but;
+    var progressInfoForm;
+    var currentProgress={};
     //#region 全局功能按钮
     var list=['corporateCompanies'];
     //list=undefined;
@@ -21,6 +22,14 @@ function addClickEvents(main_form,r){
 
     //#region page 2 checkbox
     setCheckAllBox($('#mainFooter').find('input[type="checkbox"]'),'pageSecondTable');
+    $('#progress_popupMenu').find('a').on('click',function(e){
+        $('#progress_popupMenu').popup('close');
+        switch($(this).text()){
+            case '查看':
+                $( "#update_panel" ).panel( "open" );
+                break;
+        }
+    })
     $('#pageSecondTable').find('.table-fn-btn').on('click',function(e){
         console.log($(this).jqmData('index')+"---"+$(this).text());
         var index=$(this).jqmData('index');
@@ -28,10 +37,13 @@ function addClickEvents(main_form,r){
         var matchedMainData=r.filter((d)=>d.id==index);
         switch($(this).text()){
             case '编辑':
+                $().mloader("show",{message:"读取中...."});
                 $("#progress_details").empty();
-                
+                $("#progress_diagram").empty();
+                setGlobal("currentId",index);
                 progressInfoForm=_createNewCaseForm(progress_form_template,"progress_details");
                 
+                $.mobile.navigate( '#progress');
                 if(matchedMainData.length>0){
                     console.log(matchedMainData[0].caseNo);
                     if(matchedMainData[0].isReadOnly) {
@@ -42,46 +54,69 @@ function addClickEvents(main_form,r){
                         $("#progress_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+matchedMainData[0]['caseNo']);
                         $('.edit-header-btn[name="save_btn"').show();
                     }
-                    //$('#progress_title').text(matchedMainData[0]['caseNo']);
+                    var status_val=-1;
+                    var data3=[{}];
+                    var data4=[{}];
                     if(matchedData.length>0){
-                    
                         progressInfoForm.setData(matchedData[0]).readOnly(matchedMainData[0].isReadOnly);
-                        var data3=table_progress_executes.filter((d)=>d.id==index);
-                        var data4=table_progress_updates;
-                        $("#progress_diagram").empty().filter((d)=>d.id==index);
-                        but=new ProgressesButton({
-                            steps:progresses,
-                            deadSteps:deads,
-                            showLabel:true,
-                            containerId:'#progress_diagram',
-                            currentPosition:Number(matchedData[0].caseStatus),
-                            fontSize:15,
-                            line_size:4,
-                            size:30,
-                            width:840,
-                            hasShadow:true,
-                            isViewMode:true,
-                            //verticalGap:2,
-                            //labelPosition:"bottom",
-                            showSubSteps:true,
-                            readOnly:matchedData[0].isReadOnly,
-                            showCounter:true,
-                            counterData:data3.concat(data4),
-                        });
-                        $(but.instance).on("itemOnClicked",  function (e){
-                            console.log(e);
-                            //$( "#update_panel" ).panel( "open" );
-                            $("#progress_popupMenu").popup('open');
-                            $("#progress_popupMenu").popup('reposition',{x:e.event.pageX,y:e.event.pageY});
-                            console.log($("#progress_popupMenu"));
-                        });
-                        $("#progress_diagram").trigger('create');
+                        data3=table_progress_executes.filter((d)=>d.id==index);
+                        data4=table_progress_updates.filter((d)=>d.id==index);
+                        //$("#progress_diagram").empty();
+                        status_val=Number(matchedData[0].caseStatus);
+                        
+                    }else{
+                        progressInfoForm.setEmptyData();
                     }
+                    var but=new ProgressesButton({
+                        steps:progresses,
+                        deadSteps:deads,
+                        showLabel:true,
+                        containerId:'#progress_diagram',
+                        currentPosition:status_val,
+                        fontSize:15,
+                        line_size:4,
+                        size:30,
+                        width:840,
+                        hasShadow:true,
+                        isViewMode:true,
+                        //verticalGap:2,
+                        //labelPosition:"bottom",
+                        showSubSteps:true,
+                        readOnly:matchedMainData[0].isReadOnly,
+                        showCounter:true,
+                        counterData:data3.concat(data4),
+                    });
+                    currentProgress['currentDiagramButton']=but;
+                    $(but.instance).on("itemOnClicked",  function (e){
+                        console.log(e);
+                        currentProgress['targetPosition']=e.position;
+                        currentProgress['originalPosition']=formatIndex(but.opt.currentPosition);
+                        currentProgress['isReadOnly']=matchedMainData[0].isReadOnly;
+                        
+
+                        //$( "#update_panel" ).panel( "open" );
+                        var title=progresses[e.Position.main] instanceof Array?progresses[e.Position.main][e.Position.sub]:progresses[e.Position.main];
+                        $("#progress_popupMenu_title").text('请选择对 '+title+' 的操作');
+                        if(matchedMainData[0].isReadOnly) $('#progress_popupMenu_add').hide();
+                        else $('#progress_popupMenu_add').show();
+                        $("#progress_popupMenu").trigger('create');
+                        $("#progress_popupMenu").popup('open');
+                        $("#progress_popupMenu").popup('reposition',{x:e.event.pageX,y:e.event.pageY});
+                        console.log($("#progress_popupMenu"));
+                    });
+                    $("#progress_diagram").trigger('create');
+                    $("#progress_details").trigger('create');
                 }
+                //setTimeout(function() {
+                    $().mloader("hide");
+                //},5000);
                 $("#progress_details").trigger('create');
                 
 
-                $.mobile.navigate( '#progress');
+                
+                break;
+            case '查看':
+                showProgressDetails(matchedMainData,matchedData);
                 break;
         }
     });
@@ -96,6 +131,7 @@ function addClickEvents(main_form,r){
             console.log(but.currentTarget.dataset.item+"--"+but.currentTarget.name);
             //console.log(table_data[fn_but.dataset.item]);
             var matchItems=r.filter((item) =>item.id == but.currentTarget.dataset.item);
+            var matchedData=getGlobalJson("mainDataStatus").filter((d)=>d.id==but.currentTarget.dataset.item);
             var caseNos=[];
             matchItems.forEach(_item=>{
                 caseNos.push(_item.caseNo);
@@ -125,8 +161,8 @@ function addClickEvents(main_form,r){
                     $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
                     setGlobal("currentId", matchItems[0].id);
                     //_setBlurBackgroundVisibility(true);
-                    
-                    //setTimeout(function() {
+                    $.mobile.navigate( $(_this).attr( "href" ));
+                    setTimeout(function() {
                         //console.log(matchItems[0]);
                         //main_form.setData(matchItems[0]);
                         //main_form.readOnly(false);
@@ -142,9 +178,9 @@ function addClickEvents(main_form,r){
                             $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
                             $('.edit-header-btn[name="save_btn"').show();
                         }
-                        $.mobile.navigate( $(_this).attr( "href" ));
+                        
                         $().mloader("hide");
-                    //}, 500);
+                    }, 500);
                     //$('.progress_lock.edit-info').removeClass('hide');
                     //_setFormReadOnly(data.isReadOnly);
                     //_setBlurBackgroundVisibility(true);
@@ -152,24 +188,8 @@ function addClickEvents(main_form,r){
                 }
                 //console.log($("#popup_form_main"));
             }else if(but.currentTarget.name=="fn_btn_details"){
-                if(matchItems.length>0){
-                    //window.location="./test/timeline.html"
-                    $("#summary_list").children().remove();
-                    if(matchItems.length>0){
-                        _data.basic=matchItems[0];
-                    }
-                    var canvas=document.getElementById('myCanvas');
-                    eventManager.setCanvas(canvas);
-                    var _ctx=canvas.getContext('2d');
-                    _ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    new timelinePage({template:_summary_template,data:_data,summaryListContainer:"#summary_list",canvas:canvas});
-                    $("#summary_list").trigger('create');
-                    $.mobile.navigate( "#timeline");
-                    //$("#page4").removeClass('hide');
-                    //$(getGlobal('currentPage')).addClass('hide');
-                    //_setFlowChart(table_progress_data,table_progress_status,table_progress_executes,table_progress_updates,matchItems[0].id);
-                }
-                //console.log($("#popup_form_main"));
+                showProgressDetails(matchItems,matchedData);
+                
             }
         
         })
@@ -195,14 +215,14 @@ function addClickEvents(main_form,r){
                 $("#reg_form_title").html("新增档案");
                 $('.edit-header-btn[name="save_btn"').show();
                 //_setBlurBackgroundVisibility(true);
-                
+                $.mobile.navigate( $(this).attr( "href" ));
                // main_form.readOnly(false).setEmptyData();
                     //$().mloader("hide");
-                //setTimeout(function() {
+                setTimeout(function() {
                     main_form.readOnly(false).setEmptyData();
-                    $.mobile.navigate( $(this).attr( "href" ));
+                    
                     $().mloader("hide");
-                //}, 500);
+                }, 500);
                 //main_form.setData(getGlobalJson("mainData")[0]);
                 //$("#fullscreenPage").trigger('create');
                 //main_form.instance.trigger('create');
@@ -244,7 +264,34 @@ function addClickEvents(main_form,r){
     //#endregion
 
     //#region 查看信息页面的按钮事件
-
+    function showProgressDetails(datas,stauts){
+        if(datas.length>0){
+            //window.location="./test/timeline.html"
+            $("#summary_list").children().remove();
+            if(datas.length>0){
+                _data.basic=datas[0];
+            }
+            if(datas[0].id>30){
+                if(stauts.length>0){
+                    _data.progressStatus=stauts[0];
+                }
+                _data.excuteStatus=[];
+                _data.propertyStatus=[];
+                _data.attachments=[];
+            }
+            
+            var canvas=document.getElementById('myCanvas');
+            eventManager.setCanvas(canvas);
+            var _ctx=canvas.getContext('2d');
+            _ctx.clearRect(0, 0, canvas.width, canvas.height);
+            new timelinePage({template:_summary_template,data:_data,summaryListContainer:"#summary_list",canvas:canvas});
+            $("#summary_list").trigger('create');
+            $.mobile.navigate( "#timeline");
+            //$("#page4").removeClass('hide');
+            //$(getGlobal('currentPage')).addClass('hide');
+            //_setFlowChart(table_progress_data,table_progress_status,table_progress_executes,table_progress_updates,matchItems[0].id);
+        }
+    }
     //只读锁按钮事件
     function lockEvent(e){
         var _this=this;
@@ -281,7 +328,8 @@ function addClickEvents(main_form,r){
                     if(_this.id=="reg_form_title"){
                         main_form.readOnly(datas[0].isReadOnly);
                     }else{
-
+                        progressInfoForm.readOnly(datas[0].isReadOnly);
+                        currentProgress['currentDiagramButton'].switchReadyOnly();
                     }
                     /*
                     $().mloader("show",{message:"保存中..."});

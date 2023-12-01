@@ -324,7 +324,7 @@
 					</div>
 				</div>
 			</div>
-		
+			
 	</div>
 	<div data-role="page" id="progress">
 		<div data-role="header" data-position="fixed">
@@ -344,7 +344,23 @@
 			<div id="progress_diagram" style="display: inline;text-align: center;vertical-align: middle;margin-top: 20px;"></div>
 			
 		</div>
-		
+		<div data-role="popup" id="progress_popupMenu" data-theme="a" style="z-index: 99;">
+			<ul data-role="listview" data-inset="true" style="min-width:210px;">
+				<li data-role="list-divider">请选择操作</li>
+				<li><a href="#">查看</a></li>
+				<li>
+					<div data-role="collapsible" data-inset="false" style="margin:0px;">
+						<h2>添加</h2>
+						<ul data-role="listview">
+							<li><a href="#" data-rel="dialog">进展</a></li>
+							<li><a href="#" data-rel="dialog">执行</a></li>
+							<li><a href="#" data-rel="dialog">财产</a></li>
+							<li><a href="#" data-rel="dialog">附件</a></li>
+						</ul>
+					</div>
+				</li>
+			</ul>
+		</div><!-- /collapsible -->
 	</div>
 	<!--首页读取界面-->
 	<div id="main-container">

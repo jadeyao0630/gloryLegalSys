@@ -70,7 +70,10 @@ function addClickEvents(main_form,r){
                         });
                         $(but.instance).on("itemOnClicked",  function (e){
                             console.log(e);
-                            $( "#update_panel" ).panel( "open" );
+                            //$( "#update_panel" ).panel( "open" );
+                            $("#progress_popupMenu").popup('open');
+                            $("#progress_popupMenu").popup('reposition',{x:e.event.pageX,y:e.event.pageY});
+                            console.log($("#progress_popupMenu"));
                         });
                         $("#progress_diagram").trigger('create');
                     }

@@ -353,7 +353,7 @@ ProgressesButton.prototype.init=function(arg){
         
         if(_this.opt.isViewMode&&$(e.currentTarget).data('canSelect')){
             $(_this.outter_frame).trigger({type:'itemOnClicked', Position:formatIndex($(e.currentTarget).data('main-index')),
-                        dataId:_this.dataId, target:$(e.currentTarget)});
+                        dataId:_this.dataId, target:$(e.currentTarget),event:e});
         }
         if($(e.currentTarget).data('canSelect')&&!_this.opt.isViewMode){
             //await _this.setProgress($(e.currentTarget).data('index'),_this.opt.duration);

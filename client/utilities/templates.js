@@ -240,7 +240,8 @@ var _summary_template;
                 rowButtons:{
                     type:"buttons",
                     data:[
-                        {label:'查看',clss:'ui-icon-eye btn-icon-green ui-btn-icon-notext'},
+                        {label:'查看',clss:'ui-icon-eye btn-icon-green ui-btn-icon-notext',href:"#"},
+                        {label:'编辑',clss:'ui-icon-edit btn-icon-blue ui-btn-icon-notext'},
                         {label:'删除',clss:'ui-icon-delete btn-icon-red ui-btn-icon-notext'},
                     ]
                 }
@@ -500,42 +501,42 @@ var _summary_template;
         settings:{
             hasLabel:true,
             hasPlaceHolder:true,
-            labelPosition:"top",
+            labelPosition:"left",
             width:"100%",
             textareaHeight:90,
             isCollapsibleGrouping:false,
         },
         template:{
-            courtName:{
+          court:{
                 type:"combobox",
                 data:resourceDatas.legalInstitution,
             label:"法院：",
             isOptional:true,
             },
-            caseLegal:{
+            legalPersonnel:{
                 type:"combobox",
                 data:resourceDatas.legalAgencies,
             label:"代理法务：",
             isOptional:true,
             },
-            caseLawfirm:{
+            lawFirm:{
                 type:"combobox",
                 data:resourceDatas.lawFirms,
             label:"代理律所：",
             isOptional:true,
             },
-            caseAttorney:{
+            attorney:{
                 type:"multicombobox",
                 data:resourceDatas.attorneys,
             label:"代理律师：",
             isOptional:true,
             },
-            penaltyAmount:{
+            penalty:{
             type:"text",
             label:"判决金额(万)：",
             isOptional:true,
             },
-            exexuteAmount:{
+            paidAmount:{
             type:"text",
             label:"执行金额(万)：",
             isOptional:true,

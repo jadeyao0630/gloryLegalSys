@@ -14,7 +14,7 @@ var main_form,pageOnTable,pageSeTable;
 			});
 			getCasesData(function(r){
 				output('getCasesData: ');
-				//r=formatCasesData(r);
+				//r=formatCasesData(r);//格式化cases数据表里的数据以适应程序
 				output(r);
 				
 				//console.log(r);
@@ -71,7 +71,7 @@ var main_form,pageOnTable,pageSeTable;
 				new timelinePage({template:_summary_template,data:_data,summaryListContainer:"#summary_list",canvas:canvas});
 				//$("#frame").removeClass('hide');
 				
-			
+				
 				//console.log($("#pageOneTable .ui-checkbox"));
 			});
 			
@@ -175,13 +175,15 @@ var main_form,pageOnTable,pageSeTable;
 					console.log(cas['id']+"---"+cas['casePersonnel']);
 				}else{
 					cas['casePersonnel']=val.join(',');
-					cas['caseDate']=getDateTime();
-					cas['caseCreateDate']=getDateTime();
-					//console.log(cas['id']+"---"+val.join(','));
-					insert('cases',cas,(e)=>{
-						console.log(e);
-					})	
+					
 				}
+				cas['isReadOnly']=true;
+				cas['caseDate']=getDateTime();
+				cas['caseCreateDate']=getDateTime();
+				//console.log(cas['id']+"---"+val.join(','));
+				insert('cases',cas,(e)=>{
+					console.log(e);
+				})	
 				
 			});
 			return data;

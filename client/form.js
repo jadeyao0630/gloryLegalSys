@@ -160,7 +160,9 @@ mform.prototype={
             if(item.type.toLowerCase()=="date"||item.type.toLowerCase()=="time"||item.type.toLowerCase()=="datetime") val=getDateTime();
             item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
             var input=$('<input type="'+item.type+'" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'" '+setRequired(item.isOptional,"此项必须填写")+'>');
-            item_container.append(input);
+            var subContainer=$('<div class="form-original"></div>');
+            subContainer.append(input);
+            item_container.append(subContainer);
             return input;
             //return item_container;
         }
@@ -171,7 +173,10 @@ mform.prototype={
             var textarea=$('<textarea class="form-original" cols="40" rows="4" name="'+id+'" id="'+id+'"'+placeholder+'" '+setRequired(item.isOptional,"此项必须填写")+'></textarea>');
             
             item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
-            item_container.append(textarea);
+            //item_container.append(textarea);
+            var subContainer=$('<div class="form-original"></div>');
+            subContainer.append(textarea);
+            item_container.append(subContainer);
             //item_container.find(".ui-input-text").css({"min-height":"60px"});
             return textarea;
             //console.log(item_container);
@@ -181,7 +186,10 @@ mform.prototype={
             //var item_container=$('<div class="form_item_panel"></div>');
             item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
             var input=$('<input class="form-original" type="file" name="'+id+'" id="'+id+'" value="" '+setRequired(item.isOptional,"此项必须填写")+'>');
-            item_container.append(input);
+            //item_container.append(input);
+            var subContainer=$('<div class="form-original"></div>');
+            subContainer.append(input);
+            item_container.append(subContainer);
             return input;
             //return item_container;
         }
@@ -199,7 +207,10 @@ mform.prototype={
             }
             //var item_container=$('<div class="form_item_panel"></div>');
             item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
-            item_container.append(radio_container);
+            var subContainer=$('<div class="form-original"></div>');
+            subContainer.append(radio_container);
+            item_container.append(subContainer);
+            //item_container.append(radio_container);
             return radio_container;
             //return item_container;
         }
@@ -213,7 +224,10 @@ mform.prototype={
             }
             //var item_container=$('<div class="form_item_panel"></div>');
             item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
-            item_container.append(selectItem);
+            //item_container.append(selectItem);
+            var subContainer=$('<div class="form-original"></div>');
+            subContainer.append(selectItem);
+            item_container.append(subContainer);
             //selectItem.selectmenu().selectmenu('refresh');
             return selectItem;
             //return item_container;
@@ -245,7 +259,10 @@ mform.prototype={
                 
             }
             item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
-            item_container.append(selectItem);
+            //item_container.append(selectItem);
+            var subContainer=$('<div class="form-original"></div>');
+            subContainer.append(selectItem);
+            item_container.append(subContainer);
             //console.log(item_container.html());
             //selectItem.selectmenu().selectmenu('refresh');
             return selectItem;
@@ -413,11 +430,10 @@ mform.prototype={
                 }
             });
         }
-        
         if(this.isReadOnly){
             _self.instance.find(".form-replacement").show();
-            _self.instance.find('.form-original').hide();
             _self.instance.find('.ui-input-text').hide();
+            _self.instance.find('.form-original').hide();
             _self.instance.find('.ui-select').hide();
         }else{
             _self.instance.find(".form-replacement").hide();
@@ -425,7 +441,6 @@ mform.prototype={
             _self.instance.find('.ui-input-text').show();
             _self.instance.find('.ui-select').show();
         }
-        
         //if(this.isReadOnly) _self.instance.find('.optionMark').addClass('hide');
         //else _self.instance.find('.optionMark').removeClass('hide');
         _self.instance.trigger('create');

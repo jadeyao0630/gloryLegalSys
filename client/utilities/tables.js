@@ -252,7 +252,8 @@ pageTable.prototype.addTableData=function(data){
                         if(but.hasOwnProperty('label')){
                             text=but.label;
                         }
-                        var btn=$('<a href="#" data-index="'+value+'" class="ui-btn ui-corner-all ui-shadow '+cls+'">'+text+'</a>');
+                        var href=but.hasOwnProperty('href')?but.href:"#";
+                        var btn=$('<a href="'+href+'" data-index="'+value+'" class="table-fn-btn ui-btn ui-corner-all ui-shadow '+cls+'">'+text+'</a>');
                         container.append(btn);
                         
                         //console.log(container.html());

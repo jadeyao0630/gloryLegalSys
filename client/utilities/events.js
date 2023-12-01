@@ -1,4 +1,5 @@
 function addClickEvents(main_form,r){
+    var progressInfoForm, but;
     //#region 全局功能按钮
     var list=['corporateCompanies'];
     //list=undefined;
@@ -20,6 +21,67 @@ function addClickEvents(main_form,r){
 
     //#region page 2 checkbox
     setCheckAllBox($('#mainFooter').find('input[type="checkbox"]'),'pageSecondTable');
+    $('#pageSecondTable').find('.table-fn-btn').on('click',function(e){
+        console.log($(this).jqmData('index')+"---"+$(this).text());
+        var index=$(this).jqmData('index');
+        var matchedData=getGlobalJson("mainDataStatus").filter((d)=>d.id==index);
+        var matchedMainData=r.filter((d)=>d.id==index);
+        switch($(this).text()){
+            case '编辑':
+                $("#progress_details").empty();
+                
+                progressInfoForm=_createNewCaseForm(progress_form_template,"progress_details");
+                
+                if(matchedMainData.length>0){
+                    console.log(matchedMainData[0].caseNo);
+                    if(matchedMainData[0].isReadOnly) {
+                        $("#progress_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+matchedMainData[0]['caseNo']);
+                        $('.edit-header-btn[name="save_btn"').hide();
+                    }
+                    else {
+                        $("#progress_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+matchedMainData[0]['caseNo']);
+                        $('.edit-header-btn[name="save_btn"').show();
+                    }
+                    //$('#progress_title').text(matchedMainData[0]['caseNo']);
+                    if(matchedData.length>0){
+                    
+                        progressInfoForm.setData(matchedData[0]).readOnly(matchedMainData[0].isReadOnly);
+                        var data3=table_progress_executes.filter((d)=>d.id==index);
+                        var data4=table_progress_updates;
+                        $("#progress_diagram").empty().filter((d)=>d.id==index);
+                        but=new ProgressesButton({
+                            steps:progresses,
+                            deadSteps:deads,
+                            showLabel:true,
+                            containerId:'#progress_diagram',
+                            currentPosition:Number(matchedData[0].caseStatus),
+                            fontSize:15,
+                            line_size:4,
+                            size:30,
+                            width:840,
+                            hasShadow:true,
+                            isViewMode:true,
+                            //verticalGap:2,
+                            //labelPosition:"bottom",
+                            showSubSteps:true,
+                            readOnly:matchedData[0].isReadOnly,
+                            showCounter:true,
+                            counterData:data3.concat(data4),
+                        });
+                        $(but.instance).on("itemOnClicked",  function (e){
+                            console.log(e);
+                            $( "#update_panel" ).panel( "open" );
+                        });
+                        $("#progress_diagram").trigger('create');
+                    }
+                }
+                $("#progress_details").trigger('create');
+                
+
+                $.mobile.navigate( '#progress');
+                break;
+        }
+    });
     //#endregion
     //表格内每行的功能按钮事件
     var fn_buts = document.querySelectorAll("[name^=fn_btn]")
@@ -56,12 +118,12 @@ function addClickEvents(main_form,r){
                 if(matchItems.length>0){
                     var loader=$().mloader("show",{message:"读取中...."});
                     //_showEditForm(matchItems[0]);//naviation.js
-                    
+                    var _this=this;
                     $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
                     setGlobal("currentId", matchItems[0].id);
                     //_setBlurBackgroundVisibility(true);
-                    $.mobile.navigate( $(this).attr( "href" ));
-                    setTimeout(function() {
+                    
+                    //setTimeout(function() {
                         //console.log(matchItems[0]);
                         //main_form.setData(matchItems[0]);
                         //main_form.readOnly(false);
@@ -77,8 +139,9 @@ function addClickEvents(main_form,r){
                             $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
                             $('.edit-header-btn[name="save_btn"').show();
                         }
+                        $.mobile.navigate( $(_this).attr( "href" ));
                         $().mloader("hide");
-                    }, 500);
+                    //}, 500);
                     //$('.progress_lock.edit-info').removeClass('hide');
                     //_setFormReadOnly(data.isReadOnly);
                     //_setBlurBackgroundVisibility(true);
@@ -129,13 +192,14 @@ function addClickEvents(main_form,r){
                 $("#reg_form_title").html("新增档案");
                 $('.edit-header-btn[name="save_btn"').show();
                 //_setBlurBackgroundVisibility(true);
-                $.mobile.navigate( $(this).attr( "href" ));
+                
                // main_form.readOnly(false).setEmptyData();
                     //$().mloader("hide");
-                setTimeout(function() {
+                //setTimeout(function() {
                     main_form.readOnly(false).setEmptyData();
+                    $.mobile.navigate( $(this).attr( "href" ));
                     $().mloader("hide");
-                }, 500);
+                //}, 500);
                 //main_form.setData(getGlobalJson("mainData")[0]);
                 //$("#fullscreenPage").trigger('create');
                 //main_form.instance.trigger('create');
@@ -179,8 +243,8 @@ function addClickEvents(main_form,r){
     //#region 查看信息页面的按钮事件
 
     //只读锁按钮事件
-    $("#reg_form_title").on('click',function(e){
-        //console.log(e);
+    function lockEvent(e){
+        var _this=this;
         $().requestPassword(function(res){
             if(res.success){
                 console.log("登陆成功。。")
@@ -191,17 +255,31 @@ function addClickEvents(main_form,r){
                     datas[0].isReadOnly=!Boolean(datas[0].isReadOnly);
                     //console.log(datas[0].isReadOnly);
                     if(datas[0].isReadOnly) {
-                        $("#reg_form_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+"查看档案");
+                        if(_this.id=="reg_form_title"){
+                            $("#reg_form_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+"查看档案");
+                        }else if(_this.id=="progress_title"){
+                            $("#progress_title").html('<i class="fa fa-lock text-red edit-lock"></i>'+$("#progress_title").text());
+                            
+                        }
                         $('.edit-header-btn[name="save_btn"').hide();
                     }
                     else {
-                        $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
+                        if(_this.id=="reg_form_title"){
+                            $("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
+                        }else if(_this.id=="progress_title"){
+                            $("#progress_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+$("#progress_title").text());
+                            
+                        }
                         $('.edit-header-btn[name="save_btn"').show();
                     }
                     
                     //_setFormReadOnly(data.isReadOnly);
                     //console.log(getGlobalJson('mainData'));
-                    main_form.readOnly(datas[0].isReadOnly);
+                    if(_this.id=="reg_form_title"){
+                        main_form.readOnly(datas[0].isReadOnly);
+                    }else{
+
+                    }
                     /*
                     $().mloader("show",{message:"保存中..."});
                     datas[0]['caseCreateDate']=getDateTime();
@@ -226,8 +304,9 @@ function addClickEvents(main_form,r){
             }
             
         });
-        
-    })
+    }
+    $("#reg_form_title").on('click',lockEvent);
+    $("#progress_title").on('click',lockEvent);
     //保存按钮事件
     $('.edit-header-btn').on('click',function(e){
         if($(this).text()=="保存"){

@@ -4,7 +4,31 @@ function extend(opt1,opt2){
         opt1[attr] = opt2[attr];
     }
 }
+function getStatusLabel(status,template){
+    var status_data=status instanceof Object?status:formatIndex(status);
+    var label=undefined;
+    template.forEach((stageLabel,index)=>{
+        
+        if(index==status_data.main) {
+            if(stageLabel instanceof Array){
+                //console.log('stageLabel',stageLabel);
+                label=stageLabel[Number(status_data.sub)];
+                return false;
+            }else{
 
+                label = stageLabel;
+                return false;
+            }
+        }
+        
+    });
+    return label;
+}
+function compareStatus(source,target){
+    var _source=formatIndex(source);
+    var _target=formatIndex(target);
+    return _source.main==_target.main && _source.sub==_target.sub;
+}
 function ProgressesButton(arg){
     this.body=document.body;
     this.opt = {
@@ -364,9 +388,9 @@ ProgressesButton.prototype.init=function(arg){
         if(_this.opt.showCounter && _this.opt.counterData.length>0){
             var _counter=_this.opt.counterData.filter(value=>{ 
                 if(sub==undefined)
-                    return formatIndex(value.caseStatusId).main==(index);
+                    return formatIndex(value.caseStatus).main==(index+1);
                 else
-                    return value.caseStatusId==index+sub/10
+                    return value.caseStatus==index+1+sub/10
             });
             if(_counter.length>0){
                 if(_this.opt.showCounter){

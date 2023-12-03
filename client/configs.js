@@ -3,7 +3,10 @@ let ip=isRunLocal?'localhost':'cn.luyao.site';
 let port=5555;
 var auth_code='1234';
 var enableConsoleLog=true;
+var enableRealDelete=false;
 const mainPage="text.html";
+var DataList={};
+var preload_completed_event_name="preloadCompleted";
 class Message{
     static LOGIN_IS_EMPTY='<p style="color:red;">用户名和密码不能为空</p>';
     static LOGIN_ISNOT_MATCH='<p style="color:red;">用户名和密码不匹配</p>';
@@ -13,7 +16,15 @@ class Message{
 
 var deads=["未执行"]; 
 const TextColor="rgb(51, 51, 51)";
-
+const users={
+    id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
+    user:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
+    pass:"VARCHAR(255) NOT NULL",//我方当事人->corporateCompanies* && corporatePartners*
+    name:"VARCHAR(255)",//我方当事人->corporateCompanies* && corporatePartners*
+    position:"INT NOT NULL DEFAULT '0'",//所属项目->projects*
+    level:"INT NOT NULL DEFAULT '0'",//所属项目->projects*
+    createDate:"datetime NOT NULL",//申请日期
+}
 const columns={//案件主表
     id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
     caseNo:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
@@ -60,18 +71,22 @@ const caseStatus={//案件状态
   paidAmount:"VARCHAR(255) default '0.00'",//执行金额
 }
 const caseUpdates={//案件每个状态点对应的更新
-    id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
-    caseNo:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
-    subId:"INT NOT NULL default '0'",//案件序号子序列号
+    id:"INT(11) NOT NULL",//案件唯一序列号
+    updatesId:"INT NOT NULL default '0',UNIQUE",//案件序号子附件序列号
+    caseNo:"VARCHAR(255) NOT NULL",//案件编号
+    subId:"INT(11) NOT NULL default '0'",//案件序号子序列号
     caseStatus:"VARCHAR(100) default '0.0'",//案件状态->caseStatus*
     updateDetails:"VARCHAR(255)",//案件更新事件内容
     dateOccur:"datetime",//案件更新事件发生日期
     dateUpdated:"datetime",//更新提交日期
-    caseDisputed:"",//案件争议
+    caseDisputed:"VARCHAR(255)",//案件争议
+    attachments:"VARCHAR(255)",//案件附件
 }
+
 const caseExcutes={//案件执行数据
-    id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
-    caseNo:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
+    id:"INT NOT NULL",//案件唯一序列号
+    excutesId:"INT NOT NULL default '0',UNIQUE",//案件序号子附件序列号
+    caseNo:"VARCHAR(255) NOT NULL",//案件编号
     subId:"INT NOT NULL default '0'",//案件序号子序列号
     caseStatus:"VARCHAR(100) default '0.0'",//案件状态->caseStatus*
     personExecuted:"VARCHAR(100)",//执行人
@@ -80,21 +95,24 @@ const caseExcutes={//案件执行数据
     exexuteAmount:"VARCHAR(255) default '0.00'",//执行金额
     sumExecuted:"VARCHAR(1000)",//执行概要
     dateExecuted:"datetime",//执行日期
+    attachments:"VARCHAR(255)",//案件附件
 }
 const properties={//资产状态数据
-    id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
-    caseNo:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
+    id:"INT NOT NULL",//案件唯一序列号
+    propertyId:"INT NOT NULL default '0',UNIQUE",//案件序号子附件序列号
+    caseNo:"VARCHAR(255) NOT NULL",//案件编号
     subId:"INT NOT NULL default '0'",//案件序号子序列号
     caseStatus:"VARCHAR(100) default '0.0'",//案件状态->caseStatus*
     propertyName:"VARCHAR(255)",//资产名称
     propertyStatus:"INT NOT NULL default '-1'",//资产状态->propertyStatus*
     dateUpdated:"datetime",//更新提交日期
     dateOccur:"datetime",//案件更新事件发生日期
+    attachments:"VARCHAR(255)",//案件附件
 }
 const attachments={//案件相关文件
-    id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
-    caseNo:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
-    evidenceId:"INT NOT NULL default '0'",//案件序号子附件序列号
+    id:"INT NOT NULL",//案件唯一序列号
+    caseNo:"VARCHAR(255) NOT NULL",//案件编号
+    evidenceId:"INT NOT NULL default '0',UNIQUE",//案件序号子附件序列号
     caseStatus:"VARCHAR(100) default '0.0'",//案件状态->caseStatus*
     numFile:"INT NOT NULL default '0'",//附件数
     numCPage:"INT NOT NULL default '0'",//附件页数

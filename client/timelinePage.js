@@ -1,6 +1,6 @@
 
 var _data={
-    template:["立案","一审","二审","执行","结案","再审","监督"],
+    //template:["立案","一审","二审","执行","结案","再审","监督"],
     basic:{
         id:1,caseNo:"A202311110005",caseName:"管文波离职案件",caseLabel:2,caseReason:0,caseType:0,caseBelong:0,applicant:"张国庆",
         caseCause:6,createDate:"2023-08-11 14:03:19",casePersonnel:"公司1,个人0",case2ndParty:"李四",isReadOnly:true,caseLawsuitRequest:"",caseCounterclaimRequest:"",caseSum:"",caseLawsuit:500,caseCounterclaim:0
@@ -26,76 +26,91 @@ var _data={
         {id:1,evidenceId:0,caseStatusId:0,caseNo:"A202311110005",numFile:2,numCPage:5,numCopy:1,numOriginal:1,fileName:"审判决书",filePath:"",dateUploaded:"2023-11-01 14:00:00"},
     ]
 }
+function getStageList(stageIdx,data){
+    var stageIndex=formatIndex(stageIdx);
+    var caseUpdateData=data.updates.filter((item) => formatIndex(item.caseStatus).main==stageIndex.main && formatIndex(item.caseStatus).sub==stageIndex.sub);
+    var caseExcuteData=data.excutes.filter((item) => formatIndex(item.caseStatus).main==stageIndex.main && formatIndex(item.caseStatus).sub==stageIndex.sub);
+    var casePropertyData=data.properties.filter((item) => formatIndex(item.caseStatus).main==stageIndex.main && formatIndex(item.caseStatus).sub==stageIndex.sub);
+    var caseAttachmentData=data.attachments.filter((item) => formatIndex(item.caseStatus).main==stageIndex.main && formatIndex(item.caseStatus).sub==stageIndex.sub);
+    //console.log("getStageList",caseUpdateData);
+    var newData=caseUpdateData.concat(caseExcuteData,casePropertyData,caseAttachmentData);
+    if(newData.length>0)
+        return newData;
+    else return [];
+}
 
-
-var dataList=[
-    {
+function getFlowList(data){
+    var caseData=data.basic;
+    var flowList=[];
+    flowList.push({
         label:"立案",
-        date:_data.basic.createDate,
-        id:0
-    },
-    {
-        label:"一审",
-        date:_data.progressStatus.courtDate,
-        id:1,
-        data:[
-            {
-                date:"2023-09-28 14:00:00",
-                label:"送达一审判决书"
-            },
-            {
-                date:"2023-10-13 14:00:00",
-                label:"送达修改判决书"
-            },
-            {
-                date:"2023-11-01 14:00:00",
-                label:"上传审判决书"
-            }
+        date:caseData.caseDate,
+        id:0,
+        data:getStageList(0,data)
+    });
+    if(progresses!=undefined){//---progresses需要植入到data
+        progresses.forEach((stage,idx)=>{
+            var index=idx+1;
+            switch(stage){
+                case "一审":
+                    flowList.push({
+                        label:stage,
+                        date:caseData.FirstInstance,
+                        id:index,
+                        data:getStageList(index,data)
+                    });
+                    break;
+                case "二审":
+                    flowList.push({
+                        label:stage,
+                        date:caseData.SecondInstance,
+                        id:index,
+                        data:getStageList(index,data)
+                    });
+                    break;
+                case "执行":
+                    //console.log('progresses....',progresses)
+                    
+                    var statusId=index+formatIndex(caseData.caseStatus).sub/10;
+                    var nextId=index+1+formatIndex(caseData.caseStatus).sub/10;
 
-        ]
-    },
-    {
-        label:"二审",
-        id:2,
-        data:[
-            {
-                date:"2023-10-28 14:00:00",
-                label:"送达二审判决书"
-            },
-            {
-                date:"2023-12-01 14:00:00",
-                property:"未知",
-                status:"查封",
-                type:"property",
-                label:"查封 【未知】财产"
+                    //console.log('formatIndex....',getStatusLabel(statusId,progresses))
+                    flowList.push({
+                        label:Number(caseData.caseStatus)>index?getStatusLabel(statusId,progresses):"",
+                        id:index,
+                        data:getStageList(statusId,data).concat(getStageList(nextId,data))
+                    });
+                    break;
+                case "结案":
+                    flowList.push({
+                        label:stage,
+                        id:index+1,
+                        data:getStageList(index,data)
+                    });
+                    break;
+                case "再审":
+                    flowList.push({
+                        label:stage,
+                        id:index+1,
+                        data:getStageList(index,data)
+                    });
+                    break;
+                case "监督":
+                    flowList.push({
+                        label:stage,
+                        id:index+1,
+                        data:getStageList(index,data)
+                    });
+                    break;
             }
-
-        ]
-    },
-    {
-        label:"正常执行",
-        id:3,
-        data:[
-            {
-                date:"2023-12-11 14:00:00",
-                label:"执行标的【财产】",
-                amount:"200",
-                personal:"张三",
-                type:"execute",
-                label:"张三 执行标的【财产】 200万元"
-            },
-            {
-                date:"2023-12-21 14:00:00",
-                label:"执行标的【未知】",
-                amount:"43",
-                personal:"张五",
-                type:"execute",
-                label:"张五 执行标的【未知】 43万元"
-            }
-
-        ]
+        })
     }
-]
+    console.log('data............',data);
+    console.log('getFlowList............',flowList);
+    return flowList;
+}
+
+
 function timelinePage(arg){
     this.opt = {
         template:undefined,
@@ -126,20 +141,28 @@ timelinePage.prototype.setTimeline=function(data,canvas){
     if (canvas==undefined) canvas=this.opt.canvas;
     
     if (this.ctx==undefined) this.ctx=this.opt.canvas.getContext('2d');
-    drawTimeline(data,this.ctx).forEach((circle)=>{
+    this.flowList=getFlowList(data);
+    var _this=this;
+    //console.log('canvas.height--------------------------->');
+   // console.log(canvas.height);
+    this.ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawTimeline(data,this.ctx,this.flowList).forEach((circle)=>{
         //console.log(Object.getPrototypeOf(circle))
         //console.log(Object.keys(Object.getPrototypeOf(circle)).includes('addListener'));
+
         circle.addListener('click',function(e){
-            console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
-            
-            var datas=dataList.filter((item)=>item.id==this.sourceData.index);
-            if(datas.length>0 && datas[0].data!= undefined){
+            //console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
+            //dataList=[];
+            var datas=_this.flowList.filter((item)=>item.id==this.sourceData.index);
+            if(datas.length>0 && datas[0].data!= undefined && datas[0].data.length>0){
                 $('#event_list').children().remove();
                 $('#event_list_title').text(this.sourceData.label);
                 datas[0].data.forEach((ite)=>{
-                    var date_bar=$('<li data-role="list-divider">'+formatDateTime(new Date(ite.date),"yyyy年MM月dd日 ")+'</li>');
-                    var item_container=$('<li></li>');
-                    var list_item=$('<label>'+ite.label+'</label>');
+                    var _data=getEventsDetails(ite);
+                    var date_bar=$('<li data-role="list-divider">'+_data.date+'</li>');
+                    if(ite.hasOwnProperty('evidenceId'))
+                    var item_container=$('<li'+(ite.hasOwnProperty('evidenceId')?' data-icon="eye" class="btn-icon-green"':'')+'></li>');
+                    var list_item=$('<label>'+_data.description+'</label>');
                     item_container.append(list_item);
                     $('#event_list').append(date_bar);
                     
@@ -158,7 +181,13 @@ timelinePage.prototype.setTimeline=function(data,canvas){
         })
         circle.addListener('mouseover',function(e){
             console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
-            $(canvas).css({cursor:"pointer"});
+            var datas=_this.flowList.filter((item)=>item.id==this.sourceData.index);
+            if(datas.length>0 && datas[0].data!= undefined && datas[0].data.length>0){
+                $(canvas).css({cursor:"pointer"});
+            }else{
+                $(canvas).css({cursor:"default"});
+            }
+            
             e.ctx.globalCompositeOperation = "source-over";
         })
         circle.addListener('mouseout',function(e){
@@ -184,6 +213,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                     //console.log(data_key+"--"+sub_key);
                 if (data_key!="template" && Object.keys(_data[data_key]).includes(sub_key)){
                     var data=_summary_template[key].data[sub_key].data;
+                    var type=_summary_template[key].data[sub_key].type;
                     var label=_summary_template[key].data[sub_key].label;
                     
                     var val=_data[data_key][sub_key];
@@ -206,42 +236,72 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                         else{
                             isMultiValue=true;
                             var values=val.split(",");
-                            $.each(data,(k,v)=>{
-                                console.log(v);
-                                
-                                if(v instanceof Array){
-                                    v.forEach((_val,index)=>{
-                                        if(_val instanceof Object){
-                                            if(values.includes(_val.value)){
-                                                multiValues.push(_val.name);
+                            if(type=="supermulticombobox"){
+                                values.forEach(_v=>{
+                                    var _values=formatSuperMultiSelectOptionValue(_v);
+                                    console.log('setSumList',_values);
+                                    if(_summary_template[key].data[sub_key].hasOwnProperty('displayFormat')){
+                                        var displayFormat=_summary_template[key].data[sub_key].displayFormat;
+                                        $.each(_values,(kk,vv)=>{
+                                            if(displayFormat.indexOf(kk)>-1){
+                                                displayFormat=displayFormat.replace("{"+kk+"}",vv);
                                             }
-                                        }else{
-                                            
-                                            
-                                        }
-                                    });
-                                    if(multiValues.length==0){
-                                        values.forEach(_v=>{
-                                            console.log(_v.indexOf(k));
-                                            if(_v.indexOf(k)>-1){
-                                                multiValues.push(data[k][parseInt(_v.replace(k,""))]);
-                                                return false;
-                                            }
-                                               
-                                        });
+                                        })
+                                        multiValues.push(displayFormat);
+                                    }else{
+                                        var collector=[];
+                                        $.each(_v,(kk,vv)=>{
+                                            collector.push(vv);
+                                        })
+                                        multiValues.push(collector.join(" "));
                                     }
-                                    //console.log(values);
+                                });
+
+                            }else{
+                                //var _values=formatSuperMultiSelectOptionValue(v);
+                                //console.log('setSumList',_values);
+                                $.each(data,(k,v)=>{
+                                    //console.log('setSumList',v);
+                                    //console.log(v);
+                                    if(v instanceof Array){
+                                        v.forEach((_val,index)=>{
+                                            
+                                            if(_val instanceof Object){
+                                                if(values.includes(_val.value)){
+                                                    multiValues.push(_val.name);
+                                                }
+                                            }else{
+                                                
+                                                
+                                            }
+                                        });
+                                        if(multiValues.length==0){
+                                            values.forEach(_v=>{
+                                                //var _values=formatSuperMultiSelectOptionValue(_v);
+
+                                                //console.log(_v.indexOf(k));
+                                                if(_v.indexOf(k)>-1){
+                                                    multiValues.push(data[k][parseInt(_v.replace(k,""))]);
+                                                    return false;
+                                                }
+                                                
+                                            });
+                                        }
+                                        //console.log(values);
+                                        
+                                    }else{
+                                        
+                                        //console.log();
+                                        
+                                    }
                                     
-                                }else{
-                                    //console.log();
-                                    
-                                }
-                                
-                            })
+                                })
+                            }
+                            
                             
                         }
                     }
-                    console.log(data_key+"-->"+sub_key+"--->"+multiValues+"------------------");
+                    //console.log(data_key+"-->"+sub_key+"--->"+multiValues+"------------------");
                     if(isMultiValue){
                         var _collapsibleset=$('<div data-role="collapsible" data-theme="a" data-iconpos="right" data-inset="false" class="collapsible-listview" style="border:none;margin-right:-45px;" data-collapsed-icon="carat-d" data-expanded-icon="carat-u"></div>');
                         var _collapsibleLabel=$('<h4 class="ui-field-contain" style="margin:0px;border:none;"><div style="display:grid;grid-template-columns: auto 1fr;column-gap: 9px;margin-left:-3px"><label style="margin-top:2px;margin-bottom:-2px;">'+

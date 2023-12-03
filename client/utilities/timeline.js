@@ -131,7 +131,7 @@ var datePosition=[];
 var listPosition=[];
 var colors=["#5E9B9F","#D66755","#E25C62","#4B9DCB","#43607A","#7C7594","#C76B8C","#65875D"];
 
-function drawTimeline(_data,ctx){
+function drawTimeline(_data,ctx,dataList){
     var from={x:width/2,y:20};
     var to={x:width/2,y:20+60};
     var currentPos=drawLine(from,to,ctx,colors[0],16);
@@ -142,6 +142,8 @@ function drawTimeline(_data,ctx){
     isOppsite=true;
     _data.template.forEach((label,index)=>{
         drawIndicatorText(textPosition[index],{label:label,index:index},ctx,"white");
+        //dataList=[];
+        //console.log('dataList',dataList);
         var data=dataList.filter(item=>{ return item.id==index});
         if(data.length>0){
             var val=data[0].label;
@@ -218,22 +220,34 @@ function drawListText(startPos,data,ctx,color,isOppsite){
     ctx.fillStyle = color;
     if (data.length>0){
         data.forEach((item,i)=>{
+            console.log("drawListText...................",item);
             //console.log(item);
-            var date=formatDateTime(new Date(item.date),"MM月dd日 ");
-            var text=date+item.label;
-            if(item.type=="property"){
-                text=date+item.status+" "+item.property+" 财产";
-            }
-            else if(item.type=="execute"){
-                //text=date+item.personal+"已"+item.label+" "+item.amount+"万元"
-            }
-            let text_size = getTextSize(text,ctx); 
+            var _data=getEventsDetails(item);
+            let text_size = getTextSize(_data.date+_data.description,ctx); 
             //console.log(text+"---"+text_size.width);
-            ctx.fillText(text, !isOppsite?startPos.x-text_size.width-15:startPos.x+15, (startPos.y+20+(text_size.height+5)*i));
+            ctx.fillText(_data.date+_data.description, isOppsite?startPos.x-text_size.width-15:startPos.x+15, (startPos.y+20+(text_size.height+5)*i));
         });
     }
     
     
+}
+function getEventsDetails(item){
+    var date;
+    var text;
+    if(item.hasOwnProperty('updatesId')){//updates
+        date=formatDateTime(new Date(item.dateUpdated),"MM月dd日 ");
+        text=item.updateDetails;
+    }else if(item.hasOwnProperty('evidenceId')){//evidence
+        date=formatDateTime(new Date(item.dateUploaded),"MM月dd日 ");
+        text=item.fileLabel+" 上传";
+    }else if(item.hasOwnProperty('propertyId')){//property
+        date=formatDateTime(new Date(item.dateOccur),"MM月dd日 ");
+        text="资产(" + item.propertyName+ ")状态改为"+resourceDatas['propertyStatus'][Number(item.propertyStatus)];
+    }else if(item.hasOwnProperty('excutesId')){//excutes
+        date=formatDateTime(new Date(item.dateExecuted),"MM月dd日 ");
+        text=item.personExecuted + "执行目标("+((item.targetExecuted.length>0)?item.targetExecuted:"未知")+")，金额为"+item.exexuteAmount+"万";
+    }
+    return {date:date,description:text};
 }
 function drawOneStop(startPos,ctx,color,size,isOppsite,data){
     var insideCircleSize=size+8;

@@ -63,6 +63,19 @@ async function removeCase(id,table,res){
         res(data);
     });
 }
+async function removeCases(ids,table,res){
+    await fetch("http://"+ip+":"+port+"/deleteRows",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ table: table, ids:ids})
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.error);
+        
+        res(data);
+    });
+}
 async function insertCase(data,res){
     await fetch("http://"+ip+":"+port+"/insertCase",{
         headers:headers,
@@ -84,6 +97,22 @@ async function insert(table,data,res){
         headers:headers,
         method: 'POST',
         body: JSON.stringify({ table: table, data:data})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.data.success){
+            console.log(data.data.id);
+        }else{
+            console.log(data.data.error);
+        }
+        res(data.data);
+    });
+}
+async function insertRows(table,datas,res){
+    await fetch("http://"+ip+":"+port+"/insertAll",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ table: table, data:datas})
     })
     .then(response => response.json())
     .then(data => {
@@ -165,7 +194,7 @@ async function getBasicDatabaseData(list){
         var dataSize=Object.keys(basicTableList).length;
         $.each(basicTableList,async function(k,v){
             count++;
-            if(list==undefined || list.includes(k)){
+            if(list==undefined || list.length==0 || list.includes(k)){
                 
                 var query="SELECT * FROM "+v.tablename+" ORDER BY id ASC";
                 await fetch("http://"+ip+":"+port+"/select",{
@@ -187,6 +216,7 @@ async function getBasicDatabaseData(list){
                         if(k=='attorneys') {
                             var _event = jQuery.Event( "dataLoaded" );
                             _event.status = "completed";
+                            _event.key = "completed";
                             _event.value = datas;
                             //console.log(datas);
                             //console.log(event.value);
@@ -208,6 +238,43 @@ async function getBasicDatabaseData(list){
     //console.log(response);
     return data;
 
+}
+function getCaseDb(template,list,res) {
+    const results = {};
+
+    async function fetchData(k,v) {
+        var query="SELECT * FROM "+v.tablename+" ORDER BY id ASC";
+        await fetch("http://"+ip+":"+port+"/select",{
+                        headers:headers,
+                        method: 'POST',
+                        body: JSON.stringify({ query: query})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        //console.log(`Data from ${k}:`, data.data);
+                        if(data.hasOwnProperty('data')){
+                            results[k]=data.data;
+                            if(res!=undefined) res(k,data.data);
+                        }
+                    });
+    }
+
+    $.each(template, function(k,v){
+        if(list==undefined || list.length==0 || list.includes(k)){
+            fetchData(k,v);
+        }else{
+            return;
+        }
+    });
+
+    return new Promise(resolve => {
+        const intervalId = setInterval(() => {
+        if (Object.keys(results).length === Object.keys(template).length) {
+            clearInterval(intervalId);
+            resolve(results);
+        }
+        }, 100);
+    });
 }
 function formatInsertData(key,data){
     if(key=="caseStatus"){

@@ -11,7 +11,7 @@ var list_proerty;
 var list_evidence;
 var list_executed;
 var _summary_template;
-  $('body').on('completed',function(data){
+  $('body').on(preload_completed_event_name,function(data){
     //console.log(case_orgnizationPersonnel);
     FormTemplate3={
         settings:{
@@ -56,10 +56,11 @@ var _summary_template;
                     casePersonnel:{
                         placeholder:"我方当事人",
                         label:"我方当事人:",
-                        type:"multicombobox",
+                        type:"supermulticombobox",
                         isOptional:false,
                         data:resourceDatas.casePersonnel,
-                        isFilterable:true 
+                        isFilterable:true,
+                        displayFormat:'{value} ({status})'//'{name} {contact} {institution}'
                     },
                     case2ndParty:{
                         placeholder:"对方当事人",
@@ -272,7 +273,7 @@ var _summary_template;
             type:"label"
         },
         caseName:{label:"案件名称",
-        type:"label"},
+        type:"label", isFilterable:true},
         caseReason:{label:"案由",
         type:"label",data:case_causes, isFilterable:true},
         caseType:{label:"案件类型",
@@ -511,7 +512,7 @@ var _summary_template;
             hasLabel:true,
             hasPlaceHolder:true,
             labelPosition:"left",
-            width:"100%",
+            width:'350px',
             textareaHeight:90,
             isCollapsibleGrouping:false,
         },
@@ -539,6 +540,8 @@ var _summary_template;
                 data:resourceDatas.attorneys,
                 label:"代理律师：",
                 isOptional:true,
+                //table:'caseStatus',
+                displayFormat:'{name} {contact}'
             },
             penalty:{
                 type:"text",
@@ -551,6 +554,18 @@ var _summary_template;
                 label:"执行金额(万)：",
                 isOptional:true,
                 defaultValue:0.0
+            },
+            FirstInstance:{
+                type:"date",
+                label:"一审日期：",
+                isOptional:true,
+                //defaultValue:0.0
+            },
+            SecondInstance:{
+                type:"date",
+                label:"二审日期：",
+                isOptional:true,
+                //defaultValue:0.0
             },
         }
       }
@@ -590,7 +605,7 @@ var _summary_template;
         },
       }
     
-      
+    
     list={
         caseUpdated:{
           label:"进展",
@@ -624,19 +639,24 @@ var _summary_template;
           type:"text",
         },numFile:{
           label:"份数",
-          type:"text",
+          type:"number",
           width:50,
         },numCPage:{
           label:"页数",
-          type:"text",
+          type:"number",
           width:50,
         },numOriginal:{
           label:"原件",
-          type:"text",
+          type:"number",
           width:50,
         },numCopy:{
           label:"复印件",
-          type:"text",
+          type:"number",
+          width:50,
+        },
+        filePath:{
+          label:"上传文件",
+          type:"file",
           width:50,
         }
       }
@@ -645,6 +665,10 @@ var _summary_template;
           label:"执行日期",
           type:"date",
           width:150,
+        },purposeExecute:{
+          label:"执行标的",
+          type:"text",
+          width:130,
         },personExecuted:{
           label:"执行经办人",
           type:"text",
@@ -652,10 +676,6 @@ var _summary_template;
         },personContact:{
           label:"经办人电话",
           type:"tel",
-          width:130,
-        },purposeExecute:{
-          label:"执行标的",
-          type:"text",
           width:130,
         },exexuteAmount:{
           label:"执行金额(万)",
@@ -690,10 +710,11 @@ var _summary_template;
                 casePersonnel:{
                     placeholder:"我方当事人",
                     label:"我方当事人:",
-                    type:"multicombobox",
+                    type:"supermulticombobox",
                     isOptional:false,
                     data:resourceDatas.casePersonnel,
-                    isFilterable:true 
+                    isFilterable:true ,
+                    displayFormat:'{value} ({status})'
                 },
                 case2ndParty:{
                     placeholder:"对方当事人",
@@ -791,6 +812,51 @@ var _summary_template;
         }
         
     } 
+    add_update_template={
+      settings:{
+        hasLabel:true,
+        hasPlaceHolder:true,
+        labelPosition:"left",
+        width:'550px',
+        textareaHeight:90,
+        isCollapsibleGrouping:false,
+      },
+      template:list
+    }
+    add_execute_template={
+      settings:{
+        hasLabel:true,
+        templateColumn:"50% 50%",
+        hasPlaceHolder:true,
+        labelPosition:"left",
+        width:'850px',
+        textareaHeight:90,
+        isCollapsibleGrouping:false,
+      },
+      template:list_executed
+    }
+    add_property_template={
+      settings:{
+        hasLabel:true,
+        hasPlaceHolder:true,
+        labelPosition:"left",
+        width:'550px',
+        textareaHeight:90,
+        isCollapsibleGrouping:false,
+      },
+      template:list_proerty
+    }
+    add_evidence_template={
+      settings:{
+        hasLabel:true,
+        hasPlaceHolder:true,
+        labelPosition:"left",
+        width:'550px',
+        textareaHeight:90,
+        isCollapsibleGrouping:false,
+      },
+      template:list_evidence
+    }
   });
   
 

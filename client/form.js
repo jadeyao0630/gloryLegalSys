@@ -51,6 +51,7 @@ mform.prototype={
                 _self.instance.append(catelog_title_bar);
             });
         }else{
+            console.log('setMainForm',template);
             _self.instance.append(setMainForm(template.template));
         }
         //_self.instance.find('.ui-input-text').addClass('form-original');
@@ -61,6 +62,11 @@ mform.prototype={
             console.log(v);
         });
         */
+        //_self.instance.find('select').parent().css("overflow", "auto");
+        _self.instance.find('select').parent().addClass('select-overflow');
+        
+        
+        //_self.instance.find('.supermultiSelect').setSuperMultiselect();
         if (_self.opt.buttons!=undefined) _self.instance.append(_self.opt.buttons);
         //_self.readOnly(true);
         function setMainForm(data){
@@ -91,6 +97,9 @@ mform.prototype={
                             case "text":
                                 _self.elements[item_key]=generateInputTypeBase(item_container,item,item_key,template.settings.hasPlaceHolder);
                                 break;
+                            case "number":
+                                _self.elements[item_key]=generateInputTypeBase(item_container,item,item_key,template.settings.hasPlaceHolder);
+                                break;
                             case "textarea":
                                 _self.elements[item_key]=generateTextAreaItem(item_container,item,item_key,template.settings.hasPlaceHolder);
                                 break;
@@ -118,6 +127,10 @@ mform.prototype={
                             case "multicombobox":
                                 //console.log("multicombobox..............................");
                                 _self.elements[item_key]=generateMultiComboBoxItem(item_container,item,item_key);
+                                break;
+                            case "supermulticombobox":
+                                //console.log("multicombobox..............................");
+                                _self.elements[item_key]=generateSuperMultiComboBoxItem(item_container,item,item_key);
                                 break;
                             case "radio":
                                 _self.elements[item_key]=generateRadioItem(item_container,item,item_key);
@@ -299,6 +312,81 @@ mform.prototype={
             //console.log(item_container.html());
             //return item_container;
         }
+        function generateSuperMultiComboBoxItem(item_container,item,id){
+            
+            var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="form-original multiSelect supermultiSelect'+
+            (item.isFilterable?" filterSelect":"")+'" multiple="multiple" data-native-menu="false"></select>');
+            if(item.data){
+                if(item.data instanceof Array){
+                    item.data.forEach((d,counter)=>{
+                        //console.log(d)
+                        selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
+                    });
+                }else{
+                    var opt_tip=$('<option></option>');
+                    var tips=[];
+                    $.each(item.data,function (key,value) {
+                        if(key=="无"){
+                            selectItem.append($('<option value="'+key+0+'">'+key+'</option>'));
+                        }else{
+                            tips.push(key);
+                            var grounp=$('<optgroup label="'+key+'"></optgroup>')
+                            value.forEach((d,counter)=>{
+                                //console.log(d)
+                                //console.log((d.constructor === Object))
+                                if(d.constructor === Object){//'{name} {contact} {institution}'
+                                    var label="";
+                                    if(item.hasOwnProperty('displayFormat')){
+                                        var displayFormat=item.displayFormat;
+                                        $.each(d,(kk,vv)=>{
+                                            //console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                                            if(item.displayFormat.indexOf(kk)>-1){
+                                                displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                            }
+                                        })
+                                        label=displayFormat;
+                                    }else{
+                                        var collector=[];
+                                        $.each(d,(kk,vv)=>{
+                                            collector.push(vv);
+                                        })
+                                        label=collector.join(" ");
+                                    }
+                                    var _value=d.hasOwnProperty('value')?d.value:key+counter;
+                                    grounp.append($('<option value="'+_value+'">'+label+'</option>'));
+                                }else{
+
+                                    grounp.append($('<option value="'+key+counter+'">'+d+'</option>'));
+                                }
+                            });
+                            selectItem.append(grounp);
+                            
+                        }
+                        
+                    })
+                    opt_tip.text("选择 "+tips.join(" 或 "));
+                }
+                
+            }
+            item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+            //item_container.append(selectItem);
+            var subContainer=$('<div class="form-original"></div>');
+            subContainer.append(selectItem);
+            
+            if(item.hasOwnProperty('displayFormat')){
+                subContainer.jqmData('valueformat',item.displayFormat);
+                
+                console.log("value-format1",subContainer);
+                console.log("value-format1",subContainer.jqmData('valueformat'));
+            }
+            item_container.append(subContainer);
+            //console.log(item_container.html());
+            //selectItem.selectmenu().selectmenu('refresh');
+            return selectItem;
+            //console.log('item_container');
+            //console.log(item_container.html());
+            //return item_container;
+        }
         function pageIsSelectmenuDialog( page ) {
             var isDialog = false,
             id = page && page.attr( "id" );
@@ -311,27 +399,58 @@ mform.prototype={
             return isDialog;
         }
         $.mobile.document
-        .on("pagecreate", function () {
-            $("#multiselect").selectmenu({
-                create: function (event, ui) {
-                    var popup = $(this).data("mobile-selectmenu").menuType;
-                    popup.on("popupafteropen", function () {
-                        // 在每个选项中添加列表视图
-                        popup.find("li a").each(function () {
-                            var listItem = $(this);
-                            var list = $("<ul data-role='listview'><li>List item 1</li><li>List item 2</li></ul>");
-                            listItem.append(list);
-                            list.listview();
-                        });
-                    });
-                }
-            });
-        })
+            .on("pagecreate", function () {
+                
+                $(".supermultiSelect").selectmenu({
+                    create: function (event, ui) {
+                        console.log('supermultiSelect pagecreate',this);
+                        
+                        $.each($(this),(index,select)=>{
+                            //console.log("value-format2",index,"__",$(select).parent().parent());
+                            //console.log("value-format2",index,"__",$(select).parent().parent().jqmData('valueformat'));
+                            $(this).setSuperMultiselect($(select).parent().parent().jqmData('valueformat'));
+                        })
+                        
+                        $.each($('#'+this.id+'-button').find('span'),(idx,el)=>{
+                            var isOpened
+                            $(el).on('mouseover',(e)=>{
+                                
+                                if (el.scrollWidth > el.clientWidth) {
+                                    // 设置内容自动滚动
+                                    //console.log('set tooptip',$(el).text());
+                                    $('#popupArrow').css({width:el.clientWidth})
+                                    $('#popupArrow').html($(el).text().split(',').join('<br/>'));
+                                    $('#popupArrow').popup('open',{
+                                        positionTo: $(el),
+                                        arrow:true,
+                                        focus: false
+                                    });
+                                  }
+                              });
+                              
+                              $(el).on('mouseleave',(e)=>{
+                                console.log('mouseleave',$('#popupArrow').hasClass('ui-popup-active'));
+                                if ($('#popupArrow').hasClass('ui-popup-active')) {
+                                    // 弹出框已打开
+                                    $('#popupArrow').popup('close');
+                                  }
+                                
+                              
+                            });
+                        })
+                            
+                        
+                    }
+                });
+                //$(".supermultiSelect").selectmenu().selectmenu("refresh").trigger("change");
+            })
+        $.mobile.document
             // Upon creation of the select menu, we want to make use of the fact that the ID of the
             // listview it generates starts with the ID of the select menu itself, plus the suffix "-menu".
             // We retrieve the listview and insert a search input before it.
             .on( "selectmenucreate", ".filterSelect", function( event ) {
-                console.log(" filterSelect--->");
+                console.log(" filterSelect--->",$( event.target ).hasClass('supermultiSelect'));
+                //if($( event.target ).hasClass('supermultiSelect')) return;
                 var input,
                     selectmenu = $( event.target ),
                     list = $( "#" + selectmenu.attr( "id" ) + "-menu" ),
@@ -339,7 +458,7 @@ mform.prototype={
                 // We store the generated form in a variable attached to the popup so we avoid creating a
                 // second form/input field when the listview is destroyed/rebuilt during a refresh.
                 //$("#searchInput").remove();
-                console.log("listview.......................");
+                console.log("listview.......................",+list);
                 
                 if ( !form ) {
                     //$("#filterForm").remove();
@@ -368,7 +487,7 @@ mform.prototype={
                     // Rebuild the custom select menu's list items to reflect the results of the filtering
                     // done on the select menu.
                     .on( "filterablefilter", function() {
-                        selectmenu.selectmenu( "refresh" );
+                        selectmenu.selectmenu().selectmenu( "refresh" );
                     });
             })
             // The custom select list may show up as either a popup or a dialog, depending on how much
@@ -376,12 +495,13 @@ mform.prototype={
             // the filter input field must be transferred to the dialog so that the user can continue to
             // use it for filtering list items.
             .on( "pagecontainerbeforeshow", function( event, data ) {
-                console.log("pagecontainerbeforeshow.............");
+                
                 var listview, form;
                 if ( !pageIsSelectmenuDialog( data.toPage ) ) {
                     //return;
                 }
                 listview = data.toPage.find( "ul" );
+                console.log("pagecontainerbeforeshow.............",listview.html());
                 //console.log(listview.html());
                 form = listview.jqmData( "filter-form" );
                 // Attach a reference to the listview as a data item to the dialog, because during the
@@ -394,32 +514,10 @@ mform.prototype={
                 
                 //listview.trigger('create').listview().listview( "refresh" );
                 //listview.parent().trigger('create');
-/*
-                var controlgroup=$('<div data-role="controlgroup" data-type="horizontal"></div>');
-                var select=$('<select>'+
-                                '<option selected>无</option>'+
-                                '<option>原告</option>'+
-                                '<option>被告</option>'+
-                                '<option>被执行人</option>'+
-                                '<option>执行人</option>'+
-                            '</select>');
-                
-                var li = listview.find('li[role="option"]');
-                $.each(li,(index,l)=>{
-                    //$(l).append(select);
-                    $(l).find('a').append(select);
-                    //controlgroup.append(select);
-                    //$(l).find('a').wrapAll(controlgroup);
-                    //controlgroup.append(a);
-                    console.log($(l).html());
-                });
-                
-                listview.trigger('create').listview( "refresh" );
-                */
             })
             // After the dialog is closed, the form containing the filter input is returned to the popup.
             .on( "pagecontainerhide", function( event, data ) {
-                console.log("pagecontainerhide.............");
+                console.log("pagecontainerhide.............",$(this));
                 var listview, form;
                 if ( !pageIsSelectmenuDialog( data.toPage ) ) {
                     return;
@@ -479,10 +577,38 @@ mform.prototype={
 
         function getSelectValue(element){
             var val=[];
-            $.each($(element).find(":selected"),function(index,opt){
-                //console.log(itemTemplate.label+"--------->"+opt.value);
-                val.push(opt.text);
-            });
+            if($(element).hasClass('supermultiSelect')){
+                $.each($(element).find(":selected"),function(index,opt){
+                    console.log('itemTemplate.label',$(opt).jqmData('statusValue'));
+                    //if($(opt).jqmData('statusValue')!=undefined)
+                    var fvalue=formatSuperMultiSelectOptionValue(($(opt).jqmData('statusValue')!=undefined?$(opt).jqmData('statusValue'):"")+opt.value);
+                    var status=fvalue.status;
+
+                    if($(element).parent().parent().jqmData('valueformat')!=undefined){
+                        var displayFormat=$(element).parent().parent().jqmData('valueformat');
+                        $.each(fvalue,(kk,vv)=>{
+                            //console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                            if(displayFormat.indexOf(kk)>-1){
+                                displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                            }
+                        })
+                        
+                    
+                        val.push(displayFormat);
+                        
+                    }else{
+                        val.push(opt.text+"("+status+")");
+                    }
+
+                    
+                });
+            }else{
+                $.each($(element).find(":selected"),function(index,opt){
+                    //console.log(itemTemplate.label+"--------->"+opt.value);
+                    val.push(opt.text);
+                });
+            }
+            
             return val;
         }
         function getRadioValue(element){
@@ -616,6 +742,78 @@ $.fn.extend({
                 }
                 _self.find("#_"+id).html(_values.join("<br/>"));
                 element.selectmenu().selectmenu("refresh").trigger("change");
+            }else if(type=="supermulticombobox"){
+                var _values=[];
+                var _valueData=[];
+                $(element).find("option").prop('selected',false);
+                //console.log(id+"--->"+value+"--"+(value!=null));
+                //console.log(id+"--->"+value+"--"+(value!=undefined));
+                //console.log(id+"--->"+value+"--"+(Number.isInteger(value)||value.length>0));
+                if(value!=null&&value!=undefined&&(Number.isInteger(value)||value.length>0)){
+                    //console.log(id+"--->"+Number.isInteger(value));
+                    if(Number.isInteger(value)){
+                        var ele=$(element).find("option[value="+value+"]");
+                        if(ele.length>0){
+                            ele.prop('selected',true);
+                            _values.push(ele.text());
+                            _valueData.push({
+                                status:"无",
+                                statusId:0,
+                                value:ele.text(),
+                                valueId:ele.val(),
+                                catelog:"",
+                                catelogId:0
+                            })
+                        }
+                            
+                    }else{
+                        value.split(",").forEach((v)=>{
+                            //console.log(id+"--->"+v);
+                            var _v=formatSuperMultiSelectOptionValue(v);
+                            var ele=$(element).find("option[value="+_v.catelog+_v.valueId+"]");
+                            //console.log($(element).html());
+                            //console.log(ele);
+                            ele.prop('selected',true);
+                            //console.log('value-format',$(element).parent().parent().jqmData('valueformat'));
+                            if($(element).parent().parent().jqmData('valueformat')!=undefined){
+                                var displayFormat=$(element).parent().parent().jqmData('valueformat');
+                                $.each(_v,(kk,vv)=>{
+                                    //console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                                    if(displayFormat.indexOf(kk)>-1){
+                                        displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                    }
+                                })
+                                
+                            
+                                _values.push(displayFormat);
+                                
+                            }else{
+                                _values.push(ele.text()+"("+_v.status+")");
+                            }
+                            _valueData.push(_v);
+                        });
+
+                    }
+                    
+                }else{
+                    var ele=$(element).find("option[value='无0']");
+                        if(ele.length>0){
+                            ele.prop('selected',true);
+                            _values.push(ele.text());
+                            _valueData.push({
+                                status:"无",
+                                statusId:0,
+                                value:ele.text(),
+                                valueId:ele.val(),
+                                catelog:"",
+                                catelogId:0
+                            })
+                        }
+                }
+                setSuperValue("#"+id,_valueData,$(element).parent().parent().jqmData('valueformat'));
+                //console.log('value-format',_values);
+                _self.find("#_"+id).html(_values.join("<br/>"));
+                //element.selectmenu().selectmenu("refresh").trigger("change");
             }else if(type=="combobox"){
                 
                 if(value=="") value=0;
@@ -732,17 +930,23 @@ $.fn.extend({
                 case "SELECT":
                     //console.log(itemTemplate.label+"-->"+$(element).find(":selected").length);
                     var _val=[];
+                    var _subVal=[];
+                    var _greatVal=[];
                     $.each($(element).find(":selected"),function(index,opt){
                         //console.log(itemTemplate.label+"--------->"+opt.value);
                         _val.push(opt.value);
+                        _subVal.push($(opt).jqmData('statusValue'));
+                        _greatVal.push(($(opt).jqmData('statusValue')==undefined?"":$(opt).jqmData('statusValue'))+opt.value);
                     });
                     if(_val.length==0 && !itemTemplate.isOptional) {
                         console.log(itemTemplate.label+"-- has empty value"+_val.join(","));
                         hasError=true;
                     }
                     res(hasError);
-                    //console.log(itemTemplate.label+"("+val.length+")--------->"+val.join(","));
-                    val=_val.join(",");
+                    console.log(itemTemplate.label,_subVal);
+                    console.log(itemTemplate.label,_val);
+                    console.log(itemTemplate.label,_greatVal);
+                    val=_greatVal.join(",");
                     break;
                 case "TEXTAREA":
                     if(val.length==0 && !itemTemplate.isOptional){

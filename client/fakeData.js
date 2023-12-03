@@ -29,3 +29,19 @@ const table_progress_executes=[
   {id:1,subId:0,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张三",personContact:18612221231,purposeExecute:"财产",exexuteAmount:200,sumExecuted:"",dateExecuted:"2023-11-01 14:00:00"},
   {id:1,subId:1,caseStatusId:3.1,caseNo:"A202311110005",personExecuted:"张五",personContact:1572312534,purposeExecute:"",exexuteAmount:34,sumExecuted:"",dateExecuted:"2023-12-01 14:00:00"},
 ]
+
+var caseStatus_=[
+  {id:1,subid:0,updatesId:0,caseStatus:0,caseNo:"A202311110005",updateDetails:"23.9.28送达一审判决书",caseDisputed:"",dateUpdated:"2023-11-01 14:00:00",dateOccur:"2023-09-28 14:00:00",attachments:"0"},
+  {id:1,subid:1,updatesId:1,caseStatus:0,caseNo:"A202311110005",updateDetails:"23.10.13送达判决书",caseDisputed:"",dateUpdated:"2023-11-02 14:00:00",dateOccur:"2023-10-13 14:00:00",attachments:""},
+  {id:1,subid:0,updatesId:2,caseStatus:1,caseNo:"A202311110005",updateDetails:"23.10.28送达二审判决书",caseDisputed:"",dateUpdated:"2023-12-01 14:00:00",dateOccur:"2023-10-28 14:00:00",attachments:""}
+]
+var caseExcutes_=[
+  {id:1,subId:0,excutesId:0,caseStatus:3.1,caseNo:"A202311110005",personExecuted:"张三",personContact:18612221231,targetExecuted:"财产",exexuteAmount:200,sumExecuted:"",attachments:"",dateExecuted:"2023-12-11 14:00:00"},
+  {id:1,subId:1,excutesId:1,caseStatus:3.1,caseNo:"A202311110005",personExecuted:"张五",personContact:1572312534,targetExecuted:"",exexuteAmount:34,sumExecuted:"",attachments:"",dateExecuted:"2023-12-21 14:00:00"},
+]
+var caseProperties_=[
+  {id:1,caseNo:"A202311110005",propertyId:0,caseStatus:3.1,subId:0,propertyName:"未知",propertyStatus:1,dateUpdated:"2023-12-01 14:00:00",dateOccur:"2023-12-01 14:00:00"},
+]
+var caseAttachments_=[
+  {id:1,evidenceId:0,caseStatus:0,caseNo:"A202311110005",numFile:2,numCPage:5,numCopy:1,numOriginal:1,fileLabel:"审判决书",filePath:"/1/判决书.pdf",dateUploaded:"2023-11-01 14:00:00"},
+]

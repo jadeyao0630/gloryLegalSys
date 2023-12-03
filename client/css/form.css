@@ -46,9 +46,13 @@
 .ui-selectmenu.ui-dialog .ui-header {
     border-bottom-width: 1px;
 }
-.multiSelect{
-    max-width: 320px;;
+
+.select-overflow{
+    overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
 #popupArrow {
     position: absolute !important;
     min-width:100px;

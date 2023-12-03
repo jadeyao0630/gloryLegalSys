@@ -85,6 +85,7 @@ pageTable.prototype.init=function(arg){
 pageTable.prototype.buildTableColumns=function(){
     var _this=this;
     var columnTemplate=_this.opt.template;
+    $("#"+_this.opt.containerId).find('thead').remove();
     if(!(columnTemplate instanceof Array)){
         //console.log('buildTableColumns...........');
         var thead=$('<thead></thead>');
@@ -125,6 +126,8 @@ pageTable.prototype.buildTableColumns=function(){
 pageTable.prototype.addTableData=function(data){
     var _this=this;
     var columnTemplate=_this.opt.template;
+    console.log('add new tbody: ',$("#"+_this.opt.containerId).find('tbody'))
+    $("#"+_this.opt.containerId).find('tbody').remove();
     var tbody=$('<tbody></tbody>');
     
     //console.log('data instanceof Array');
@@ -199,7 +202,9 @@ pageTable.prototype.addTableData=function(data){
                     $.each(ids,function(index,id){
                         
                         
-                        if(template.data[id].type=="backgroundColorLabel"){
+                        if(template.data[id].type=="backgroundColorLabel" && template.data[id].hasOwnProperty('backgroundData') && template.data[id].backgroundData!=undefined){
+                            //console.log(id,template.data[id]);
+
                             //console.log('backgroundData: '+template.data[id].backgroundData[template.data[id].data[d[id]]]+"--"+template.data[id].data[d[id]]);
                             td.css(template.data[id].backgroundData[template.data[id].data[d[id]]])
                         }
@@ -331,11 +336,22 @@ pageTable.prototype.addTableData=function(data){
         return td;
     }
 }
-pageTable.prototype.pageTable=function(command){
+pageTable.prototype.pageTable=function(command,data){
     var _this=this;
     if(command=="refresh"){
         $("#"+_this.opt.containerId).table().table("refresh");
         $("#"+_this.opt.containerId).trigger("create");
+    }else if(command=="create"){
+        _this.buildTableColumns();
+        _this.addTableData(data);
+        tableColumnToggle(_this.opt.template,"mainFooter",_this.opt.containerId);
+        //console.log('pageTable data:',data);
+        //$("#"+_this.opt.containerId).find('tbody').remove();
+        $("#"+_this.opt.containerId).table().table("refresh");
+        $("#"+_this.opt.containerId).trigger("create");
+        
+        $("#"+_this.opt.containerId).hpaging({ limit: 10 });
+       // console.log($("#"+_this.opt.containerId).html());
     }
 }
 function _createNewCaseForm(template, constainerId){

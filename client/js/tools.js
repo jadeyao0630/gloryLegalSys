@@ -13,6 +13,18 @@ String.prototype.format = function(...args) {
         return typeof args[index] === 'undefined' ? match : args[index];
     });
 }
+function saveNewData2List(sourceData,newData,indexName){
+    
+    var index = sourceData.findIndex(function(item) {
+        return item[indexName] === Number(newData[indexName]);
+      });
+      if (index !== -1) {
+        sourceData[index] = newData;
+        console.log('saveNewData2List','保存新数据成功。。。');
+      }else{
+        console.log('saveNewData2List','无法找到新数据匹配。。。',sourceData,newData);
+      }
+}
 function formatDateTime(date, format) {
     const o = {
       'M+': date.getMonth() + 1, // 月份
@@ -76,37 +88,48 @@ function getKeyValues(object,key){
     return collector;
 }
 $.fn.extend({
-    removeTableItem:function(sourceDate,itemData){
-        var index=sourceDate.indexOf(itemData);
+    removeTableItem:function(sourceData,itemData,res){
+        var index=sourceData.indexOf(itemData);
         var trs=$(this).find('tbody tr');
+        var _this=this;
         if(trs.length>0){
             //console.log('width: '+parseInt($(trs[index]).css('width'))*-1);
             $(trs[index]).find('td').animate({
                 padding: 0
-                }).wrapInner('<div />').children().slideUp(function() {
+                }).wrapInner('<div />').children().slideUp(500,function() {
                     $(this).closest('tr').remove();
+                    sourceData=$.grep(sourceData,function(val){
+                        return itemData!=val;
+                    });
+                    //console.log(sourceData);
+                    //sourceData=sourceData.splice(index,1);
+                    $(_this).trigger('create');
+                    //console.log('sourceDate:',sourceDate);
+                    if(res!=undefined) res(sourceData);
+                    return sourceData;
                 });
             }
         
-            sourceDate.splice(index,1);
-            $(this).trigger('create');
     },
-    removeTableItems:function(sourceDate,itemDatas){
+    removeTableItems:function(sourceData,itemDatas,res){
         var _self=this;
         var counter=0;
+        var duration=500;
         $.each(itemDatas,function(index,data){
-            var index=sourceDate.indexOf(data);
+            var _index=sourceData.indexOf(data);
             var trs=$(_self).find('tbody tr');
             //console.log($(_self));
             if(trs.length>0){
-                var duration=500;
+                
                 setTimeout(function() {
-					$(trs[index]).find('td').animate({
+					$(trs[_index]).find('td').animate({
                         'padding-top': 0,
                         'padding-bottom':0,
-                        }).wrapInner('<div />').children().slideUp({ duration: duration, queue: true },function() {
+                        }).wrapInner('<div />').children().slideUp(duration,function() {
                             $(this).closest('tr').remove();
-                            sourceDate.splice(index,1);
+                            //sourceData.splice(_index,1);
+                            //console.log('removeTableItems:'+_index+' ',sourceData);
+                            
                         });
 				}, duration*counter);
                 counter++;
@@ -116,7 +139,15 @@ $.fn.extend({
                 
                 
         });
-        $(this).trigger('create');
+        setTimeout(function() {
+            $(this).trigger('create');
+            
+            sourceData=$.grep(sourceData,function(val){
+                return itemDatas.indexOf(val)<0;
+            });
+            if(res!=undefined) res(sourceData);
+            return sourceData;
+        },duration*itemDatas.length);
         
     }
 })
@@ -221,7 +252,7 @@ $.fn.extend({
     },
     mloader:function(visibility,arg){
         //console.log(visibility);
-        console.log(arg);
+        //console.log(arg);
         if(visibility.toLowerCase()=="show"){
             var title="";
             var popup_style=' style="padding:10px 15px;text-align:center;min-width:100px;"';

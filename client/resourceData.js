@@ -12,6 +12,7 @@ var caseRelatedParty={
     "公司":corporate_companies,
     "个人":corporate_partners
 }
+var casePersonnel={}
 var auth_levels=["一般","主管","管理员"];
 var legalAffairs=["无","贺璐璐","李俊峰","王培斯"];
 var legal_agencies=[
@@ -76,4 +77,13 @@ const basicTableList={
     counselTitles:{tablename:"counsel_titles",data:counsel_titles,template:counselTitles},
     lawFirms:{tablename:"law_firms",data:law_firms,template:_lawFirms},
     attorneys:{tablename:"attorneys",data:_attorneys,template:attorneys},
+}
+const caseTableList={
+    userList:{tablename:"names",template:users},
+    caseStatus:{tablename:"caseStatus",template:caseStatus},
+    casesDb:{tablename:"cases",template:columns},
+    caseUpdates:{tablename:"caseUpdates",template:caseUpdates},
+    caseExcutes:{tablename:"caseExcutes",template:caseExcutes},
+    caseProperties:{tablename:"caseProperties",template:properties},
+    caseAttachments:{tablename:"caseAttachments",template:attachments},
 }

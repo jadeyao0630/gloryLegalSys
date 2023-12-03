@@ -11,17 +11,8 @@
 	<link rel="stylesheet" href="./css/popup.css" />
 	<link rel="stylesheet" href="./css/color.css" />
 	<link rel="stylesheet" href="./css/stepButton.css" />
-	<script src="./js/jquery.js"></script>
-	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
-
-	<script src="./js/jquery.table.hpaging.js"></script>
-	<script src="./configs.js"></script>
-	<script type="text/javascript" src="./js/tools.js"></script>
-	
-	<script type="text/javascript" src="./form.js"></script>
-	<script type="text/javascript" src="./utilities/tables.js"></script>
-	<script type="text/javascript" src="./js/progressesButton.js"></script>
-	
+	<link rel="stylesheet" href="./css/superMultiSelect.css" />
+	<link rel="stylesheet" href="https://unpkg.com/tippy.js@5/dist/backdrop.css" />
 	<style>
 		#main_nav ul li button{
 			vertical-align: middle;
@@ -210,6 +201,22 @@
 			cursor: pointer;
 		}
 	</style>
+
+	<script src="./js/jquery.js"></script>
+	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
+
+	<script src="https://unpkg.com/popper.js@1"></script>
+	<script src="https://unpkg.com/tippy.js@5"></script>
+	<script src="./js/jquery.table.hpaging.js"></script>
+	<script src="./configs.js"></script>
+	<script type="text/javascript" src="./js/tools.js"></script>
+	
+	<script type="text/javascript" src="./form.js"></script>
+	<script type="text/javascript" src="./utilities/tables.js"></script>
+	<script type="text/javascript" src="./js/progressesButton.js"></script>
+	<script type="text/javascript" src="./utilities/superMutliSelect.js"></script>
+	
+	
 	<script type="text/javascript" src="./utilities/events.js"></script>
 	<script type="text/javascript" src="./utilities/eventManager.js"></script>
 	<script type="text/javascript" src="./utilities/timeline.js"></script>
@@ -274,22 +281,23 @@
 		</div><!-- /footer -->
 	</div><!-- /page -->
 	
-	<!-- Start of second page -->
+	<!--#region Start of second page -->
 	<div data-role="page" id="fullscreenPage">
 	
 		<div data-role="header" data-position="fixed">
-				<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
+				<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-mini ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
 			<h1 id="reg_form_title">My App</h1>
 			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
 		</div><!-- /header -->
-	
+		
 		<div data-role="popup" id="popupArrow" data-arrow="true" style="padding:5px;"></div>
 			<form role="main" data-ajax="false" id="case_reg_page">
 
 			</form>
 		
 
-	</div><!-- /page -->
+	</div>
+	<!--#endRegion -->
 	<div data-role="page" id="loginPage">
 		<h4>登录页面</h4>
 		<form>
@@ -328,11 +336,11 @@
 	</div>
 	<div data-role="page" id="progress">
 		<div data-role="header" data-position="fixed">
-			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
 			<h1 id="progress_title">My App</h1>
 			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
 		</div><!-- /header -->
-		<div data-role="panel" id="update_panel" data-position="right" data-display="overlay" data-position-fixed="true" data-theme="a" style="width:100%;">
+		<div data-role="panel" id="update_panel" data-position="right" data-display="overlay" data-position-fixed="true" data-dismissible="false" data-theme="a" style="width:100%;">
 			<h4 id="update_list_title"> </h4>
 			<ul data-role="listview" data-inset="true" id="event_list" data-theme="a">
 	
@@ -340,8 +348,8 @@
 		</div><!-- /panel -->
 		<div class="ui-body-d ui-content" style="display: grid;grid-template-columns: auto 1fr;column-gap: 30px; vertical-align: middle;">
 			
-			<div id="progress_details"></div>
-			<div id="progress_diagram" style="display: inline;text-align: center;vertical-align: middle;margin-top: 20px;"></div>
+			<div id="progress_details" style="width: 350px;"></div>
+			<div id="progress_diagram" style="display: inline;text-align: center;vertical-align: middle;margin-top: 20px; margin-left:20px;"></div>
 			
 		</div>
 		<div data-role="popup" id="progress_popupMenu" data-theme="a">
@@ -361,13 +369,33 @@
 				</li>
 			</ul>
 		</div><!-- /collapsible -->
+		<div data-role="popup" id="progress_popup_add" data-theme="a" style="z-index: 100;padding: 20px;">
+			<h3 id="progress_popup_add_title">test</h3>
+			<form id="progress_popup_add_form"></form>
+			<fieldset class="ui-grid-a">
+				<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a></div>
+				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green">提交</a></div>
+			</fieldset>
+		</div>
+		
 	</div>
+	<div data-role="page" id="progress_details_info" >
+		<div data-role="header" data-position="fixed">
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
+			<h1 id="progress_details_info_title">My App</h1>
+			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
+		</div><!-- /header -->
+		<div class="ui-body-d ui-content">
+			<ul data-role="listview" data-inset="true" data-theme="a" id="progress_details_info_body"></ul>
+		</div>
+	</div>
+		
 	<!--首页读取界面-->
 	<div id="main-container">
 		<h1>国瑞法务管理系统</h1>
 		<div style="display: inline;">
 			<div class="fa fa-spinner fa-spin" style="font-size: 40px;color:steelblue;vertical-align:middle;"></div>
-			<h3 style="display: inline;margin-left: 10px;vertical-align:middle;">读取中</h3>
+			<h3 id="mainLoadingMessage" style="display: inline;margin-left: 10px;vertical-align:middle;">读取中</h3>
 		</div>
 	</div>
 	<script type="text/javascript" src="./fakeData.js"></script>

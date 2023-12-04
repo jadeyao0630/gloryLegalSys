@@ -291,6 +291,7 @@ pageTable.prototype.addTableData=function(data){
                     //console.log(val);
                 }
             }
+            if(val==undefined) val='未开始流程';
             var label=$('<label>'+val+'</label>')
             td.append(label);
         }else if(columnSettings.type=="progressesButton"){

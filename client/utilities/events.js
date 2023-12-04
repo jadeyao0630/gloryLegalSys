@@ -139,8 +139,13 @@ function addClickEvents(){
             });
             
         }else if(this.id=="case_reg_but_remove"){
+            var targetTable='#pageOneTable';
+            if(getGlobal('currentPage')=="#page2"){
+                targetTable='#pageSecondTable';
+            }
+            console.log("currentPage",$(getGlobal('currentPage')),targetTable,(getGlobal('currentPage')=="#page2"));
             //console.log($('#pageOneTable').find('input[type="checkbox"][name="item_checkbox"]:checked'));
-            var checked=$('#pageOneTable').find('input[type="checkbox"][name="item_checkbox"]:checked');
+            var checked=$(targetTable).find('input[type="checkbox"][name="item_checkbox"]:checked');
             if(checked.length>0){
                 $().requestDialog({
                     title:'提示',
@@ -149,8 +154,8 @@ function addClickEvents(){
                     console.log("删除");
                     var matcheds=[];
                     var ids=[];
-                    $.each($('#pageOneTable').find('input[type="checkbox"][name="item_checkbox"]:checked'),function(index,check){
-                        //console.log($(check).data('item'));
+                    $.each($(targetTable).find('input[type="checkbox"][name="item_checkbox"]:checked'),function(index,check){
+                        console.log("delete...",$(check).data('item'));
                         var matched=DataList.combinedData.filter((d)=>{return d.id==$(check).data('item')});
                         if(matched.length>0){
                             matcheds.push(matched[0]);
@@ -159,7 +164,7 @@ function addClickEvents(){
                         
                     });
                     if(matcheds.length>0){
-                        DataList.combinedData=$('#pageOneTable').removeTableItems(DataList.combinedData,matcheds,(data)=>{
+                        DataList.combinedData=$(targetTable).removeTableItems(DataList.combinedData,matcheds,(data)=>{
                             $('.reg-checkbox-all').prop("checked",false);
                             //pageSeTable.pageTable('refresh');
                             DataList.combinedData=data;
@@ -193,6 +198,7 @@ function addClickEvents(){
             case '查看':
                 //$( "#update_panel" ).panel( "open" );
                 //$( "#progress_details_info" ).removeClass('hide');
+                $().mloader('show',{message:"读取中..."});
                 setTimeout(() => {
                     //console.log('查看...',sessionStorage.getItem("currentId"));
                     var index=Number(sessionStorage.getItem("currentId"));
@@ -235,7 +241,7 @@ function addClickEvents(){
                     //$('#progress_details_info_body').trigger('create');
                     $('#progress_details_info_body').listview().listview('refresh');
                     $.mobile.navigate( "#progress_details_info");
-                    
+                    $().mloader('hide');
                 }, 200);
                 //$.mobile.navigate( "#progress_details_info");
                 break;
@@ -348,25 +354,34 @@ function addClickEvents(){
 
                         //$( "#update_panel" ).panel( "open" );
                         var title=progresses[e.Position.main] instanceof Array?progresses[e.Position.main][e.Position.sub]:progresses[e.Position.main];
+                        
                         $("#progress_popupMenu_title").text('请选择对 '+title+' 的操作');
-                        if(matchedMainData[0].isReadOnly) $('#progress_popupMenu_add').hide();
-                        else $('#progress_popupMenu_add').show();
-                        var exeBtn=$.grep($($('#progress_popupMenu_add').find('a')),(a)=>{
-                            console.log('setMainForm', $(a).text()=="执行");
+                        if(matchedMainData[0].isReadOnly) $('.progress_popupMenu_add_group').hide();
+                        else {
+                            $('.progress_popupMenu_add_group').show();
+                            
+                        }
+                        var exeBtn=$.grep($($('#progress_popupMenu_add_group').find('a')),(a)=>{
+                            //console.log('setMainForm', $(a).text()=="执行");
                             return $(a).text()=="执行";
                         });
                         //console.log('setMainForm',e.Position.main);
-                        if(e.Position.main==3||e.Position.main==2){
+                        if((e.Position.main==3||e.Position.main==2)&&!matchedMainData[0].isReadOnly){
                             $(exeBtn).show();
-                            $(exeBtn).trigger('create');
+                            $(exeBtn).css({'display':'block'});
                         }else{
                             $(exeBtn).hide();
                         }
-                        $('#progress_popupMenu_add').find('ul').trigger('create').listview().listview('refresh');
-                        console.log('progress_popupMenu_add',$('#progress_popupMenu_add').find('ul'));
+                        //$('#progress_popupMenu_add').find('ul').trigger('create').listview().listview('refresh');
+                       // $('#progress_popupMenu_add').find('div').trigger('create');
+                        //$('#progress_popupMenu_add').find('div').
+                        //console.log('progress_popupMenu_add',$('#progress_popupMenu_add').find('ul'));
+                        //console.log('progress_popupMenu_add',$("#progress_popupMenu").find('ul'));
                         $("#progress_popupMenu").trigger('create');
+                        
                         $("#progress_popupMenu").popup('open');
                         $("#progress_popupMenu").popup('reposition',{x:e.event.pageX,y:e.event.pageY});
+                        $("#progress_popupMenu_add_group").listview().listview('refresh');
                         //console.log($("#progress_popupMenu"));
                     });
                     $("#progress_diagram").trigger('create');
@@ -391,6 +406,7 @@ function addClickEvents(){
 
     //#region 查看信息页面的按钮事件
     function showProgressDetails(datas,updates,excutes,properties,attachments){
+        $().mloader('show',{message:"读取中..."});
         if(datas.length>0){
             //window.location="./test/timeline.html"
             $("#summary_list").children().remove();
@@ -420,6 +436,7 @@ function addClickEvents(){
             //$(getGlobal('currentPage')).addClass('hide');
             //_setFlowChart(table_progress_data,table_progress_status,table_progress_executes,table_progress_updates,matchItems[0].id);
         }
+        $().mloader('hide');
     }
     //只读锁按钮事件
     function lockEvent(e){

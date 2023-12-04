@@ -47,6 +47,7 @@ $('body').on(preload_completed_event_name,function(){
 	});
 
 	$('#main-container').addClass('hide');
+	$('#mainFooter').show();
 	logingStatus();
 });
 

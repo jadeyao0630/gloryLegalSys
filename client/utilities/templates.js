@@ -512,6 +512,7 @@ var _summary_template;
             hasLabel:true,
             hasPlaceHolder:true,
             labelPosition:"left",
+            gridStyle:{'row-gap':"5px"},
             width:'350px',
             textareaHeight:90,
             isCollapsibleGrouping:false,
@@ -809,7 +810,14 @@ var _summary_template;
                 },
             }
             
-        }
+        },
+        attachments:{
+          label:"附件信息",
+          data:{
+            type:"listview",
+            attachments:[]
+          }
+        },
         
     } 
     add_update_template={

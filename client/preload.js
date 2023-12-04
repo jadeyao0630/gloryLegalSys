@@ -1,7 +1,7 @@
 
 
 var result=[];
-
+$('#mainFooter').hide();
 //getBasicDatabaseData();
 getCaseDb(basicTableList,[],(k,d)=>{
     $('#mainLoadingMessage').text('读取中...'+k);

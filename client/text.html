@@ -356,17 +356,13 @@
 			<ul data-role="listview" data-inset="false" style="min-width:210px;">
 				<li data-role="list-divider" id="progress_popupMenu_title">请选择操作</li>
 				<li><a href="#">查看</a></li>
-				<li style="margin:0px 0px;" id="progress_popupMenu_add">
-					<div data-role="collapsible" data-inset="false"  style="margin:-20px;" data-iconpos="right" data-theme="b" data-content-theme="a">
-						<h2>添加</h2>
-						<ul data-role="listview">
-							<li><a href="#">进展</a></li>
-							<li><a href="#">执行</a></li>
-							<li><a href="#">财产</a></li>
-							<li><a href="#">附件</a></li>
-						</ul>
-					</div>
-				</li>
+				<li data-role="list-divider" class="progress_popupMenu_add_group">添加</li>
+				<ul data-role="listview" id="progress_popupMenu_add_group" class="progress_popupMenu_add_group">
+					<li><a href="#">进展</a></li>
+					<li><a href="#">执行</a></li>
+					<li><a href="#">财产</a></li>
+					<li><a href="#">附件</a></li>
+				</ul>
 			</ul>
 		</div><!-- /collapsible -->
 		<div data-role="popup" id="progress_popup_add" data-theme="a" style="z-index: 100;padding: 20px;">

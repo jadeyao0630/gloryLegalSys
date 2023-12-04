@@ -78,6 +78,9 @@ mform.prototype={
                     var columns=template.settings.templateColumn.split(" ");
                     row_grid.css({'gridTemplateColumns':template.settings.templateColumn,'padding-right':(20*(columns.length-1))+"px"});
                 }
+                else if(template.settings.gridStyle!=undefined){
+                    row_grid.css(template.settings.gridStyle);
+                }
                 
                 
                 var stepControler=0;

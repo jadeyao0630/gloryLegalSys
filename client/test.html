@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Document</title>
     <link rel="stylesheet" href="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" href="./css/color.css">
     <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
     <script src="//code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <style>
@@ -38,6 +39,13 @@
     .spaceSpan::after {
   content: "\00a0"; /* Unicode character for non-breaking space */
 }
+.controlgroup-textinput{
+    padding-top:.22em;
+    padding-bottom:.22em;
+}
+.row-controlgroup{
+    margin:2px 0px;
+}
     </style>
 </head>
 <body>
@@ -63,7 +71,13 @@
         
     </select>
 </div>
+<div data-role="fieldcontain">
+    <label for="multiselect1">Choose options:</label>
+    <select name="multiselect" id="multiselect1" data-native-menu="false" multiple="multiple">
 
+        
+    </select>
+</div>
 
 <script>
 function getValue(element){
@@ -136,14 +150,193 @@ function checkIfMainSelectChecked(element,id4check){
     return val;
 }
     $(document).on("pagecreate", function () {
-//return;
-        console.log($('#multiselect-listbox'));
-            var _this=$('#multiselect-listbox');
+        superMultiSelectWithData();
+        superMultiSelectWithoutData('multiselect1');
+        superMultiSelectSetDatas('multiselect1',['2中国人寿','3中国银行']);
+        
+});
+function getSuperValue(elementid){
+
+    console.log('elementId',elementid);
+    var listbox_popup=$('#'+elementid.replace('#','')+'-listbox');
+    var values=[];
+
+    $.each(listbox_popup.find('div[data-role="controlgroup"]'),function(i,cg){
+        var input=$(cg).find('input');
+        
+        var select=$(cg).find('select > option:selected');
+    console.log("getValue input",$(select));
+        if($(input).val().length>0){
+            values.push({
+                status:select.text(),
+                statusId:select.val(),
+                value:$(input).val(),
+            });
+        }
+    });
+    console.log("getValue values",values);
+    return values;
+//button_span.find('span').text(datas.join(','));
+
+}
+
+function setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
+    var collector=[];
+    elementid=elementid.replace('#','');
+    
+    //console.log('setSuperMultiselect setSuperLabel format',format);
+    var datas=getSuperValue(elementid);
+   if(datas==undefined) return;
+    datas.forEach((data)=>{
+        var label=format;
+        var value=data.value;
+        var status=data.status;
+        if(format!=undefined){
+            if(label.indexOf('{value}')>-1) label=label.replace('{value}',value);
+            if(label.indexOf('{status}')>-1) label=label.replace('{status}',status);
+        }else{
+            label=`${data.value} (${data.status})`;
+        }
+        //console.log('formatSuperValue data',data);
+        
+        //console.log('formatSuperValue format',label);
+        collector.push(label);
+    });
+    //console.log('formatSuperValue values',collector)
+    if(collector.length>0){
+        $('#'+elementid+'-button').find('span').first().text(collector.join(','));
+        $('#'+elementid+'-button').find('span').last().text(collector.length);
+        if(collector.length>1) $('#'+elementid+'-button').find('span').last().show();
+        else $('#'+elementid+'-button').find('span').last().hide();
+    }else{
+        $('#'+elementid+'-button').find('span').first().html('&nbsp;');
+        $('#'+elementid+'-button').find('span').last().text(collector.length);
+        $('#'+elementid+'-button').find('span').last().hide();
+    }
+}
+function superMultiSelectWithoutData(id,format){//'{value} ({status})'
+    //var id='multiselect1';
+    if (format==undefined) format='{value} ({status})';
+    id=id.replace('#','');
+    console.log($('#'+id+'-listbox'));
+        var _this=$('#'+id+'-listbox');
+        _this.popup({
+            afterclose: function( event, ui ) {
+                console.log("closed");
+                var datas=getValue($('#'+id+''));
+                var options=$('#'+id+'').find('option');
+                options.prop('selected',false);
+                datas.forEach((data)=>{
+                    $.each(options,function(ii,opt){
+                        if(data.valueId==$(opt).val()) {
+                            $(opt).prop('selected',true);
+                            console.log($(opt));
+                        }
+                    });
+                });
+                console.log($('#'+id+'').html());
+            }
+        });
+
+        var search_form=$(_this).find("form");
+    search_form.find('div > input').attr('id',id+"-search");
+    //var title=$(listbox).find('.ui-header.ui-bar-inherit');
+    //aList.find('li').remove();
+    var listbox = _this.find("ul")
+    //var aList=$(listbox).find("li");
+    
+    listbox.remove();
+    listbox=$('<ul class="ui-selectmenu-list ui-listview ui-super-listview" id="'+id+'-menu" role="listbox" aria-labelledby="'+id+'-button" data-filter="true" data-input="#'+id+'-search"></ul>');
+    _this.append(listbox);
+    var li=$('<li data-option-index="0"  data-icon="false" role="option" ></li>');
+    
+    //li.append(controlgroup);
+    listbox.append(superMultiSelectRowItem(listbox,0,format));
+    listbox.trigger('create').listview().listview( "refresh" );
+    
+}
+function superMultiSelectSetDatas(elementId,datas){//2中国人寿,3中国银行
+    var listbox=$('#'+elementId+'-menu');
+    console.log('listbox',listbox);
+    listbox.empty();
+    $.each(datas,(index,data)=>{
+        var fdata=formatSuperMultiSelectData(data);
+        listbox.append(superMultiSelectRowItem(listbox,index,'{value} ({status})',fdata,index<datas.length-1));
+    })
+    setSuperLabel(elementId,'{value} ({status})');
+    listbox.trigger('create').listview().listview( "refresh" );
+}
+var casePersonnelStatus=['无','原告','被告','被执行人','执行人'];
+function formatSuperMultiSelectData(data){
+    var statusid=0;
+    var value="";
+    if(!isNaN(parseInt(data[0]))){//我方当事人状态
+        statusid=Number(data[0]);
+        value=data.substring(1, data.length);
+    }
+    return {
+        status:casePersonnelStatus[statusid],
+        statusId:statusid,
+        value:value,
+    };
+}
+function superMultiSelectRowItem(listbox,idx,format,data,notLast){
+    console.log("id",idx);
+    var controlgroup=$('<div data-option-index="'+idx+'" data-role="controlgroup" class="row-controlgroup" data-type="horizontal"></div>');
+    var select=$('<select class="sub-selectmenu" data-corners="false"></select>');
+    $.each(casePersonnelStatus,(index,status)=>{
+        var opt=$('<option class="sub-option" value='+index+'>'+status+'</option>');
+        if(data!=undefined) {
+            if(data.statusId==index) opt=$('<option class="sub-option" value='+index+' selected>'+status+'</option>');
+        }
+        select.append(opt);
+    })
+    var input=$('<input id="mutliselect-input-0" type="text" data-wrapper-class="controlgroup-textinput ui-btn">')
+    if(data!=undefined) {
+        input.val(data.value);
+    }
+    var button=$('<button data-option-index="'+idx+'" class="ui-btn ui-btn-icon-notext ui-icon-plus btn-icon-green">添加</button>')
+    if(notLast){
+        button=$('<button data-option-index="'+idx+'" class="ui-btn ui-btn-icon-notext ui-icon-delete btn-icon-red">删除</button>')
+    }
+    
+    controlgroup.append(select);
+    controlgroup.append(input);
+    controlgroup.append(button);
+    select.change(function () {
+        var elementId=listbox.attr('id').replace('-menu','');
+        setSuperLabel(elementId,format);
+    });
+    button.on('click',function(e){
+        var id=$(this).jqmData('option-index');
+        console.log(id);
+        var elementId=listbox.attr('id').replace('-menu','');
+        if($(this).hasClass('ui-icon-plus')){
+            //打印到selectbutton
+            
+            
+            //添加新的一行
+            listbox.append(superMultiSelectRowItem(listbox,(id+1)));
+            listbox.trigger('create').listview().listview( "refresh" );
+            $(this).removeClass('ui-icon-plus').addClass('ui-icon-delete');
+            $(this).removeClass('btn-icon-green').addClass('btn-icon-red');
+        }else{
+            listbox.find('div[data-option-index="'+id+'"]').remove();
+        }
+        setSuperLabel(elementId,format);
+
+    });
+    return controlgroup;
+}
+function superMultiSelectWithData(){
+    var id='multiselect';
+        console.log($('#'+id+'-listbox'));
+            var _this=$('#'+id+'-listbox');
             _this.popup({
                 afterclose: function( event, ui ) {
                     console.log("closed");
-                    var datas=getValue($('#multiselect'));
-                    var options=$('#multiselect').find('option');
+                    var datas=getValue($('#'+id+''));
+                    var options=$('#'+id+'').find('option');
                     options.prop('selected',false);
                     datas.forEach((data)=>{
                         $.each(options,function(ii,opt){
@@ -153,13 +346,22 @@ function checkIfMainSelectChecked(element,id4check){
                             }
                         });
                     });
-                    console.log($('#multiselect').html());
+                    console.log($('#'+id+'').html());
                 }
             });
-            //console.log(_this.html());
-            var aList=$(this).find("li");
-            _this.children().remove();
-            //aList.remove();
+
+            var search_form=$(_this).find("form");
+        search_form.find('div > input').attr('id',id+"-search");
+        //var title=$(listbox).find('.ui-header.ui-bar-inherit');
+        //aList.find('li').remove();
+        var listbox = _this.find("ul")
+        var aList=$(listbox).find("li");
+        
+        listbox.remove();
+        listbox=$('<ul class="ui-selectmenu-list ui-listview ui-super-listview" id="'+id+'-menu" role="listbox" aria-labelledby="'+id+'-button" data-filter="true" data-input="#'+id+'-search"></ul>');
+        _this.append(listbox);
+
+
         var count=0;
         var catelog_count=-1;
         var catelog="";
@@ -167,7 +369,7 @@ function checkIfMainSelectChecked(element,id4check){
                     var listItem = $(this);
                     console.log(listItem.find('a'));
                     if(listItem.hasClass('ui-li-divider')){
-                        _this.append(listItem);
+                        listbox.append(listItem);
                         catelog=listItem.text();
                         catelog_count++;
                     }else{
@@ -193,7 +395,7 @@ function checkIfMainSelectChecked(element,id4check){
                             select.prop('disabled',true);
                         }
                         li.append(controlgroup);
-                        _this.append(li);
+                        listbox.append(li);
                         a.on('click',function(e){
                            
                            //_this.trigger('create').listview().listview( "refresh" );
@@ -218,8 +420,8 @@ function checkIfMainSelectChecked(element,id4check){
                             var optionSelected = $(this).find('option:selected');
                             //var optTextSelected = optionSelected.text();
                             var optValueSelected = optionSelected.val();
-                            console.log(_this.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]'));
-                            if(_this.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]').attr('aria-selected')){
+                            console.log(listbox.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]'));
+                            if(listbox.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]').attr('aria-selected')){
                                 formatValue('#multiselect',"{value} ({status})");
                             }
                             //console.log(optValueSelected);
@@ -228,36 +430,16 @@ function checkIfMainSelectChecked(element,id4check){
                     }
                     
                 });
-                _this.attr("aria-labelledby" ,"multiselect-button");
+                listbox.attr("aria-labelledby" ,"multiselect-button");
                 formatValue('#multiselect',"{value} ({status})");
-                _this.trigger('create').listview().listview( "refresh" );
-                console.log(_this.html());
+                listbox.trigger('create').listview().listview( "refresh" );
+                console.log(listbox.html());
                 $('#multiselect-listbox').find("a").on("click", function (event) {
                     
                     //$('#multiselect').selectmenu().trigger('change');
                     //event.preventDefault();
                 });
-                
-            
-        /*
-    $("#multiselect").selectmenu({
-        create: function (event, ui) {
-            console.log(event);
-            var popup = $(this).data("mobile-selectmenu").menuType;
-            
-            popup.on("popupafteropen", function () {
-                // 在每个选项中添加列表视图
-                popup.find("li a").each(function () {
-                    var listItem = $(this);
-                    var list = $("<ul data-role='listview'><li>List item 1</li><li>List item 2</li></ul>");
-                    listItem.append(list);
-                    list.listview();
-                });
-            });
-        }
-    });
-    */
-});
+}
 </script>
 </body>
 </html>

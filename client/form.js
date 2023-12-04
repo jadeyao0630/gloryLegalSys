@@ -678,6 +678,8 @@ mform.prototype={
 
                     
                 });
+            }else if($(element).hasClass('supermultiInput')){
+                var val=_setSuperLabel($(element).attr('id'),'{value} ({status})');
             }else{
                 $.each($(element).find(":selected"),function(index,opt){
                     //console.log(itemTemplate.label+"--------->"+opt.value);
@@ -890,6 +892,16 @@ $.fn.extend({
                 //console.log('value-format',_values);
                 _self.find("#_"+id).html(_values.join("<br/>"));
                 //element.selectmenu().selectmenu("refresh").trigger("change");
+            }else if(type=="supermultiinput"){
+                //var _values=[];
+                //var _valueData=[];
+                console.log("form setvalue",value);
+                superMultiSelectSetDatas(id,value.split(','));
+                var _values=_setSuperLabel(id,'{value} ({status})');
+                //console.log("form setvalue",_values.join("<br/>"));
+                _self.find("#_"+id).html(_values.join("<br/>"));
+                //console.log("form setvalue",_self.find("#_"+id));
+                //console.log("form setvalue",_self.find("#_"+id).text());
             }else if(type=="combobox"){
                 
                 if(value=="") value=0;
@@ -899,9 +911,17 @@ $.fn.extend({
                     _self.find("#_"+id).text(ele.text());
                 element.selectmenu().selectmenu("refresh").trigger("change");
             }else if(type=="date"||type=="datetime"||type=="time")  {
-                if(value=="") value=new Date();
-                element.val(getDateTime(value));
-                _self.find("#_"+id).text(getDateTime(value));
+                
+                if(value!='0000-00-00 00:00:00' && value!='0000-00-00' && value!='00:00:00'){
+                    if(value=="") value=new Date();
+                    element.val(getDateTime(value));
+                    _self.find("#_"+id).text(getDateTime(value));
+                }else{
+                    console.log('Date mform',value);
+                    element.val('');
+                    _self.find("#_"+id).text('');
+                }
+                
             }else{
                 element.val(value);
                 _self.find("#_"+id).text(value);
@@ -992,7 +1012,23 @@ $.fn.extend({
                     
                     //console.log(element.type);
                     if(element.type.toLowerCase()=="date"||element.type.toLowerCase()=="time"||element.type.toLowerCase()=="datetime"){
-                        val=new Date(val).toISOString().slice(0, 19).replace('T', ' ');
+                        if(val.length>0){
+                            val=new Date(val).toISOString().slice(0, 19).replace('T', ' ');
+                        }else{
+                            if(!itemTemplate.isOptional) {
+                                console.log(itemTemplate.label+"-- has empty value");
+                                hasError=true;
+                            }else{
+                                if(element.type.toLowerCase()=="datetime")
+                                    val='0000-00-00 00:00:00';
+                                else if(element.type.toLowerCase()=="date")
+                                    val='0000-00-00';
+                                else if(element.type.toLowerCase()=="time")
+                                    val='00:00:00';
+                            }
+                        }
+                        //console.log('Date mform getvalue',val);
+                        
                     }else if(itemTemplate.numberOnly){
                         if(eval.length==0) val=0;
                         else val=parseInt(val);
@@ -1004,16 +1040,22 @@ $.fn.extend({
                     res(hasError);
                     break;
                 case "SELECT":
-                    //console.log(itemTemplate.label+"-->"+$(element).find(":selected").length);
                     var _val=[];
                     var _subVal=[];
                     var _greatVal=[];
-                    $.each($(element).find(":selected"),function(index,opt){
-                        //console.log(itemTemplate.label+"--------->"+opt.value);
-                        _val.push(opt.value);
-                        _subVal.push($(opt).jqmData('statusValue'));
-                        _greatVal.push(($(opt).jqmData('statusValue')==undefined?"":$(opt).jqmData('statusValue'))+opt.value);
-                    });
+                    //console.log(itemTemplate.label+"-->"+$(element).find(":selected").length);
+                    if($(element).hasClass('supermultiInput')){
+                        _greatVal=_getSuperValue($(element).attr('id'),'{statusId}{value}')
+                        _val=_greatVal;
+                    }else{
+                        $.each($(element).find(":selected"),function(index,opt){
+                            //console.log(itemTemplate.label+"--------->"+opt.value);
+                            _val.push(opt.value);
+                            _subVal.push($(opt).jqmData('statusValue'));
+                            _greatVal.push(($(opt).jqmData('statusValue')==undefined?"":$(opt).jqmData('statusValue'))+opt.value);
+                        });
+                        
+                    }
                     if(_val.length==0 && !itemTemplate.isOptional) {
                         console.log(itemTemplate.label+"-- has empty value"+_val.join(","));
                         hasError=true;

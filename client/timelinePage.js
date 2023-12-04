@@ -257,6 +257,27 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                                     }
                                 });
 
+                            }else if(type=="supermultiinput"){
+                                values.forEach(_v=>{
+                                    var _values=formatSuperMultiSelectData(_v);
+                                    console.log('setSumList',_values);
+                                    if(_summary_template[key].data[sub_key].hasOwnProperty('displayFormat')){
+                                        var displayFormat=_summary_template[key].data[sub_key].displayFormat;
+                                        $.each(_values,(kk,vv)=>{
+                                            if(displayFormat.indexOf(kk)>-1){
+                                                displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                            }
+                                        })
+                                        multiValues.push(displayFormat);
+                                    }else{
+                                        var collector=[];
+                                        $.each(_v,(kk,vv)=>{
+                                            collector.push(vv);
+                                        })
+                                        multiValues.push(collector.join(" "));
+                                    }
+                                });
+
                             }else{
                                 //var _values=formatSuperMultiSelectOptionValue(v);
                                 //console.log('setSumList',_values);
@@ -305,7 +326,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                     if(isMultiValue){
                         var _collapsibleset=$('<div data-role="collapsible" data-theme="a" data-iconpos="right" data-inset="false" class="collapsible-listview" style="border:none;margin-right:-45px;" data-collapsed-icon="carat-d" data-expanded-icon="carat-u"></div>');
                         var _collapsibleLabel=$('<h4 class="ui-field-contain" style="margin:0px;border:none;"><div style="display:grid;grid-template-columns: auto 1fr;column-gap: 9px;margin-left:-3px"><label style="margin-top:2px;margin-bottom:-2px;">'+
-                            label+'</label><label style="margin-top:2px;margin-bottom:-2px;">'+multiValues.join(",")+'</label></div><span class="ui-li-count">'+multiValues.length+'</span></h4>');
+                            label+'</label><label style="margin-top:2px;margin-bottom:-2px;width:250px;white-space: nowrap; overflow: hidden;text-overflow: ellipsis;">'+multiValues.join(",")+'</label></div><span class="ui-li-count">'+multiValues.length+'</span></h4>');
                         _collapsibleset.append(_collapsibleLabel);
                         var _listview=$('<ol data-role="listview" data-theme="b"> </ol>');
                         _collapsibleset.append(_listview);
@@ -381,6 +402,6 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                 
             });
         });
-        
+        $(containerId).find('select').parent().addClass('select-overflow');
     });
 }

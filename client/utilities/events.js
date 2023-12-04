@@ -309,8 +309,8 @@ function addClickEvents(){
                 $("#progress_details").empty();
                 $("#progress_diagram").empty();
                 setGlobal("currentId",index);
-                var progressInfoForm=_createNewCaseForm(progress_form_template,"progress_details");
-                progressInfoForm.instance.find('#attorney').parent().css({"width": "250px"});
+                var progressInfoForm=_createNewCaseForm(progress_form_template,"progress_details");//table.js
+                //progressInfoForm.instance.find('#attorney').parent().css({"width": "250px"});
                 $.mobile.navigate( '#progress');
                 if(matchedMainData.length>0){
                     console.log(matchedMainData[0].caseNo);

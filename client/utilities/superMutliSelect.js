@@ -1,4 +1,4 @@
-var casePersonnelStatus=['无','原告','被告','被执行人','执行人'];
+var casePersonnelStatus=['无','原告','被告','被执行人','申请执行人','上诉人','原审被告'];
 var value_format="{value} ({status})";
 //#region superMultiSelectWithInput
 function superMultiSelectSetDatas(elementId,datas){//2中国人寿,3中国银行
@@ -9,10 +9,45 @@ function superMultiSelectSetDatas(elementId,datas){//2中国人寿,3中国银行
         var fdata=formatSuperMultiSelectData(data);
         listbox.append(superMultiSelectRowItem(listbox,index,'{value} ({status})',fdata,index<datas.length-1));
     })
-    setSuperLabel(elementId,'{value} ({status})');
+    _setSuperLabel(elementId,'{value} ({status})');
     listbox.trigger('create').listview().listview( "refresh" );
 }
-
+function _setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
+    var collector=[];
+    elementid=elementid.replace('#','');
+    
+    //console.log('setSuperMultiselect setSuperLabel format',format);
+    var datas=_getSuperValue(elementid);
+    console.log('formatSuperValue datas',datas);
+   if(datas==undefined) return;
+    datas.forEach((data)=>{
+        var label=format;
+        var value=data.value;
+        var status=data.status;
+        if(format!=undefined){
+            if(label.indexOf('{value}')>-1) label=label.replace('{value}',value);
+            if(label.indexOf('{status}')>-1) label=label.replace('{status}',status);
+        }else{
+            label=`${data.value} (${data.status})`;
+        }
+        //console.log('formatSuperValue data',data);
+        
+        //console.log('formatSuperValue format',label);
+        collector.push(label);
+    });
+    console.log('formatSuperValue values',collector)
+    if(collector.length>0){
+        $('#'+elementid+'-button').find('span').first().text(collector.join(','));
+        $('#'+elementid+'-button').find('span').last().text(collector.length);
+        if(collector.length>1) $('#'+elementid+'-button').find('span').last().show();
+        else $('#'+elementid+'-button').find('span').last().hide();
+    }else{
+        $('#'+elementid+'-button').find('span').first().html('&nbsp;');
+        $('#'+elementid+'-button').find('span').last().text(collector.length);
+        $('#'+elementid+'-button').find('span').last().hide();
+    }
+    return collector;
+}
 function superMultiSelectRowItem(listbox,idx,format,data,notLast){
     console.log("id",idx);
     var controlgroup=$('<div data-option-index="'+idx+'" data-role="controlgroup" class="row-controlgroup" data-type="horizontal"></div>');
@@ -38,7 +73,7 @@ function superMultiSelectRowItem(listbox,idx,format,data,notLast){
     controlgroup.append(button);
     select.change(function () {
         var elementId=listbox.attr('id').replace('-menu','');
-        setSuperLabel(elementId,format);
+        _setSuperLabel(elementId,format);
     });
     button.on('click',function(e){
         var id=$(this).jqmData('option-index');
@@ -56,18 +91,19 @@ function superMultiSelectRowItem(listbox,idx,format,data,notLast){
         }else{
             listbox.find('div[data-option-index="'+id+'"]').remove();
         }
-        setSuperLabel(elementId,format);
+        _setSuperLabel(elementId,format);
 
     });
     return controlgroup;
 }
 
-function getSuperValue(elementid,format){
+function _getSuperValue(elementid,format){
 
-    console.log('elementId',elementid);
+    console.log('formatSuperValue elementId',elementid);
     var listbox_popup=$('#'+elementid.replace('#','')+'-listbox');
     var values=[];
 
+    console.log("formatSuperValue listbox_popup",listbox_popup);
     $.each(listbox_popup.find('div[data-role="controlgroup"]'),function(i,cg){
         var input=$(cg).find('input');
         
@@ -90,7 +126,7 @@ function getSuperValue(elementid,format){
             
         }
     });
-    console.log("getValue values",values);
+    console.log("formatSuperValue values",values);
     return values;
 //button_span.find('span').text(datas.join(','));
 
@@ -428,10 +464,11 @@ $.fn.extend({
         if (vformat==undefined) vformat='{value} ({status})';
         var elementId=$(this).attr('id');
         console.log('listbox',elementId);
+        $(elementId).parent().parent().find('.sub-selectmenu').remove();
         var listbox_popup=$('#'+elementId+'-listbox');
         listbox_popup.popup({
             afterclose: function( event, ui ) {
-                setSuperLabel(elementId,vformat);
+                _setSuperLabel(elementId,vformat);
             }
         });
 
@@ -452,40 +489,7 @@ $.fn.extend({
         listbox.trigger('create').listview().listview( "refresh" );
         console.log('listbox',listbox_popup.html());
 
-        function setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
-            var collector=[];
-            elementid=elementid.replace('#','');
-            
-            //console.log('setSuperMultiselect setSuperLabel format',format);
-            var datas=getSuperValue(elementid);
-           if(datas==undefined) return;
-            datas.forEach((data)=>{
-                var label=format;
-                var value=data.value;
-                var status=data.status;
-                if(format!=undefined){
-                    if(label.indexOf('{value}')>-1) label=label.replace('{value}',value);
-                    if(label.indexOf('{status}')>-1) label=label.replace('{status}',status);
-                }else{
-                    label=`${data.value} (${data.status})`;
-                }
-                //console.log('formatSuperValue data',data);
-                
-                //console.log('formatSuperValue format',label);
-                collector.push(label);
-            });
-            //console.log('formatSuperValue values',collector)
-            if(collector.length>0){
-                $('#'+elementid+'-button').find('span').first().text(collector.join(','));
-                $('#'+elementid+'-button').find('span').last().text(collector.length);
-                if(collector.length>1) $('#'+elementid+'-button').find('span').last().show();
-                else $('#'+elementid+'-button').find('span').last().hide();
-            }else{
-                $('#'+elementid+'-button').find('span').first().html('&nbsp;');
-                $('#'+elementid+'-button').find('span').last().text(collector.length);
-                $('#'+elementid+'-button').find('span').last().hide();
-            }
-        }
+        
         
 
     }

@@ -148,7 +148,10 @@ function drawTimeline(_data,ctx,dataList){
         if(data.length>0){
             var val=data[0].label;
             if(data[0].date!=undefined){
-                val=new Date(data[0].date);
+                if(data[0].date=="0000-00-00 00:00:00")
+                    val="";
+                else
+                    val=new Date(data[0].date);
             }
             //console.log(val)
             drawDateText(datePosition[index],val,ctx,colors[index+1]);
@@ -185,6 +188,7 @@ function drawIndicatorText(startPos,data,ctx,color){
 function drawDateText(startPos,val,ctx,color){
     var text=val;
     if(val instanceof Date){
+        console.log('Date',val);
         var offsetX=50;
         text=val.getFullYear()+" | "+val.getMonth()+"月"+val.getDate()+"日";
         ctx.font = 'bold 30px Arial';

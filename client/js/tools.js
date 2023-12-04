@@ -52,7 +52,7 @@ function formatDateTime(date, format) {
     return format;
   }
   function getDateTime(dateTimeStr){
-      if (dateTimeStr==undefined)
+      if (dateTimeStr==undefined||dateTimeStr=='0000-00-00 00:00:00')
           return new Date().toISOString().substr(0,10);
       else
           return new Date(dateTimeStr).toISOString().substr(0,10);

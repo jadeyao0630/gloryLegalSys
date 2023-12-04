@@ -721,8 +721,11 @@ var _summary_template;
                 case2ndParty:{
                     placeholder:"对方当事人",
                     label:"对方当事人:",
-                    type:"text",
+                    type:"supermultiinput",
                     isOptional:false,
+                    isFilterable:true ,
+                    data:{},
+                    displayFormat:'{value} ({status})'
                 },
                 caseCatelog:{
                     placeholder:"案件类别",

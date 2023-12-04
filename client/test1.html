@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+
+         
+         <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
+         <style>
+            .pag{
+                text-align: center;
+            }
+            .btn-light{
+                color: white;
+                
+            }
+            .btn-light:active{
+                background-color: bisque;
+                color: white;
+            }
+         </style>
+    </head>
+    <body><form>
+            <input id="filterTable-input" data-type="text">
+        </form>
+        <table data-role="table" id="movie-table" data-filter="true" data-input="#filterTable-input" class="ui-responsive">
+            <thead>
+                <tr>
+                    <th data-priority="1">Rank</th>
+                    <th data-priority="persist">Movie Title</th>
+                    <th data-priority="2">Year</th>
+                    <th data-priority="3"><abbr title="Rotten Tomato Rating">Rating</abbr></th>
+                    <th data-priority="4">Reviews</th>
+                </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th>1</th>
+                        <td><a href="https://en.wikipedia.org/wiki/Citizen_Kane" data-rel="external">Citizen Kane</a></td>
+                        <td>1941</td>
+                        <td>100%</td>
+                        <td>74</td>
+                    </tr>
+                    <tr>
+                        <th>2</th>
+                        <td><a href="https://en.wikipedia.org/wiki/Casablanca_(film)" data-rel="external">Casablanca</a></td>
+                        <td>1942</td>
+                        <td>97%</td>
+                        <td>64</td>
+                    </tr>
+                    <tr>
+                        <th>3</th>
+                        <td><a href="https://en.wikipedia.org/wiki/The_Godfather" data-rel="external">The Godfather</a></td>
+                        <td>1972</td>
+                        <td>97%</td>
+                        <td>87</td>
+                    </tr>
+                </tbody>
+            </table>
+        <script  src="./js/jquery.min.js"></script>
+	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
+        <script src="./js/fancyTable.js"></script>
+        </script>
+        <script type="text/javascript">
+             function setTable(elm,searchField,instance){
+                console.log(this);
+                settings = {
+                    inputStyle: "",
+                    inputPlaceholder: "Search...",
+                    pagination: false,
+                    paginationClass: "btn btn-light",
+                    paginationClassActive: "active",
+                    pagClosest: 3,
+                    perPage: 1,
+                    sortable: true,
+                    searchable: true,
+                    matchCase: false,
+                    exactMatch: false,
+                   globalSearch:true,
+                    localeCompare: false,}
+                elm.fancyTable = {
+                    nColumns: $(elm).find("td").first().parent().find("td").length,
+                    nRows : $(this).find("tbody tr").length,
+                    perPage : settings.perPage,
+                    page : 1,
+                    pages : 0,
+                    matches : 0,
+                    searchArr : [],
+                    search : "",
+                    sortColumn : settings.sortColumn,
+                    sortOrder : (typeof settings.sortOrder === "undefined") ? 1 : (new RegExp("desc","i").test(settings.sortOrder) || settings.sortOrder == -1) ? -1 : 1,
+                    sortAs:[], // undefined, numeric, datetime, case-insensitive, or custom
+                    paginationElement : settings.paginationElement
+                };
+                elm.fancyTable.rowSortOrder = new Array(elm.fancyTable.nRows);
+                if($(elm).find("tbody").length==0){
+                    var content = $(elm).html();
+                    $(elm).empty();
+                    $(elm).append("<tbody>").append($(content));
+                }
+                if($(elm).find("thead").length==0){
+                    $(elm).prepend($("<thead>"));
+                    // Maybe add generated headers at some point
+                    //var c=$(elm).find("tr").first().find("td").length;
+                    //for(var n=0; n<c; n++){
+                    //	$(elm).find("thead").append($("<th></th>"));
+                    //}
+                }
+                $(elm).find("tbody tr").each(function(index) {
+                    // $(this).attr("data-rowid", index);
+                    $(this).data("rowid", index);
+                });
+                if(settings.sortable){
+                    var nAElm=0;
+                    $(elm).find("thead th").each(function() {
+                        elm.fancyTable.sortAs.push($(this).data('sortas'));
+                        var content = $(this).html();
+                        var a = $("<a>",{
+                            href: "#",
+                            "aria-label": "Sort by " + $(this).text(),
+                            html:content,
+                            "data-n": nAElm,
+                            class:""
+                        }).css({"cursor":"pointer","color":"inherit","text-decoration":"none","white-space":"nowrap"}).bind("click",function(){
+                            if(elm.fancyTable.sortColumn == $(this).data("n")){
+                                elm.fancyTable.sortOrder=-elm.fancyTable.sortOrder;
+                            } else {
+                                elm.fancyTable.sortOrder=1;
+                            }
+                            elm.fancyTable.sortColumn = $(this).data("n");
+                            instance.tableSort(elm);
+                            instance.tableUpdate(elm);
+                            return false;
+                        });
+                        $(this).empty();
+                        $(this).append(a);
+                        nAElm++;
+                    });
+                }
+                if(settings.searchable){
+                    var searchHeader = $("<tr>");
+                    if(settings.globalSearch){
+                        searchField.bind("change paste keyup",function(){
+                            elm.fancyTable.search = $(this).val();
+                            elm.fancyTable.page = 1;
+                            console.log(elm.fancyTable);
+                            instance.tableUpdate(elm);
+                        });
+                        var th = $("<th>",{ style:"padding:2px;" }).attr("colspan",elm.fancyTable.nColumns);
+                        //$(searchField).appendTo($(th));
+                        //$(th).appendTo($(searchHeader));
+                    } 
+                    //searchHeader.appendTo($(elm).find("thead"));
+                    //$(elm).find("thead").prepend(searchHeader);
+                }
+                // Sort
+                instance.tableSort(elm);
+                if(settings.pagination && !settings.paginationElement){
+                    $(elm).find("tfoot").remove();
+                    $(elm).append($("<div class=\"paging\"></div>"));
+                    $(elm).find(".paging").append($("<div class='pag'></div>",{ }));
+                }
+                instance.tableUpdate(elm);
+                //settings.onInit.call(this,elm);
+                $(elm).trigger('create');
+             }
+            $(document).ready(function() {
+                //$("#movie-table").jqmData('searchId','filterTable-input');
+                var instance=$("#movie-table").fancyTable({
+                  /* Column number for initial sorting*/
+                   sortColumn:6,
+                   /* Setting pagination or enabling */
+                   pagination: true,
+                   /* Rows per page kept for display */
+                   perPage:1,
+                   globalSearch:true
+                   });
+
+
+                   //setTable($("#movie-table"),$('#filterTable-input'),instance);
+                   
+                             
+            });
+        </script>
+    </body>
+</html>

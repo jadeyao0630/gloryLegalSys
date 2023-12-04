@@ -169,6 +169,11 @@ function addClickEvents(){
                             //pageSeTable.pageTable('refresh');
                             DataList.combinedData=data;
                             if(enableRealDelete) removeCases(ids,'cases',(res)=>console.log);
+                            setTimeout(() => {
+                                fancyTable1.tableUpdate($("#pageOneTable"));
+                                $("#pageOneTable").trigger('create');
+                            }, 1000);
+                            
                             //console.log('deleted1....', DataList.combinedData);
                             //pageOnTable.pageTable('create',DataList.combinedData);
                         });
@@ -217,12 +222,13 @@ function addClickEvents(){
                         var date_bar=$('<li data-role="list-divider">'+_data.date+'</li>');
                         var item_container=$('<li></li>');
                         if(ite.hasOwnProperty('evidenceId')){
-                            var list_item=$('<label>'+_data.description+'</label>');
+                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+_data.description+'</h3>');
                             
-                            item_container.append(list_item);
-                            var group=$('<fieldset data-role="controlgroup" data-type="horizontal"><fieldset>');
-                            var view_btn=$('<a href="#" class="ui-btn ui-btn-inline ui-icon-eye ui-btn-icon-right ui-btn-icon-notext btn-icon-green">查看</a>')
-                            var del_btn=$('<a href="#" class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-right ui-btn-icon-notext btn-icon-red">删除</a>')
+                            item_container=$('<li style="padding:0px;"></li>');
+                            var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
+                            var view_btn=$('<a href="#" class="ui-btn ui-icon-eye ui-btn-icon-notext btn-icon-green" style="padding:10px 5px;border-top: none;border-bottom: none;">查看</a>')
+                            var del_btn=$('<a href="#" class="ui-btn ui-icon-delete ui-btn-icon-notext btn-icon-red" style="padding:10px 5px;border: none;">删除</a>')
+                            group.append(list_item);
                             group.append(view_btn);
                             group.append(del_btn);
                             item_container.append(group);
@@ -309,8 +315,8 @@ function addClickEvents(){
                 $("#progress_details").empty();
                 $("#progress_diagram").empty();
                 setGlobal("currentId",index);
-                var progressInfoForm=_createNewCaseForm(progress_form_template,"progress_details");//table.js
-                //progressInfoForm.instance.find('#attorney').parent().css({"width": "250px"});
+                var progressInfoForm=_createNewCaseForm(progress_form_template,"progress_details");
+                progressInfoForm.instance.find('#attorney').parent().css({"width": "250px"});
                 $.mobile.navigate( '#progress');
                 if(matchedMainData.length>0){
                     console.log(matchedMainData[0].caseNo);

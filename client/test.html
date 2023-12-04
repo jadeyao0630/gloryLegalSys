@@ -39,13 +39,16 @@
     .spaceSpan::after {
   content: "\00a0"; /* Unicode character for non-breaking space */
 }
-.controlgroup-textinput{
-    padding-top:.22em;
-    padding-bottom:.22em;
-}
-.row-controlgroup{
-    margin:2px 0px;
-}
+.custom-controlgroup-horizontal {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      grid-gap: 0px;
+      padding:0px;
+      margin:0px;
+    }
+    .ui-table tfoot td{
+        text-align: center;
+    }
     </style>
 </head>
 <body>
@@ -78,7 +81,11 @@
         
     </select>
 </div>
-
+<div class="custom-controlgroup-horizontal" >
+    <label >Button 1</label>
+    <a href="#" class="ui-btn ui-icon-eye ui-btn-icon-right ui-btn-icon-notext btn-icon-green" style="width:20px;padding:10px;">查看</a>
+    <a href="#" class="ui-btn ui-icon-delete ui-btn-icon-right ui-btn-icon-notext btn-icon-red" style="width:20px;padding:10px;border-left: none">删除</a>
+  </div>
 <script>
 function getValue(element){
 

@@ -35,9 +35,24 @@ $('body').on(preload_completed_event_name,function(){
 
 	addClickEvents();
 
-	$("#pageOneTable").hpaging({ limit: 10 });
-	$("#pageSecondTable").hpaging({ limit: 10 });
-	
+	$("#pageOneTable").fancyTable({
+		/* Column number for initial sorting*/
+		 sortColumn:0,
+		 /* Setting pagination or enabling */
+		 pagination: true,
+		 /* Rows per page kept for display */
+		 perPage:10,
+		 globalSearch:true
+		 });
+	$("#pageSecondTable").fancyTable({
+		/* Column number for initial sorting*/
+		 sortColumn:0,
+		 /* Setting pagination or enabling */
+		 pagination: true,
+		 /* Rows per page kept for display */
+		 perPage:10,
+		 globalSearch:true
+		 });
 	$.each($("#pageOneTable-popup [type=checkbox]"),function(index,checkbox){
 		if(index<2){
 			$(checkbox).prop("checked", false)            /* uncheck it */

@@ -80,39 +80,7 @@
 </div>
 
 <script>
-function getValue(element){
 
-    var id=$(element).attr('id');
-    var listbox_popup=$('#'+id+'-listbox');
-    var button_span=$('#'+id+'-button')
-    //var datas=[];
-    var values=[];
-    $.each(listbox_popup.find('li[aria-selected="true"]'),function(i,l){
-        //console.log($(l).find('select').val());
-        console.log(i);
-        var index=$(l).jqmData('option-index');
-        var subOptVal=$(l).find('select').val();
-        var subOpt=$(l).find('select > option:selected').text();
-        $.each($(element).find('option'),function(ii,opt){
-            if(index==ii) {
-                //datas.push("("+subOpt+") "+$(opt).text())
-                values.push({
-                    status:subOpt,
-                    statusId:subOptVal,
-                    value:$(opt).text(),
-                    valueId:$(opt).val(),
-                    catelog:$(l).jqmData('group'),
-                    catelogId:$(l).jqmData('group-id')
-                });
-                //if(isSetData2MainSelect) $(opt)
-            }
-        });
-    });
-    console.log(values);
-    return values;
-    //button_span.find('span').text(datas.join(','));
-
-}
 function formatValue(element,format){//"[{catelog}] {value} ({status})"
     var datas=getValue($(element));
     var collector=[];

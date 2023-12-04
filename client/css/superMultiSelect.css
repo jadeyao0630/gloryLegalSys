@@ -25,3 +25,10 @@ width:80px;
 .spaceSpan::after {
 content: "\00a0"; /* Unicode character for non-breaking space */
 }
+.controlgroup-textinput{
+    padding-top:.22em;
+    padding-bottom:.22em;
+}
+.row-controlgroup{
+    margin:2px 0px;
+}

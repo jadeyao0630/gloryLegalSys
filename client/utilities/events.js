@@ -35,7 +35,7 @@ function addClickEvents(){
             console.log(index+"--"+but.currentTarget.name);
             //console.log(table_data[fn_but.dataset.item]);
             var matchItems=DataList.combinedData.filter((item) =>item.id == index);
-            var matchedData=getGlobalJson("mainDataStatus").filter((d)=>d.id==index);
+            //var matchedData=getGlobalJson("mainDataStatus").filter((d)=>d.id==index);
             var caseNos=[];
             matchItems.forEach(_item=>{
                 caseNos.push(_item.caseNo);

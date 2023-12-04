@@ -152,10 +152,11 @@ function checkIfMainSelectChecked(element,id4check){
     $(document).on("pagecreate", function () {
         superMultiSelectWithData();
         superMultiSelectWithoutData('multiselect1');
-        superMultiSelectSetDatas('multiselect1',['2中国人寿','3中国银行']);
+        //superMultiSelectSetDatas('multiselect1',['2中国人寿','3中国银行']);
+        //console.log('getSuperValue',getSuperValue('multiselect1','{statusId}{value}'));
         
 });
-function getSuperValue(elementid){
+function getSuperValue(elementid,format){
 
     console.log('elementId',elementid);
     var listbox_popup=$('#'+elementid.replace('#','')+'-listbox');
@@ -165,13 +166,22 @@ function getSuperValue(elementid){
         var input=$(cg).find('input');
         
         var select=$(cg).find('select > option:selected');
-    console.log("getValue input",$(select));
+        console.log("getValue input",$(select));
         if($(input).val().length>0){
-            values.push({
-                status:select.text(),
-                statusId:select.val(),
-                value:$(input).val(),
-            });
+            if(format!=undefined){
+                var label=format;
+                if(label.indexOf('{value}')>-1) label=label.replace('{value}',$(input).val());
+                if(label.indexOf('{status}')>-1) label=label.replace('{status}',select.text());
+                if(label.indexOf('{statusId}')>-1) label=label.replace('{statusId}',select.val());
+                values.push(label);
+            }else{
+                values.push({
+                    status:select.text(),
+                    statusId:select.val(),
+                    value:$(input).val(),
+                });
+            }
+            
         }
     });
     console.log("getValue values",values);

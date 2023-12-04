@@ -1,5 +1,115 @@
 var casePersonnelStatus=['无','原告','被告','被执行人','执行人'];
 var value_format="{value} ({status})";
+//#region superMultiSelectWithInput
+function superMultiSelectSetDatas(elementId,datas){//2中国人寿,3中国银行
+    var listbox=$('#'+elementId+'-menu');
+    console.log('listbox',listbox);
+    listbox.empty();
+    $.each(datas,(index,data)=>{
+        var fdata=formatSuperMultiSelectData(data);
+        listbox.append(superMultiSelectRowItem(listbox,index,'{value} ({status})',fdata,index<datas.length-1));
+    })
+    setSuperLabel(elementId,'{value} ({status})');
+    listbox.trigger('create').listview().listview( "refresh" );
+}
+
+function superMultiSelectRowItem(listbox,idx,format,data,notLast){
+    console.log("id",idx);
+    var controlgroup=$('<div data-option-index="'+idx+'" data-role="controlgroup" class="row-controlgroup" data-type="horizontal"></div>');
+    var select=$('<select class="sub-selectmenu" data-corners="false"></select>');
+    $.each(casePersonnelStatus,(index,status)=>{
+        var opt=$('<option class="sub-option" value='+index+'>'+status+'</option>');
+        if(data!=undefined) {
+            if(data.statusId==index) opt=$('<option class="sub-option" value='+index+' selected>'+status+'</option>');
+        }
+        select.append(opt);
+    })
+    var input=$('<input id="mutliselect-input-0" type="text" data-wrapper-class="controlgroup-textinput ui-btn">')
+    if(data!=undefined) {
+        input.val(data.value);
+    }
+    var button=$('<button data-option-index="'+idx+'" class="ui-btn ui-btn-icon-notext ui-icon-plus btn-icon-green">添加</button>')
+    if(notLast){
+        button=$('<button data-option-index="'+idx+'" class="ui-btn ui-btn-icon-notext ui-icon-delete btn-icon-red">删除</button>')
+    }
+    
+    controlgroup.append(select);
+    controlgroup.append(input);
+    controlgroup.append(button);
+    select.change(function () {
+        var elementId=listbox.attr('id').replace('-menu','');
+        setSuperLabel(elementId,format);
+    });
+    button.on('click',function(e){
+        var id=$(this).jqmData('option-index');
+        console.log(id);
+        var elementId=listbox.attr('id').replace('-menu','');
+        if($(this).hasClass('ui-icon-plus')){
+            //打印到selectbutton
+            
+            
+            //添加新的一行
+            listbox.append(superMultiSelectRowItem(listbox,(id+1)));
+            listbox.trigger('create').listview().listview( "refresh" );
+            $(this).removeClass('ui-icon-plus').addClass('ui-icon-delete');
+            $(this).removeClass('btn-icon-green').addClass('btn-icon-red');
+        }else{
+            listbox.find('div[data-option-index="'+id+'"]').remove();
+        }
+        setSuperLabel(elementId,format);
+
+    });
+    return controlgroup;
+}
+
+function getSuperValue(elementid,format){
+
+    console.log('elementId',elementid);
+    var listbox_popup=$('#'+elementid.replace('#','')+'-listbox');
+    var values=[];
+
+    $.each(listbox_popup.find('div[data-role="controlgroup"]'),function(i,cg){
+        var input=$(cg).find('input');
+        
+        var select=$(cg).find('select > option:selected');
+        console.log("getValue input",$(select));
+        if($(input).val().length>0){
+            if(format!=undefined){
+                var label=format;
+                if(label.indexOf('{value}')>-1) label=label.replace('{value}',$(input).val());
+                if(label.indexOf('{status}')>-1) label=label.replace('{status}',select.text());
+                if(label.indexOf('{statusId}')>-1) label=label.replace('{statusId}',select.val());
+                values.push(label);
+            }else{
+                values.push({
+                    status:select.text(),
+                    statusId:select.val(),
+                    value:$(input).val(),
+                });
+            }
+            
+        }
+    });
+    console.log("getValue values",values);
+    return values;
+//button_span.find('span').text(datas.join(','));
+
+}
+function formatSuperMultiSelectData(data){
+    var statusid=0;
+    var value="";
+    if(!isNaN(parseInt(data[0]))){//我方当事人状态
+        statusid=Number(data[0]);
+        value=data.substring(1, data.length);
+    }
+    return {
+        status:casePersonnelStatus[statusid],
+        statusId:statusid,
+        value:value,
+    };
+}
+//#endregion SuperMultiselectWithInput
+
 function setSuperValue(element,values,vformat){
     console.log('setSuperMultiselect setSuperValue format',vformat);
     if(vformat==undefined) vformat=value_format;
@@ -313,5 +423,71 @@ $.fn.extend({
         $(self).trigger('create');
         
 //});
+    },
+    setSuperMultiselectA:function(vformat){
+        if (vformat==undefined) vformat='{value} ({status})';
+        var elementId=$(this).attr('id');
+        console.log('listbox',elementId);
+        var listbox_popup=$('#'+elementId+'-listbox');
+        listbox_popup.popup({
+            afterclose: function( event, ui ) {
+                setSuperLabel(elementId,vformat);
+            }
+        });
+
+        var search_form=$(listbox_popup).find("form");
+        search_form.find('div > input').attr('id',elementId+"-search");
+        //var title=$(listbox).find('.ui-header.ui-bar-inherit');
+        //aList.find('li').remove();
+        var listbox = listbox_popup.find("ul")
+        //var aList=$(listbox).find("li");
+        
+        listbox.remove();
+        listbox=$('<ul class="ui-selectmenu-list ui-listview ui-super-listview" id="'+elementId+'-menu" role="listbox" aria-labelledby="'+elementId+'-button" data-filter="true" data-input="#'+elementId+'-search"></ul>');
+        listbox_popup.append(listbox);
+        var li=$('<li data-option-index="0"  data-icon="false" role="option" ></li>');
+        
+        //li.append(controlgroup);
+        listbox.append(superMultiSelectRowItem(listbox,0,vformat));
+        listbox.trigger('create').listview().listview( "refresh" );
+        console.log('listbox',listbox_popup.html());
+
+        function setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
+            var collector=[];
+            elementid=elementid.replace('#','');
+            
+            //console.log('setSuperMultiselect setSuperLabel format',format);
+            var datas=getSuperValue(elementid);
+           if(datas==undefined) return;
+            datas.forEach((data)=>{
+                var label=format;
+                var value=data.value;
+                var status=data.status;
+                if(format!=undefined){
+                    if(label.indexOf('{value}')>-1) label=label.replace('{value}',value);
+                    if(label.indexOf('{status}')>-1) label=label.replace('{status}',status);
+                }else{
+                    label=`${data.value} (${data.status})`;
+                }
+                //console.log('formatSuperValue data',data);
+                
+                //console.log('formatSuperValue format',label);
+                collector.push(label);
+            });
+            //console.log('formatSuperValue values',collector)
+            if(collector.length>0){
+                $('#'+elementid+'-button').find('span').first().text(collector.join(','));
+                $('#'+elementid+'-button').find('span').last().text(collector.length);
+                if(collector.length>1) $('#'+elementid+'-button').find('span').last().show();
+                else $('#'+elementid+'-button').find('span').last().hide();
+            }else{
+                $('#'+elementid+'-button').find('span').first().html('&nbsp;');
+                $('#'+elementid+'-button').find('span').last().text(collector.length);
+                $('#'+elementid+'-button').find('span').last().hide();
+            }
+        }
+        
+
     }
+    
 });

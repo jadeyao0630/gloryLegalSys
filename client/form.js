@@ -135,6 +135,10 @@ mform.prototype={
                                 //console.log("multicombobox..............................");
                                 _self.elements[item_key]=generateSuperMultiComboBoxItem(item_container,item,item_key);
                                 break;
+                            case "supermultiinput":
+                                //console.log("multicombobox..............................");
+                                _self.elements[item_key]=generateSuperMultiInputItem(item_container,item,item_key);
+                                break;
                             case "radio":
                                 _self.elements[item_key]=generateRadioItem(item_container,item,item_key);
                                 break;
@@ -390,6 +394,30 @@ mform.prototype={
             //console.log(item_container.html());
             //return item_container;
         }
+        function generateSuperMultiInputItem(item_container,item,id){
+            
+            var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="form-original multiSelect supermultiInput'+
+            (item.isFilterable?" filterSelect":"")+'" multiple="multiple" data-native-menu="false"></select>');
+
+            item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+            //item_container.append(selectItem);
+            var subContainer=$('<div class="form-original"></div>');
+            subContainer.append(selectItem);
+            
+            if(item.hasOwnProperty('displayFormat')){
+                subContainer.jqmData('valueformat',item.displayFormat);
+                
+                console.log("value-format1",subContainer);
+                console.log("value-format1",subContainer.jqmData('valueformat'));
+            }
+            item_container.append(subContainer);
+            //console.log(item_container.html());
+            //selectItem.selectmenu().selectmenu('refresh');
+            return selectItem;
+            //console.log('item_container');
+            //console.log(item_container.html());
+            //return item_container;
+        }
         function pageIsSelectmenuDialog( page ) {
             var isDialog = false,
             id = page && page.attr( "id" );
@@ -404,6 +432,51 @@ mform.prototype={
         $.mobile.document
             .on("pagecreate", function () {
                 
+                $(".supermultiInput").selectmenu({
+                    create: function (event, ui) {
+                        console.log('supermultiSelect pagecreate',this);
+                        
+                        $.each($(this),(index,select)=>{
+                            //console.log("value-format2",index,"__",$(select).parent().parent());
+                            //console.log("value-format2",index,"__",$(select).parent().parent().jqmData('valueformat'));
+                            $(this).setSuperMultiselectA($(select).parent().parent().jqmData('valueformat'));
+                        })
+                        
+                        $.each($('#'+this.id+'-button').find('span'),(idx,el)=>{
+                            var isOpened
+                            $(el).on('mouseover',(e)=>{
+                                
+                                if (el.scrollWidth > el.clientWidth) {
+                                    // 设置内容自动滚动
+                                    //console.log('set tooptip',$(el).text());
+                                    $('#popupArrow').css({width:el.clientWidth})
+                                    $('#popupArrow').html($(el).text().split(',').join('<br/>'));
+                                    $('#popupArrow').popup('open',{
+                                        positionTo: $(el),
+                                        arrow:true,
+                                        focus: false
+                                    });
+                                  }
+                              });
+                              
+                              $(el).on('mouseleave',(e)=>{
+                                console.log('mouseleave',$('#popupArrow').hasClass('ui-popup-active'));
+                                if ($('#popupArrow').hasClass('ui-popup-active')) {
+                                    // 弹出框已打开
+                                    $('#popupArrow').popup('close');
+                                  }
+                                
+                              
+                            });
+                        })
+                            
+                        
+                    }
+                });
+                //$(".supermultiSelect").selectmenu().selectmenu("refresh").trigger("change");
+            })
+        $.mobile.document
+            .on("pagecreate", function () {
                 $(".supermultiSelect").selectmenu({
                     create: function (event, ui) {
                         console.log('supermultiSelect pagecreate',this);

@@ -305,7 +305,7 @@
 			if(settings.pagination && !settings.paginationElement){
                 $(elm).find("tfoot").remove();
                 $(elm).append($("<div class=\"paging\"></div>"));
-                $(elm).parent().append($("<div class='pag'></div>",{ }));
+                $(elm).parent().append($("<div class='pag' style='text-align: center;'></div>",{ }));
 			}
 			instance.tableUpdate(elm);
 			settings.onInit.call(this,elm);

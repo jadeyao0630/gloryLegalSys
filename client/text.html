@@ -248,7 +248,12 @@
 					</ul>
 				</div><!-- /navbar -->
 		</div><!-- /header -->
+		<div data-role="panel" id="search_panel" data-position="left" data-display="reveal" data-position-fixed="true" data-dismissible="true" data-theme="a">
+			<h4 id="search_list_title"> </h4>
+			<ul data-role="listview" data-inset="true" id="event_list" data-theme="a">
 	
+			</ul>
+			</div>
 	<div id="page1" class="ui-body-d ui-content">
 		
 		<div data-role="controlgroup" data-type="horizontal" id="pone_fun_buts">
@@ -268,7 +273,7 @@
 
 				<input type="checkbox" data-mini="true" class="hide" style="margin-top: 8px;margin-left:5px;">
 				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
-					
+					<a href="#search_panel" id="case_reg_but_search" class="ui-btn ui-icon-gear ui-btn-icon-notext btn-icon-blue case_reg_but footerBtn">搜索</a>
 					<a href="#fullscreenPage" id="case_reg_but_add" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn">新增</a>
 					<a href="#" id="case_reg_but_remove" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but">删除</a>
 				</div>
@@ -276,7 +281,7 @@
 			
 			<div id="searchbar1">
 				<form class="ui-filterable filtertable1">
-					<input id="filterBasic-input" placeholder="搜索关键字" data-type="search">
+					<input id="filterBasic-input" placeholder="索引关键字" data-type="search">
 				</form>
 			</div>
 		</div><!-- /footer -->

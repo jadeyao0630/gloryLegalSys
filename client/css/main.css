@@ -195,6 +195,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     background: #262626;
     color:white;
     text-shadow: none;
+    border:none;
 }
 #main-header .header-search-container{
     position: absolute;
@@ -239,4 +240,18 @@ ui-collapsible.collapsible-listview .ui-btn{
   .ui-btn-right{
     position: absolute;
     top:10px;
+  }
+  .header-filter-container{
+    position: absolute;
+    background: #262626;
+    color:white;
+    top:0;
+    left:0;
+    width: calc(100% - 40px);
+    text-shadow: none;
+    padding: 0px 20px;
+    z-index: 99;
+  }
+  #main-body{
+    padding:0px;
   }

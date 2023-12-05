@@ -32,9 +32,9 @@
     <div data-role="page" id="main">
         <div data-role="header" id="main-header" data-position="fixed">
             <div class="header-search-container"><i class="fa fa-search header-btn-search"></i><span class="tooltip-serarch">开启搜索</span></div>
+            <input type="search" style="max-width:200px;top:30px;" placeholder="索引"></input>
             <h1 style="font-size: 30px;">国瑞法务管理系统</h1>
             <a id="name" href="#popupMenu" data-rel="popup" data-transition="slideup" data-icon="user" class="ui-btn-right">登录</a>
-            <div id="header-filter-container" calss="header-filter-container"></div>
             <div data-role="popup" id="popupMenu" data-theme="b" data-history="false">
                 <ul data-role="listview" data-inset="true" style="min-width:160px;" data-theme="b">
                     <li data-role="list-divider">操作</li>
@@ -46,6 +46,12 @@
 					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-read-table" data-rel="back">读取表</a></li>
                 </ul>
             </div>
+            
+            
+        </div>
+        <div id="main-body" class="ui-body-d ui-content">
+            test
+            <div id="header-filter-container" class="header-filter-container"></div>
         </div>
     </div>
     <!-- /header -->
@@ -63,28 +69,52 @@
 	<script type="text/javascript" src="./preload.js"></script>
 	<script type="text/javascript" src="./utilities/templates.js"></script>
     <script>
-        
+        var form;
         //document.body.style.fontSize = "16px";
-        $('.header-search-container').togglebuttonicon('main-header',function(e){
-            if(e){
-                var main_form= new mform({template:header_filter_template});
-                var form=main_form.instance;
-                $('#header-filter-container').append(form);
-                $('#header-filter-container').trigger('create');
-                //$('#main-header').trigger('create');
-                //console.log($('#header-filter-container').html());
-                //document.documentElement.style.fontSize = "30px";
-                //document.body.style.fontSize = "30px";
-                //form.find('label').css({'font-size':"30px"});
-                //form.find('span').css({'font-size':"30px"});
-                //form.find('select').css({'font-size':"30px"});
-                form.trigger('create');
-            }else{
-                $('#header-filter-container').empty();
-            }
-        })
+        
+        
         $('body').on(preload_completed_event_name,function(){
+            var tb=$('.header-search-container').togglebuttonicon('header-filter-container',function(e){
+                if(e){
+                    form.show();
+                    
+                }else{
+                    //$('#header-filter-container').empty();
+                    form.hide();
+                }
+            },{distance:190});
             $('#main-container').addClass('hide');
+            var main_form= new mform({template:header_filter_template});
+            form=main_form.instance;
+            $('#header-filter-container').css({height:"0px",top:$('#main-header').css('height')});
+            $('#header-filter-container').append(form);
+            form.hide();
+            $('#header-filter-container').trigger('create');
+            //$('#main-header').trigger('create');
+            //console.log($('#header-filter-container').html());
+            //document.documentElement.style.fontSize = "30px";
+            //document.body.style.fontSize = "30px";
+            //form.find('label').css({'font-size':"30px"});
+            //form.find('span').css({'font-size':"30px"});
+            //form.find('select').css({'font-size':"30px"});
+            form.trigger('create');
+            $('.header-filter-btn').on('click',function(e){
+                switch($(this).text()){
+                    case "复位":
+                        
+                        
+                        main_form.setEmptyData();
+                        break;
+                    case "查询":
+                        $.each($(form).find('select,input'),(index,ele)=>{
+                            console.log($(ele).val());
+                        });
+                        tb.instance.togglebutton('close')
+                        form.hide();
+                        //console.log('togglebuttonicon',);
+                        break;
+                }
+            });
         })
     </script>
 </body>

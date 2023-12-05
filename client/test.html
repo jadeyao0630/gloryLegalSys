@@ -49,414 +49,79 @@
     .ui-table tfoot td{
         text-align: center;
     }
+    .grid-container{
+        display: grid;
+        grid-template-columns: 33.3% 33.3% 33.3%;
+    }
+    .form_item_panel{
+    display:grid;
+    grid-template-columns: auto 1fr;
+    grid-gap:0px;
+    text-align: left;
+}
+.select-overflow{
+    overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.form_item_panel label{
+    min-width: 120px;
+    text-align: left;
+    vertical-align:top;
+    margin-top: 15px;
+} 
     </style>
 </head>
 <body>
-
-<div data-role="fieldcontain">
-    <label for="multiselect">Choose options:</label>
-    <select name="multiselect" id="multiselect" data-native-menu="false" multiple="multiple">
-        <optgroup label="公司">
-            <option value="公司0">国瑞兴业建筑工程设计有限公司</option>
-            <option value="公司1">国瑞德恒房地产开发有限公司</option>
-            <option value="公司2">国瑞兴业地产股份有限公司</option>
-            <option value="公司3">益万家文化传播有限公司</option>
-            <option value="公司4">国瑞兴业健康科技有限公司</option>
-            <option value="公司5">大兴区保障性住房建设投资有限公司</option>
-            <option value="公司6">浩业环宇装饰工程有限公司</option>
-            <option value="公司7">文华盛达房地产开发有限公司</option>
-        </optgroup>
+<div class="grid-container">
+    
+    <div class="form_item_panel">
         
-        <optgroup label="个人">
-            <option value="个人0">张丽佳</option>
-            <option value="个人1">李立</option>
-        </optgroup>
+    
+        <label for="select-native-5" class="select">test1</label>
         
-    </select>
+        <div class="select-overflow">
+            <select name="select-native-5" id="select-native-5">
+                <option value="#">One</option>
+                <option value="#">Two</option>
+                <option value="#">Three</option>
+            </select>
+        </div>
+        <label class="form-replacement" id="_select-native-5" style="min-height:25px;">test</label>
+    </div>   
+    <div class="form_item_panel">
+        <label for="select-native-6" class="select">test1</label>
+        
+        <div class="select-overflow">
+            <select name="select-native-6" id="select-native-6">
+            
+                <option value="#">One</option>
+                <option value="#">Two</option>
+                <option value="#">Three</option>
+            </select>
+        </div>
+        <label class="form-replacement" id="_select-native-6" style="min-height:25px;">test</label>
+    </div>
+        
+    <div class="form_item_panel"> 
+            
+        <label for="select-native-7" class="select">test1</label>
+        <div class="select-overflow">
+            <select name="select-native-7" id="select-native-7">
+            
+                <option value="#">One</option>
+                <option value="#">Two</option>
+                <option value="#">Three</option>
+            
+            </select>
+        
+        </div>
+        <label class="form-replacement" id="_select-native-7" style="min-height:25px;">test</label>
+    </div>      
 </div>
-<div data-role="fieldcontain">
-    <label for="multiselect1">Choose options:</label>
-    <select name="multiselect" id="multiselect1" data-native-menu="false" multiple="multiple">
-
-        
-    </select>
-</div>
-<div class="custom-controlgroup-horizontal" >
-    <label >Button 1</label>
-    <a href="#" class="ui-btn ui-icon-eye ui-btn-icon-right ui-btn-icon-notext btn-icon-green" style="width:20px;padding:10px;">查看</a>
-    <a href="#" class="ui-btn ui-icon-delete ui-btn-icon-right ui-btn-icon-notext btn-icon-red" style="width:20px;padding:10px;border-left: none">删除</a>
-  </div>
+    
 <script>
-function getValue(element){
-
-    var id=$(element).attr('id');
-    var listbox_popup=$('#'+id+'-listbox');
-    var button_span=$('#'+id+'-button')
-    //var datas=[];
-    var values=[];
-    $.each(listbox_popup.find('li[aria-selected="true"]'),function(i,l){
-        //console.log($(l).find('select').val());
-        console.log(i);
-        var index=$(l).jqmData('option-index');
-        var subOptVal=$(l).find('select').val();
-        var subOpt=$(l).find('select > option:selected').text();
-        $.each($(element).find('option'),function(ii,opt){
-            if(index==ii) {
-                //datas.push("("+subOpt+") "+$(opt).text())
-                values.push({
-                    status:subOpt,
-                    statusId:subOptVal,
-                    value:$(opt).text(),
-                    valueId:$(opt).val(),
-                    catelog:$(l).jqmData('group'),
-                    catelogId:$(l).jqmData('group-id')
-                });
-                //if(isSetData2MainSelect) $(opt)
-            }
-        });
-    });
-    console.log(values);
-    return values;
-    //button_span.find('span').text(datas.join(','));
-
-}
-function formatValue(element,format){//"[{catelog}] {value} ({status})"
-    var datas=getValue($(element));
-    var collector=[];
-    
-    datas.forEach((data)=>{
-        var catelog=data.catelog;
-        var value=data.value;
-        var status=data.status;
-        if(format!=undefined){
-            if(format.indexOf('{catelog}')>-1) format=format.replace('{catelog}',catelog);
-            if(format.indexOf('{value}')>-1) format=format.replace('{value}',value);
-            if(format.indexOf('{status}')>-1) format=format.replace('{status}',status);
-        }else{
-            format=`[${data.catelog}] ${data.value} (${data.status})`;
-        }
-        collector.push(format);
-    });
-    if(collector.length>0){
-        $(element+'-button').find('span').first().text(collector.join(','));
-        $(element+'-button').find('span').last().text(collector.length);
-    }else{
-        $(element+'-button').find('span').first().html('&nbsp;');
-        $(element+'-button').find('span').last().text(collector.length);
-    }
-}
-function checkIfMainSelectChecked(element,id4check){
-    var val=false;
-    $.each($(element).find('option'),function(ii,opt){
-        console.log($(opt).text()+"-->"+ii+"=="+id4check+"---"+$(opt).prop('selected'))
-        if($(opt).prop('selected') && ii==id4check) {
-            val=true;
-            return false;
-        }
-    });
-    return val;
-}
-    $(document).on("pagecreate", function () {
-        superMultiSelectWithData();
-        superMultiSelectWithoutData('multiselect1');
-        //superMultiSelectSetDatas('multiselect1',['2中国人寿','3中国银行']);
-        //console.log('getSuperValue',getSuperValue('multiselect1','{statusId}{value}'));
-        
-});
-function getSuperValue(elementid,format){
-
-    console.log('elementId',elementid);
-    var listbox_popup=$('#'+elementid.replace('#','')+'-listbox');
-    var values=[];
-
-    $.each(listbox_popup.find('div[data-role="controlgroup"]'),function(i,cg){
-        var input=$(cg).find('input');
-        
-        var select=$(cg).find('select > option:selected');
-        console.log("getValue input",$(select));
-        if($(input).val().length>0){
-            if(format!=undefined){
-                var label=format;
-                if(label.indexOf('{value}')>-1) label=label.replace('{value}',$(input).val());
-                if(label.indexOf('{status}')>-1) label=label.replace('{status}',select.text());
-                if(label.indexOf('{statusId}')>-1) label=label.replace('{statusId}',select.val());
-                values.push(label);
-            }else{
-                values.push({
-                    status:select.text(),
-                    statusId:select.val(),
-                    value:$(input).val(),
-                });
-            }
-            
-        }
-    });
-    console.log("getValue values",values);
-    return values;
-//button_span.find('span').text(datas.join(','));
-
-}
-
-function setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
-    var collector=[];
-    elementid=elementid.replace('#','');
-    
-    //console.log('setSuperMultiselect setSuperLabel format',format);
-    var datas=getSuperValue(elementid);
-   if(datas==undefined) return;
-    datas.forEach((data)=>{
-        var label=format;
-        var value=data.value;
-        var status=data.status;
-        if(format!=undefined){
-            if(label.indexOf('{value}')>-1) label=label.replace('{value}',value);
-            if(label.indexOf('{status}')>-1) label=label.replace('{status}',status);
-        }else{
-            label=`${data.value} (${data.status})`;
-        }
-        //console.log('formatSuperValue data',data);
-        
-        //console.log('formatSuperValue format',label);
-        collector.push(label);
-    });
-    //console.log('formatSuperValue values',collector)
-    if(collector.length>0){
-        $('#'+elementid+'-button').find('span').first().text(collector.join(','));
-        $('#'+elementid+'-button').find('span').last().text(collector.length);
-        if(collector.length>1) $('#'+elementid+'-button').find('span').last().show();
-        else $('#'+elementid+'-button').find('span').last().hide();
-    }else{
-        $('#'+elementid+'-button').find('span').first().html('&nbsp;');
-        $('#'+elementid+'-button').find('span').last().text(collector.length);
-        $('#'+elementid+'-button').find('span').last().hide();
-    }
-}
-function superMultiSelectWithoutData(id,format){//'{value} ({status})'
-    //var id='multiselect1';
-    if (format==undefined) format='{value} ({status})';
-    id=id.replace('#','');
-    console.log($('#'+id+'-listbox'));
-        var _this=$('#'+id+'-listbox');
-        _this.popup({
-            afterclose: function( event, ui ) {
-                console.log("closed");
-                var datas=getValue($('#'+id+''));
-                var options=$('#'+id+'').find('option');
-                options.prop('selected',false);
-                datas.forEach((data)=>{
-                    $.each(options,function(ii,opt){
-                        if(data.valueId==$(opt).val()) {
-                            $(opt).prop('selected',true);
-                            console.log($(opt));
-                        }
-                    });
-                });
-                console.log($('#'+id+'').html());
-            }
-        });
-
-        var search_form=$(_this).find("form");
-    search_form.find('div > input').attr('id',id+"-search");
-    //var title=$(listbox).find('.ui-header.ui-bar-inherit');
-    //aList.find('li').remove();
-    var listbox = _this.find("ul")
-    //var aList=$(listbox).find("li");
-    
-    listbox.remove();
-    listbox=$('<ul class="ui-selectmenu-list ui-listview ui-super-listview" id="'+id+'-menu" role="listbox" aria-labelledby="'+id+'-button" data-filter="true" data-input="#'+id+'-search"></ul>');
-    _this.append(listbox);
-    var li=$('<li data-option-index="0"  data-icon="false" role="option" ></li>');
-    
-    //li.append(controlgroup);
-    listbox.append(superMultiSelectRowItem(listbox,0,format));
-    listbox.trigger('create').listview().listview( "refresh" );
-    
-}
-function superMultiSelectSetDatas(elementId,datas){//2中国人寿,3中国银行
-    var listbox=$('#'+elementId+'-menu');
-    console.log('listbox',listbox);
-    listbox.empty();
-    $.each(datas,(index,data)=>{
-        var fdata=formatSuperMultiSelectData(data);
-        listbox.append(superMultiSelectRowItem(listbox,index,'{value} ({status})',fdata,index<datas.length-1));
-    })
-    setSuperLabel(elementId,'{value} ({status})');
-    listbox.trigger('create').listview().listview( "refresh" );
-}
-var casePersonnelStatus=['无','原告','被告','被执行人','执行人'];
-function formatSuperMultiSelectData(data){
-    var statusid=0;
-    var value="";
-    if(!isNaN(parseInt(data[0]))){//我方当事人状态
-        statusid=Number(data[0]);
-        value=data.substring(1, data.length);
-    }
-    return {
-        status:casePersonnelStatus[statusid],
-        statusId:statusid,
-        value:value,
-    };
-}
-function superMultiSelectRowItem(listbox,idx,format,data,notLast){
-    console.log("id",idx);
-    var controlgroup=$('<div data-option-index="'+idx+'" data-role="controlgroup" class="row-controlgroup" data-type="horizontal"></div>');
-    var select=$('<select class="sub-selectmenu" data-corners="false"></select>');
-    $.each(casePersonnelStatus,(index,status)=>{
-        var opt=$('<option class="sub-option" value='+index+'>'+status+'</option>');
-        if(data!=undefined) {
-            if(data.statusId==index) opt=$('<option class="sub-option" value='+index+' selected>'+status+'</option>');
-        }
-        select.append(opt);
-    })
-    var input=$('<input id="mutliselect-input-0" type="text" data-wrapper-class="controlgroup-textinput ui-btn">')
-    if(data!=undefined) {
-        input.val(data.value);
-    }
-    var button=$('<button data-option-index="'+idx+'" class="ui-btn ui-btn-icon-notext ui-icon-plus btn-icon-green">添加</button>')
-    if(notLast){
-        button=$('<button data-option-index="'+idx+'" class="ui-btn ui-btn-icon-notext ui-icon-delete btn-icon-red">删除</button>')
-    }
-    
-    controlgroup.append(select);
-    controlgroup.append(input);
-    controlgroup.append(button);
-    select.change(function () {
-        var elementId=listbox.attr('id').replace('-menu','');
-        setSuperLabel(elementId,format);
-    });
-    button.on('click',function(e){
-        var id=$(this).jqmData('option-index');
-        console.log(id);
-        var elementId=listbox.attr('id').replace('-menu','');
-        if($(this).hasClass('ui-icon-plus')){
-            //打印到selectbutton
-            
-            
-            //添加新的一行
-            listbox.append(superMultiSelectRowItem(listbox,(id+1)));
-            listbox.trigger('create').listview().listview( "refresh" );
-            $(this).removeClass('ui-icon-plus').addClass('ui-icon-delete');
-            $(this).removeClass('btn-icon-green').addClass('btn-icon-red');
-        }else{
-            listbox.find('div[data-option-index="'+id+'"]').remove();
-        }
-        setSuperLabel(elementId,format);
-
-    });
-    return controlgroup;
-}
-function superMultiSelectWithData(){
-    var id='multiselect';
-        console.log($('#'+id+'-listbox'));
-            var _this=$('#'+id+'-listbox');
-            _this.popup({
-                afterclose: function( event, ui ) {
-                    console.log("closed");
-                    var datas=getValue($('#'+id+''));
-                    var options=$('#'+id+'').find('option');
-                    options.prop('selected',false);
-                    datas.forEach((data)=>{
-                        $.each(options,function(ii,opt){
-                            if(data.valueId==$(opt).val()) {
-                                $(opt).prop('selected',true);
-                                console.log($(opt));
-                            }
-                        });
-                    });
-                    console.log($('#'+id+'').html());
-                }
-            });
-
-            var search_form=$(_this).find("form");
-        search_form.find('div > input').attr('id',id+"-search");
-        //var title=$(listbox).find('.ui-header.ui-bar-inherit');
-        //aList.find('li').remove();
-        var listbox = _this.find("ul")
-        var aList=$(listbox).find("li");
-        
-        listbox.remove();
-        listbox=$('<ul class="ui-selectmenu-list ui-listview ui-super-listview" id="'+id+'-menu" role="listbox" aria-labelledby="'+id+'-button" data-filter="true" data-input="#'+id+'-search"></ul>');
-        _this.append(listbox);
-
-
-        var count=0;
-        var catelog_count=-1;
-        var catelog="";
-                aList.each(function () {
-                    var listItem = $(this);
-                    console.log(listItem.find('a'));
-                    if(listItem.hasClass('ui-li-divider')){
-                        listbox.append(listItem);
-                        catelog=listItem.text();
-                        catelog_count++;
-                    }else{
-                        var a=listItem.find('a');
-                        var li=$('<li data-option-index="'+count+'" data-group="'+catelog+'" data-group-id="'+catelog_count+'" data-icon="false" class="" role="option" aria-selected="'+checkIfMainSelectChecked('#multiselect',count)+'"></li>');
-                        var controlgroup=$('<div class="ui-controlgroup" ></div>');
-                        var select=$('<select data-option-index="'+count+'" class="sub-selectmenu" data-corners="false">'+
-                                '<option class="sub-option" value=0 selected>无</option>'+
-                                '<option class="sub-option" value=1 >原告</option>'+
-                                '<option class="sub-option" value=2 >被告</option>'+
-                                '<option class="sub-option" value=3 >被执行人</option>'+
-                                '<option class="sub-option" value=4 >执行人</option>'+
-                            '</select>');
-                        controlgroup.append(select);
-                        
-                        select.trigger('create').selectmenu().selectmenu('refresh');
-                        controlgroup.append(a);
-                        if(checkIfMainSelectChecked('#multiselect',count)){
-                            $(a).removeClass('ui-checkbox-off').addClass('ui-checkbox-on');
-                            select.prop('disabled',false);
-                        }else{
-                            $(a).removeClass('ui-checkbox-on').addClass('ui-checkbox-off');
-                            select.prop('disabled',true);
-                        }
-                        li.append(controlgroup);
-                        listbox.append(li);
-                        a.on('click',function(e){
-                           
-                           //_this.trigger('create').listview().listview( "refresh" );
-                           $('#multiselect').selectmenu().trigger('create');
-                           //console.log(li.attr("aria-selected"));
-                            //$('#multiselect-button > span').text();
-                            if($(this).hasClass('ui-checkbox-on')){
-                                $(this).removeClass('ui-checkbox-on').addClass('ui-checkbox-off');
-                                li.attr("aria-selected" , false);
-
-                                select.prop('disabled',true);
-                            }else{
-                                $(this).removeClass('ui-checkbox-off').addClass('ui-checkbox-on');
-                                select.prop('disabled',false);
-                                li.attr("aria-selected" , true);
-                            }
-                            //console.log($('#multiselect').find(':selected').text().join(","));
-                            formatValue('#multiselect',"{value} ({status})");
-                            
-                        })
-                        select.change(function () {
-                            var optionSelected = $(this).find('option:selected');
-                            //var optTextSelected = optionSelected.text();
-                            var optValueSelected = optionSelected.val();
-                            console.log(listbox.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]'));
-                            if(listbox.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]').attr('aria-selected')){
-                                formatValue('#multiselect',"{value} ({status})");
-                            }
-                            //console.log(optValueSelected);
-                        });
-                        count++;
-                    }
-                    
-                });
-                listbox.attr("aria-labelledby" ,"multiselect-button");
-                formatValue('#multiselect',"{value} ({status})");
-                listbox.trigger('create').listview().listview( "refresh" );
-                console.log(listbox.html());
-                $('#multiselect-listbox').find("a").on("click", function (event) {
-                    
-                    //$('#multiselect').selectmenu().trigger('change');
-                    //event.preventDefault();
-                });
-}
+    $('.form-replacement').hide();
 </script>
 </body>
 </html>

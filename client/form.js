@@ -92,14 +92,17 @@ mform.prototype={
             if(data!=undefined && catelog_item_keys.length>0){
                 
                 var row_grid=$('<div class="form_grid"></div>');
+                var style={};
                 if(template.settings.templateColumn!=undefined){
                     var columns=template.settings.templateColumn.split(" ");
-                    row_grid.css({'gridTemplateColumns':template.settings.templateColumn,'padding-right':(20*(columns.length-1))+"px"});
+                    style=$.extend({}, style, {'gridTemplateColumns':template.settings.templateColumn,'padding-right':(20*(columns.length-1))+"px"});
                 }
-                else if(template.settings.gridStyle!=undefined){
-                    row_grid.css(template.settings.gridStyle);
+                if(template.settings.gridStyle!=undefined){
+                    //row_grid.css(template.settings.gridStyle);
+                    style=$.extend({}, style,template.settings.gridStyle);
                 }
-                
+                console.log('form grid style',style);
+                row_grid.css(style);
                 
                 var stepControler=0;
                 
@@ -117,6 +120,9 @@ mform.prototype={
                         switch(item.type.toLowerCase()){
                             case "text":
                                 _self.elements[item_key]=generateInputTypeBase(item_container,item,item_key,template.settings.hasPlaceHolder);
+                                break;
+                            case "textrange":
+                                _self.elements[item_key]=generateInputRange(item_container,item,item_key,template.settings.hasPlaceHolder);
                                 break;
                             case "number":
                                 _self.elements[item_key]=generateInputTypeBase(item_container,item,item_key,template.settings.hasPlaceHolder);
@@ -164,12 +170,22 @@ mform.prototype={
                             case "file":
                                 _self.elements[item_key]=generateFileItem(item_container,item,item_key);
                                 break;
+                            case "custom":
+                                _self.elements[item_key]=generateCustomItem(item_container,item,item_key);
+                                break;
                         }
                         if(item.width!=undefined){
                             itemNeedToSetWidth.push({
                                 element:_self.elements[item_key],
                                 itemData:item,
                             })
+                        }
+                        if(template.settings.hasOwnProperty('isMini')){
+                            if(_self.elements[item_key]!=undefined) _self.elements[item_key].jqmData('mini',template.settings.isMini);
+                        }
+                        
+                        if(item.hasOwnProperty('span')){
+                            item_container.css({'grid-column':item.span})
                         }
                         var replacement=replacementOfInput(item_key);
                         item_container.append(replacement);
@@ -197,15 +213,55 @@ mform.prototype={
             var input=$('<label class="form-replacement" id="_'+id+'" style="min-height:25px;">test</label>');
             return input;
         }
+        function labelStyle(labelElement,template){
+            if(template.settings.hasOwnProperty('labelStyle')){
+                $(labelElement).css(template.settings.labelStyle);
+            }
+        }
+        function generateCustomItem(item_container,item){
+            item_container.append(item.data);
+            item_container.css({'grid-template-columns':'auto'})
+            return $(item.data);
+        }
         function generateInputTypeBase(item_container,item,id,hasPlaceHolder){
             //var item_container=$('<div class="form_item_panel"></div>');
             var placeholder="";
             if(hasPlaceHolder&&item.placeholder!=undefined) placeholder=' placeholder="'+item.placeholder+'"';
             var val="";
             if(item.type.toLowerCase()=="date"||item.type.toLowerCase()=="time"||item.type.toLowerCase()=="datetime") val=getDateTime();
-            item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
+            labelStyle(label,template);
             var input=$('<input type="'+item.type+'" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'" '+setRequired(item.isOptional,"此项必须填写")+'>');
             var subContainer=$('<div class="form-original"></div>');
+            subContainer.append(input);
+            item_container.append(subContainer);
+            return input;
+            //return item_container;
+        }
+        function generateInputRange(item_container,item,id,hasPlaceHolder){
+            //var item_container=$('<div class="form_item_panel"></div>');
+            var placeholders=[" placeholder=''"," placeholder=''"];
+            if(hasPlaceHolder&&item.placeholders!=undefined) {
+                placeholders=[]
+                item.placeholders.forEach(p=>{
+                    placeholders.push(' placeholder="'+p+'"');
+                })
+            }
+            //if(item.type.toLowerCase()=="date"||item.type.toLowerCase()=="time"||item.type.toLowerCase()=="datetime") val=getDateTime();
+            var label=$('<label for="'+id+'_0">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
+            
+            labelStyle(label,template);
+            var type='text';
+            if(item.hasOwnProperty('subType')) type=item.subType;
+
+            var input=$('<input type="'+type+'" class="form-original" name="'+id+'_1" id="'+id+'_0"'+placeholders[0]+'" value="" '+setRequired(item.isOptional,"此项必须填写")+'>');
+            var subContainer=$('<div class="form-original" style="display:grid;grid-template-columns: 1fr auto 1fr;grid-gap:0px;"></div>');
+            subContainer.append(input);
+            var dash=$('<label style="text-align: center;min-width:50px;"> 到 </label>');
+            subContainer.append(dash);
+            input=$('<input type="'+type+'" class="form-original" name="'+id+'_1" id="'+id+'_1"'+placeholders[1]+'" value="" '+setRequired(item.isOptional,"此项必须填写")+'>');
             subContainer.append(input);
             item_container.append(subContainer);
             return input;
@@ -217,7 +273,10 @@ mform.prototype={
             if(hasPlaceHolder&&item.placeholder!=undefined) placeholder=' placeholder="'+item.placeholder+'"';
             var textarea=$('<textarea class="form-original" cols="40" rows="4" name="'+id+'" id="'+id+'"'+placeholder+'" '+setRequired(item.isOptional,"此项必须填写")+'></textarea>');
             
-            item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'_0">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
+            
+            labelStyle(label,template);
             //item_container.append(textarea);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(textarea);
@@ -229,7 +288,10 @@ mform.prototype={
         }
         function generateFileItem(item_container,item,id){
             //var item_container=$('<div class="form_item_panel"></div>');
-            item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'_0">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
+            
+            labelStyle(label,template);
             var input=$('<input class="form-original" type="file" name="'+id+'" id="'+id+'" value="" '+setRequired(item.isOptional,"此项必须填写")+'>');
             //item_container.append(input);
             var subContainer=$('<div class="form-original"></div>');
@@ -251,7 +313,10 @@ mform.prototype={
                 });
             }
             //var item_container=$('<div class="form_item_panel"></div>');
-            item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'_0">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
+            
+            labelStyle(label,template);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(radio_container);
             item_container.append(subContainer);
@@ -311,7 +376,10 @@ mform.prototype={
                 
             }
             //var item_container=$('<div class="form_item_panel"></div>');
-            item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'_0">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
+            
+            labelStyle(label,template);
             //item_container.append(selectItem);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
@@ -375,7 +443,10 @@ mform.prototype={
                 }
                 
             }
-            item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'_0">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
+            
+            labelStyle(label,template);
             //item_container.append(selectItem);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
@@ -443,7 +514,10 @@ mform.prototype={
                 }
                 
             }
-            item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'_0">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
+            
+            labelStyle(label,template);
             //item_container.append(selectItem);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
@@ -467,7 +541,10 @@ mform.prototype={
             var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="form-original multiSelect supermultiInput'+
             (item.isFilterable?" filterSelect":"")+'" multiple="multiple" data-native-menu="false"></select>');
 
-            item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'_0">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
+            
+            labelStyle(label,template);
             //item_container.append(selectItem);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
@@ -605,7 +682,14 @@ mform.prototype={
                 // second form/input field when the listview is destroyed/rebuilt during a refresh.
                 //$("#searchInput").remove();
                 console.log("listview.......................",+list);
+                var popup=$( "#" + selectmenu.attr( "id" ) + "-listbox" );
                 
+                console.log('pagecontainerhide',popup);
+                popup.popup({afterclose: function( event, ui ) {
+                    console.log('pagecontainerhide',"popup closed");
+                        $(this).find('input[data-type="search"]').val('');
+                    }
+                });
                 if ( !form ) {
                     //$("#filterForm").remove();
                     input = $( "<input data-type='search'></input>" );
@@ -644,10 +728,15 @@ mform.prototype={
                 
                 var listview, form;
                 if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                    
                     //return;
                 }
+                data.toPage.find('a.ui-icon-delete').on('click',function(e){
+                    //console.log('pagecontainerhide',$(data.toPage).find('input[data-type="search"]').val());
+                    $(data.toPage).find('input[data-type="search"]').val('');
+                    $(data.toPage).find('input[data-type="search"]').trigger('keyup');
+                })
                 listview = data.toPage.find( "ul" );
-                console.log("pagecontainerbeforeshow.............",listview.html());
                 //console.log(listview.html());
                 form = listview.jqmData( "filter-form" );
                 // Attach a reference to the listview as a data item to the dialog, because during the
@@ -663,9 +752,9 @@ mform.prototype={
             })
             // After the dialog is closed, the form containing the filter input is returned to the popup.
             .on( "pagecontainerhide", function( event, data ) {
-                console.log("pagecontainerhide.............",$(this));
                 var listview, form;
                 if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                    console.log('pagecontainerhide1',$(data.toPage).find('input[data-type="search"]').val());
                     return;
                 }
                 listview = data.prevPage.jqmData( "listview" ),
@@ -793,6 +882,7 @@ $.fn.extend({
         $.each(template,(k,v)=>{
             var val=undefined;
             if(v.hasOwnProperty('type')){
+                if(k.nodeName=="input") val="";
                 if(v.defaultValue!=undefined) val=v.defaultValue;
                 _self.addData(v.type,k,val);
             }else{
@@ -801,6 +891,7 @@ $.fn.extend({
                     $.each(v.data,(kk,vv)=>{
                         var _val=undefined;
                         if(vv.hasOwnProperty('type')){
+                            if(kk.nodeName=="input") _val="";
                             if(vv.defaultValue!=undefined) _val=vv.defaultValue;
                             _self.addData(vv.type,kk,_val);
                             
@@ -821,7 +912,7 @@ $.fn.extend({
         $.each(template,(k,v)=>{
             if(v.hasOwnProperty('type')){
                 var val=data[k];
-                if(data_keys.includes(k)){
+                if(data_keys.includes(k)||(v.type=="textrange" && (data_keys.includes(k.replace('_0',''))||data_keys.includes(k.replace('_1',''))))){
                     if(v.defaultValue!=undefined && (val==undefined || val.length==0)) val=v.defaultValue;
                     _self.addData(v.type,k,val);
                 }
@@ -830,7 +921,7 @@ $.fn.extend({
                     $.each(v.data,(kk,vv)=>{
                         if(vv.hasOwnProperty('type')){
                             var _val=data[kk];
-                            if(data_keys.includes(kk)){
+                            if(data_keys.includes(kk)||(v.type=="textrange" && (data_keys.includes(k.replace('_0',''))||data_keys.includes(k.replace('_1',''))))){
                                 if(vv.defaultValue!=undefined && (_val==undefined || _val.length==0)) _val=vv.defaultValue;
                                 _self.addData(vv.type,kk,_val);
                             }
@@ -980,6 +1071,12 @@ $.fn.extend({
                 if(ele.length>0)
                     _self.find("#_"+id).text(ele.text());
                 element.selectmenu().selectmenu("refresh").trigger("change");
+            }else if(type=="textrange"){
+                
+                console.log(_self.find('#'+id+"_0"),_self.find('#'+id+"_1"));
+                _self.find('#'+id+"_0").val('');
+                _self.find('#'+id+"_1").val('');
+                _self.find("#_"+id).text(value);
             }else if(type=="date"||type=="datetime"||type=="time")  {
                 
                 if(value!='0000-00-00 00:00:00' && value!='0000-00-00' && value!='00:00:00'){
@@ -994,6 +1091,14 @@ $.fn.extend({
                 
             }else{
                 element.val(value);
+                _self.find("#_"+id).text(value);
+            }
+        }else{
+            if(type=="textrange"){
+                
+                console.log(_self.find('#'+id+"_0"),_self.find('#'+id+"_1"));
+                _self.find('#'+id+"_0").val('');
+                _self.find('#'+id+"_1").val('');
                 _self.find("#_"+id).text(value);
             }
         }

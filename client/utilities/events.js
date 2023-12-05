@@ -21,6 +21,14 @@ function addClickEvents(){
         //insertRows('caseProperties',caseProperties_,(r)=>{})
         //insertRows('caseAttachments',caseAttachments_,(r)=>{})
     });
+    $('#popupMenu').find('a').on('click',function(e){
+        switch($(this).text()){
+            case '设置':
+                $.mobile.navigate( $(this).attr( "href" ));
+                break;
+        }
+        
+    })
     //#endregion
 
     //#region 第一页面 table 的 checkbox 和 按钮 事件
@@ -298,6 +306,7 @@ function addClickEvents(){
         }
     })
     //第二页表格每行的功能按钮 编辑，查看，删除
+    console.log($('#pageSecondTable').find('.table-fn-btn'));
     $('#pageSecondTable').find('.table-fn-btn').on('click',function(e){
         console.log($(this).jqmData('index')+"---"+$(this).text());
         var index=$(this).jqmData('index');

@@ -57,8 +57,9 @@
             width: 32px !important;
             height: 32px !important;
             margin-bottom: 10px;
-            margin-left: 20px;
+            margin-left: 50px;
             margin-top: -15px;
+			text-align: center;
         }
 		.hide{
 			display: none;
@@ -121,8 +122,12 @@
 		}
 		#searchbar1{
 			margin-top: 0px;
-			margin-left:160px;
+			margin-left:210px;
 			margin-right:80px;
+		}
+		
+		.pag{
+			font-size: 16px;
 		}
 		/* page1  */
 
@@ -226,6 +231,13 @@
 	
 	<div data-role="page" id="main">
 		
+		<div data-role="panel" id="search_panel" data-position="left" data-display="overlay" data-position-fixed="true" data-dismissible="true" data-theme="a">
+			<h4 id="search_list_title"> </h4>
+			<ul data-role="listview" data-inset="true" id="event_list" data-theme="a">
+	
+			</ul>
+			</div>
+		
 		<div data-role="header" style="overflow:hidden;background: #262626;color:white;text-shadow: none;padding:0px;" data-position="fixed">
 			<h1 style="font-size: 30px;display: flex;margin: 0 0 0 15px;padding:10px;">国瑞法务管理系统</h1>
 			<a id="name" href="#popupMenu" data-rel="popup" data-transition="slideup" data-icon="user" class="ui-btn-right">登录</a>
@@ -233,6 +245,7 @@
                 <ul data-role="listview" data-inset="true" style="min-width:160px;" data-theme="b">
                     <li data-role="list-divider">操作</li>
                     <li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-power" onclick='location.href=("index.html")'>退出</a></li>
+					<li><a href="#settings" class="ui-btn ui-btn-a ui-icon-gear ui-btn-icon-left popup-menu-btns" data-rel="back">设置</a></li>
 					<li data-role="list-divider">添加</li>
 					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-add-row" data-rel="back">添加记录</a></li>
 					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-add-table" data-rel="back">添加表</a></li>
@@ -240,20 +253,8 @@
                 </ul>
             </div>
 
-				<div data-role="navbar" id="main_nav">
-					<ul>
-						<li><button href="#page1" data-theme="b" class="tab-active ui-btn ui-icon-bullets ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><div>案件登记查询</div></button></li>
-                    	<li><button href="#page2" data-theme="b" class="ui-btn ui-icon-star ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><div>案件进展执行</div></button></li>
-                    	<li><button href="#page3" data-theme="b" class="ui-btn ui-icon-gear ui-btn-icon-left nav-but" data-ajax="false" data-theme="a"><div>设置</div></button></li>
-					</ul>
-				</div><!-- /navbar -->
+				
 		</div><!-- /header -->
-		<div data-role="panel" id="search_panel" data-position="left" data-display="reveal" data-position-fixed="true" data-dismissible="true" data-theme="a">
-			<h4 id="search_list_title"> </h4>
-			<ul data-role="listview" data-inset="true" id="event_list" data-theme="a">
-	
-			</ul>
-			</div>
 	<div id="page1" class="ui-body-d ui-content">
 		
 		<div data-role="controlgroup" data-type="horizontal" id="pone_fun_buts">
@@ -263,17 +264,14 @@
 	<div id="page2" class="hide">
 		<table id="pageSecondTable" data-role="table" class="ui-responsive table-stroke" data-filter="true" data-input="#filterBasic-input"></table>
 	</div>
-	<div id="page3" class="ui-body-d ui-content hide">
-		<h1>设置</h1>
-		
-	</div>
+	
 	
 	
 		<div data-role="footer"  data-position="fixed" id="mainFooter">
 
 				<input type="checkbox" data-mini="true" class="hide" style="margin-top: 8px;margin-left:5px;">
 				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
-					<a href="#search_panel" id="case_reg_but_search" class="ui-btn ui-icon-gear ui-btn-icon-notext btn-icon-blue case_reg_but footerBtn">搜索</a>
+					<a href="#search_panel" id="case_reg_but_search" class="ui-btn ui-icon-search ui-btn-icon-notext btn-icon-blue case_reg_but footerBtn">搜索</a>
 					<a href="#fullscreenPage" id="case_reg_but_add" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn">新增</a>
 					<a href="#" id="case_reg_but_remove" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but">删除</a>
 				</div>
@@ -281,12 +279,15 @@
 			
 			<div id="searchbar1">
 				<form class="ui-filterable filtertable1">
-					<input id="filterBasic-input" placeholder="索引关键字" data-type="search">
+					<input id="filterBasic-input" placeholder="索引关键字" data-type="search" data-icon="tag">
 				</form>
 			</div>
 		</div><!-- /footer -->
 	</div><!-- /page -->
-	
+	<div data-role="page" id="settings" class="">
+		<h1>设置</h1>
+		
+	</div>
 	<!--#region Start of second page -->
 	<div data-role="page" id="fullscreenPage">
 	

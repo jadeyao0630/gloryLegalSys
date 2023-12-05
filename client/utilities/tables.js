@@ -279,6 +279,54 @@ pageTable.prototype.addTableData=function(data){
             }
             var label=$('<label>'+val+'</label>')
             td.append(label);
+        }else if(columnSettings.type=="supermulticombobox"){
+            var vals=value.split(',');
+            var multiValues=[];
+            vals.forEach(_v=>{
+                var _values=formatSuperMultiSelectOptionValue(_v);
+                //console.log('setSumList',_values);
+                if(columnSettings.hasOwnProperty('displayFormat')){
+                    var displayFormat=columnSettings.displayFormat;
+                    $.each(_values,(kk,vv)=>{
+                        if(displayFormat.indexOf(kk)>-1){
+                            displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                        }
+                    })
+                    multiValues.push(displayFormat);
+                }else{
+                    var collector=[];
+                    $.each(_v,(kk,vv)=>{
+                        collector.push(vv);
+                    })
+                    multiValues.push(collector.join(" "));
+                }
+            });
+            var label=$('<label>'+multiValues.join("<br/>")+'</label>')
+            td.append(label);
+        }else if(columnSettings.type=="supermultiinput"){
+            var vals=value.split(',');
+            var multiValues=[];
+            vals.forEach(_v=>{
+                var _values=formatSuperMultiSelectData(_v);
+                console.log('setSumList',_values);
+                if(columnSettings.hasOwnProperty('displayFormat')){
+                    var displayFormat=columnSettings.displayFormat;
+                    $.each(_values,(kk,vv)=>{
+                        if(displayFormat.indexOf(kk)>-1){
+                            displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                        }
+                    })
+                    multiValues.push(displayFormat);
+                }else{
+                    var collector=[];
+                    $.each(_v,(kk,vv)=>{
+                        collector.push(vv);
+                    })
+                    multiValues.push(collector.join(" "));
+                }
+            });
+            var label=$('<label>'+multiValues.join("<br/>")+'</label>')
+            td.append(label);
         }else if(columnSettings.type=="progresses"){
             var val=value;
             if(columnSettings.data!=undefined){

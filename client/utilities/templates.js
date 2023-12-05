@@ -273,14 +273,64 @@ var _summary_template;
             label:"案件编号",
             type:"label"
         },
+        caseLabel:{
+          label:"标签",
+            type:"backgroundColorLabel",
+            data:case_labels,
+            backgroundData:resourceDatas.caseLabelsColors,
+            //style:{'font-weight':'700','font-size':'18px'},
+            isFilterable:true
+        },
         caseName:{label:"案件名称",
-        type:"label", isFilterable:true},
-        caseReason:{label:"案由",
+        type:"label", isFilterable:true,isHidden:true},
+        caseCause:{label:"案由",
         type:"label",data:case_causes, isFilterable:true},
+        caseReason:{
+          label:"案发原因",
+          data:resourceDatas.caseReason,isFilterable:true
+          //style:{'font-weight':'700','font-size':'18px'}
+        },
         caseType:{label:"案件类型",
         type:"label",data:case_types, isFilterable:true},
         caseProject:{label:"所属项目",
         type:"label",data:projects, isFilterable:true},
+        
+        caseStatus:{
+          label:"状态",
+          data:resourceDatas.caseStatus,
+          type:"progresses", isFilterable:true
+        },
+        penalty:{
+          label:"判决金额(万)",
+          type:"label", isFilterable:true
+      },
+        /*
+        caseStatus:{
+          label:"状态图",
+          data:resourceDatas.caseStatus,
+          type:"progressesButton", isFilterable:true
+        },
+        */
+        legalAgencies:{
+          label:"代理法务",
+          type:"label",
+          data:resourceDatas.legalAgencies,
+          isFilterable:true
+        },
+        casePersonnel:{
+            label:"我方当事人",
+            type:"supermulticombobox",
+            data:resourceDatas.casePersonnel,
+            isFilterable:true ,
+            displayFormat:'{value} ({status})'
+        },
+        case2ndParty:{
+            label:"对方当事人",
+            type:"supermultiinput",
+            isFilterable:true ,
+            data:{},
+            displayFormat:'{value} ({status})'
+        },
         caseApplicant:{label:"申请人",matchKey:"id",valueKey:"name",
         type:"label", isFilterable:true,isHidden:true},
         caseCreateDate:{label:"创建时间",

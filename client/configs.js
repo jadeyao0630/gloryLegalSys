@@ -4,6 +4,7 @@ let port=5555;
 var auth_code='1234';
 var enableConsoleLog=true;
 var enableRealDelete=false;
+var functionButoonPostion="top";
 const mainPage="text.html";
 var DataList={};
 var preload_completed_event_name="preloadCompleted";

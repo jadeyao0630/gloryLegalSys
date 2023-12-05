@@ -1,0 +1,242 @@
+#main_nav ul li button{
+    vertical-align: middle;
+    text-align: center;
+    line-height: 30px;
+    height:60px;
+}
+#main_nav ul li button{
+    font-size: 20px;
+}
+.tab-active div{
+    font-size: 25px;
+    vertical-align: middle;
+    text-align: center;
+}
+.tab-active::after{
+    background-color: #1362B7;
+}
+.fixedHeader{
+    overflow:hidden;background: #262626;color:white;text-shadow: none;padding:0px;
+}
+.ui-content{
+    border: none;
+}
+.navbar{
+    background: #262626;
+    text-align: center;
+    vertical-align: middle;
+    width:100%;
+    margin:0px;
+    border: none;
+}
+.nav-but{
+    height:50px;
+    text-align: center;
+    vertical-align: middle;
+    line-height: 20px;
+}
+.nav-but::after {
+    background-size: 20px !important;
+    border-radius: 16px;
+    width: 32px !important;
+    height: 32px !important;
+    margin-bottom: 10px;
+    margin-left: 50px;
+    margin-top: -15px;
+    text-align: center;
+}
+.hide{
+    display: none;
+}
+#name{
+    text-align: right;
+    margin-right: 20px;
+    margin-top: 8px;
+    line-height: 15px;
+    height: 15px;
+    min-width: 40px;
+    font-size: 16px;
+}
+#main-container{
+    position: absolute;
+    top:0;
+    left:0;
+    height: 100%;
+    width:100%;
+    background: whitesmoke;
+    z-index: 1002;
+    text-align: center;
+    vertical-align: middle;
+    
+}
+#main-container h1{
+    margin-top: 25%;
+    margin-left: 50%;
+    vertical-align: middle;
+    transform:translate(-50%,-50%);
+}
+.grid2Column{
+    display:grid;
+    grid-template-columns: auto auto;
+}
+/* page1  */
+#pageOneTable{
+    margin: 0px 10px;
+    width:100%;
+}
+#pageOneTable tbody tr td{
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+#pageOneTable thead tr th{
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+#pone_fun_buts{
+    top:195px;
+    left:15px;
+    position: absolute;
+}
+#searchbar1{
+    margin-top: 0px;
+    margin-left:210px;
+    margin-right:80px;
+}
+
+.pag{
+    font-size: 16px;
+}
+/* page1  */
+
+/* page2  */
+#pageSecondTable{
+    margin: 10px 10px;
+    width:100%;
+}
+#pageSecondTable tbody tr td{
+    text-align: left;
+    vertical-align:middle;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+}
+#pageSecondTable thead tr th{
+    text-align: left;
+    vertical-align: middle;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* page2  */
+
+/* page4  */
+ui-collapsible.collapsible-listview .ui-btn{
+    background-color: white !important;
+    box-shadow: none;
+}
+.ui-collapsible.collapsible-listview{
+    border:none;
+    box-shadow: none;
+}
+.ui-li-count{
+    color:white;
+    background: black;
+}
+/* page4  */
+
+.ui-selectmenu.ui-popup .ui-input-search {
+    margin-left: .5em;
+    margin-right: .5em;
+}
+.ui-selectmenu.ui-dialog .ui-content {
+    padding-top: 0;
+}
+.ui-selectmenu.ui-dialog .ui-selectmenu-list {
+    margin-top: 0;
+    background: white;
+}
+.ui-selectmenu.ui-popup .ui-selectmenu-list li.ui-first-child .ui-btn {
+    border-top-width: 1px;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+}
+.ui-selectmenu.ui-dialog .ui-header {
+    border-bottom-width: 1px;
+}
+.progress_lock{
+    z-index: 99;
+    margin-right:10px;
+    margin-top: -5px;
+    margin-bottom: -5px;
+}
+.ui-but-lock-edit:after{
+    background-size: 20px !important;
+    border-radius: 16px;
+    width: 32px !important;
+    height: 32px !important;
+    left:9px;
+    top:8px;
+}
+.edit-lock{
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+#main-header{
+    overflow:hidden;
+    background: #262626;
+    color:white;
+    text-shadow: none;
+}
+#main-header .header-search-container{
+    position: absolute;
+    top: 30px; 
+}
+.header-btn-search{
+    color:white;
+    font-size: 25px;
+    padding-left:20px;
+}
+.header-btn-search:hover{
+    cursor: pointer;
+    color:aqua;
+}
+
+.header-search-container {
+    position: relative;
+    display: inline-block;
+  }
+
+.header-search-container .tooltip-serarch {
+    visibility: hidden;
+    width: 120px;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    top: 50%;
+    left: -45%;
+    margin-left: 60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+.header-search-container:hover .tooltip-serarch {
+    visibility: visible;
+    opacity: 1;
+  }
+  .ui-btn-right{
+    position: absolute;
+    top:10px;
+  }

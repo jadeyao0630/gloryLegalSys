@@ -919,7 +919,44 @@ var _summary_template;
       },
       template:list_evidence
     }
-  });
+    
+  header_filter_template={
+    settings:{
+      hasLabel:true,
+      hasPlaceHolder:true,
+      labelPosition:"left",
+      templateColumn:"33.3% 33.3% 33.3%",
+      isCollapsibleGrouping:false,
+    },
+    template:{
+      caseLabel:{
+          placeholder:"案件标签",
+          label:"案件标签:",
+          type:"combobox",
+          isOptional:true,
+          data:resourceDatas.caseLabels,
+          width:"200px"
+      },
+      caseProject:{
+          placeholder:"所属项目",
+          label:"所属项目:",
+          type:"combobox",
+          isOptional:true,
+          data:resourceDatas.projects,
+          width:"200px"
+      },
+      
+      casePersonnel:{
+          placeholder:"我方当事人",
+          label:"我方当事人:",
+          type:"combobox",
+          isOptional:true,
+          data:resourceDatas.casePersonnel,
+          width:"200px"
+      },
+    }
+  }
+});
   
 
 

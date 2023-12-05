@@ -34,6 +34,7 @@ mform.prototype={
             form_width=' style="width:'+template.settings.width+';"'
         }
         
+        var itemNeedToSetWidth=[];
         //var formItemIds=[];
         _self.instance=$('<form'+form_width+' onsubmit="javascript:return false;"></form>');
         _self.instance.template=template.template;
@@ -63,9 +64,26 @@ mform.prototype={
         });
         */
         //_self.instance.find('select').parent().css("overflow", "auto");
+        //_self.instance.trigger('create');
         _self.instance.find('select').parent().addClass('select-overflow');
-        
-        
+        $.mobile.document
+            .on("pagecreate", function () {
+                /*
+        itemNeedToSetWidth.forEach((ele)=>{
+            if(ele.itemData.type=="combobox" || ele.itemData.type=="multicombobox" || ele.itemData.type=="supermulticombobox" || ele.itemData.type=="supermultiinput"){
+                $(ele.element).selectmenu({
+                    create: function (event, ui) {
+                        console.log('itemNeedToSetWidth',_self.instance.find("#"+$(this).attr('id')+"-button"),ele.itemData.width);
+                        $("#"+$(this).attr('id')+"-button").css({'width':ele.itemData.width});
+                    }
+                });
+                //$("#"+$(ele.element).attr('id')+"-button").css({'width':ele.itemData.width});
+            }else{
+                $(ele.element).css({'width':ele.itemData.width});
+            }
+            
+        })*/
+    });
         //_self.instance.find('.supermultiSelect').setSuperMultiselect();
         if (_self.opt.buttons!=undefined) _self.instance.append(_self.opt.buttons);
         //_self.readOnly(true);
@@ -126,6 +144,7 @@ mform.prototype={
                                 break;
                             case "combobox":
                                 _self.elements[item_key]=generateComboBoxItem(item_container,item,item_key);
+                                //if(item.width!=undefined) _self.elements[item_key].parent().css({'width':item.width});
                                 break;
                             case "multicombobox":
                                 //console.log("multicombobox..............................");
@@ -145,6 +164,12 @@ mform.prototype={
                             case "file":
                                 _self.elements[item_key]=generateFileItem(item_container,item,item_key);
                                 break;
+                        }
+                        if(item.width!=undefined){
+                            itemNeedToSetWidth.push({
+                                element:_self.elements[item_key],
+                                itemData:item,
+                            })
                         }
                         var replacement=replacementOfInput(item_key);
                         item_container.append(replacement);
@@ -235,12 +260,55 @@ mform.prototype={
             //return item_container;
         }
         function generateComboBoxItem(item_container,item,id){
+            console.log('generateComboBoxItem',item.label,item.data);
             var selectItem=$('<select name="'+id+'" id="'+id+'"'+
             (item.isFilterable?"class=\"filterSelect\" data-native-menu=\"false\"":"class=\"form-original\"")+'" '+setRequired(item.isOptional,"此项必须选择")+'></select>');
-            if(item.data){
-                item.data.forEach((d,counter)=>{
-                    selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
-                });
+            if(item.data!=undefined){
+                if(item.data instanceof Array){
+                    item.data.forEach((d,counter)=>{
+                        selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
+                    });
+                }else{
+                    $.each(item.data,function(key,value){
+                        if(key=="无"){
+                            selectItem.append($('<option value="'+key+0+'">'+key+'</option>'));
+                        }else{
+                            var grounp=$('<optgroup label="'+key+'"></optgroup>')
+                            value.forEach((d,counter)=>{
+                                console.log(d)
+                                console.log((d.constructor === Object))
+                                if(d.constructor === Object){//'{name} {contact} {institution}'
+                                    var label="";
+                                    if(item.hasOwnProperty('displayFormat')){
+                                        var displayFormat=item.displayFormat;
+                                        $.each(d,(kk,vv)=>{
+                                            console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                                            if(item.displayFormat.indexOf(kk)>-1){
+                                                displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                            }
+                                        })
+                                        label=displayFormat;
+                                    }else{
+                                        var collector=[];
+                                        $.each(d,(kk,vv)=>{
+                                            collector.push(vv);
+                                        })
+                                        label=collector.join(" ");
+                                    }
+                                    var _value=d.hasOwnProperty('value')?d.value:key+counter;
+                                    grounp.append($('<option value="'+_value+'">'+label+'</option>'));
+                                }else{
+
+                                    grounp.append($('<option value="'+key+counter+'">'+d+'</option>'));
+                                }
+                            });
+                            selectItem.append(grounp);
+                        }
+                        
+                    
+                    })
+                }
+                
             }
             //var item_container=$('<div class="form_item_panel"></div>');
             item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
@@ -477,6 +545,8 @@ mform.prototype={
             })
         $.mobile.document
             .on("pagecreate", function () {
+                
+                console.log('itemNeedToSetWidth','pagecreate');
                 $(".supermultiSelect").selectmenu({
                     create: function (event, ui) {
                         console.log('supermultiSelect pagecreate',this);

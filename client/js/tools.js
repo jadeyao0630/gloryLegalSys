@@ -1,6 +1,12 @@
 function output(message){
     if (enableConsoleLog) console.log(message);
 }
+function extendOpt(opt1,opt2){
+    for(var attr in opt2){
+        //console.log(attr+": "+opt1[attr]+"-->"+opt2[attr]);
+        opt1[attr] = opt2[attr];
+    }
+}
 const formatString = (template, ...args) => {
     return template.replace(/{([0-9]+)}/g, function (match, index) {
         return typeof args[index] === 'undefined' ? match : args[index];

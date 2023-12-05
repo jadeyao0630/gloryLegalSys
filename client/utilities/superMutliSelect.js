@@ -464,7 +464,7 @@ $.fn.extend({
         if (vformat==undefined) vformat='{value} ({status})';
         var elementId=$(this).attr('id');
         console.log('listbox',elementId);
-        $(elementId).parent().parent().find('.sub-selectmenu').remove();
+        $(this).parent().parent().find('.sub-selectmenu').remove();
         var listbox_popup=$('#'+elementId+'-listbox');
         listbox_popup.popup({
             afterclose: function( event, ui ) {

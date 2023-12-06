@@ -261,7 +261,7 @@ var _summary_template;
       ]
       _firstPageTableColumns={
         checkallbox:{
-            width:50,
+            width:25,
             type:"checkbox"
         },
         id:{

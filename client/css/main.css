@@ -80,25 +80,7 @@
     grid-template-columns: auto auto;
 }
 /* page1  */
-#pageOneTable{
-    margin: 0px 10px;
-    width:100%;
-}
-#pageOneTable tbody tr td{
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap; 
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 200px;
-}
-#pageOneTable thead tr th{
-    text-align: center;
-    vertical-align: middle;
-    white-space: nowrap; 
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+
 #pone_fun_buts{
     top:195px;
     left:15px;
@@ -198,13 +180,23 @@ ui-collapsible.collapsible-listview .ui-btn{
     border:none;
 }
 #main-header .header-search-container{
+    margin-right:10px;
+    margin-top:15px;
+}
+.header-search-bar{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    padding-left:20px;
+    width:250px;
+    
     position: absolute;
-    top: 30px; 
+    top: 15px; 
+}
+#header-search-input{
 }
 .header-btn-search{
     color:white;
     font-size: 25px;
-    padding-left:20px;
 }
 .header-btn-search:hover{
     cursor: pointer;
@@ -242,7 +234,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     top:10px;
   }
   .header-filter-container{
-    position: absolute;
+    position: fixed;
     background: #262626;
     color:white;
     top:0;
@@ -250,8 +242,112 @@ ui-collapsible.collapsible-listview .ui-btn{
     width: calc(100% - 40px);
     text-shadow: none;
     padding: 0px 20px;
-    z-index: 99;
+    z-index: 102;
   }
   #main-body{
     padding:0px;
   }
+
+/* 主表格 */
+#pageOneTable{
+    margin: 0px 0px;
+    width:100%;
+}
+
+#pageOneTable tbody tr td{
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+#pageOneTable thead tr th{
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+#pageOneTable-fixed{
+    background: #262626;
+    color:white;
+    text-shadow: none;
+width: calc(100% + 40px);
+  margin-left:-20px;
+}
+#pageOneTable-fixed th{
+
+  text-align: center;
+    vertical-align: middle;
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+.table-regularFont{
+    font-size: 12px;
+}
+.table-regularFont tbody tr td{
+    font-size: 12px;
+}
+.table-regularFont thead tr th{
+    font-size: 12px;
+}
+.table-regularFont label{
+    font-size: 12px;
+}
+
+.table-regularFont input.reg-checkbox{
+    font-size: 12px;
+}
+.table-regularFont tbody tr td div button:after{
+    
+    margin: auto;
+    transform: translate(-50%,-50%);
+}
+
+.table-smallFont{
+    font-size: 8px;
+}
+.table-smallFont tbody tr td{
+    font-size: 8px;
+    max-width: 150px;
+}
+.table-smallFont thead tr th{
+    font-size: 8px;
+    max-width: 150px;
+}
+.table-smallFont label{
+    font-size: 8px;
+}
+.table-smallFont .reg-checkbox{
+    font-size: 8px;
+    width:14px;
+}
+.table-smallFont .reg-checkbox-all{
+    font-size: 8px;
+    width:14px;
+}
+.table-smallFont select{
+    font-size: 8px;
+}
+.table-smallFont tbody tr td div{
+    font-size: 8px;
+}
+.table-smallFont tbody tr td div a:after{
+    background-size: 8px;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    transform: translate(-50%,-50%);
+}
+.table-smallFont tbody tr td div button:after{
+    background-size: 8px;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    transform: translate(-50%,-50%);
+}

@@ -30,9 +30,14 @@
 <body>
     <!-- header -->
     <div data-role="page" id="main">
-        <div data-role="header" id="main-header" data-position="fixed">
-            <div class="header-search-container"><i class="fa fa-search header-btn-search"></i><span class="tooltip-serarch">开启搜索</span></div>
-            <input type="search" style="max-width:200px;top:30px;" placeholder="索引"></input>
+        <div data-role="header" id="main-header" data-position="fixed" data-tap-toggle="false">
+            
+            
+            <div class="header-search-bar">
+                <div class="header-search-container" href="#"><i class="fa fa-search header-btn-search"></i><span class="tooltip-serarch">开启搜索</span></div>
+                <input type="text" id="header-search-input" class="header-search-input" placeholder="关键字索引"></input>
+                
+            </div>
             <h1 style="font-size: 30px;">国瑞法务管理系统</h1>
             <a id="name" href="#popupMenu" data-rel="popup" data-transition="slideup" data-icon="user" class="ui-btn-right">登录</a>
             <div data-role="popup" id="popupMenu" data-theme="b" data-history="false">
@@ -50,8 +55,11 @@
             
         </div>
         <div id="main-body" class="ui-body-d ui-content">
-            test
-            <div id="header-filter-container" class="header-filter-container"></div>
+            <table id="pageOneTable" style="font-size: 12px;" data-role="table" class="ui-responsive table-stroke" data-filter="true" data-input="#header-search-input"></table>
+            
+            <div id="header-filter-container" class="header-filter-container">
+                <table id="pageOneTable-fixed" data-role="table" class="ui-responsive table-stroke"></table>
+            </div>
         </div>
     </div>
     <!-- /header -->
@@ -68,54 +76,12 @@
 	<script type="text/javascript" src="./js/db.js"></script>
 	<script type="text/javascript" src="./preload.js"></script>
 	<script type="text/javascript" src="./utilities/templates.js"></script>
+
+    
+    <script type="text/javascript" src="./pages/legal.js"></script>
     <script>
-        var form;
-        //document.body.style.fontSize = "16px";
         
         
-        $('body').on(preload_completed_event_name,function(){
-            var tb=$('.header-search-container').togglebuttonicon('header-filter-container',function(e){
-                if(e){
-                    form.show();
-                    
-                }else{
-                    //$('#header-filter-container').empty();
-                    form.hide();
-                }
-            },{distance:190});
-            $('#main-container').addClass('hide');
-            var main_form= new mform({template:header_filter_template});
-            form=main_form.instance;
-            $('#header-filter-container').css({height:"0px",top:$('#main-header').css('height')});
-            $('#header-filter-container').append(form);
-            form.hide();
-            $('#header-filter-container').trigger('create');
-            //$('#main-header').trigger('create');
-            //console.log($('#header-filter-container').html());
-            //document.documentElement.style.fontSize = "30px";
-            //document.body.style.fontSize = "30px";
-            //form.find('label').css({'font-size':"30px"});
-            //form.find('span').css({'font-size':"30px"});
-            //form.find('select').css({'font-size':"30px"});
-            form.trigger('create');
-            $('.header-filter-btn').on('click',function(e){
-                switch($(this).text()){
-                    case "复位":
-                        
-                        
-                        main_form.setEmptyData();
-                        break;
-                    case "查询":
-                        $.each($(form).find('select,input'),(index,ele)=>{
-                            console.log($(ele).val());
-                        });
-                        tb.instance.togglebutton('close')
-                        form.hide();
-                        //console.log('togglebuttonicon',);
-                        break;
-                }
-            });
-        })
     </script>
 </body>
 </html>

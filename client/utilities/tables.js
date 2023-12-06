@@ -3,16 +3,27 @@ function tableColumnToggle(columnTemplate,container,target){
     var filterables={};
     var hiddenList={};
 
-    var filterBtn=$('<a href="#'+target+'-columnFilter" data-rel="popup" data-position-to="origin" class="ui-btn-right footerBtn ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-bullets ui-btn-icon-left ui-btn-a" data-transition="pop">列</a>');
+    var filterBtn=container;
     var filterPopup=$('<div data-role="popup" id="'+target+'-columnFilter" data-theme="a" class="ui-corner-all"></div>');
+    if(container instanceof String){
+        filterBtn=$('<a href="#'+target+'-columnFilter" data-rel="popup" data-position-to="origin" class="ui-btn-right footerBtn ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-bullets ui-btn-icon-left ui-btn-a" data-transition="pop">列</a>');
+        $("#"+container).append($(filterBtn));
+        $("#"+container).append(filterPopup);
+    }else{
+        filterPopup.insertAfter(filterBtn);
+        $(filterBtn).on('click',function(e){
+            console.log(e);
+            $('#'+target+'-columnFilter').popup('open');
+            $('#'+target+'-columnFilter').popup('reposition',{x:e.pageX,y:e.pageY});
+        })
+    }
     
     var filterForm=$('<form></form>');
     var filterFielset=$('<fieldset data-role="controlgroup" style="margin:0px;"></fieldset>');
     filterForm.append(filterFielset);
     filterPopup.append(filterForm);
     
-    $("#"+container).append(filterBtn);
-    $("#"+container).append(filterPopup);
+    
     filterPopup.popup({
         afterclose: function( event, ui ) {
             console.log(getGlobal('currentPage'));
@@ -33,22 +44,29 @@ function tableColumnToggle(columnTemplate,container,target){
                 //console.log( $('td[name="'+input.prop('name')+'"]'));
                 if(!input.prop('checked')){
                     $("#"+target).find('th[name="'+input.prop('name')+'"]').hide(1000);
+                    
+                    $("#"+target+"-fixed").find('th[name="'+input.prop('name')+'"]').hide(1000);
                     $("#"+target).find('td[name="'+input.prop('name')+'"]').hide(1000);
                 }else{
                     $("#"+target).find('th[name="'+input.prop('name')+'"]').show(1000);
+                    $("#"+target+"-fixed").find('th[name="'+input.prop('name')+'"]').show(1000);
                     $("#"+target).find('td[name="'+input.prop('name')+'"]').show(1000);
                 }
             });
             if(columnData.isHidden){
-                $("#"+target).find('th[name="'+id+'"]').hide(1000);
-                $("#"+target).find('td[name="'+id+'"]').hide(1000);
+                $("#"+target).find('th[name="'+id+'"]').hide(1);
+                $("#"+target+"-fixed").find('th[name="'+id+'"]').hide(1);
+                $("#"+target).find('td[name="'+id+'"]').hide(1);
             }
         }
         //hiddenList[columnData.label]=columnData.isHidden;
         //th.jqmData('isHidden',columnData.isHidden);
     });
     filterPopup.trigger('create');filterPopup.trigger('change');
-    $("#"+container).trigger('create');
+    if(container instanceof String){
+        $("#"+container).trigger('create');
+    }
+    return filterPopup;
 }
 function pageTable(arg){
     this.opt={

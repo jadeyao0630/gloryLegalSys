@@ -229,6 +229,9 @@ ui-collapsible.collapsible-listview .ui-btn{
     visibility: visible;
     opacity: 1;
   }
+  .header-filter-from{
+    margin:0px 10px;
+  }
   .ui-btn-right{
     position: absolute;
     top:10px;
@@ -239,9 +242,9 @@ ui-collapsible.collapsible-listview .ui-btn{
     color:white;
     top:0;
     left:0;
-    width: calc(100% - 40px);
+    width: calc(100% - 0px);
     text-shadow: none;
-    padding: 0px 20px;
+    padding: 0px 0px;
     z-index: 102;
   }
   #main-body{
@@ -250,7 +253,7 @@ ui-collapsible.collapsible-listview .ui-btn{
 
 /* 主表格 */
 #pageOneTable{
-    margin: 0px 0px;
+    margin: 80px 0px 0px 0px;
     width:100%;
 }
 
@@ -261,6 +264,9 @@ ui-collapsible.collapsible-listview .ui-btn{
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 150px;
+    min-width: 25px;
+    border-right: 1px solid lightgray;
+    padding:5px 0px 0px 0px;
 }
 #pageOneTable thead tr th{
     text-align: center;
@@ -268,14 +274,18 @@ ui-collapsible.collapsible-listview .ui-btn{
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
+    border-right: 1px solid lightgray;
     max-width: 150px;
+    min-width: 25px;
+    padding:5px 0px;
+    position: fixed;
 }
 #pageOneTable-fixed{
+    margin: 0px 0px;
     background: #262626;
     color:white;
     text-shadow: none;
-width: calc(100% + 40px);
-  margin-left:-20px;
+    width: 100%;
 }
 #pageOneTable-fixed th{
 
@@ -285,6 +295,8 @@ width: calc(100% + 40px);
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 150px;
+    padding:0px 0px;
+    visibility: collapse;
 }
 
 .table-regularFont{
@@ -302,6 +314,11 @@ width: calc(100% + 40px);
 
 .table-regularFont input.reg-checkbox{
     font-size: 12px;
+    top:-5px;
+}
+.table-regularFont input.reg-checkbox-all{
+    font-size: 12px;
+    top:-2px;
 }
 .table-regularFont tbody tr td div button:after{
     
@@ -323,13 +340,19 @@ width: calc(100% + 40px);
 .table-smallFont label{
     font-size: 8px;
 }
+
+.table-smallFont input{
+    font-size: 8px;
+}
 .table-smallFont .reg-checkbox{
     font-size: 8px;
     width:14px;
+    top:-4px;
 }
 .table-smallFont .reg-checkbox-all{
     font-size: 8px;
     width:14px;
+    top:-1px;
 }
 .table-smallFont select{
     font-size: 8px;
@@ -350,4 +373,28 @@ width: calc(100% + 40px);
     height: 16px;
     margin: auto;
     transform: translate(-50%,-50%);
+}
+.table-column-toggle:hover{
+    cursor: pointer;
+    color:aqua;
+    font-size: 12px;
+    padding:0px 4px;
+}
+.table-smallFont label.ui-checkbox-off::after{
+    width:12px;
+    height:12px;
+    margin-top:-7px;
+    background-size: 8px;
+}
+.table-smallFont label.ui-checkbox-on::after{
+    width:12px;
+    height:12px;
+    margin-top:-7px;
+    background-size: 8px;
+}
+.table-smallFont label.ui-checkbox-on.ui-btn-icon-left{
+    padding-left: 3em;
+}
+.table-smallFont label.ui-checkbox-off.ui-btn-icon-left{
+    padding-left: 3em;
 }

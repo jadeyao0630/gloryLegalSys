@@ -3,22 +3,25 @@ var form;
 
 
 $('body').on(preload_completed_event_name,function(){
-    var tb=$('.header-search-container').togglebuttonicon('header-filter-container',function(e){
+    var tb=$('.header-search-container').togglebuttonicon('header-filter-container',function(e,isbefore){
         if(e){
-            form.slideDown();
-            
+            if(isbefore){
+                form.slideDown();
+                $('#pageOneTable').animate({'margin-top':"200px"})
+            }
         }else{
             //$('#header-filter-container').empty();
-            form.slideUp();
+            if(isbefore){
+                form.slideUp();
+                $('#pageOneTable').animate({'margin-top':"0px"})
+            }
+            
         }
     },{distance:200});
     $('#main-container').addClass('hide');
     var main_form= new mform({template:header_filter_template});
     form=main_form.instance;
-    $('#header-filter-container').css({height:"0px",top:$('#main-header').css('height')});
-    $('#header-filter-container').prepend(form);
-    form.hide();
-    form.trigger('create');
+    
 
     pageOnTable=new pageTable({
 		containerId:"pageOneTable",
@@ -59,9 +62,17 @@ $('body').on(preload_completed_event_name,function(){
                     $(cloneHeader[index]).css({'width':$(td).css('width')})
                     console.log("set clone header",index,$(td).css('width'),$(cloneHeader[index]))
                 })
+                
             }
-            
+            var trs_clone=$('#pageOneTable-fixed').find('thead > tr');
+            if (trs_clone.length>0){
+                $(trs_clone[0]).append($('<td style="width:20px;"><i class="fa fa-gear"></i></td>'));
+            }
             $('#pageOneTable-fixed').trigger('create');
+            $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height'),top:$('#main-header').css('height')});
+            $('#header-filter-container').prepend(form);
+            form.hide();
+            form.trigger('create');
         $(window).resize(function(e){
             console.log('高度',window.innerHeight,'宽度',window.innerWidth)
             if(window.innerWidth<=1280){

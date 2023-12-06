@@ -17,13 +17,16 @@ $.fn.extend({
                 instance.targetHeight=$(instance.target).height();
             }
             if(instance.isTargetToggle){
+                if(callback!=undefined)callback(instance.isTargetToggle,true);//isbefore=true
                 instance.target.animate({height:(instance.targetHeight+instance.opt.distance)+'px'},instance.opt.duration,function(){
-                    if(callback!=undefined)callback(instance.isTargetToggle);
+                    if(callback!=undefined)callback(instance.isTargetToggle,false);//isbefore=false
                 });
             }else{
                 
-                if(callback!=undefined)callback(instance.isTargetToggle);
+                if(callback!=undefined)callback(instance.isTargetToggle,true);
                 instance.target.animate({height:(instance.targetHeight)+'px'},instance.opt.duration,function(){
+                    
+                    if(callback!=undefined)callback(instance.isTargetToggle,false);
                 });
             }
             

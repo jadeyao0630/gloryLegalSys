@@ -2,7 +2,7 @@ function tableColumnToggle(columnTemplate,container,target){
     var ids=Object.keys(columnTemplate);
     var filterables={};
     var hiddenList={};
-
+var duration=500;
     var filterBtn=container;
     var filterPopup=$('<div data-role="popup" id="'+target+'-columnFilter" data-theme="a" class="ui-corner-all"></div>');
     if(container instanceof String){
@@ -43,15 +43,19 @@ function tableColumnToggle(columnTemplate,container,target){
             input.on("click",function(e){
                 //console.log( $('td[name="'+input.prop('name')+'"]'));
                 if(!input.prop('checked')){
-                    $("#"+target).find('th[name="'+input.prop('name')+'"]').hide(1000);
+                    $("#"+target).find('th[name="'+input.prop('name')+'"]').hide(duration);
                     
-                    $("#"+target+"-fixed").find('th[name="'+input.prop('name')+'"]').hide(1000);
-                    $("#"+target).find('td[name="'+input.prop('name')+'"]').hide(1000);
+                    $("#"+target+"-fixed").find('th[name="'+input.prop('name')+'"]').hide(duration);
+                    $("#"+target).find('td[name="'+input.prop('name')+'"]').hide(duration);
                 }else{
-                    $("#"+target).find('th[name="'+input.prop('name')+'"]').show(1000);
-                    $("#"+target+"-fixed").find('th[name="'+input.prop('name')+'"]').show(1000);
-                    $("#"+target).find('td[name="'+input.prop('name')+'"]').show(1000);
+                    $("#"+target).find('th[name="'+input.prop('name')+'"]').show(duration);
+                    $("#"+target+"-fixed").find('th[name="'+input.prop('name')+'"]').show(duration);
+                    $("#"+target).find('td[name="'+input.prop('name')+'"]').show(duration);
                 }
+                setTimeout(() => {
+                    filterPopup.trigger('columnChanged');
+                }, duration+100);
+                
             });
             if(columnData.isHidden){
                 $("#"+target).find('th[name="'+id+'"]').hide(1);

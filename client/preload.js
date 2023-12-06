@@ -34,6 +34,7 @@ getCaseDb(basicTableList,[],(k,d)=>{
     }
     else if(k=="caseStatus"){
         progresses=[];
+        progresses_object={};
         var collector=[];
         $.each(d,(index,_d)=>{
             if(_d.isMain){
@@ -42,11 +43,14 @@ getCaseDb(basicTableList,[],(k,d)=>{
                     collector=[];
                 }
                 progresses.push(_d.name)
+                progresses_object[_d.id]=_d.name;
             }else{
                 collector.push(_d.name);
+                progresses_object[_d.id]=_d.name;
             }
         });
         resourceDatas[k]=progresses;
+        resourceDatas[k+"_object"]=progresses_object;
     }
     else if(k=="propertyStatus"){
         property_status=getKeyValues(d,"label")

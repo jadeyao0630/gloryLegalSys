@@ -333,7 +333,7 @@ var _summary_template;
         },
         caseApplicant:{label:"申请人",matchKey:"id",valueKey:"name",
         type:"label", isFilterable:true,isHidden:true},
-        caseCreateDate:{label:"创建时间",
+        caseDate:{label:"立案日期",
         type:"date", dateFormat:'yyyy年MM月dd日', isFilterable:true},
         rowButtons:{
             label:"操作",
@@ -354,7 +354,7 @@ var _summary_template;
         caseType:{label:"案件类型",data:resourceDatas.caseType},
         caseProject:{label:"所属项目",data:resourceDatas.projects},
         caseApplicant:{label:"申请人",},
-        caseCreateDate:{label:"创建时间"},
+        caseDate:{label:"立案日期"},
     }
     progressTableTemplate=[
         {
@@ -976,7 +976,7 @@ var _summary_template;
         type:"multicombobox",
         isOptional:true,
         //data:addEmptyValueToArray(resourceDatas.legalAgencies),
-        data:resourceDatas.legalAgencies.filter((d)=>{return d!='无'}),
+        data:resourceDatas.legalAgencies//.filter((d)=>{return d!='无'}),
       },
         caseType:{label:"案件类型:",
         type:"multicombobox",
@@ -987,7 +987,7 @@ var _summary_template;
         caseStatus:{
           label:"状态:",
           //data:addEmptyValueToArray(resourceDatas.caseStatus),
-          data:resourceDatas.caseStatus,
+          data:resourceDatas.caseStatus_object,
           type:"multicombobox", 
           isOptional:true,
         },

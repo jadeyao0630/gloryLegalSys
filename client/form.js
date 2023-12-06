@@ -405,37 +405,43 @@ mform.prototype={
                         if(key=="无"){
                             selectItem.append($('<option value="'+key+0+'">'+key+'</option>'));
                         }else{
-                            tips.push(key);
-                            var grounp=$('<optgroup label="'+key+'"></optgroup>')
-                            value.forEach((d,counter)=>{
-                                console.log(d)
-                                console.log((d.constructor === Object))
-                                if(d.constructor === Object){//'{name} {contact} {institution}'
-                                    var label="";
-                                    if(item.hasOwnProperty('displayFormat')){
-                                        var displayFormat=item.displayFormat;
-                                        $.each(d,(kk,vv)=>{
-                                            console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
-                                            if(item.displayFormat.indexOf(kk)>-1){
-                                                displayFormat=displayFormat.replace("{"+kk+"}",vv);
-                                            }
-                                        })
-                                        label=displayFormat;
+                            console.log(value,value instanceof String);
+                            if(value.constructor === String){
+                                selectItem.append($('<option value="'+key+'">'+value+'</option>'));
+                            }else{
+                                tips.push(key);
+                                var grounp=$('<optgroup label="'+key+'"></optgroup>')
+                                value.forEach((d,counter)=>{
+                                    console.log(d)
+                                    console.log((d.constructor === Object))
+                                    if(d.constructor === Object){//'{name} {contact} {institution}'
+                                        var label="";
+                                        if(item.hasOwnProperty('displayFormat')){
+                                            var displayFormat=item.displayFormat;
+                                            $.each(d,(kk,vv)=>{
+                                                console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                                                if(item.displayFormat.indexOf(kk)>-1){
+                                                    displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                                }
+                                            })
+                                            label=displayFormat;
+                                        }else{
+                                            var collector=[];
+                                            $.each(d,(kk,vv)=>{
+                                                collector.push(vv);
+                                            })
+                                            label=collector.join(" ");
+                                        }
+                                        var _value=d.hasOwnProperty('value')?d.value:key+counter;
+                                        grounp.append($('<option value="'+_value+'">'+label+'</option>'));
                                     }else{
-                                        var collector=[];
-                                        $.each(d,(kk,vv)=>{
-                                            collector.push(vv);
-                                        })
-                                        label=collector.join(" ");
+    
+                                        grounp.append($('<option value="'+key+counter+'">'+d+'</option>'));
                                     }
-                                    var _value=d.hasOwnProperty('value')?d.value:key+counter;
-                                    grounp.append($('<option value="'+_value+'">'+label+'</option>'));
-                                }else{
-
-                                    grounp.append($('<option value="'+key+counter+'">'+d+'</option>'));
-                                }
-                            });
-                            selectItem.append(grounp);
+                                });
+                                selectItem.append(grounp);
+                            }
+                            
                         }
                         
                     })

@@ -263,7 +263,7 @@ function formatCasesData(data){
 			//console.log(e);
 		//})	
 		if(cas.id>30){
-			delete cas.caseStatus;
+			//delete cas.caseStatus;
 			delete cas.lawFirm;
 			delete cas.legalAgencies;
 			delete cas.legalCounsel;
@@ -277,7 +277,8 @@ function formatCasesData(data){
 			var status_data={
 				id:cas.id,
 				caseNo:cas.caseNo,
-				caseStatus:cas.id<67?2.0:4.1,
+				//caseStatus:cas.id<67?1.0:3.1,
+				caseStatus:cas.caseStatus==2||cas.caseStatus==4.1?cas.caseStatus-1:cas.caseStatus,
 				//legalAgencies:1,
 				//lawFirm:0,
 				//attorney:"无0",

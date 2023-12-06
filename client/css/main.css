@@ -246,6 +246,15 @@ ui-collapsible.collapsible-listview .ui-btn{
     text-shadow: none;
     padding: 0px 0px;
     z-index: 102;
+    height:auto;
+  }
+  .header-filter-container-div{
+    background: #262626;
+    color:white;
+    width: 100%;
+    text-shadow: none;
+    padding: 0px 0px;
+    z-index: 102;
   }
   #main-body{
     padding:0px;
@@ -253,7 +262,7 @@ ui-collapsible.collapsible-listview .ui-btn{
 
 /* 主表格 */
 #pageOneTable{
-    margin: 80px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
     width:100%;
 }
 
@@ -266,7 +275,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     max-width: 150px;
     min-width: 25px;
     border-right: 1px solid lightgray;
-    padding:5px 0px 0px 0px;
+    padding:5px 7px 0px 0px;
 }
 #pageOneTable thead tr th{
     text-align: center;
@@ -275,10 +284,8 @@ ui-collapsible.collapsible-listview .ui-btn{
     overflow: hidden;
     text-overflow: ellipsis;
     border-right: 1px solid lightgray;
-    max-width: 150px;
     min-width: 25px;
     padding:5px 0px;
-    position: fixed;
 }
 #pageOneTable-fixed{
     margin: 0px 0px;
@@ -294,9 +301,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 150px;
-    padding:0px 0px;
-    visibility: collapse;
+    padding:5px 0px;
 }
 
 .table-regularFont{
@@ -335,7 +340,6 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 .table-smallFont thead tr th{
     font-size: 8px;
-    max-width: 150px;
 }
 .table-smallFont label{
     font-size: 8px;
@@ -373,6 +377,9 @@ ui-collapsible.collapsible-listview .ui-btn{
     height: 16px;
     margin: auto;
     transform: translate(-50%,-50%);
+}
+.table-column-toggle{
+    text-align: right;
 }
 .table-column-toggle:hover{
     cursor: pointer;

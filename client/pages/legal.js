@@ -1,4 +1,11 @@
-var form,pageOnTable;
+//global variations
+var form,//header filter form
+pageOnTable,//main table
+caseForm;
+
+//getGlobal("currentId")
+//getGlobal("currentUser")
+
 //document.body.style.fontSize = "16px";
 
 $('body').on(main_load_completed_event_name,function(){
@@ -8,6 +15,7 @@ $('body').on(main_load_completed_event_name,function(){
             console.log('currentUser',getGlobalJson('currentUser'));
             pageOnTable.addTableData(DataList.combinedData);
             
+            setTableFunctionButonClickedEvent();
             $('#pageOneTable').trigger('create');
             
             setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
@@ -37,6 +45,7 @@ $('body').on(preload_completed_event_name,function(){
         }
     },{distance:200});
     
+    caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
 
     pageOnTable=new pageTable({
 		containerId:"pageOneTable",
@@ -45,7 +54,7 @@ $('body').on(preload_completed_event_name,function(){
 		//filterParent:"mainFooter",
 		rowButtons:'<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
 			'<a href="#timeline" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-eye ui-btn-icon-notext" data-transition="slidefade" data-item={0}>查看</a>'+
-			'<button href="#fullscreenPage" name="fn_btn_edit" class="btn-icon-blue" data-icon="edit" data-iconpos="notext" data-item={0}>修改</button>'+
+			'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue" data-icon="edit" data-iconpos="notext" data-item={0}>修改</button>'+
 			'<button name="fn_btn_delete" class="btn-icon-red" data-icon="delete" data-iconpos="notext" data-item={0}>删除</button>'+
 		'</div>'
 	});
@@ -88,26 +97,26 @@ $('body').on(preload_completed_event_name,function(){
                 var penalty={};
                 var caseDate={};
                 $.each($(form).find('select,input'),(index,ele)=>{
-                    console.log("filter...",ele.nodeName,ele.id,$(ele).val());
+                    console.log("filter...",ele.nodeName,id,$(ele).val());
                     if($(ele).val()!=undefined && $(ele).val().length>0){
-                        
-                        if(ele.id=="penalty_0"){
+                        var id=ele.id.replace('_f','');
+                        if(id=="penalty_0"){
                             penalty['from']=$(ele).val();
-                        }else if(ele.id=="penalty_1"){
+                        }else if(id=="penalty_1"){
                             penalty['to']=$(ele).val();
-                        }else if(ele.id=="caseDate_0"){
+                        }else if(id=="caseDate_0"){
                             caseDate['from']=new Date($(ele).val()+" 00:00:00");
-                        }else if(ele.id=="caseDate_1"){
+                        }else if(id=="caseDate_1"){
                             caseDate['to']=new Date($(ele).val()+" 23:59:00");
-                        }else if(ele.id=="caseStatus"){
+                        }else if(id=="caseStatus"){
                             //if($(ele).val().constructor !== String){
                                 //console.log('数子');
                                 matched=$.grep(matched,(item)=>{
                                     return $.grep($(ele).val(),(v)=>{
                                         if(parseFloat(v)>2){
-                                            return Math.round(parseFloat(v))==Math.round(parseFloat(item[ele.id]));
+                                            return Math.round(parseFloat(v))==Math.round(parseFloat(item[id]));
                                         }else{
-                                            return parseFloat(v)==parseFloat(item[ele.id]);
+                                            return parseFloat(v)==parseFloat(item[id]);
                                         }
                                         
                                     }).length>0;
@@ -116,20 +125,20 @@ $('body').on(preload_completed_event_name,function(){
                         }
                         else{
                             matched=$.grep(matched,(item)=>{
-                                //console.log(item[ele.id]);
-                                if(item[ele.id].constructor !== String){
+                                //console.log(item[id]);
+                                if(item[id].constructor !== String){
                                     //console.log('数子');
-                                    return $(ele).val().includes(item[ele.id]+"");
+                                    return $(ele).val().includes(item[id]+"");
                                 }else{
                                     //console.log('数组');
-                                    return item[ele.id].split(',').some(itm => $.grep($(ele).val(),(it)=>{
+                                    return item[id].split(',').some(itm => $.grep($(ele).val(),(it)=>{
                                         console.log(itm,it);
                                         return itm.indexOf(it)>-1;
                                     }));
                                 }
-                                //$(ele).val().includes(item[ele.id]+"")
+                                //$(ele).val().includes(item[id]+"")
                                 //$.each($(ele).val(),(i,val)=>{
-                                    //if(item[ele.id]==Number(val)) return true;
+                                    //if(item[id]==Number(val)) return true;
                                 //})
     
                             })
@@ -159,6 +168,9 @@ $('body').on(preload_completed_event_name,function(){
                 console.log(matched);
                 pageOnTable.addTableData(matched);
                 tb.instance.isTargetToggle=false;
+                setTableFunctionButonClickedEvent();
+                
+                setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
                 form.slideUp();
                 $('#pageOneTable').animate({'margin-top':"0px"})
                 $('#pageOneTable').trigger('create');
@@ -205,15 +217,20 @@ function syncHeaderCloneWidth(){//同步表格头和身的宽度
             $.each(_firstPageTableColumns,(k,v)=>{
                 v.isHidden=!(user_cols.includes(k)&&v.isFilterable);
             });
+            $('#pageOneTable').trigger('create');
+            $('#pageOneTable-fixed').trigger('create'); 
         }
         var columnFilter=tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
         columnFilter.on('columnChanged',function(){
             $('#pageOneTable').trigger('create');
-                var ref_ths=$('#pageOneTable').find('th');
-                if(ref_ths.length>0){
-                    resizeTables($(ref_ths[ref_ths.length-1]).outerWidth()/window.innerWidth>0.14);
-                };
+            var ref_ths=$('#pageOneTable').find('th');
+            if(ref_ths.length>0){
+                resizeTables($(ref_ths[ref_ths.length-1]).outerWidth()/window.innerWidth>0.14);
+            };
         })
+        setTimeout(() => {
+            resizeTables();
+        }, 100);
     }else{
         
     }
@@ -235,7 +252,7 @@ function resizeTables(isNormal){//按照窗口尺寸调整表格字体尺寸
         //$('#header-filter-container').removeClass('table-regularFont').addClass('table-smallFont');
         }
     }else{
-        console.log('isNormal',isNormal);
+        //console.log('isNormal',isNormal);
         if(isNormal){
             $('#pageOneTable').removeClass('table-smallFont').removeClass('table-regularFont');
             $('#pageOneTable-fixed').removeClass('table-smallFont').removeClass('table-regularFont');

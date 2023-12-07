@@ -282,18 +282,18 @@ var _summary_template;
             isFilterable:true
         },
         caseName:{label:"案件名称",
-        type:"label", isFilterable:true,isHidden:true},
+          type:"label", isFilterable:true,isHidden:true},
         caseCause:{label:"案由",
-        type:"label",data:case_causes, isFilterable:true},
+          type:"label",data:case_causes, isFilterable:true},
         caseReason:{
           label:"案发原因",
           data:resourceDatas.caseReason,isFilterable:true
           //style:{'font-weight':'700','font-size':'18px'}
         },
         caseType:{label:"案件类型",
-        type:"label",data:case_types, isFilterable:true},
+          type:"label",data:case_types, isFilterable:true},
         caseProject:{label:"所属项目",
-        type:"label",data:projects, isFilterable:true},
+          type:"label",data:projects, isFilterable:true},
         
         caseStatus:{
           label:"状态",
@@ -931,14 +931,14 @@ var _summary_template;
       isMini:true
     },
     template:{
-      caseLabel:{
+      caseLabel_f:{
           label:"案件标签:",
           type:"multicombobox",
           isOptional:true,
           //data:addEmptyValueToArray(resourceDatas.caseLabels,'无'),
           data:resourceDatas.caseLabels,
       },
-      caseProject:{
+      caseProject_f:{
           label:"所属项目:",
           type:"multicombobox",
           isOptional:true,
@@ -946,14 +946,14 @@ var _summary_template;
           data:resourceDatas.projects,
       },
       
-      caseCause:{label:"案由:",
+      caseCause_f:{label:"案由:",
         type:"multicombobox",
         //data:addEmptyValueToArray(resourceDatas.caseCauses), 
         data:resourceDatas.caseCauses,
         isOptional:true,
         isFilterable:true,
       },
-      caseReason:{
+      caseReason_f:{
           label:"案发原因:",
           //data:addEmptyValueToArray(resourceDatas.caseReason),
           data:resourceDatas.caseReason,
@@ -961,7 +961,7 @@ var _summary_template;
           type:"multicombobox"
           //style:{'font-weight':'700','font-size':'18px'}
       },
-      casePersonnel:{
+      casePersonnel_f:{
           label:"我方当事人:",
           type:"multicombobox",
           isOptional:true,
@@ -971,32 +971,32 @@ var _summary_template;
           //defaultValue:"无0"
       },
       
-      legalAgencies:{
+      legalAgencies_f:{
         label:"代理法务:",
         type:"multicombobox",
         isOptional:true,
         //data:addEmptyValueToArray(resourceDatas.legalAgencies),
         data:resourceDatas.legalAgencies//.filter((d)=>{return d!='无'}),
       },
-        caseType:{label:"案件类型:",
+        caseType_f:{label:"案件类型:",
         type:"multicombobox",
         //data:addEmptyValueToArray(resourceDatas.caseTypes), 
         data:resourceDatas.caseTypes,
         isOptional:true,},
         
-        caseStatus:{
+        caseStatus_f:{
           label:"状态:",
           //data:addEmptyValueToArray(resourceDatas.caseStatus),
           data:resourceDatas.caseStatus_object,
           type:"multicombobox", 
           isOptional:true,
         },
-        penalty:{
+        penalty_f:{
           label:"判决金额(万):",
           type:"textrange", 
           isOptional:true,
       },
-      caseDate:{
+      caseDate_f:{
           label:"立案日期:",
           type:"textrange",
           subType:"date",

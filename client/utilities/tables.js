@@ -12,7 +12,7 @@ var duration=500;
     }else{
         filterPopup.insertAfter(filterBtn);
         $(filterBtn).on('click',function(e){
-            console.log(e);
+            //console.log(e);
             $('#'+target+'-columnFilter').popup('open');
             $('#'+target+'-columnFilter').popup('reposition',{x:e.pageX,y:e.pageY});
         })
@@ -26,7 +26,7 @@ var duration=500;
     
     filterPopup.popup({
         afterclose: function( event, ui ) {
-            console.log(getGlobal('currentPage'));
+            //console.log(getGlobal('currentPage'));
         }
       });
 
@@ -43,6 +43,7 @@ var duration=500;
             input.on("click",function(e){
                 //console.log( $('td[name="'+input.prop('name')+'"]'));
                 setAvailableColumn(target,input,duration);
+                saveChangedToUser(target);
                 setTimeout(() => {
                     filterPopup.trigger('columnChanged');
                 }, duration+100);
@@ -62,6 +63,19 @@ var duration=500;
         $("#"+container).trigger('create');
     }
     return filterPopup;
+}
+function saveChangedToUser(target){
+    target=getElementId(target);
+    var checkboxs=$('#'+target+'-columnFilter').find('input[type="checkbox"]:checked');
+    var checkedCols=[];
+    $.each(checkboxs,(index,checkbox)=>{
+        checkedCols.push($(checkbox).attr('name'));
+    })
+    //console.log(checkedCols);
+    var userData=getCurrentUserSaved();
+    userData.columns=checkedCols.join();
+    userData.createDate=formatDateTimeStr2Mysql(userData.createDate);
+    saveCurrentUser(userData);
 }
 function setAvailableColumns(target,duration){
     target=target.replace('#','');

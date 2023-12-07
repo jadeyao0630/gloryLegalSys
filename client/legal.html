@@ -28,7 +28,7 @@
 	<script type="text/javascript" src="./elements/toggleButton.js"></script>
 </head>
 <body>
-    <!-- header -->
+    <!-- 主页面 -->
     <div data-role="page" id="main">
         <div data-role="header" id="main-header" data-position="fixed" data-tap-toggle="false">
             
@@ -43,7 +43,7 @@
             <div data-role="popup" id="popupMenu" data-theme="b" data-history="false">
                 <ul data-role="listview" data-inset="true" style="min-width:160px;" data-theme="b">
                     <li data-role="list-divider">操作</li>
-                    <li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-power" onclick='location.href=("index.html")'>退出</a></li>
+                    <li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-power">退出</a></li>
 					<li><a href="#settings" class="ui-btn ui-btn-a ui-icon-gear ui-btn-icon-left popup-menu-btns" data-rel="back">设置</a></li>
 					<li data-role="list-divider">添加</li>
 					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-add-row" data-rel="back">添加记录</a></li>
@@ -62,7 +62,77 @@
             </div>
         </div>
     </div>
-    <!-- /header -->
+    <!-- /主页面 -->
+    <!-- 案件页面 -->
+    <div data-role="page" id="casePage">
+	
+		<div data-role="header" data-position="fixed">
+				<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-mini ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
+			<h1 id="reg_form_title">My App</h1>
+			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
+		</div><!-- /header -->
+		
+		<div data-role="popup" id="popupArrow" data-arrow="true" style="padding:5px;"></div>
+			<form role="main" data-ajax="false" id="case_reg_page">
+
+			</form>
+		
+
+	</div>
+    <!-- /案件页面 -->
+    <!-- 案件进度页面 -->
+    <div data-role="page" id="progress">
+		<div data-role="header" data-position="fixed">
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
+			<h1 id="progress_title">My App</h1>
+			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
+		</div><!-- /header -->
+		<div data-role="panel" id="update_panel" data-position="right" data-display="overlay" data-position-fixed="true" data-dismissible="false" data-theme="a" style="width:100%;">
+			<h4 id="update_list_title"> </h4>
+			<ul data-role="listview" data-inset="true" id="event_list" data-theme="a">
+	
+			</ul>
+		</div><!-- /panel -->
+		<div class="ui-body-d ui-content" style="display: grid;grid-template-columns: auto 1fr;column-gap: 30px; vertical-align: middle;">
+			
+			<div id="progress_details" style="width: 350px;"></div>
+			<div id="progress_diagram" style="display: inline;text-align: center;vertical-align: middle;margin-top: 20px; margin-left:20px;"></div>
+			
+		</div>
+		<div data-role="popup" id="progress_popupMenu" data-theme="a">
+			<ul data-role="listview" data-inset="false" style="min-width:210px;">
+				<li data-role="list-divider" id="progress_popupMenu_title">请选择操作</li>
+				<li><a href="#">查看</a></li>
+				<li data-role="list-divider" class="progress_popupMenu_add_group">添加</li>
+				<ul data-role="listview" id="progress_popupMenu_add_group" class="progress_popupMenu_add_group">
+					<li><a href="#">进展</a></li>
+					<li><a href="#">执行</a></li>
+					<li><a href="#">财产</a></li>
+					<li><a href="#">附件</a></li>
+				</ul>
+			</ul>
+		</div><!-- /collapsible -->
+		<div data-role="popup" id="progress_popup_add" data-theme="a" style="z-index: 100;padding: 20px;">
+			<h3 id="progress_popup_add_title">test</h3>
+			<form id="progress_popup_add_form"></form>
+			<fieldset class="ui-grid-a">
+				<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a></div>
+				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green">提交</a></div>
+			</fieldset>
+		</div>
+		
+	</div>
+    <!-- /案件进度页面 -->
+    <div data-role="page" id="progress_details_info" >
+		<div data-role="header" data-position="fixed">
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
+			<h1 id="progress_details_info_title">My App</h1>
+			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
+		</div><!-- /header -->
+		<div class="ui-body-d ui-content">
+			<ul data-role="listview" data-inset="true" data-theme="a" id="progress_details_info_body"></ul>
+		</div>
+	</div>
     <!--首页读取界面-->
 	<div id="main-container">
 		<h1>国瑞法务管理系统</h1>
@@ -76,7 +146,7 @@
 	<script type="text/javascript" src="./js/db.js"></script>
 	<script type="text/javascript" src="./preload.js"></script>
 	<script type="text/javascript" src="./utilities/templates.js"></script>
-
+    <script type="text/javascript" src="./utilities/setClickedEvents.js"></script>
     
     <script type="text/javascript" src="./pages/legal.js"></script>
     <script>

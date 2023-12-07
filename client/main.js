@@ -7,7 +7,7 @@ eventManager.setCanvas(canvas);
 setGlobal('currentPage',"#page1");
 //window.location.href = 'text.html';
 $('body').on(preload_completed_event_name,function(){
-	//formatCasesData(DataList.casesDb);
+	formatCasesData(DataList.casesDb);
 	main_form=_createNewCaseForm(FormTemplate3,"case_reg_page");
 	//console.log("datalist: ",getGlobalJson("datalist"));
 	_firstPageTableColumns.caseApplicant.data=DataList.userList;

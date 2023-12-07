@@ -58,7 +58,21 @@
     min-width:100px;
     margin: 10px auto auto auto;
   }
-
+.tooltip-form {
+    visibility: hidden;
+    width: 120px;
+    background-color: #000;
+    color: #fff;
+    text-align: left;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+text-shadow: none;
+padding:5px 10px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+  }
 /*
 #caseOrgnizationPersonnel-button{
     background: white;

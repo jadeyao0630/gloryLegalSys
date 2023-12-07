@@ -2,6 +2,7 @@
 
 var result=[];
 var collectDbList=true;
+$.mobile.navigate('#');
 $('#mainFooter').hide();
 //getBasicDatabaseData();
 $('#mainLoadingMessage').text('读取中...');
@@ -189,12 +190,25 @@ function logingStatus(){
 	//setGlobalJson("currentUser","{}");
 	if(getGlobalJson("currentUser") && getGlobalJson("currentUser").name){
 		$('#name').text(getGlobalJson("currentUser").name);
+        getCurrentUser({id:getGlobalJson("currentUser").id,pass:getGlobalJson("currentUser").pass,user:getGlobalJson("currentUser").user})
+        .then((d)=>{
+            if(d.data.length>0 && d.data[0].hasOwnProperty('name')){
+                setGlobalJson("currentUser",d.data[0]);
+            }else{
+                showAutoLogin();
+                return false;
+            }
+            
+        });
         return true;
 	}else{
-		$().minfo('show',{title:"错误",message:"自动跳转到登录页面？"});
-		setTimeout(function() {
-			window.location.href = 'index.html';
-		}, 2000);
+		showAutoLogin();
         return false;
 	}
+}
+function showAutoLogin(){
+    $().minfo('show',{title:"错误",message:"账户问题，将自动跳转到登录页面？"});
+    setTimeout(function() {
+        window.location.href = 'index.html';
+    }, 2000);
 }

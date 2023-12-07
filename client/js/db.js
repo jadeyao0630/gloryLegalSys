@@ -50,6 +50,47 @@ async function getUserList(res){
     .then(data => {if(data['data'].length>0) _data=data['data'];});
     res(_data);
 }
+async function getCurrentUser(userData){
+    var where=[];
+    $.each(userData,(k,v)=>{
+        if(v.constructor === String){
+            where.push(k+" = '"+v+"'");
+        }
+    })
+    const response = new Promise(async(resolve,reject)=>{
+        await fetch("http://"+ip+":"+port+"/select",{
+            headers:headers,
+            method: 'POST',
+            body: JSON.stringify({ query: 'SELECT * FROM '+userDbTableName+' WHERE '+where.join(' AND ')})
+        })
+        .then(response => response.json())
+        .then(data => {
+            resolve(data);
+        }).catch(err => console.log(err));
+        
+    });
+    return await response;
+}
+async function saveCurrentUser(userData){
+    const response = new Promise(async(resolve,reject)=>{
+        await fetch("http://"+ip+":"+port+"/insert",{
+            headers:headers,
+            method: 'POST',
+            body: JSON.stringify({ table: userDbTableName, data:userData})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.data.success){
+                resolve(data);
+            }else{
+                console.log(data.data.error);
+            }
+            
+        }).catch(err => console.log(err));
+        
+    });
+    return await response;
+}
 async function removeCase(id,table,res){
     await fetch("http://"+ip+":"+port+"/delete",{
         headers:headers,

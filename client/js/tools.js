@@ -19,6 +19,21 @@ String.prototype.format = function(...args) {
         return typeof args[index] === 'undefined' ? match : args[index];
     });
 }
+function getElementId(target){
+    if(target.constructor === String){
+        return target.replace('#','');
+    }else{
+        return $(target).attr('id');
+    }
+}
+function getCurrentUserSaved(){
+    if(getGlobalJson("currentUser") && getGlobalJson("currentUser").name){
+        return getGlobalJson("currentUser");
+	}else{
+		showAutoLogin();
+        return undefined;
+	}
+}
 function saveNewData2List(sourceData,newData,indexName){
     
     var index = sourceData.findIndex(function(item) {
@@ -62,6 +77,9 @@ function formatDateTime(date, format) {
           return new Date().toISOString().substr(0,10);
       else
           return new Date(dateTimeStr).toISOString().substr(0,10);
+  }
+  function formatDateTimeStr2Mysql(dateTimeStr){
+    return new Date(dateTimeStr).toISOString().substr(0,10);
   }
 function formatIndex(position){
     var main=Math.floor(position);
@@ -361,8 +379,8 @@ function setGlobalJson(key,value){
     sessionStorage.setItem(key,JSON.stringify(value));
 }
 function getGlobalJson(key){
-    //console.log(key,sessionStorage.getItem(key));
-    if(sessionStorage.getItem(key)=='[object Object]') return undefined;
+    console.log(key,sessionStorage.getItem(key));
+    if(sessionStorage.getItem(key)=='[object Object]' || sessionStorage.getItem(key)=='undefined') return undefined;
     return JSON.parse(sessionStorage.getItem(key))
 }
 function showLoading(message){

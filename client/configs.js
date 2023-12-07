@@ -1,4 +1,4 @@
-var isRunLocal=true;
+var isRunLocal=false;
 var showDebug=false;
 let ip=isRunLocal?'192.168.10.69':'cn.luyao.site';
 let port=5555;
@@ -10,6 +10,7 @@ const mainPage="legal.html";
 var DataList={};
 var preload_completed_event_name="preloadCompleted";
 var main_load_completed_event_name="mainDataloadCompleted";
+var userDbTableName="names";
 class Message{
     static LOGIN_IS_EMPTY='<p style="color:red;">用户名和密码不能为空</p>';
     static LOGIN_ISNOT_MATCH='<p style="color:red;">用户名和密码不匹配</p>';
@@ -17,7 +18,7 @@ class Message{
     static PROGRESS_DELETE_WARNING_F='确定删除此流程点[{0}]后已存在其它流程点吗？';
 }
 
-var deads=["未执行"]; 
+var deads=["无需执行"]; 
 const TextColor="rgb(51, 51, 51)";
 const users={
     id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号

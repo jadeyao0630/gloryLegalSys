@@ -42,16 +42,7 @@ var duration=500;
             filterFielset.append(label);
             input.on("click",function(e){
                 //console.log( $('td[name="'+input.prop('name')+'"]'));
-                if(!input.prop('checked')){
-                    $("#"+target).find('th[name="'+input.prop('name')+'"]').hide(duration);
-                    
-                    $("#"+target+"-fixed").find('th[name="'+input.prop('name')+'"]').hide(duration);
-                    $("#"+target).find('td[name="'+input.prop('name')+'"]').hide(duration);
-                }else{
-                    $("#"+target).find('th[name="'+input.prop('name')+'"]').show(duration);
-                    $("#"+target+"-fixed").find('th[name="'+input.prop('name')+'"]').show(duration);
-                    $("#"+target).find('td[name="'+input.prop('name')+'"]').show(duration);
-                }
+                setAvailableColumn(target,input,duration);
                 setTimeout(() => {
                     filterPopup.trigger('columnChanged');
                 }, duration+100);
@@ -71,6 +62,29 @@ var duration=500;
         $("#"+container).trigger('create');
     }
     return filterPopup;
+}
+function setAvailableColumns(target,duration){
+    target=target.replace('#','');
+    var checkboxs=$('#'+target+'-columnFilter').find('input[type="checkbox"]');
+    $.each(checkboxs,(index,checkbox)=>{
+        setAvailableColumn(target,checkbox,duration);
+    })
+    setTimeout(() => {
+        $('#'+target+'-columnFilter').trigger('columnChanged');
+    }, duration+100);
+}
+function setAvailableColumn(target,checkbox,duration){
+    target=target.replace('#','');
+    if(!$(checkbox).prop('checked')){
+        $("#"+target).find('th[name="'+$(checkbox).prop('name')+'"]').hide(duration);
+        
+        $("#"+target+"-fixed").find('th[name="'+$(checkbox).prop('name')+'"]').hide(duration);
+        $("#"+target).find('td[name="'+$(checkbox).prop('name')+'"]').hide(duration);
+    }else{
+        $("#"+target).find('th[name="'+$(checkbox).prop('name')+'"]').show(duration);
+        $("#"+target+"-fixed").find('th[name="'+$(checkbox).prop('name')+'"]').show(duration);
+        $("#"+target).find('td[name="'+$(checkbox).prop('name')+'"]').show(duration);
+    }
 }
 function pageTable(arg){
     this.opt={

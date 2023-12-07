@@ -289,7 +289,6 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 #pageOneTable-fixed{
     margin: 0px 0px;
-    background: #262626;
     color:white;
     text-shadow: none;
     width: 100%;
@@ -302,6 +301,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     overflow: hidden;
     text-overflow: ellipsis;
     padding:5px 0px;
+    background: #262626;
 }
 
 .table-regularFont{

@@ -239,6 +239,21 @@ async function getBasicDatabaseData(list){
     return data;
 
 }
+async function getBasic(template,list){
+    const response = new Promise(async(resolve,reject)=>{
+        await fetch("http://"+ip+":"+port+"/getBasic",{
+            headers:headers,
+            method: 'POST',
+            body: JSON.stringify({ template: template,list:list})
+        })
+        .then(response => response.json())
+        .then(data => {
+            resolve(data);
+        }).catch(err => console.log(err));
+        
+    });
+    return await response;
+}
 function getCaseDb(template,list,res) {
     const results = {};
 
@@ -252,9 +267,11 @@ function getCaseDb(template,list,res) {
                     .then(response => response.json())
                     .then(data => {
                         //console.log(`Data from ${k}:`, data.data);
+                        //console.log(data);
                         if(data.hasOwnProperty('data')){
+                            console.log(data.data);
                             results[k]=data.data;
-                            if(res!=undefined) res(k,data.data);
+                            //if(res!=undefined) res(k,data.data);
                         }
                     });
     }

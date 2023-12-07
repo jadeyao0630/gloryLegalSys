@@ -1,7 +1,24 @@
-var form;
+var form,pageOnTable;
 //document.body.style.fontSize = "16px";
 
-
+$('body').on(main_load_completed_event_name,function(){
+    const intervalId = setInterval(() => {
+        if (pageOnTable!=undefined) {
+            clearInterval(intervalId);
+            console.log('currentUser',getGlobalJson('currentUser'));
+            pageOnTable.addTableData(DataList.combinedData);
+            
+            $('#pageOneTable').trigger('create');
+            
+            setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
+            
+            resizeTables();
+            resizeColumnFilter();
+            //$('#header-filter-container').trigger('create')
+            $().mloader("hide");
+        }
+    }, 100);
+});
 $('body').on(preload_completed_event_name,function(){
     console.log('resourceDatas',getGlobalJson('resourceDatas'));
     var tb=$('.header-search-container').togglebuttonicon(form,function(e,isbefore){
@@ -17,17 +34,14 @@ $('body').on(preload_completed_event_name,function(){
                 form.slideUp();
                 $('#pageOneTable').animate({'margin-top':"0px"})
             }
-            
         }
     },{distance:200});
-    $('#main-container').addClass('hide');
-    var main_form= new mform({template:header_filter_template});
-    form=main_form.instance;
-    form.addClass('header-filter-from')
+    
+
     pageOnTable=new pageTable({
 		containerId:"pageOneTable",
 		template:_firstPageTableColumns,
-		data:DataList.combinedData,
+		//data:DataList.combinedData,
 		//filterParent:"mainFooter",
 		rowButtons:'<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
 			'<a href="#timeline" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-eye ui-btn-icon-notext" data-transition="slidefade" data-item={0}>查看</a>'+
@@ -35,43 +49,31 @@ $('body').on(preload_completed_event_name,function(){
 			'<button name="fn_btn_delete" class="btn-icon-red" data-icon="delete" data-iconpos="notext" data-item={0}>删除</button>'+
 		'</div>'
 	});
+    //设置主表格头固定顶部位置，需要克隆主表格的原有头
     var t1Header=$('#pageOneTable').find('thead').clone();
     $('#pageOneTable-fixed').append(t1Header);
-    /*
-    var ths=$('#pageOneTable').find('thead > tr >th');
-    var tr=$('<tr></tr>');
-    $.each(ths,(index,th)=>{
-        tr.append('<td class="ref-td">'+$(th).html()+'</td>');
-    })
-    ths.addClass('fixed-th');
-    $('#pageOneTable').find('tbody').prepend(tr);
-    //$('#pageOneTable').append(t1Header);
-    */
-    resizeTables();
-    //var trs_clone=$('#pageOneTable-fixed').find('thead > tr');
-    //if (trs_clone.length>0){
-        //$(trs_clone[0]).append($('<td style="width:20px;font-szie:16px;"><i class="fa fa-gear"></i></td>'));
-    //}
-    //$('#pageOneTable-fixed').trigger('create');
-    $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height'),top:$('#main-header').css('height')});
+    
+    $('#header-filter-container').css({top:$('#main-header').css('height')});
+    //添加头部过滤表格
+    var main_form= new mform({template:header_filter_template});
+    form=main_form.instance;
+    form.addClass('header-filter-from')
     var container=$('<div class="header-filter-container-div"></div>')
     container.append(form);
     $('#header-filter-container').prepend(container);
-    
-    //form.css({'height':"0px"});
     form.hide();
-    
-    
-    resizeColumnFilter();
-
     form.trigger('create');
-
-    setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
-    $(window).resize(function(e){
-        console.log('高度',window.innerHeight,'宽度',window.innerWidth)
-        resizeTables();
-        resizeColumnFilter();
+    $("#pageOneTable").trigger('create');
+    //在过滤表格后同步表格头和身的宽度
+    $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
+        $('#pageOneTable').filterable({
+            filter: function( event, ui ) {
+                console.log('create');
+                syncHeaderCloneWidth();
+            }
+        });
     });
+    
    
     $('.header-filter-btn').on('click',function(e){
         switch($(this).text()){
@@ -81,7 +83,7 @@ $('body').on(preload_completed_event_name,function(){
                 main_form.setEmptyData();
                 break;
             case "查询":
-                console.log("filter...",$(form).find('select,input'));
+                //console.log("filter...",$(form).find('select,input'));
                 var matched=DataList.combinedData;
                 var penalty={};
                 var caseDate={};
@@ -114,7 +116,7 @@ $('body').on(preload_completed_event_name,function(){
                         }
                         else{
                             matched=$.grep(matched,(item)=>{
-                                console.log(item[ele.id]);
+                                //console.log(item[ele.id]);
                                 if(item[ele.id].constructor !== String){
                                     //console.log('数子');
                                     return $(ele).val().includes(item[ele.id]+"");
@@ -160,18 +162,20 @@ $('body').on(preload_completed_event_name,function(){
                 form.slideUp();
                 $('#pageOneTable').animate({'margin-top':"0px"})
                 $('#pageOneTable').trigger('create');
+                setAvailableColumns('pageOneTable',1);
+                $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height')});
+                $('#header-filter-container').trigger('create');
+                //resizeTables();
                 //console.log('togglebuttonicon',);
                 break;
         }
     });
+    
 })
-$.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
-    $('#pageOneTable').filterable({
-        filter: function( event, ui ) {
-            syncHeaderCloneWidth();
-            //console.log('create');
-        }
-      });
+$(window).resize(function(e){
+    //console.log('高度',window.innerHeight,'宽度',window.innerWidth)
+    resizeTables();
+    resizeColumnFilter();
 });
 function syncHeaderCloneWidth(){//同步表格头和身的宽度
     var columnToggler=$('<i class="fa fa-gear"></i>');
@@ -182,6 +186,7 @@ function syncHeaderCloneWidth(){//同步表格头和身的宽度
         var border={};
         //if(index==index==ths.length-1) border={'text-align':"right"};
         $(th).css(Object.assign(border,{width:$(ref_ths[index]).outerWidth()+"px",left:left+"px"}));
+        //console.log(index,$(ref_ths[index]).outerWidth());
         if(index==ths.length-1) {
             $(th).empty();
             $(th).removeClass('table-column-toggle');
@@ -195,22 +200,25 @@ function syncHeaderCloneWidth(){//同步表格头和身的宽度
     //var th_column_filter;
     
     if($('#pageOneTable-columnFilter').length==0){
+        if(getGlobalJson('currentUser').columns!=undefined && getGlobalJson('currentUser').columns!=null){
+            var user_cols=getGlobalJson('currentUser').columns.split(',');
+            $.each(_firstPageTableColumns,(k,v)=>{
+                v.isHidden=!(user_cols.includes(k)&&v.isFilterable);
+            });
+        }
         var columnFilter=tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
         columnFilter.on('columnChanged',function(){
-            //console.log("columnChanged");
-            
-            
             $('#pageOneTable').trigger('create');
                 var ref_ths=$('#pageOneTable').find('th');
                 if(ref_ths.length>0){
                     resizeTables($(ref_ths[ref_ths.length-1]).outerWidth()/window.innerWidth>0.14);
-                    
                 };
-                //syncHeaderCloneWidth();
-            
         })
-    }
+    }else{
         
+    }
+    
+    $('#pageOneTable-fixed').trigger('create');    
     //resizeColumnFilter();
 }
 function resizeTables(isNormal){//按照窗口尺寸调整表格字体尺寸
@@ -242,7 +250,7 @@ function resizeTables(isNormal){//按照窗口尺寸调整表格字体尺寸
     //$('#pageOneTable-fixed').trigger('create');
     
     syncHeaderCloneWidth();
-    $('#pageOneTable-fixed').trigger('create');
+    $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height')});
     $('#header-filter-container').trigger('create');
 }
 function resizeColumnFilter(){//按照窗口尺寸调整列过滤弹窗字体尺寸

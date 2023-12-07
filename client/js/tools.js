@@ -262,6 +262,7 @@ $.fn.extend({
         if(visibility.toLowerCase()=="show"){
             var title="";
             var popup_style=' style="padding:10px 15px;text-align:center;min-width:100px;"';
+            var overlay=true;
             if (arg!=undefined){
                 if(arg.hasOwnProperty('title')){
                     title='<h4><i class="fa fa-info-circle text-green"></i> '+arg.title+'</h4>';
@@ -273,18 +274,25 @@ $.fn.extend({
                     '<div style="display: inline;margin-left: 15px;vertical-align:middle;font-szie:16px;">'+arg.message+'</div>'+
                     '</div>';
                 }
+                if(arg.hasOwnProperty('overlay')){
+                    overlay=arg.overlay;
+                }
             }
-            var popup=$('<div class="popup-message popup-loader"'+popup_style+'>'+title+arg.message+'</div>');
-            var popup_background=$('<div class="popup-background popup-c popup-loader-background"></div>');
-            $('body').append(popup_background);
-            $('body').append(popup);
-            popup.trigger('create');
             var index=$('div[data-position="fixed"][data-role="header"]').css('z-index');
             if(index=="auto") index=1001;
+            var popup=$('<div class="popup-message popup-loader"'+popup_style+'>'+title+arg.message+'</div>');
+            var popup_background=$('<div class="popup-background popup-c popup-loader-background"></div>');
             popup_background.css("z-index",index);
-            popup.css("z-index",parseInt(popup_background.css('z-index'))+1);
+            popup.css("z-index",index+1);
+            if(overlay){
+                $('body').append(popup_background);
+            }
+            
+
+            $('body').append(popup);
+            popup.trigger('create');
             popup.popIn(popup_background);
-            console.log($('div[data-position="fixed"][data-role="header"]').css('z-index'));
+            //console.log($('div[data-position="fixed"][data-role="header"]').css('z-index'));
             return [popup,popup_background];
         }else{
             $().hideMessage();
@@ -353,7 +361,7 @@ function setGlobalJson(key,value){
     sessionStorage.setItem(key,JSON.stringify(value));
 }
 function getGlobalJson(key){
-    console.log(key,sessionStorage.getItem(key));
+    //console.log(key,sessionStorage.getItem(key));
     if(sessionStorage.getItem(key)=='[object Object]') return undefined;
     return JSON.parse(sessionStorage.getItem(key))
 }

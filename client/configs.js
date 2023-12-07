@@ -9,6 +9,7 @@ var functionButoonPostion="top";
 const mainPage="legal.html";
 var DataList={};
 var preload_completed_event_name="preloadCompleted";
+var main_load_completed_event_name="mainDataloadCompleted";
 class Message{
     static LOGIN_IS_EMPTY='<p style="color:red;">用户名和密码不能为空</p>';
     static LOGIN_ISNOT_MATCH='<p style="color:red;">用户名和密码不匹配</p>';

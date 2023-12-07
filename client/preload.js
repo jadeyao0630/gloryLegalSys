@@ -1,11 +1,17 @@
 
 
 var result=[];
+var collectDbList=true;
 $('#mainFooter').hide();
 //getBasicDatabaseData();
 getCaseDb(basicTableList,[],(k,d)=>{
     $('#mainLoadingMessage').text('读取中...'+k);
-    console.log(`Data from ${k}:`, d);
+    if( getGlobalJson('resourceDatas')!=undefined){
+        console.log("resourceDatas is set...");
+        //result.push(true);
+        //return;
+    }
+    if(showDebug)console.log(`Data from ${k}:`, d);
     if(k=="projects"){
         projects=getKeyValues(d,"name");
         resourceDatas[k]=projects;
@@ -21,7 +27,7 @@ getCaseDb(basicTableList,[],(k,d)=>{
         
         resourceDatas[k]=case_labels;
         resourceDatas['caseLabelsColors']=_data;
-        console.log(`Data from caseLabelsColors:`, _data);
+        //console.log(`Data from caseLabelsColors:`, _data);
         //FormTemplate3.template.baseInfo.data.caseLabel.data=getKeyValues(d,"label");
     }
     else if(k=="caseReason"){
@@ -129,44 +135,51 @@ getCaseDb(basicTableList,[],(k,d)=>{
     //console.log(casePersonnel);
     resourceDatas['casePersonnel']=caseRelatedParty;
     result.push(true);
-    
+    setGlobalJson('resourceDatas',resourceDatas);
 })
 .catch(error => {
     console.error('Error:', error);
     result.push(false);
 });
-
-getCaseDb(caseTableList,[],(k,d)=>{
+if(collectDbList){
+    getCaseDb(caseTableList,[],(k,d)=>{
     
-    $('#mainLoadingMessage').text('读取中...'+k);
-    console.log(`Data from ${k}:`, d);
-}).then((r) => {
-    console.log('caseTableList completed: ',r);
-    var combinedData=[];
-    r.casesDb.forEach((data)=>{
-        var matchedData=r.caseStatus.filter(sta => sta.id==data.id);
-        //console.log(matchedData);
-        if(matchedData.length>0){
-            combinedData.push(Object.assign(data,matchedData[0]));
-        }
+        $('#mainLoadingMessage').text('读取中...'+k);
+        if(showDebug) console.log(`Data from ${k}:`, d);
+    }).then((r) => {
+        if(showDebug) console.log('caseTableList completed: ',r);
+        var combinedData=[];
+        r.casesDb.forEach((data)=>{
+            var matchedData=r.caseStatus.filter(sta => sta.id==data.id);
+            //console.log(matchedData);
+            if(matchedData.length>0){
+                combinedData.push(Object.assign(data,matchedData[0]));
+            }
+        });
+        //console.log(combinedData);
+        DataList=r;
+        DataList.combinedData=combinedData;
+        setGlobalJson("combinedData",combinedData);
+        setGlobalJson("datalist",r);
+        //console.log("setGlobalJson datalist: ",getGlobalJson("datalist"));
+    
+        result.push(true);
+        
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        result.push(false);
     });
-    //console.log(combinedData);
-    DataList=r;
-    DataList.combinedData=combinedData;
-    setGlobalJson("combinedData",combinedData);
-    setGlobalJson("datalist",r);
-    console.log("setGlobalJson datalist: ",getGlobalJson("datalist"));
-
+}else{
     result.push(true);
-    
-})
-.catch(error => {
-    console.error('Error:', error);
-    result.push(false);
-});
+}
+
 const intervalId = setInterval(() => {
     if (result.length==2) {
         clearInterval(intervalId);
-        $('body').trigger(preload_completed_event_name);
+        if(sessionStorage.getItem("currentUser")!=undefined){
+            $('body').trigger(preload_completed_event_name);
+        }
+        
     }
 }, 100);

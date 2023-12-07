@@ -99,6 +99,7 @@ function IsLoginVaild(){
 
 
 //console.log(JSON.stringify(columns));
+/*
 fetch("http://"+ip+":"+port+"/createTable",{
     headers:{
         'Content-Type': 'application/json'
@@ -108,3 +109,4 @@ fetch("http://"+ip+":"+port+"/createTable",{
 })
 .then(response => response.json())
 .then(data => {console.log(data);});
+*/

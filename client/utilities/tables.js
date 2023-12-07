@@ -148,7 +148,7 @@ pageTable.prototype.buildTableColumns=function(){
 pageTable.prototype.addTableData=function(data){
     var _this=this;
     var columnTemplate=_this.opt.template;
-    console.log('add new tbody: ',$("#"+_this.opt.containerId).find('tbody'))
+    //console.log('add new tbody: ',$("#"+_this.opt.containerId).find('tbody'))
     $("#"+_this.opt.containerId).find('tbody').remove();
     var tbody=$('<tbody></tbody>');
     
@@ -330,7 +330,7 @@ pageTable.prototype.addTableData=function(data){
             var multiValues=[];
             vals.forEach(_v=>{
                 var _values=formatSuperMultiSelectData(_v);
-                console.log('setSumList',_values);
+                //console.log('setSumList',_values);
                 if(columnSettings.hasOwnProperty('displayFormat')){
                     var displayFormat=columnSettings.displayFormat;
                     $.each(_values,(kk,vv)=>{

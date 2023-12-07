@@ -221,11 +221,12 @@ function formatSuperMultiSelectOptionValue(value){
         }
         
         catelogid=Object.keys(casePersonnel).indexOf(catelog.join(''));
-        console.log('formatSuperMultiSelectOptionValue value',value)
-        console.log('formatSuperMultiSelectOptionValue catelog',catelog.join(''))
-        console.log('formatSuperMultiSelectOptionValue casePersonnel',casePersonnel[catelog.join('')])
+        //console.log('formatSuperMultiSelectOptionValue value',value)
+        //console.log('formatSuperMultiSelectOptionValue catelog',catelog.join(''))
+        //console.log('formatSuperMultiSelectOptionValue casePersonnel',casePersonnel[catelog.join('')])
         var value=casePersonnel[catelog.join('')][valueid];
         //if(value.length>0) value=value[0].name;
+        /*
         console.log('formatSuperMultiSelectOptionValue',{
             status:casePersonnelStatus[statusid],
             statusId:statusid,
@@ -234,6 +235,7 @@ function formatSuperMultiSelectOptionValue(value){
             catelog:catelog.join(''),
             catelogId:catelogid
         });
+        */
         return {
             status:casePersonnelStatus[statusid],
             statusId:statusid,

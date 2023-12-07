@@ -3,6 +3,7 @@ var form;
 
 
 $('body').on(preload_completed_event_name,function(){
+    console.log('resourceDatas',getGlobalJson('resourceDatas'));
     var tb=$('.header-search-container').togglebuttonicon(form,function(e,isbefore){
         if(e){
             if(isbefore){
@@ -214,7 +215,7 @@ function syncHeaderCloneWidth(){//同步表格头和身的宽度
 }
 function resizeTables(isNormal){//按照窗口尺寸调整表格字体尺寸
     if(window.innerWidth<=1280){
-        console.log('高度',$('#pageOneTable').find('label'));
+        //console.log('高度',$('#pageOneTable').find('label'));
         //$('#pageOneTable').find('label').css({'font-size':"8px"});
         //$('#pageOneTable').find('td,th').css({'font-size':"8px"});
         if(isNormal){

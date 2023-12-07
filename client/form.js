@@ -52,7 +52,7 @@ mform.prototype={
                 _self.instance.append(catelog_title_bar);
             });
         }else{
-            console.log('setMainForm',template);
+            //console.log('setMainForm',template);
             _self.instance.append(setMainForm(template.template));
         }
         //_self.instance.find('.ui-input-text').addClass('form-original');
@@ -101,7 +101,7 @@ mform.prototype={
                     //row_grid.css(template.settings.gridStyle);
                     style=$.extend({}, style,template.settings.gridStyle);
                 }
-                console.log('form grid style',style);
+                //console.log('form grid style',style);
                 row_grid.css(style);
                 
                 var stepControler=0;
@@ -405,15 +405,15 @@ mform.prototype={
                         if(key=="无"){
                             selectItem.append($('<option value="'+key+0+'">'+key+'</option>'));
                         }else{
-                            console.log(value,value instanceof String);
+                            //console.log(value,value instanceof String);
                             if(value.constructor === String){
                                 selectItem.append($('<option value="'+key+'">'+value+'</option>'));
                             }else{
                                 tips.push(key);
                                 var grounp=$('<optgroup label="'+key+'"></optgroup>')
                                 value.forEach((d,counter)=>{
-                                    console.log(d)
-                                    console.log((d.constructor === Object))
+                                    //console.log(d)
+                                    //console.log((d.constructor === Object))
                                     if(d.constructor === Object){//'{name} {contact} {institution}'
                                         var label="";
                                         if(item.hasOwnProperty('displayFormat')){
@@ -678,7 +678,7 @@ mform.prototype={
             // listview it generates starts with the ID of the select menu itself, plus the suffix "-menu".
             // We retrieve the listview and insert a search input before it.
             .on( "selectmenucreate", ".filterSelect", function( event ) {
-                console.log(" filterSelect--->",$( event.target ).hasClass('supermultiSelect'));
+                //console.log(" filterSelect--->",$( event.target ).hasClass('supermultiSelect'));
                 //if($( event.target ).hasClass('supermultiSelect')) return;
                 var input,
                     selectmenu = $( event.target ),
@@ -687,12 +687,12 @@ mform.prototype={
                 // We store the generated form in a variable attached to the popup so we avoid creating a
                 // second form/input field when the listview is destroyed/rebuilt during a refresh.
                 //$("#searchInput").remove();
-                console.log("listview.......................",+list);
+                //console.log("listview.......................",+list);
                 var popup=$( "#" + selectmenu.attr( "id" ) + "-listbox" );
                 
-                console.log('pagecontainerhide',popup);
+                //console.log('pagecontainerhide',popup);
                 popup.popup({afterclose: function( event, ui ) {
-                    console.log('pagecontainerhide',"popup closed");
+                    //console.log('pagecontainerhide',"popup closed");
                         $(this).find('input[data-type="search"]').val('');
                     }
                 });
@@ -820,7 +820,7 @@ mform.prototype={
             var val=[];
             if($(element).hasClass('supermultiSelect')){
                 $.each($(element).find(":selected"),function(index,opt){
-                    console.log('itemTemplate.label',$(opt).jqmData('statusValue'));
+                    //console.log('itemTemplate.label',$(opt).jqmData('statusValue'));
                     //if($(opt).jqmData('statusValue')!=undefined)
                     var fvalue=formatSuperMultiSelectOptionValue(($(opt).jqmData('statusValue')!=undefined?$(opt).jqmData('statusValue'):"")+opt.value);
                     var status=fvalue.status;

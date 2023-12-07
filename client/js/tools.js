@@ -353,6 +353,8 @@ function setGlobalJson(key,value){
     sessionStorage.setItem(key,JSON.stringify(value));
 }
 function getGlobalJson(key){
+    console.log(key,sessionStorage.getItem(key));
+    if(sessionStorage.getItem(key)=='[object Object]') return undefined;
     return JSON.parse(sessionStorage.getItem(key))
 }
 function showLoading(message){

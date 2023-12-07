@@ -24,6 +24,7 @@ $('body').on(main_load_completed_event_name,function(){
             resizeColumnFilter();
             //$('#header-filter-container').trigger('create')
             $().mloader("hide");
+            $('#mainFooter').show();
         }
     }, 100);
 });
@@ -53,7 +54,7 @@ $('body').on(preload_completed_event_name,function(){
 		//data:DataList.combinedData,
 		//filterParent:"mainFooter",
 		rowButtons:'<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
-			'<a href="#timeline" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-eye ui-btn-icon-notext" data-transition="slidefade" data-item={0}>查看</a>'+
+			'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-eye ui-btn-icon-notext" data-transition="slidefade" data-item={0}>查看</a>'+
 			'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue" data-icon="edit" data-iconpos="notext" data-item={0}>修改</button>'+
 			'<button name="fn_btn_delete" class="btn-icon-red" data-icon="delete" data-iconpos="notext" data-item={0}>删除</button>'+
 		'</div>'

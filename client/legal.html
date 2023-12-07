@@ -61,6 +61,18 @@
                 <table id="pageOneTable-fixed" data-role="table" class="ui-responsive table-stroke"></table>
             </div>
         </div>
+        <div data-role="footer"  data-position="fixed" id="mainFooter">
+
+				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
+					<a href="#casePage" id="case_reg_but_add" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn">新增</a>
+					<a href="#" id="case_reg_but_remove" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but">删除</a>
+				</div>
+				<div id="searchbar1">
+					<form class="ui-filterable filtertable1">
+						<input id="filterBasic-input1" placeholder="索引关键字" data-type="search" data-icon="tag">
+					</form>
+				</div>
+			</div>
     </div>
     <!-- /主页面 -->
     <!-- 案件页面 -->
@@ -122,6 +134,36 @@
 		</div>
 		
 	</div>
+    <div data-role="page" id="timeline">
+		
+		<div data-role="header" data-position="fixed">
+				<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left btn-icon-blue ui-icon-back" data-rel="back">返回</a>
+			<h1 id="timelineTitle">A202311110005</h1>
+			</div>
+			<div class="ui-body-d ui-content">
+				<div data-role="panel" id="event_panel" data-position="right" data-display="overlay" data-position-fixed="true" data-theme="b" style="width:300px;">
+					<h4 id="event_list_title"> </h4>
+					<ul data-role="listview" data-inset="true" id="event_list" data-theme="a">
+			
+					</ul>
+				</div><!-- /panel -->
+				<div style="display:grid;grid-template-columns: 450px 1fr;background: white;">
+					<div id="summary_list"></div>
+					<canvas id="myCanvas" width="800" height="1200" >
+				</div>
+				
+				<div data-role="popup" id="popupDialog" data-overlay-theme="b" data-theme="a" data-dismissible="true" style="min-width:400px;padding:15px;">
+					<h4 id="event_list_title"> </h4>
+					<div role="main" class="ui-content">
+						<ul data-role="listview" data-inset="true" id="event_list">
+			
+						</ul>
+						
+					</div>
+				</div>
+			</div>
+			
+	</div>
     <!-- /案件进度页面 -->
     <div data-role="page" id="progress_details_info" >
 		<div data-role="header" data-position="fixed">
@@ -147,6 +189,7 @@
 	<script type="text/javascript" src="./preload.js"></script>
 	<script type="text/javascript" src="./utilities/templates.js"></script>
     <script type="text/javascript" src="./utilities/setClickedEvents.js"></script>
+    <script type="text/javascript" src="./timelinePage.js"></script>
     
     <script type="text/javascript" src="./pages/legal.js"></script>
     <script>

@@ -48,7 +48,7 @@ function setTableFunctionButonClickedEvent(){
             console.log(index+"--"+but.currentTarget.name);
 
             if(but.currentTarget.name=="fn_btn_delete"){//主表里的删除按钮
-
+                showProgressDetails(matchItems,matchedUpdates,matchedExcutes,matchedProperties,matchedAttachments);
             }
             else if(but.currentTarget.name=="fn_btn_edit"){//主表里的编辑按钮
                 if(matchItems.length>0){
@@ -271,7 +271,128 @@ $('#progress_popupMenu').find('a').on('click',function(e){
             break;
     }
 })
+//第一页左下方 添加 删除 按钮事件
+$('.case_reg_but').on('click',async function(e){
+    e.preventDefault();
+    if(this.id=="case_reg_but_add"){
+        $().mloader("show",{message:"读取中...."});
+        await getCaseLatestIndex().then(id=>{
+            
+            sessionStorage.setItem("currentId", id+1);
+            
+            //main_form.readOnly(false);
+            //main_form.instance.setEmptyData(FormTemplate.template);
+            //main_form.readOnly(false).setEmptyData();
+            //main_form.instance.setEmptyData()
+            //
+            
+            //main_form.readOnly(false).setEmptyData();
+            $('.progress_lock.edit-info').addClass('hide');
+            //console.log($('.progress_lock.edit-info'));
+            $("#reg_form_title").html("新增档案");
+            $('.edit-header-btn[name="save_btn"').show();
+            //_setBlurBackgroundVisibility(true);
+            $.mobile.navigate( $(this).attr( "href" ));
+           // main_form.readOnly(false).setEmptyData();
+                //$().mloader("hide");
+            setTimeout(function() {
+                caseForm.readOnly(false).setEmptyData();
+                
+                $().mloader("hide");
+            }, 500);
+            //main_form.setData(getGlobalJson("mainData")[0]);
+            //$("#fullscreenPage").trigger('create');
+            //main_form.instance.trigger('create');
+        });
+        
+    }else if(this.id=="case_reg_but_remove"){
+        var targetTable='#pageOneTable';
+        if(getGlobal('currentPage')=="#page2"){
+            targetTable='#pageSecondTable';
+        }
+        console.log("currentPage",$(getGlobal('currentPage')),targetTable,(getGlobal('currentPage')=="#page2"));
+        //console.log($('#pageOneTable').find('input[type="checkbox"][name="item_checkbox"]:checked'));
+        var checked=$(targetTable).find('input[type="checkbox"][name="item_checkbox"]:checked');
+        if(checked.length>0){
+            $().requestDialog({
+                title:'提示',
+                message:"确认删除所选案件吗？",
+            },function(form){
+                console.log("删除");
+                var matcheds=[];
+                var ids=[];
+                $.each($(targetTable).find('input[type="checkbox"][name="item_checkbox"]:checked'),function(index,check){
+                    console.log("delete...",$(check).data('item'));
+                    var matched=DataList.combinedData.filter((d)=>{return d.id==$(check).data('item')});
+                    if(matched.length>0){
+                        matcheds.push(matched[0]);
+                        ids.push(matched[0].id);
+                    }
+                    
+                });
+                if(matcheds.length>0){
+                    DataList.combinedData=$(targetTable).removeTableItems(DataList.combinedData,matcheds,(data)=>{
+                        $('.reg-checkbox-all').prop("checked",false);
+                        //pageSeTable.pageTable('refresh');
+                        DataList.combinedData=data;
+                        if(enableRealDelete) removeCases(ids,'cases',(res)=>console.log);
+                        setTimeout(() => {
+                            fancyTable1.tableUpdate($("#pageOneTable"));
+                            $("#pageOneTable").trigger('create');
+                        }, 1000);
+                        
+                        //console.log('deleted1....', DataList.combinedData);
+                        //pageOnTable.pageTable('create',DataList.combinedData);
+                    });
+                    
+                    
+                    
+                    //console.log(matcheds);
+                }
+                //_initRegTable(r,firstPageTableColumns,"pageOneTable");
+                
+                //$("#pageOneTable").hpaging({ limit: 5 });
+                //$("#pageOneTable").trigger('create');
+            });
+        }
+        
+       
+    }
+})
+//#region 查看信息页面的按钮事件
+function showProgressDetails(datas,updates,excutes,properties,attachments){
+    $().mloader('show',{message:"读取中..."});
+    if(datas.length>0){
+        //window.location="./test/timeline.html"
+        $("#summary_list").children().remove();
+        var data={
+            template:["立案","一审","二审","执行","结案","再审","监督"],
+            basic:datas[0],
+            updates:updates,
+            excutes:excutes,
+            properties:properties,
+            attachments:attachments,
+            
+        }
+        
+    //console.log('showProgressDetails',data);
+        //if(datas[0].id>30){
+            //dataList=[];
+        //}
 
+        $('#timelineTitle').text(datas[0].caseNo);
+        var canvas=document.getElementById('myCanvas');
+        //eventManager.setCanvas(canvas);
+
+        new timelinePage({template:_summary_template,data:data,summaryListContainer:"#summary_list",canvas:canvas});
+        $("#summary_list").trigger('create');
+        $.mobile.navigate( "#timeline");
+        //$("#page4").removeClass('hide');
+        //$(getGlobal('currentPage')).addClass('hide');
+        //_setFlowChart(table_progress_data,table_progress_status,table_progress_executes,table_progress_updates,matchItems[0].id);
+    }
+    $().mloader('hide');
+}
 function _setTitleBar(titlebarId,displayKey){
     var lockedTitle="查看案件";
     var unlockedTitle="修改案件";

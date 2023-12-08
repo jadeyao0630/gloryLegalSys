@@ -4,7 +4,7 @@ function tableColumnToggle(columnTemplate,container,target){
     var hiddenList={};
 var duration=500;
     var filterBtn=container;
-    var filterPopup=$('<div data-role="popup" id="'+target+'-columnFilter_" data-theme="a" class="ui-corner-all"></div>');
+    var filterPopup=$('<div data-role="popup" id="'+target+'-columnFilter" data-theme="a" class="ui-corner-all"></div>');
     if(container instanceof String){
         filterBtn=$('<a href="#'+target+'-columnFilter" data-rel="popup" data-position-to="origin" class="ui-btn-right footerBtn ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-bullets ui-btn-icon-left ui-btn-a" data-transition="pop">列</a>');
         $("#"+container).append($(filterBtn));
@@ -12,7 +12,7 @@ var duration=500;
     }else{
         filterPopup.insertAfter(filterBtn);
         $(filterBtn).on('click',function(e){
-            //console.log(e);
+            console.log($('#'+target+'-columnFilter'),e);
             $('#'+target+'-columnFilter').popup('open');
             $('#'+target+'-columnFilter').popup('reposition',{x:e.pageX,y:e.pageY});
         })
@@ -173,12 +173,16 @@ pageTable.prototype.buildTableColumns=function(){
     
 
 }
-pageTable.prototype.addTableData=function(data){
+pageTable.prototype.addTableData=function(data,isAdd){
     var _this=this;
     var columnTemplate=_this.opt.template;
     //console.log('add new tbody: ',$("#"+_this.opt.containerId).find('tbody'))
-    $("#"+_this.opt.containerId).find('tbody').remove();
-    var tbody=$('<tbody></tbody>');
+    var tbody=$("#"+_this.opt.containerId).find('tbody');
+    if(!isAdd){
+        tbody.remove();
+        tbody=$('<tbody></tbody>');
+    }
+    
     
     //console.log('data instanceof Array');
     //console.log(data instanceof Array);
@@ -217,6 +221,7 @@ pageTable.prototype.addTableData=function(data){
             $.each(ids,function(index,id){
                 var td;
                 if(d.hasOwnProperty(id)){
+                    tr.jqmData('item',d[id])
                     td=getTdElement(columnTemplate[id],d[id],id);
                     
                 }else{
@@ -225,7 +230,15 @@ pageTable.prototype.addTableData=function(data){
                 }
                 tr.append(td);
             })
-            tbody.append(tr);
+            if(isAdd){
+                tr.hide();
+                tbody.prepend(tr);
+            }else
+                tbody.append(tr);
+            setTimeout(() => {
+                
+                tr.slideDown();
+            }, 500);
         });
     }else{
         $.each(data,function(i,d){
@@ -284,7 +297,7 @@ pageTable.prototype.addTableData=function(data){
     
     //console.log(tbody);
     $("#"+_this.opt.containerId).append(tbody);
-    
+    $("#"+_this.opt.containerId).trigger('create');
     function getTdElement(columnSettings,value,key){
         var td=$('<td name="'+key+'"></td>');
         if(columnSettings.style!=undefined) td.css(columnSettings.style);

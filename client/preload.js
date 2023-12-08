@@ -6,6 +6,12 @@ $.mobile.navigate('#');
 $('#mainFooter').hide();
 //getBasicDatabaseData();
 $('#mainLoadingMessage').text('读取中...');
+getLegalAgencies().then(d=>{
+    console.log('getLegalAgencies',d)
+    var agencies=d.data.filter(dd=>dd.position>0);
+    resourceDatas['legalAgencies']=agencies;
+    resourceDatas['users']=d.data;
+})
 getBasic(basicTableList,[]).then(d=>{
     //console.log(d.data.attorneys);
     if(d.data!=undefined){
@@ -87,10 +93,12 @@ getBasic(basicTableList,[]).then(d=>{
                 auth_levels=getKeyValues(d,"descriptions")
                 resourceDatas[k]=auth_levels;
             }
+            /*
             else if(k=="legalAgencies"){
                 legalAffairs=getKeyValues(d,"name")
                 resourceDatas[k]=legalAffairs;
             }
+            */
             else if(k=="lawFirms"){
                 lawFirms=getKeyValues(d,"name")
                 resourceDatas[k]=lawFirms;
@@ -134,13 +142,20 @@ getBasic(basicTableList,[]).then(d=>{
         caseRelatedParty=casePersonnel;
         //console.log(casePersonnel);
         resourceDatas['casePersonnel']=caseRelatedParty;
-        setGlobalJson('resourceDatas',resourceDatas);
+        //setGlobalJson('resourceDatas',resourceDatas);
         result.push(true);
         
         $('#main-container').addClass('hide');
         if(logingStatus()){
-            $('body').trigger(preload_completed_event_name);
-            if(collectDbList) $().mloader("show",{message:"加载表格数据....",overlay:false});
+            const intervalId = setInterval(() => {
+                console.log(resourceDatas.hasOwnProperty('legalAgencies'))
+                if (resourceDatas.hasOwnProperty('legalAgencies')) {
+                    clearInterval(intervalId);
+                    $('body').trigger(preload_completed_event_name);
+                    if(collectDbList) $().mloader("show",{message:"加载表格数据....",overlay:false});
+                    
+                }
+            }, 100);
         }
         
         

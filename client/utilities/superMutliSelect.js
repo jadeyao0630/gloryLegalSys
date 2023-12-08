@@ -314,9 +314,15 @@ function setSuperLabel(datas,element,format){
     if(collector.length>0){
         $(element+'-button').find('span').first().text(collector.join(','));
         $(element+'-button').find('span').last().text(collector.length);
+        if(collector.length>1){
+            $(element+'-button').find('span').last().show();
+        }else{
+            $(element+'-button').find('span').last().hide();
+        }
     }else{
         $(element+'-button').find('span').first().html('&nbsp;');
         $(element+'-button').find('span').last().text(collector.length);
+        $(element+'-button').find('span').last().hide();
     }
 }
 function checkIfMainSelectChecked(element,id4check){

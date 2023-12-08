@@ -89,6 +89,15 @@ var _summary_template;
                         type:"date",
                         isOptional:false,
                     },
+                    legalAgencies:{
+                      placeholder:"代理法务",
+                      label:"代理法务:",
+                      type:"combobox",
+                      data:resourceDatas.legalAgencies,
+                      value:'id',
+                      displayFormat:'{name}',
+                      isFilterable:false
+                    },
                     caseAttachments:{
                         placeholder:"上传文件",
                         label:"附件:",
@@ -314,7 +323,7 @@ var _summary_template;
         legalAgencies:{
           label:"代理法务",
           type:"label",
-          data:resourceDatas.legalAgencies,
+          data:resourceDatas.legalAgencies,matchKey:"id",valueKey:"name",
           isFilterable:true
         },
         casePersonnel:{

@@ -331,7 +331,28 @@ mform.prototype={
             if(item.data!=undefined){
                 if(item.data instanceof Array){
                     item.data.forEach((d,counter)=>{
-                        selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
+                        if(d.constructor === Object){//'{name} {contact} {institution}'
+                            var label="";
+                            if(item.hasOwnProperty('displayFormat')){
+                                var displayFormat=item.displayFormat;
+                                $.each(d,(kk,vv)=>{
+                                    console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                                    if(item.displayFormat.indexOf(kk)>-1){
+                                        displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                    }
+                                })
+                                label=displayFormat;
+                            }else{
+                                var collector=[];
+                                $.each(d,(kk,vv)=>{
+                                    collector.push(vv);
+                                })
+                                label=collector.join(" ");
+                            }
+                            var _value=d.hasOwnProperty('value')?d.value:counter;
+                            selectItem.append($('<option value="'+_value+'">'+label+'</option>'));
+                        }else
+                            selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
                     });
                 }else{
                     $.each(item.data,function(key,value){
@@ -554,8 +575,10 @@ mform.prototype={
             
             labelStyle(label,template);
             //item_container.append(selectItem);
+            var tooltip=$('<span id="'+id+'_tooltip" class="tooltip-form">开启搜索</span>')
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
+            subContainer.append(tooltip);
             
             if(item.hasOwnProperty('displayFormat')){
                 subContainer.jqmData('valueformat',item.displayFormat);
@@ -600,10 +623,11 @@ mform.prototype={
                             //var isOpened
                             
                             $(el).on('mouseover',(e)=>{
-                                //console.log('over',$('#'+id+'_tooltip'));
-                                $('#'+id+'_tooltip').html($(el).text().split(',').join('<br/>'));
-                                $('#'+id+'_tooltip').css({'visibility': 'visible','opacity': '1','width':$(el).css('width')})
-                                
+                                if (el.scrollWidth > el.clientWidth) {
+                                    //console.log('over',$('#'+id+'_tooltip'));
+                                    $('#'+id+'_tooltip').html($(el).text().split(',').join('<br/>'));
+                                    $('#'+id+'_tooltip').css({'visibility': 'visible','opacity': '1','min-width':$(el).css('width')})
+                                }
                               });
                               
                               $(el).on('mouseleave',(e)=>{
@@ -627,30 +651,21 @@ mform.prototype={
                             //console.log("value-format2",index,"__",$(select).parent().parent().jqmData('valueformat'));
                             $(this).setSuperMultiselectA($(select).parent().parent().jqmData('valueformat'));
                         })
-                        
+                        var id=this.id;
                         $.each($('#'+this.id+'-button').find('span'),(idx,el)=>{
                             //var isOpened
                             $(el).on('mouseover',(e)=>{
-                                
                                 if (el.scrollWidth > el.clientWidth) {
-                                    // 设置内容自动滚动
-                                    //console.log('set tooptip',$(el).text());
-                                    $('#popupArrow').css({width:el.clientWidth})
-                                    $('#popupArrow').html($(el).text().split(',').join('<br/>'));
-                                    $('#popupArrow').popup('open',{
-                                        positionTo: $(el),
-                                        arrow:true,
-                                        focus: false
-                                    });
-                                  }
+                                    //console.log('over',$('#'+id+'_tooltip'));
+                                    $('#'+id+'_tooltip').html($(el).text().split(',').join('<br/>'));
+                                    $('#'+id+'_tooltip').css({'visibility': 'visible','opacity': '1','min-width':$(el).css('width')})
+                                }
                               });
                               
                               $(el).on('mouseleave',(e)=>{
-                                console.log('mouseleave',$('#popupArrow').hasClass('ui-popup-active'));
-                                if ($('#popupArrow').hasClass('ui-popup-active')) {
-                                    // 弹出框已打开
-                                    $('#popupArrow').popup('close');
-                                  }
+                                //console.log('leave',$('#'+id+'_tooltip'));
+                                $('#'+id+'_tooltip').css({'visibility': 'hidden','opacity': '0'})
+                                
                                 
                               
                             });

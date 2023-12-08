@@ -35,144 +35,148 @@ $('#popupMenu').find('a').on('click',function(e){
     
 })
 var currentProgress={};
+var tableFuntionButListenerList=[];
 function setTableFunctionButonClickedEvent(){
-    $.each($("[name^='fn_btn']"),(index,btn)=>{
-        $(btn).on('click', function(but) {
+    tableFuntionButListenerList=[];
+    $("[name^='fn_btn']").on('click', functionBtnsEvent);
+}
+function setTableRowFunctionButonClickedEvent(buttons){
+    $(buttons).on('click', functionBtnsEvent);
+}
+function functionBtnsEvent(but){
+    tableFuntionButListenerList.push(but.currentTarget);
+    var index=but.currentTarget.dataset.item;
+    var matchItems=DataList.combinedData.filter((item) =>item.id == index);
+    var matchedUpdates=DataList.caseUpdates.filter((d)=>d.id==index);
+    var matchedExcutes=DataList.caseExcutes.filter((d)=>d.id==index);
+    var matchedProperties=DataList.caseProperties.filter((d)=>d.id==index);
+    var matchedAttachments=DataList.caseAttachments.filter((d)=>d.id==index);
+    console.log(index+"--"+but.currentTarget.name,matchItems);
+
+    if(but.currentTarget.name=="fn_btn_details"){//主表里的删除按钮
+        showProgressDetails(matchItems,matchedUpdates,matchedExcutes,matchedProperties,matchedAttachments);
+    }
+    else if(but.currentTarget.name=="fn_btn_edit"){//主表里的编辑按钮
+        if(matchItems.length>0){
+            $().mloader("show",{message:"读取中...."});
+            //_showEditForm(matchItems[0]);//naviation.js
+            var _this=this;
+            //$("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
+            setGlobal("currentId", matchItems[0].id);
+            //_setBlurBackgroundVisibility(true);
+            $.mobile.navigate( $(_this).attr( "href" ));
+            setTimeout(function() {
+                //console.log(matchItems[0]);
+                //main_form.setData(matchItems[0]);
+                //main_form.readOnly(false);
+                //
+                //console.log("data-role------"+$('.edit-header-btn[name="save_btn"').jqmData('role'));
+                caseForm.setData(matchItems[0]);
+                caseForm.readOnly(matchItems[0].isReadOnly);
+                _setTitleBar("reg_form_title");
+                $().mloader("hide");
+            }, 500);
+            //$('.progress_lock.edit-info').removeClass('hide');
+            //_setFormReadOnly(data.isReadOnly);
+            //_setBlurBackgroundVisibility(true);
             
-            var index=but.currentTarget.dataset.item;
-            var matchItems=DataList.combinedData.filter((item) =>item.id == index);
-            var matchedUpdates=DataList.caseUpdates.filter((d)=>d.id==index);
-            var matchedExcutes=DataList.caseExcutes.filter((d)=>d.id==index);
-            var matchedProperties=DataList.caseProperties.filter((d)=>d.id==index);
-            var matchedAttachments=DataList.caseAttachments.filter((d)=>d.id==index);
-            console.log(index+"--"+but.currentTarget.name);
-
-            if(but.currentTarget.name=="fn_btn_details"){//主表里的删除按钮
-                showProgressDetails(matchItems,matchedUpdates,matchedExcutes,matchedProperties,matchedAttachments);
+        }
+    }
+    else if(but.currentTarget.name=="fn_btn_update"){//主表里的信息按钮
+        $().mloader("show",{message:"读取中...."});
+        $("#progress_details").empty();
+        $("#progress_diagram").empty();
+        setGlobal("currentId",index);
+        var progressInfoForm=_createNewCaseForm(progress_form_template,"progress_details");
+        progressInfoForm.instance.find('#attorney').parent().css({"width": "250px"});
+        $.mobile.navigate( '#progress');
+        if(matchItems.length>0){
+            
+            _setTitleBar("progress_title",'caseNo');
+            var status_val=-1;
+            if(matchItems.length>0){
+                progressInfoForm.setData(matchItems[0]).readOnly(matchItems[0].isReadOnly);
+                //$("#progress_diagram").empty();
+                status_val=Number(matchItems[0].caseStatus);
+                
+            }else{
+                progressInfoForm.setEmptyData();
             }
-            else if(but.currentTarget.name=="fn_btn_edit"){//主表里的编辑按钮
-                if(matchItems.length>0){
-                    $().mloader("show",{message:"读取中...."});
-                    //_showEditForm(matchItems[0]);//naviation.js
-                    var _this=this;
-                    //$("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
-                    setGlobal("currentId", matchItems[0].id);
-                    //_setBlurBackgroundVisibility(true);
-                    $.mobile.navigate( $(_this).attr( "href" ));
-                    setTimeout(function() {
-                        //console.log(matchItems[0]);
-                        //main_form.setData(matchItems[0]);
-                        //main_form.readOnly(false);
-                        //
-                        //console.log("data-role------"+$('.edit-header-btn[name="save_btn"').jqmData('role'));
-                        caseForm.setData(matchItems[0]);
-                        caseForm.readOnly(matchItems[0].isReadOnly);
-                        _setTitleBar("reg_form_title");
-                        $().mloader("hide");
-                    }, 500);
-                    //$('.progress_lock.edit-info').removeClass('hide');
-                    //_setFormReadOnly(data.isReadOnly);
-                    //_setBlurBackgroundVisibility(true);
+            
+            
+            var but=new ProgressesButton({
+                steps:progresses,
+                deadSteps:deads,
+                showLabel:true,
+                containerId:'#progress_diagram',
+                currentPosition:status_val,
+                fontSize:15,
+                line_size:4,
+                size:30,
+                width:840,
+                hasShadow:true,
+                isViewMode:true,
+                //verticalGap:2,
+                //labelPosition:"bottom",
+                showSubSteps:true,
+                readOnly:matchItems[0].isReadOnly,
+                showCounter:true,
+                counterData:matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments),
+            });
+            //console.log("caseNo",matchItems[0].caseNo);
+            currentProgress['currentDiagramButton']=but;
+            $(but.instance).on("itemOnClicked",  function (e){
+                console.log(but.opt.counterData);
+                console.log('targetPosition...e',e);
+                currentProgress['targetPosition']=e.Position;
+                currentProgress['originalPosition']=formatIndex(but.opt.currentPosition);
+                currentProgress['isReadOnly']=matchItems[0].isReadOnly;
+                
+            //console.log('targetPosition...',currentProgress['targetPosition']);
+
+                //$( "#update_panel" ).panel( "open" );
+                var title=progresses[e.Position.main] instanceof Array?progresses[e.Position.main][e.Position.sub]:progresses[e.Position.main];
+                
+                $("#progress_popupMenu_title").text('请选择对 '+title+' 的操作');
+                if(matchItems[0].isReadOnly) $('.progress_popupMenu_add_group').hide();
+                else {
+                    $('.progress_popupMenu_add_group').show();
                     
                 }
-            }
-            else if(but.currentTarget.name=="fn_btn_update"){//主表里的信息按钮
-                $().mloader("show",{message:"读取中...."});
-                $("#progress_details").empty();
-                $("#progress_diagram").empty();
-                setGlobal("currentId",index);
-                var progressInfoForm=_createNewCaseForm(progress_form_template,"progress_details");
-                progressInfoForm.instance.find('#attorney').parent().css({"width": "250px"});
-                $.mobile.navigate( '#progress');
-                if(matchItems.length>0){
-                    
-                    _setTitleBar("progress_title",'caseNo');
-                    var status_val=-1;
-                    if(matchItems.length>0){
-                        progressInfoForm.setData(matchItems[0]).readOnly(matchItems[0].isReadOnly);
-                        //$("#progress_diagram").empty();
-                        status_val=Number(matchItems[0].caseStatus);
-                        
-                    }else{
-                        progressInfoForm.setEmptyData();
-                    }
-                    
-                    
-                    var but=new ProgressesButton({
-                        steps:progresses,
-                        deadSteps:deads,
-                        showLabel:true,
-                        containerId:'#progress_diagram',
-                        currentPosition:status_val,
-                        fontSize:15,
-                        line_size:4,
-                        size:30,
-                        width:840,
-                        hasShadow:true,
-                        isViewMode:true,
-                        //verticalGap:2,
-                        //labelPosition:"bottom",
-                        showSubSteps:true,
-                        readOnly:matchItems[0].isReadOnly,
-                        showCounter:true,
-                        counterData:matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments),
-                    });
-                    //console.log("caseNo",matchItems[0].caseNo);
-                    currentProgress['currentDiagramButton']=but;
-                    $(but.instance).on("itemOnClicked",  function (e){
-                        console.log(but.opt.counterData);
-                        console.log('targetPosition...e',e);
-                        currentProgress['targetPosition']=e.Position;
-                        currentProgress['originalPosition']=formatIndex(but.opt.currentPosition);
-                        currentProgress['isReadOnly']=matchItems[0].isReadOnly;
-                        
-                    //console.log('targetPosition...',currentProgress['targetPosition']);
-
-                        //$( "#update_panel" ).panel( "open" );
-                        var title=progresses[e.Position.main] instanceof Array?progresses[e.Position.main][e.Position.sub]:progresses[e.Position.main];
-                        
-                        $("#progress_popupMenu_title").text('请选择对 '+title+' 的操作');
-                        if(matchItems[0].isReadOnly) $('.progress_popupMenu_add_group').hide();
-                        else {
-                            $('.progress_popupMenu_add_group').show();
-                            
-                        }
-                        var exeBtn=$.grep($($('#progress_popupMenu_add_group').find('a')),(a)=>{
-                            //console.log('setMainForm', $(a).text()=="执行");
-                            return $(a).text()=="执行";
-                        });
-                        //console.log('setMainForm',e.Position.main);
-                        if((e.Position.main==3||e.Position.main==2)&&!matchItems[0].isReadOnly){
-                            $(exeBtn).show();
-                            $(exeBtn).css({'display':'block'});
-                        }else{
-                            $(exeBtn).hide();
-                        }
-                        //$('#progress_popupMenu_add').find('ul').trigger('create').listview().listview('refresh');
-                       // $('#progress_popupMenu_add').find('div').trigger('create');
-                        //$('#progress_popupMenu_add').find('div').
-                        //console.log('progress_popupMenu_add',$('#progress_popupMenu_add').find('ul'));
-                        //console.log('progress_popupMenu_add',$("#progress_popupMenu").find('ul'));
-                        $("#progress_popupMenu").trigger('create');
-                        
-                        $("#progress_popupMenu").popup('open');
-                        $("#progress_popupMenu").popup('reposition',{x:e.event.pageX,y:e.event.pageY});
-                        $("#progress_popupMenu_add_group").listview().listview('refresh');
-                        //console.log($("#progress_popupMenu"));
-                    });
-                    $("#progress_diagram").trigger('create');
-                    $("#progress_details").trigger('create');
+                var exeBtn=$.grep($($('#progress_popupMenu_add_group').find('a')),(a)=>{
+                    //console.log('setMainForm', $(a).text()=="执行");
+                    return $(a).text()=="执行";
+                });
+                //console.log('setMainForm',e.Position.main);
+                if((e.Position.main==3||e.Position.main==2)&&!matchItems[0].isReadOnly){
+                    $(exeBtn).show();
+                    $(exeBtn).css({'display':'block'});
+                }else{
+                    $(exeBtn).hide();
                 }
-                //setTimeout(function() {
-                    
-                //},5000);
-                $("#progress_details").trigger('create');
-                setTimeout(function() {
-                    $().mloader("hide");
-                },100);
-            }
-        });
-    })
+                //$('#progress_popupMenu_add').find('ul').trigger('create').listview().listview('refresh');
+               // $('#progress_popupMenu_add').find('div').trigger('create');
+                //$('#progress_popupMenu_add').find('div').
+                //console.log('progress_popupMenu_add',$('#progress_popupMenu_add').find('ul'));
+                //console.log('progress_popupMenu_add',$("#progress_popupMenu").find('ul'));
+                $("#progress_popupMenu").trigger('create');
+                
+                $("#progress_popupMenu").popup('open');
+                $("#progress_popupMenu").popup('reposition',{x:e.event.pageX,y:e.event.pageY});
+                $("#progress_popupMenu_add_group").listview().listview('refresh');
+                //console.log($("#progress_popupMenu"));
+            });
+            $("#progress_diagram").trigger('create');
+            $("#progress_details").trigger('create');
+        }
+        //setTimeout(function() {
+            
+        //},5000);
+        $("#progress_details").trigger('create');
+        setTimeout(function() {
+            $().mloader("hide");
+        },10);
+    }
 }
 //流程图节点点击弹出菜单
 $('#progress_popupMenu').find('a').on('click',function(e){
@@ -303,7 +307,7 @@ $('.case_reg_but').on('click',async function(e){
                 caseForm.readOnly(false).setEmptyData();
                 
                 $().mloader("hide");
-            }, 100);
+            }, 10);
             //main_form.setData(getGlobalJson("mainData")[0]);
             //$("#fullscreenPage").trigger('create');
             //main_form.instance.trigger('create');
@@ -397,13 +401,13 @@ function showProgressDetails(datas,updates,excutes,properties,attachments){
     }
     setTimeout(function() {
         $().mloader("hide");
-    },100);
+    },10);
 }
 //#region 保存按钮事件
 $('.edit-header-btn').on('click',function(e){
     if($(this).text()=="保存"){
         //console.log("保存");
-        console.log($(pageOnTable).html())
+        //console.log($(pageOnTable).html())
         caseForm.instance.getValues(getGlobal("currentId"),FormTemplate3.template,function(message,values){
             if(values.success){
                 console.log(message.message);
@@ -419,22 +423,31 @@ $('.edit-header-btn').on('click',function(e){
                     values.data.values["caseApplicant"]=getGlobalJson("currentUser").id;
                     values.data.values["isReadOnly"]=_isReadOnlyCurrentForm();
                     values.data.values["id"]=Number(values.data.values["id"]);
-                    $().mloader('show',{message:"保存中..."});
-                    //console.log(values.data);
-                    insertCase(values.data.values,function(r){
-                        //console.log(r);
-                        if(r.success){
-                            console.log("修改添加成功。");
-                            $().minfo('show',{title:"提示",message:"保存完成。"},function(){
-                                $.mobile.navigate('#');
-                            });
-                            saveNewData2List(DataList.combinedData,values.data.values,'id');//tools.js
-                        }else{
-                            console.log(r);
-                            $().minfo('show',{title:"错误",message:r.error});
-                        }
-                        $().mloader('hide');
-                    });
+                    history.back();
+                    pageOnTable.addTableData([values.data.values],true);
+                    console.log('保存',values.data.values.id,$("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
+                    setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
+                    if(enableRealDelete){
+                        $().mloader('show',{message:"保存中..."});
+                        //console.log(values.data);
+                        insertCase(values.data.values,caseInfoList,function(r){
+                            //console.log(r);
+                            if(r.success){
+                                console.log("修改添加成功。");
+                                $().minfo('show',{title:"提示",message:"保存完成。"},function(){
+                                    $.mobile.navigate('#');
+                                });
+                                DataList.combinedData=saveNewData2List(DataList.combinedData,values.data.values,'id');//tools.js
+                            }else{
+                                console.log(r);
+                                $().minfo('show',{title:"错误",message:r.error});
+                            }
+                            $().mloader('hide');
+                        });
+                    }else{
+                        DataList.combinedData=saveNewData2List(DataList.combinedData,values.data.values,'id');
+                    }
+                    
                 }
                 
                 

@@ -43,6 +43,22 @@ async function getCasesStatus(res){
     });
     res(_data);
 }
+async function getLegalAgencies(){
+    const response = new Promise(async(resolve,reject)=>{
+        await fetch("http://"+ip+":"+port+"/select",{
+            headers:headers,
+            method: 'POST',
+            body: JSON.stringify({ query: 'SELECT id,name,position FROM '+userDbTableName+''})
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            resolve(data);
+        }).catch(err => console.log(err));
+        
+    });
+    return await response;
+}
 async function getUserList(res){
     var _data=undefined;
     await fetch('http://'+ip+':'+port+'/getAll')
@@ -121,11 +137,11 @@ async function removeCases(ids,table,res){
         res(data);
     });
 }
-async function insertCase(data,res){
+async function insertCase(data,template,res){
     await fetch("http://"+ip+":"+port+"/insertCase",{
         headers:headers,
         method: 'POST',
-        body: JSON.stringify({ table: "cases", data:data})
+        body: JSON.stringify({ template: template, data:data})
     })
     .then(response => response.json())
     .then(data => {

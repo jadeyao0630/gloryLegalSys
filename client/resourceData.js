@@ -70,7 +70,7 @@ const basicTableList={
     projects:{tablename:"projects",data:projects,template:project},
     corporateCompanies:{tablename:"corporate_companies",data:corporate_companies,template:corporateCompanies},
     corporatePartners:{tablename:"corporate_partners",data:corporate_partners,template:corporatePartners},
-    legalAgencies:{tablename:"legal_agencies",data:legal_agencies,template:legalAgencies},
+    //legalAgencies:{tablename:"legal_agencies",data:legal_agencies,template:legalAgencies},
     authLevels:{tablename:"auth_levels",data:auth_levels,template:authLevels},
     legalInstitution:{tablename:"legal_institution",data:case_orgnization,template:legalInstitution},
     legalCounsels:{tablename:"legal_counsels",data:legal_counsels,template:legalCounsel},
@@ -86,4 +86,8 @@ const caseTableList={
     caseExcutes:{tablename:"caseExcutes",template:caseExcutes},
     caseProperties:{tablename:"caseProperties",template:properties},
     caseAttachments:{tablename:"caseAttachments",template:attachments},
+}
+const caseInfoList={
+    caseStatus:{tablename:"caseStatus",template:caseStatus},
+    casesDb:{tablename:"cases",template:columns},
 }

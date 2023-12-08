@@ -43,8 +43,10 @@ function saveNewData2List(sourceData,newData,indexName){
         sourceData[index] = newData;
         console.log('saveNewData2List','保存新数据成功。。。');
       }else{
+        sourceData.push(newData);
         console.log('saveNewData2List','无法找到新数据匹配。。。',sourceData,newData);
       }
+      return sourceData;
 }
 function formatDateTime(date, format) {
     const o = {
@@ -114,11 +116,11 @@ function getKeyValues(object,key){
 $.fn.extend({
     removeTableItem:function(sourceData,itemData,res){
         var index=sourceData.indexOf(itemData);
-        var trs=$(this).find('tbody tr');
+        var trs=$(this).find('tbody tr[data-item='+itemData.id+']');
         var _this=this;
         if(trs.length>0){
             //console.log('width: '+parseInt($(trs[index]).css('width'))*-1);
-            $(trs[index]).find('td').animate({
+            $(trs[0]).find('td').animate({
                 padding: 0
                 }).wrapInner('<div />').children().slideUp(500,function() {
                     $(this).closest('tr').remove();

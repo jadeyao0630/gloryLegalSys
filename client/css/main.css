@@ -406,13 +406,3 @@ ui-collapsible.collapsible-listview .ui-btn{
 .table-smallFont label.ui-checkbox-off.ui-btn-icon-left{
     padding-left: 3em;
 }
-
-.fa-btn-bk::before{
-    color:white;
-    text-shadow: none;
-    border-radius: 16px;
-    width: 32px;
-    height:32px;
-    background-color: red;
-    padding:6px;
-}

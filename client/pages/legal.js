@@ -15,7 +15,7 @@ $('body').on(main_load_completed_event_name,function(){
             console.log('currentUser',getGlobalJson('currentUser'));
             pageOnTable.addTableData(DataList.combinedData);
             setTableFunctionButonClickedEvent();
-            $('#pageOneTable').trigger('create');
+            //$('#pageOneTable').trigger('create');
             
             setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
             
@@ -55,7 +55,7 @@ $('body').on(preload_completed_event_name,function(){
 		rowButtons:'<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
 			'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-eye ui-btn-icon-notext" data-transition="slidefade" data-item={0}>查看</a>'+
 			'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue" data-icon="edit" data-iconpos="notext" data-item={0}>修改</button>'+
-			'<button name="fn_btn_update" data-item={0}><i class="fa fa-calendar-alt text-green fa-btn-bk"></i></button>'+
+			'<button name="fn_btn_update" class="btn-icon-red" data-icon="calendar" data-iconpos="notext" data-item={0}>更新</button>'+
 		'</div>'
 	});
     //设置主表格头固定顶部位置，需要克隆主表格的原有头
@@ -220,6 +220,7 @@ function syncHeaderCloneWidth(){//同步表格头和身的宽度
             $('#pageOneTable').trigger('create');
             $('#pageOneTable-fixed').trigger('create'); 
         }
+        console.log('tableColumnToggle',$('.table-column-toggle'));
         var columnFilter=tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
         columnFilter.on('columnChanged',function(){
             $('#pageOneTable').trigger('create');
@@ -281,17 +282,18 @@ function resizeColumnFilter(){//按照窗口尺寸调整列过滤弹窗字体尺
 }
 function setCheckAllBox(checkboxAll,targetTable){
     var _this=checkboxAll;
-    var tr=$('#'+targetTable+' > tbody > tr');
+    
     $.each($('#'+targetTable).find("input[type=checkbox][name=item_checkbox]"),function(index,checkbox) {
         //console.log()
         $(checkbox).on('change', function() {
-            
+            var tr=$('#'+targetTable+' > tbody > tr');
             $(_this).prop("checked",
             tr.not(':hidden').length==tr.not(':hidden').find('input[type="checkbox"]:checked').length);
         
         })
     });
     $(_this).on('change',function() {
+        var tr=$('#'+targetTable+' > tbody > tr');
         //console.log('change');
         tr.not(':hidden').find('input[type="checkbox"]').prop( "checked", $(this).prop('checked') );
 

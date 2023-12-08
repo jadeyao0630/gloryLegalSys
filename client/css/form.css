@@ -60,12 +60,10 @@
   }
 .tooltip-form {
     visibility: hidden;
-    width: 120px;
     background-color: #000;
     color: #fff;
     text-align: left;
     border-radius: 6px;
-    padding: 5px 0;
     position: absolute;
 text-shadow: none;
 padding:5px 10px;

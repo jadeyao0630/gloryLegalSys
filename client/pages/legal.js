@@ -55,7 +55,7 @@ $('body').on(preload_completed_event_name,function(){
 		rowButtons:'<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
 			'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-eye ui-btn-icon-notext" data-transition="slidefade" data-item={0}>查看</a>'+
 			'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue" data-icon="edit" data-iconpos="notext" data-item={0}>修改</button>'+
-			'<button name="fn_btn_update" style="padding:3px 5px;" data-item={0}><div class="fa-btn-bk" style="background:red;"><i class="fa fa-calendar-alt text-green"></div></button>'+
+			'<button name="fn_btn_update" data-item={0}><i class="fa fa-calendar-alt text-green fa-btn-bk"></i></button>'+
 		'</div>'
 	});
     //设置主表格头固定顶部位置，需要克隆主表格的原有头

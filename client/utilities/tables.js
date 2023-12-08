@@ -4,7 +4,7 @@ function tableColumnToggle(columnTemplate,container,target){
     var hiddenList={};
 var duration=500;
     var filterBtn=container;
-    var filterPopup=$('<div data-role="popup" id="'+target+'-columnFilter" data-theme="a" class="ui-corner-all"></div>');
+    var filterPopup=$('<div data-role="popup" id="'+target+'-columnFilter_" data-theme="a" class="ui-corner-all"></div>');
     if(container instanceof String){
         filterBtn=$('<a href="#'+target+'-columnFilter" data-rel="popup" data-position-to="origin" class="ui-btn-right footerBtn ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-bullets ui-btn-icon-left ui-btn-a" data-transition="pop">列</a>');
         $("#"+container).append($(filterBtn));
@@ -148,7 +148,7 @@ pageTable.prototype.buildTableColumns=function(){
             var th;
             //console.log(id+": "+ws);
             if(columnData.type=="checkbox"){
-                th=$('<th'+ws+'><input class="reg-checkbox-all" type="checkbox" data-mini="true"></th>');
+                th=$('<th'+ws+' name="'+id+'"><input class="reg-checkbox-all" type="checkbox" data-mini="true"></th>');
             }else{
                 if(columnData.isFilterable){
                     th=$(`<th${ws} name="${id}" data-priority="1">${columnData.label}</th>`);

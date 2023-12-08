@@ -112,7 +112,11 @@ async function removeCases(ids,table,res){
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data.error);
+        if (data.data.success){
+            console.log(data.data.id);
+        }else{
+            console.log(data.data.error);
+        }
         
         res(data);
     });

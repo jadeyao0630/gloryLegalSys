@@ -263,7 +263,7 @@ ProgressesButton.prototype.init=function(arg){
             var realIndex=index;
             if(!_this.opt.showSubSteps){
 
-                    if(realIndex>2)
+                    if(realIndex>1)
                         realIndex+=1;
                 
             }
@@ -386,12 +386,14 @@ ProgressesButton.prototype.init=function(arg){
     }
     function setCounterIndecator(left,top,index,sub){
         if(_this.opt.showCounter && _this.opt.counterData.length>0){
+            
             var _counter=_this.opt.counterData.filter(value=>{ 
                 if(sub==undefined)
-                    return formatIndex(value.caseStatus).main==(index+1);
+                    return formatIndex(value.caseStatus).main==(index);
                 else
-                    return value.caseStatus==index+1+sub/10
+                    return value.caseStatus==index+sub/10
             });
+            console.log('setCounterIndecator',_counter.length,index,_counter);
             if(_counter.length>0){
                 if(_this.opt.showCounter){
                     var size=_this.opt.size*2*0.4;

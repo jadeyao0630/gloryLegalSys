@@ -18,7 +18,7 @@ function _setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
     
     //console.log('setSuperMultiselect setSuperLabel format',format);
     var datas=_getSuperValue(elementid);
-    console.log('formatSuperValue datas',datas);
+    //console.log('formatSuperValue datas',datas);
    if(datas==undefined) return;
     datas.forEach((data)=>{
         var label=format;
@@ -35,7 +35,7 @@ function _setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
         //console.log('formatSuperValue format',label);
         collector.push(label);
     });
-    console.log('formatSuperValue values',collector)
+    //console.log('formatSuperValue values',collector)
     if(collector.length>0){
         $('#'+elementid+'-button').find('span').first().text(collector.join(','));
         $('#'+elementid+'-button').find('span').last().text(collector.length);
@@ -49,7 +49,7 @@ function _setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
     return collector;
 }
 function superMultiSelectRowItem(listbox,idx,format,data,notLast){
-    console.log("id",idx);
+    //console.log("id",idx);
     var controlgroup=$('<div data-option-index="'+idx+'" data-role="controlgroup" class="row-controlgroup" data-type="horizontal"></div>');
     var select=$('<select class="sub-selectmenu" data-corners="false"></select>');
     $.each(casePersonnelStatus,(index,status)=>{
@@ -108,7 +108,7 @@ function _getSuperValue(elementid,format){
         var input=$(cg).find('input');
         
         var select=$(cg).find('select > option:selected');
-        console.log("getValue input",$(select));
+        //console.log("getValue input",$(select));
         if($(input).val().length>0){
             if(format!=undefined){
                 var label=format;
@@ -126,10 +126,16 @@ function _getSuperValue(elementid,format){
             
         }
     });
-    console.log("formatSuperValue values",values);
+    //console.log("formatSuperValue values",values);
     return values;
 //button_span.find('span').text(datas.join(','));
 
+}
+function _isReadOnlyCurrentForm(){
+    var datas=DataList.combinedData.filter(d=>d.id==getGlobal("currentId"));
+    if(datas.length>0)
+        return datas[0].isReadOnly;
+    return true;
 }
 function formatSuperMultiSelectData(data){
     var statusid=0;
@@ -147,9 +153,9 @@ function formatSuperMultiSelectData(data){
 //#endregion SuperMultiselectWithInput
 
 function setSuperValue(element,values,vformat){
-    console.log('setSuperMultiselect setSuperValue format',vformat);
+    //console.log('setSuperMultiselect setSuperValue format',vformat);
     if(vformat==undefined) vformat=value_format;
-    console.log('setSuperValue value',values);
+    //console.log('setSuperValue value',values);
     if(values==undefined) return;
     setSuperLabel(values,element,vformat);
     var listbox_popup=$(element+'-listbox');
@@ -331,7 +337,7 @@ $.fn.extend({
         var self=this;
         var id=$(self).attr('id');
         var listbox_popup=$('#'+id+'-listbox')
-        console.log('setSuperMultiselect format',vformat);
+        //console.log('setSuperMultiselect format',vformat);
         //console.log('setSuperMultiselect before html',$('#'+id+'-menu').html());
         $(self).parent().parent().find('.sub-selectmenu').remove();
         setSuperValue('#'+id,undefined,vformat);
@@ -465,7 +471,7 @@ $.fn.extend({
     setSuperMultiselectA:function(vformat){
         if (vformat==undefined) vformat='{value} ({status})';
         var elementId=$(this).attr('id');
-        console.log('listbox',elementId);
+        //console.log('listbox',elementId);
         $(this).parent().parent().find('.sub-selectmenu').remove();
         var listbox_popup=$('#'+elementId+'-listbox');
         listbox_popup.popup({
@@ -489,7 +495,7 @@ $.fn.extend({
         //li.append(controlgroup);
         listbox.append(superMultiSelectRowItem(listbox,0,vformat));
         listbox.trigger('create').listview().listview( "refresh" );
-        console.log('listbox',listbox_popup.html());
+        //console.log('listbox',listbox_popup.html());
 
         
         

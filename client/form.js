@@ -325,7 +325,7 @@ mform.prototype={
             //return item_container;
         }
         function generateComboBoxItem(item_container,item,id){
-            console.log('generateComboBoxItem',item.label,item.data);
+            //console.log('generateComboBoxItem',item.label,item.data);
             var selectItem=$('<select name="'+id+'" id="'+id+'"'+
             (item.isFilterable?"class=\"filterSelect\" data-native-menu=\"false\"":"class=\"form-original\"")+'" '+setRequired(item.isOptional,"此项必须选择")+'></select>');
             if(item.data!=undefined){
@@ -585,10 +585,10 @@ mform.prototype={
         $.mobile.document
             .on("pagecreate", function () {
                 
-                console.log('itemNeedToSetWidth','pagecreate');
+                //console.log('itemNeedToSetWidth','pagecreate');
                 $(".supermultiSelect").selectmenu({
                     create: function (event, ui) {
-                        console.log('supermultiSelect pagecreate',this);
+                        //console.log('supermultiSelect pagecreate',this);
                         
                         $.each($(this),(index,select)=>{
                             //console.log("value-format2",index,"__",$(select).parent().parent());
@@ -600,14 +600,14 @@ mform.prototype={
                             //var isOpened
                             
                             $(el).on('mouseover',(e)=>{
-                                console.log('over',$('#'+id+'_tooltip'));
+                                //console.log('over',$('#'+id+'_tooltip'));
                                 $('#'+id+'_tooltip').html($(el).text().split(',').join('<br/>'));
                                 $('#'+id+'_tooltip').css({'visibility': 'visible','opacity': '1','width':$(el).css('width')})
                                 
                               });
                               
                               $(el).on('mouseleave',(e)=>{
-                                console.log('leave',$('#'+id+'_tooltip'));
+                                //console.log('leave',$('#'+id+'_tooltip'));
                                 $('#'+id+'_tooltip').css({'visibility': 'hidden','opacity': '0'})
                                 
                                 
@@ -620,7 +620,7 @@ mform.prototype={
                 });
                 $(".supermultiInput").selectmenu({
                     create: function (event, ui) {
-                        console.log('supermultiSelect pagecreate',this);
+                        //console.log('supermultiSelect pagecreate',this);
                         
                         $.each($(this),(index,select)=>{
                             //console.log("value-format2",index,"__",$(select).parent().parent());
@@ -753,7 +753,7 @@ mform.prototype={
     },
     readOnly:function(isReadOnly){
         //if(isReadOnly) this.replacementIndexs={};
-        console.log("isReadOnly........................."+isReadOnly+"--"+this.isReadOnly);
+        //console.log("isReadOnly........................."+isReadOnly+"--"+this.isReadOnly);
         if(isReadOnly==1) isReadOnly=true;
         if(this.isReadOnly==isReadOnly) return this;
         this.isReadOnly=isReadOnly;

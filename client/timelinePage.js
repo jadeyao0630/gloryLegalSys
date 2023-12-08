@@ -34,6 +34,7 @@ function getStageList(stageIdx,data){
     var caseAttachmentData=data.attachments.filter((item) => formatIndex(item.caseStatus).main==stageIndex.main && formatIndex(item.caseStatus).sub==stageIndex.sub);
     //console.log("getStageList",caseUpdateData);
     var newData=caseUpdateData.concat(caseExcuteData,casePropertyData,caseAttachmentData);
+    console.log('getFlowList',stageIdx,newData);
     if(newData.length>0)
         return newData;
     else return [];
@@ -46,7 +47,7 @@ function getFlowList(data){
         label:"立案",
         date:caseData.caseDate,
         id:0,
-        data:getStageList(0,data)
+        //data:getStageList(-1,data)
     });
     if(progresses!=undefined){//---progresses需要植入到data
         progresses.forEach((stage,idx)=>{
@@ -57,7 +58,7 @@ function getFlowList(data){
                         label:stage,
                         date:caseData.FirstInstance,
                         id:index,
-                        data:getStageList(index,data)
+                        //data:getStageList(index-1,data)
                     });
                     break;
                 case "二审":
@@ -65,49 +66,48 @@ function getFlowList(data){
                         label:stage,
                         date:caseData.SecondInstance,
                         id:index,
-                        data:getStageList(index,data)
+                        //data:getStageList(index-1,data)
                     });
                     break;
                 case "执行":
                     //console.log('progresses....',progresses)
                     
-                    var statusId=index+formatIndex(caseData.caseStatus).sub/10;
-                    var nextId=index+1+formatIndex(caseData.caseStatus).sub/10;
+                    var statusId=index-1+formatIndex(caseData.caseStatus).sub/10;
 
                     //console.log('formatIndex....',getStatusLabel(statusId,progresses))
                     flowList.push({
                         label:Number(caseData.caseStatus)>index?getStatusLabel(statusId,progresses):"",
                         id:index,
-                        data:getStageList(statusId,data).concat(getStageList(nextId,data))
+                        //data:getStageList(statusId,data)
                     });
                     break;
                 case "结案":
                     flowList.push({
                         label:stage,
                         id:index+1,
-                        data:getStageList(index,data)
+                        //data:getStageList(index-1,data)
                     });
                     break;
                 case "再审":
                     flowList.push({
                         label:stage,
-                        id:index+1,
-                        data:getStageList(index,data)
+                        id:index,
+                        //data:getStageList(index-1,data)
                     });
                     break;
                 case "监督":
                     flowList.push({
                         label:stage,
-                        id:index+1,
-                        data:getStageList(index,data)
+                        id:index,
+                        //data:getStageList(index-1,data)
                     });
                     break;
             }
         })
     }
     console.log('data............',data);
-    console.log('getFlowList............',flowList);
-    return flowList;
+    console.log('getFlowList1............',flowList);
+    return [flowList];
 }
 
 

@@ -100,6 +100,10 @@ function setAvailableColumn(target,checkbox,duration){
         $("#"+target).find('td[name="'+$(checkbox).prop('name')+'"]').show(duration);
     }
 }
+function disableGlowing(e){
+    $(this).removeClass('newItem');
+    $(this).off('click',disableGlowing);
+}
 function pageTable(arg){
     this.opt={
         data:undefined,
@@ -173,6 +177,92 @@ pageTable.prototype.buildTableColumns=function(){
     
 
 }
+pageTable.prototype.updateTableData=function(data,tr){
+    var _this=this;
+    var columnTemplate=_this.opt.template;
+    var dataKeys=Object.keys(data);
+    //console.log('updateTableData',$(tr).find('td'));
+    $.each($(tr).find('td'),(index,td)=>{
+        var id=$(td).attr('name');
+        //console.log('updateTableData',id,dataKeys.includes(id));
+        if(dataKeys.includes(id)){
+            var newTd=getTdElement(columnTemplate[id],data[id],id,_this);
+            $(newTd).css({'display':$(td).css('display')});
+            $(td).before(newTd);
+            $(td).remove();
+        }
+    })
+    _this.pageTable('refresh');
+}
+
+pageTable.prototype.removeTableItem=function(callback){
+    var _this=this;
+    var duration=200;
+    var targetTable=$("#"+_this.opt.containerId)
+    var trs=$(targetTable).find('input[type="checkbox"][name="item_checkbox"]:checked').closest('tr');
+    trs.addClass('slip-left-out');
+    var ids=[];
+    // Remove the tr element after the animation completes
+    trs.on('animationend', function() {
+        ids.push($(this).data('item'));
+        
+        $(this).find('td').animate({
+            'padding-top': 0,
+            'padding-bottom':0,
+            }).wrapInner('<div />').children().slideUp(duration,function() {
+                $(this).closest('tr').remove();
+                
+            });
+    });
+    const intervalId = setInterval(() => {
+        if (ids.length==trs.length) {
+            clearInterval(intervalId);
+            if(callback!=undefined) callback(ids);
+            
+        }
+    }, 100);
+}
+pageTable.prototype.insertTableData=function(data){
+    var _this=this;
+    var tbody=$("#"+_this.opt.containerId).find('tbody');
+    var columnTemplate=_this.opt.template;
+    var dataKeys=Object.keys(data);
+    var tr=$('<tr data-item='+data.id+'></tr>');
+    //console.log('updateTableData',$(tr).find('td'));
+    $.each(columnTemplate,(id,settings)=>{
+        //console.log('updateTableData',id,dataKeys.includes(id));
+        //if(dataKeys.includes(id)){
+            var td=$('<td></td>');
+            if(data.hasOwnProperty(id)){
+                    
+                td=getTdElement(columnTemplate[id],data[id],id,_this);
+                
+            }else{
+                //console.log("id.........."+d.id);
+                td=getTdElement(columnTemplate[id],data.id,id,_this);
+            }
+            $(tr).append(td);
+            console.log('isHidden',id,settings.isHidden);
+            if(settings.isFilterable && settings.hasOwnProperty('isHidden') && settings.isHidden) $(td).hide();
+        //}
+    })
+    //console.log('scrollTop height',$("#"+_this.opt.containerId).height());
+    tbody.append(tr);
+    $(tr).addClass('newItem');
+    $(tr).on('click',disableGlowing)
+    _this.pageTable('refresh');
+    setTimeout(() => {
+        //console.log('scrollTop height1',$("#"+_this.opt.containerId).height());
+        var table=$("#"+_this.opt.containerId);
+        var tableHeight = table.height();
+        console.log($(tr).offset(),tableHeight);
+        //var pageHeight = $(window).height();
+        //var scrollAmount = tableHeight - pageHeight;
+        //console.log('scrollTop',scrollAmount);
+        $("html, body").animate({ scrollTop: $(tr).offset().top+$(tr).height()}, 1000);
+
+    }, 500);
+}
 pageTable.prototype.addTableData=function(data,isAdd){
     var _this=this;
     var columnTemplate=_this.opt.template;
@@ -217,16 +307,16 @@ pageTable.prototype.addTableData=function(data,isAdd){
         var ids=Object.keys(columnTemplate);
     
         $.each(data,function(i,d){
-            var tr=$('<tr></tr>');
+            var tr=$('<tr data-item='+d.id+'></tr>');
             $.each(ids,function(index,id){
                 var td;
                 if(d.hasOwnProperty(id)){
-                    tr.jqmData('item',d[id])
-                    td=getTdElement(columnTemplate[id],d[id],id);
+                    
+                    td=getTdElement(columnTemplate[id],d[id],id,_this);
                     
                 }else{
                     //console.log("id.........."+d.id);
-                    td=getTdElement(columnTemplate[id],d.id,id);
+                    td=getTdElement(columnTemplate[id],d.id,id,_this);
                 }
                 tr.append(td);
             })
@@ -242,7 +332,7 @@ pageTable.prototype.addTableData=function(data,isAdd){
         });
     }else{
         $.each(data,function(i,d){
-            var tr=$('<tr></tr>');
+            var tr=$('<tr data-item='+d.id+'></tr>');
             columnTemplate.forEach(template => {
                 if(template.hasOwnProperty('data')){
                     var ids=Object.keys(template.data);
@@ -281,10 +371,10 @@ pageTable.prototype.addTableData=function(data,isAdd){
                             //console.log(template.data[id]);
                             //console.log(d[id]);
                             
-                            labelValueContainer.append($(getTdElement(template.data[id],d[id],id).html()));
+                            labelValueContainer.append($(getTdElement(template.data[id],d[id],id,_this).html()));
                         }else{
                             //console.log(template.data[id]);
-                            labelValueContainer.append($(getTdElement(template.data[id],d.id,id).html()));
+                            labelValueContainer.append($(getTdElement(template.data[id],d.id,id,_this).html()));
                         }
                     });
                     
@@ -298,155 +388,7 @@ pageTable.prototype.addTableData=function(data,isAdd){
     //console.log(tbody);
     $("#"+_this.opt.containerId).append(tbody);
     $("#"+_this.opt.containerId).trigger('create');
-    function getTdElement(columnSettings,value,key){
-        var td=$('<td name="'+key+'"></td>');
-        if(columnSettings.style!=undefined) td.css(columnSettings.style);
-        if(columnSettings.type=="checkbox"){
-            var item=$('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+value+'>');
-            //console.log('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+value+'>');
-            td.append(item);
-        }else if(columnSettings.type=="buttons"){
-            if(_this.opt.rowButtons!=undefined){
-                td.append($(formatString(_this.opt.rowButtons,value)));
-            }else{
-                if(columnSettings.data!=undefined){
-                    var container=$('<div data-role="controlgroup" data-mini="true" data-type="horizontal"></div>');
-                    columnSettings.data.forEach(but=>{
-                        var cls="";
-                        var text="";
-                        if(but.hasOwnProperty('clss')){
-                            cls=but.clss;
-                        }
-                        if(but.hasOwnProperty('label')){
-                            text=but.label;
-                        }
-                        var href=but.hasOwnProperty('href')?but.href:"#";
-                        var btn=$('<a href="'+href+'" data-index="'+value+'" class="table-fn-btn ui-btn ui-corner-all ui-shadow '+cls+'">'+text+'</a>');
-                        container.append(btn);
-                        
-                        //console.log(container.html());
-                    })
-                    td.append(container);
-                }
-            }
-        }else if(columnSettings.type=="date"){
-            //console.log(value);
-            val=getDateTime(value);
-            if(columnSettings.dateFormat!=null) val=formatDateTime(new Date(value),columnSettings.dateFormat);
-            var label=$('<label>'+val+'</label>')
-            td.append(label);
-        }else if(columnSettings.type=="backgroundColorLabel"){
-            var val=value;
-            if(columnSettings.data!=undefined){
-                val=columnSettings.data[val];
-            }
-            var label=$('<label>'+val+'</label>')
-            td.append(label);
-        }else if(columnSettings.type=="supermulticombobox"){
-            var vals=value.split(',');
-            var multiValues=[];
-            vals.forEach(_v=>{
-                var _values=formatSuperMultiSelectOptionValue(_v);
-                //console.log('setSumList',_values);
-                if(columnSettings.hasOwnProperty('displayFormat')){
-                    var displayFormat=columnSettings.displayFormat;
-                    $.each(_values,(kk,vv)=>{
-                        if(displayFormat.indexOf(kk)>-1){
-                            displayFormat=displayFormat.replace("{"+kk+"}",vv);
-                        }
-                    })
-                    multiValues.push(displayFormat);
-                }else{
-                    var collector=[];
-                    $.each(_v,(kk,vv)=>{
-                        collector.push(vv);
-                    })
-                    multiValues.push(collector.join(" "));
-                }
-            });
-            var label=$('<label>'+multiValues.join("<br/>")+'</label>')
-            td.append(label);
-        }else if(columnSettings.type=="supermultiinput"){
-            var vals=value.split(',');
-            var multiValues=[];
-            vals.forEach(_v=>{
-                var _values=formatSuperMultiSelectData(_v);
-                //console.log('setSumList',_values);
-                if(columnSettings.hasOwnProperty('displayFormat')){
-                    var displayFormat=columnSettings.displayFormat;
-                    $.each(_values,(kk,vv)=>{
-                        if(displayFormat.indexOf(kk)>-1){
-                            displayFormat=displayFormat.replace("{"+kk+"}",vv);
-                        }
-                    })
-                    multiValues.push(displayFormat);
-                }else{
-                    var collector=[];
-                    $.each(_v,(kk,vv)=>{
-                        collector.push(vv);
-                    })
-                    multiValues.push(collector.join(" "));
-                }
-            });
-            var label=$('<label>'+multiValues.join("<br/>")+'</label>')
-            td.append(label);
-        }else if(columnSettings.type=="progresses"){
-            var val=value;
-            if(columnSettings.data!=undefined){
-                var index=formatIndex(val);
-                //console.log('val....');
-                val=columnSettings.data[index.main];
-                //console.log(columnSettings.data);
-                if(val instanceof Array){
-                    val=val[index.sub];
-                    //console.log(val);
-                }
-            }
-            if(val==undefined) val='未开始流程';
-            var label=$('<label>'+val+'</label>')
-            td.append(label);
-        }else if(columnSettings.type=="progressesButton"){
-            var but=new ProgressesButton({
-                steps:progresses,
-                deadSteps:deads,
-                showLabel:true,
-                //containerId:'#'+pbut.id,
-                currentPosition:Number(value),
-                fontSize:12,
-                line_size:4,
-                size:12,
-                width:240,
-                isViewMode:true,
-                verticalGap:2,
-                labelPosition:"bottom",
-                showSubSteps:false,
-                readOnly:true,
-              });
-              td.append(but.instance);
-              but.instance.css({'margin-top':"-25px"})
-        }
-        else{ //if(columnSettings.type=="label"){
-            var val=value;
-            if(columnSettings.data!=undefined){
-                if(columnSettings.valueKey!=undefined && 
-                    columnSettings.matchKey!=undefined){
-                        //console.log(columnSettings.data);
-                        var itemD=columnSettings.data.filter((_itemD)=>{return _itemD.hasOwnProperty(columnSettings.matchKey) && _itemD[columnSettings.matchKey]==val});
-                        if(itemD.length>0 && itemD[0].hasOwnProperty(columnSettings.valueKey)){
-                            val=itemD[0][columnSettings.valueKey];
-                        }
-                    
-                }else{
-                    val=columnSettings.data[val];
-                }
-                
-            }
-            var label=$('<label>'+val+'</label>')
-            td.append(label);
-        }
-        if(columnSettings.style!=undefined) td.children().css(columnSettings.style);
-        return td;
-    }
+    
 }
 pageTable.prototype.pageTable=function(command,data){
     var _this=this;
@@ -479,4 +421,154 @@ function _createNewCaseForm(template, constainerId){
 
 
     return main_form;
+}
+function getTdElement(columnSettings,value,key,_this){
+    var td=$('<td name="'+key+'"></td>');
+    if(columnSettings.style!=undefined) td.css(columnSettings.style);
+    if(columnSettings.type=="checkbox"){
+        var item=$('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+value+'>');
+        //console.log('<input class="reg-checkbox" type="checkbox" data-mini="true" name="item_checkbox" data-item='+value+'>');
+        td.append(item);
+    }else if(columnSettings.type=="buttons"){
+        if(_this.opt.rowButtons!=undefined){
+            td.append($(formatString(_this.opt.rowButtons,value)));
+        }else{
+            if(columnSettings.data!=undefined){
+                var container=$('<div data-role="controlgroup" data-mini="true" data-type="horizontal"></div>');
+                columnSettings.data.forEach(but=>{
+                    var cls="";
+                    var text="";
+                    if(but.hasOwnProperty('clss')){
+                        cls=but.clss;
+                    }
+                    if(but.hasOwnProperty('label')){
+                        text=but.label;
+                    }
+                    var href=but.hasOwnProperty('href')?but.href:"#";
+                    var btn=$('<a href="'+href+'" data-index="'+value+'" class="table-fn-btn ui-btn ui-corner-all ui-shadow '+cls+'">'+text+'</a>');
+                    container.append(btn);
+                    
+                    //console.log(container.html());
+                })
+                td.append(container);
+            }
+        }
+    }else if(columnSettings.type=="date"){
+        //console.log(value);
+        val=getDateTime(value);
+        if(columnSettings.dateFormat!=null) val=formatDateTime(new Date(value),columnSettings.dateFormat);
+        var label=$('<label>'+val+'</label>')
+        td.append(label);
+    }else if(columnSettings.type=="backgroundColorLabel"){
+        var val=value;
+        if(columnSettings.data!=undefined){
+            val=columnSettings.data[val];
+        }
+        var label=$('<label>'+val+'</label>')
+        td.append(label);
+    }else if(columnSettings.type=="supermulticombobox"){
+        var vals=value.split(',');
+        var multiValues=[];
+        vals.forEach(_v=>{
+            var _values=formatSuperMultiSelectOptionValue(_v);
+            //console.log('setSumList',_values);
+            if(columnSettings.hasOwnProperty('displayFormat')){
+                var displayFormat=columnSettings.displayFormat;
+                $.each(_values,(kk,vv)=>{
+                    if(displayFormat.indexOf(kk)>-1){
+                        displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                    }
+                })
+                multiValues.push(displayFormat);
+            }else{
+                var collector=[];
+                $.each(_v,(kk,vv)=>{
+                    collector.push(vv);
+                })
+                multiValues.push(collector.join(" "));
+            }
+        });
+        var label=$('<label>'+multiValues.join("<br/>")+'</label>')
+        td.append(label);
+    }else if(columnSettings.type=="supermultiinput"){
+        var vals=value.split(',');
+        var multiValues=[];
+        vals.forEach(_v=>{
+            var _values=formatSuperMultiSelectData(_v);
+            //console.log('setSumList',_values);
+            if(columnSettings.hasOwnProperty('displayFormat')){
+                var displayFormat=columnSettings.displayFormat;
+                $.each(_values,(kk,vv)=>{
+                    if(displayFormat.indexOf(kk)>-1){
+                        displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                    }
+                })
+                multiValues.push(displayFormat);
+            }else{
+                var collector=[];
+                $.each(_v,(kk,vv)=>{
+                    collector.push(vv);
+                })
+                multiValues.push(collector.join(" "));
+            }
+        });
+        var label=$('<label>'+multiValues.join("<br/>")+'</label>')
+        td.append(label);
+    }else if(columnSettings.type=="progresses"){
+        var val=value;
+        if(columnSettings.data!=undefined){
+            var index=formatIndex(val);
+            //console.log('val....');
+            val=columnSettings.data[index.main];
+            //console.log(columnSettings.data);
+            if(val instanceof Array){
+                val=val[index.sub];
+                //console.log(val);
+            }
+        }
+        if(val==undefined) val='未开始流程';
+        var label=$('<label>'+val+'</label>')
+        td.append(label);
+    }else if(columnSettings.type=="progressesButton"){
+        var but=new ProgressesButton({
+            steps:progresses,
+            deadSteps:deads,
+            showLabel:true,
+            //containerId:'#'+pbut.id,
+            currentPosition:Number(value),
+            fontSize:12,
+            line_size:4,
+            size:12,
+            width:240,
+            isViewMode:true,
+            verticalGap:2,
+            labelPosition:"bottom",
+            showSubSteps:false,
+            readOnly:true,
+          });
+          td.append(but.instance);
+          but.instance.css({'margin-top':"-25px"})
+    }
+    else{ //if(columnSettings.type=="label"){
+        var val=value;
+        if(columnSettings.data!=undefined){
+            if(columnSettings.valueKey!=undefined && 
+                columnSettings.matchKey!=undefined){
+                    //console.log(columnSettings.data);
+                    var itemD=columnSettings.data.filter((_itemD)=>{return _itemD.hasOwnProperty(columnSettings.matchKey) && _itemD[columnSettings.matchKey]==val});
+                    if(itemD.length>0 && itemD[0].hasOwnProperty(columnSettings.valueKey)){
+                        val=itemD[0][columnSettings.valueKey];
+                    }
+                
+            }else{
+                val=columnSettings.data[val];
+            }
+            
+        }
+        var label=$('<label>'+val+'</label>')
+        td.append(label);
+    }
+    //if(columnSettings.isHidden) td.hide();
+    if(columnSettings.style!=undefined) td.children().css(columnSettings.style);
+    return td;
 }

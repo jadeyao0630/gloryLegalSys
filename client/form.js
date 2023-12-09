@@ -416,8 +416,28 @@ mform.prototype={
             if(item.data){
                 if(item.data instanceof Array){
                     item.data.forEach((d,counter)=>{
-                        //console.log(d)
-                        selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
+                        if(d.constructor === Object){//'{name} {contact} {institution}'
+                            var label="";
+                            if(item.hasOwnProperty('displayFormat')){
+                                var displayFormat=item.displayFormat;
+                                $.each(d,(kk,vv)=>{
+                                    console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                                    if(item.displayFormat.indexOf(kk)>-1){
+                                        displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                    }
+                                })
+                                label=displayFormat;
+                            }else{
+                                var collector=[];
+                                $.each(d,(kk,vv)=>{
+                                    collector.push(vv);
+                                })
+                                label=collector.join(" ");
+                            }
+                            var _value=d.hasOwnProperty('value')?d.value:counter;
+                            selectItem.append($('<option value="'+_value+'">'+label+'</option>'));
+                        }else
+                            selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
                     });
                 }else{
                     var opt_tip=$('<option></option>');

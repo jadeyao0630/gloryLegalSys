@@ -4,7 +4,7 @@ let ip=isRunLocal?'192.168.10.69':'cn.luyao.site';
 let port=5555;
 var auth_code='1234';
 var enableConsoleLog=true;
-var enableRealDelete=true;
+var enableRealDelete=false;
 var functionButoonPostion="top";
 const mainPage="legal.html";
 var DataList={};
@@ -41,7 +41,7 @@ const columns={//案件主表
     case2ndParty:"VARCHAR(255) NOT NULL",//对方当事人
     caseCatelog:"INT NOT NULL DEFAULT '0'",//案件类别->caseCatelogs*
     //caseBelongs:"INT NOT NULL DEFAULT '0'",
-    caseType:"INTNOT NULL DEFAULT '0'",//案件类型->caseTypes*
+    caseType:"INT NOT NULL DEFAULT '0'",//案件类型->caseTypes*
     //caseAttachments:"varchar(1000)",//案件附件->attachments
     caseCause:"INT NOT NULL DEFAULT '0'",//案由->caseCauses*
     caseDate:"datetime NOT NULL",//立案日期

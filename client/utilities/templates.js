@@ -341,7 +341,8 @@ var _summary_template;
             displayFormat:'{value} ({status})'
         },
         caseApplicant:{label:"申请人",matchKey:"id",valueKey:"name",
-        type:"label", isFilterable:true,isHidden:true},
+          data:resourceDatas['users'],matchKey:"id",valueKey:"name",
+          type:"label", isFilterable:true,isHidden:true},
         caseDate:{label:"立案日期",
         type:"date", dateFormat:'yyyy年MM月dd日', isFilterable:true},
         rowButtons:{
@@ -984,6 +985,8 @@ var _summary_template;
         label:"代理法务:",
         type:"multicombobox",
         isOptional:true,
+        value:'id',
+        displayFormat:'{name}',
         //data:addEmptyValueToArray(resourceDatas.legalAgencies),
         data:resourceDatas.legalAgencies//.filter((d)=>{return d!='无'}),
       },

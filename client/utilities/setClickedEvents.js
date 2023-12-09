@@ -1,5 +1,5 @@
 var lockeventListener=[];
-
+var isSavePage=false;
 $('.popup-add-table').on('click',function(e){
     //createBasicDatabase();
     //createTable('caseUpdates',caseUpdates);
@@ -57,6 +57,7 @@ function functionBtnsEvent(but){
         showProgressDetails(matchItems,matchedUpdates,matchedExcutes,matchedProperties,matchedAttachments);
     }
     else if(but.currentTarget.name=="fn_btn_edit"){//主表里的编辑按钮
+        isSavePage=true;
         if(matchItems.length>0){
             $().mloader("show",{message:"读取中...."});
             //_showEditForm(matchItems[0]);//naviation.js
@@ -283,6 +284,7 @@ $('#progress_popupMenu').find('a').on('click',function(e){
 $('.case_reg_but').on('click',async function(e){
     e.preventDefault();
     if(this.id=="case_reg_but_add"){
+        isSavePage=false;
         $().mloader("show",{message:"读取中...."});
         await getCaseLatestIndex().then(id=>{
             
@@ -315,18 +317,17 @@ $('.case_reg_but').on('click',async function(e){
         
     }else if(this.id=="case_reg_but_remove"){
         var targetTable='#pageOneTable';
-        if(getGlobal('currentPage')=="#page2"){
-            targetTable='#pageSecondTable';
-        }
-        console.log("currentPage",$(getGlobal('currentPage')),targetTable,(getGlobal('currentPage')=="#page2"));
+        
         //console.log($('#pageOneTable').find('input[type="checkbox"][name="item_checkbox"]:checked'));
         var checked=$(targetTable).find('input[type="checkbox"][name="item_checkbox"]:checked');
+        console.log(checked);
         if(checked.length>0){
             $().requestDialog({
                 title:'提示',
                 message:"确认删除所选案件吗？",
             },function(form){
                 console.log("删除");
+                
                 var matcheds=[];
                 var ids=[];
                 $.each($(targetTable).find('input[type="checkbox"][name="item_checkbox"]:checked'),function(index,check){
@@ -336,26 +337,27 @@ $('.case_reg_but').on('click',async function(e){
                         matcheds.push(matched[0]);
                         ids.push(matched[0].id);
                     }
+
                     
                 });
+                
                 if(matcheds.length>0){
-                    DataList.combinedData=$(targetTable).removeTableItems(DataList.combinedData,matcheds,(data)=>{
+                    pageOnTable.removeTableItem(function(ids){
+                        console.log(ids);
+                        
+                        DataList.combinedData=$.grep(DataList.combinedData,function(val){
+                            return matcheds.indexOf(val)<0;
+                        });
                         $('.reg-checkbox-all').prop("checked",false);
                         //pageSeTable.pageTable('refresh');
-                        DataList.combinedData=data;
+                        //DataList.combinedData=data;
                         if(enableRealDelete) removeCases(ids,'cases',(res)=>console.log);
                         setTimeout(() => {
                             //fancyTable1.tableUpdate($("#pageOneTable"));
                             $("#pageOneTable").trigger('create');
                         }, 1000);
                         
-                        //console.log('deleted1....', DataList.combinedData);
-                        //pageOnTable.pageTable('create',DataList.combinedData);
-                    });
-                    
-                    
-                    
-                    //console.log(matcheds);
+                    })
                 }
                 //_initRegTable(r,firstPageTableColumns,"pageOneTable");
                 
@@ -424,9 +426,13 @@ $('.edit-header-btn').on('click',function(e){
                     values.data.values["isReadOnly"]=_isReadOnlyCurrentForm();
                     values.data.values["id"]=Number(values.data.values["id"]);
                     history.back();
-                    pageOnTable.addTableData([values.data.values],true);
-                    console.log('保存',values.data.values.id,$("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
-                    setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
+                    if(!isSavePage){
+                        pageOnTable.insertTableData(values.data.values);
+                        setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
+                    }
+                    //pageOnTable.addTableData([values.data.values],true);
+                    //console.log('保存',values.data.values.id,$("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
+                    //setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
                     if(enableRealDelete){
                         $().mloader('show',{message:"保存中..."});
                         //console.log(values.data);
@@ -437,6 +443,9 @@ $('.edit-header-btn').on('click',function(e){
                                 $().minfo('show',{title:"提示",message:"保存完成。"},function(){
                                     $.mobile.navigate('#');
                                 });
+                                console.log('pageOneTable id',$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
+                                pageOnTable.updateTableData(values.data.values,$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
+                                
                                 DataList.combinedData=saveNewData2List(DataList.combinedData,values.data.values,'id');//tools.js
                             }else{
                                 console.log(r);

@@ -187,6 +187,9 @@ mform.prototype={
                         if(item.hasOwnProperty('span')){
                             item_container.css({'grid-column':item.span})
                         }
+                        if(item.isDisabled){
+                            _self.elements[item_key].attr("disabled",true);
+                        }
                         var replacement=replacementOfInput(item_key);
                         item_container.append(replacement);
                         replacement.hide();
@@ -336,7 +339,7 @@ mform.prototype={
                             if(item.hasOwnProperty('displayFormat')){
                                 var displayFormat=item.displayFormat;
                                 $.each(d,(kk,vv)=>{
-                                    console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                                    //console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
                                     if(item.displayFormat.indexOf(kk)>-1){
                                         displayFormat=displayFormat.replace("{"+kk+"}",vv);
                                     }
@@ -421,7 +424,7 @@ mform.prototype={
                             if(item.hasOwnProperty('displayFormat')){
                                 var displayFormat=item.displayFormat;
                                 $.each(d,(kk,vv)=>{
-                                    console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                                    //console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
                                     if(item.displayFormat.indexOf(kk)>-1){
                                         displayFormat=displayFormat.replace("{"+kk+"}",vv);
                                     }
@@ -574,8 +577,8 @@ mform.prototype={
             if(item.hasOwnProperty('displayFormat')){
                 subContainer.jqmData('valueformat',item.displayFormat);
                 
-                console.log("value-format1",subContainer);
-                console.log("value-format1",subContainer.jqmData('valueformat'));
+                //console.log("value-format1",subContainer);
+                //console.log("value-format1",subContainer.jqmData('valueformat'));
             }
             item_container.append(subContainer);
             //console.log(item_container.html());
@@ -1116,7 +1119,7 @@ $.fn.extend({
         }else{
             if(type=="textrange"){
                 
-                console.log(_self.find('#'+id+"_0"),_self.find('#'+id+"_1"));
+                //console.log(_self.find('#'+id+"_0"),_self.find('#'+id+"_1"));
                 _self.find('#'+id+"_0").val('');
                 _self.find('#'+id+"_1").val('');
                 _self.find("#_"+id).text(value);

@@ -178,10 +178,10 @@ app.post('/getBasic',(request,response) => {
             //console.log();
             
             const db = DbService.getDbServiceInstance();
-            const result = db.getBasic(template[k].tablename);
+            const result = db.getBasic(template[k]);
             result
             .then(data => {
-                console.log("in loop",k,data);
+                //console.log("in loop",k,data);
                 results[k]=data;
             })
             .catch(err => console.log(err));

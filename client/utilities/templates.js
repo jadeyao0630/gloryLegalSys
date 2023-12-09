@@ -96,7 +96,7 @@ var _summary_template;
                       data:resourceDatas.legalAgencies,
                       value:'id',
                       displayFormat:'{name}',
-                      isFilterable:false
+                      isFilterable:false,
                     },
                     caseAttachments:{
                         placeholder:"上传文件",
@@ -276,7 +276,12 @@ var _summary_template;
         id:{
         label: "序号",
         width:50,
-        type:"label"
+        type:"label",
+        sortable:{
+          type:'number',
+          isASC:true,
+          id:'id',
+        }
         },
         caseNo:{
             label:"案件编号",
@@ -311,7 +316,12 @@ var _summary_template;
         },
         penalty:{
           label:"判决金额(万)",
-          type:"label", isFilterable:true
+          type:"label", isFilterable:true,
+          sortable:{
+            type:'number',
+            isASC:true,
+            id:'penalty',
+          }
       },
         /*
         caseStatus:{
@@ -344,7 +354,12 @@ var _summary_template;
           data:resourceDatas['users'],matchKey:"id",valueKey:"name",
           type:"label", isFilterable:true,isHidden:true},
         caseDate:{label:"立案日期",
-        type:"date", dateFormat:'yyyy年MM月dd日', isFilterable:true},
+          type:"date", dateFormat:'yyyy年MM月dd日', isFilterable:true,
+          sortable:{
+            type:'date',
+            isASC:true,
+            id:'caseDate',
+          }},
         rowButtons:{
             label:"操作",
             type:"buttons"
@@ -355,6 +370,10 @@ var _summary_template;
         id:{
         label: "序号",
         width:50,
+        sortable:{
+          type:'number',
+          isASC:true
+        }
         },
         caseNo:{
             label:"案件编号"
@@ -590,6 +609,8 @@ var _summary_template;
                 data:resourceDatas.legalAgencies,
                 label:"代理法务：",
                 isOptional:true,
+                value:'id',
+                displayFormat:'{name}',
             },
             lawFirm:{
                 type:"combobox",
@@ -814,6 +835,8 @@ var _summary_template;
               legalAgencies:{
                     label:"代理法务:",
                     data:resourceDatas.legalAgencies,
+                    value:'id',
+                    displayFormat:'{name}',
                 },
                 legalInstitution:{
                     label:"受理法院:",

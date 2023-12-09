@@ -32,10 +32,11 @@ class DbService{
         return instance ? instance : new DbService();
     }
     //#region 选择
-    async getBasic(tablename){
+    async getBasic(columnData){
         try{
             const response = await new Promise((resolve,reject)=>{
-                const query = "SELECT * FROM "+tablename;
+                const query = "SELECT * FROM "+columnData.tablename+
+                    (columnData.conditions!=undefined?columnData.conditions:"");
                 connection.query(query, (err,results)=>{
                     if (err) reject(new Error(err.message));
                     resolve(results);

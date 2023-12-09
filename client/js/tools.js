@@ -7,6 +7,14 @@ function extendOpt(opt1,opt2){
         opt1[attr] = opt2[attr];
     }
 }
+function waitTask(condition, callback){
+    const intervalId = setInterval(() => {
+        if (condition) {
+            clearInterval(intervalId);
+            if(callback!=undefined) callback();
+        }
+    }, 100);
+}
 const formatString = (template, ...args) => {
     return template.replace(/{([0-9]+)}/g, function (match, index) {
         return typeof args[index] === 'undefined' ? match : args[index];

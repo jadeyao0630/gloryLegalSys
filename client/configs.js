@@ -1,6 +1,6 @@
-var isRunLocal=false;
+var isRunLocal=true;
 var showDebug=false;
-let ip=isRunLocal?'192.168.10.69':'cn.luyao.site';
+let ip=isRunLocal?'localhost':'cn.luyao.site';
 let port=5555;
 var auth_code='1234';
 var enableConsoleLog=true;
@@ -28,6 +28,9 @@ const users={
     position:"INT NOT NULL DEFAULT '0'",//所属项目->projects*
     level:"INT NOT NULL DEFAULT '0'",//所属项目->projects*
     createDate:"datetime NOT NULL",//申请日期
+    contact:"VARCHAR(255)",
+    descriptions:"VARCHAR(255)",
+    isInactived:"VARCHAR(255)",
 }
 const columns={//案件主表
     id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号

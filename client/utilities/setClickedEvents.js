@@ -43,6 +43,7 @@ function setTableFunctionButonClickedEvent(){
 function setTableRowFunctionButonClickedEvent(buttons){
     $(buttons).on('click', functionBtnsEvent);
 }
+//#region 主表里的功能按钮
 function functionBtnsEvent(but){
     tableFuntionButListenerList.push(but.currentTarget);
     var index=but.currentTarget.dataset.item;
@@ -179,6 +180,7 @@ function functionBtnsEvent(but){
         },10);
     }
 }
+//#endregion /主表里的功能按钮
 //流程图节点点击弹出菜单
 $('#progress_popupMenu').find('a').on('click',function(e){
     $('#progress_popupMenu').popup('close');
@@ -283,7 +285,7 @@ $('#progress_popupMenu').find('a').on('click',function(e){
 //第一页左下方 添加 删除 按钮事件
 $('.case_reg_but').on('click',async function(e){
     e.preventDefault();
-    if(this.id=="case_reg_but_add"){
+    if(this.id=="case_reg_but_add"){//第一页左下方 添加
         isSavePage=false;
         $().mloader("show",{message:"读取中...."});
         await getCaseLatestIndex().then(id=>{
@@ -328,37 +330,26 @@ $('.case_reg_but').on('click',async function(e){
             },function(form){
                 console.log("删除");
                 
-                var matcheds=[];
-                var ids=[];
-                $.each($(targetTable).find('input[type="checkbox"][name="item_checkbox"]:checked'),function(index,check){
-                    console.log("delete...",$(check).data('item'));
-                    var matched=DataList.combinedData.filter((d)=>{return d.id==$(check).data('item')});
-                    if(matched.length>0){
-                        matcheds.push(matched[0]);
-                        ids.push(matched[0].id);
-                    }
-
+                pageOnTable.removeTableItem(function(ids){
+                    console.log(ids);
                     
-                });
-                
-                if(matcheds.length>0){
-                    pageOnTable.removeTableItem(function(ids){
-                        console.log(ids);
-                        
-                        DataList.combinedData=$.grep(DataList.combinedData,function(val){
-                            return matcheds.indexOf(val)<0;
-                        });
-                        $('.reg-checkbox-all').prop("checked",false);
-                        //pageSeTable.pageTable('refresh');
-                        //DataList.combinedData=data;
-                        if(enableRealDelete) removeCases(ids,'cases',(res)=>console.log);
-                        setTimeout(() => {
-                            //fancyTable1.tableUpdate($("#pageOneTable"));
-                            $("#pageOneTable").trigger('create');
-                        }, 1000);
-                        
-                    })
-                }
+                    DataList.combinedData=$.grep(DataList.combinedData,function(val){
+                        return !ids.includes(val.id);
+                    });
+                    currentData=$.grep(currentData,function(val){
+                        return !ids.includes(val.id);
+                    });;
+                    console.log(DataList.combinedData);
+                    $('.reg-checkbox-all').prop("checked",false);
+                    //pageSeTable.pageTable('refresh');
+                    //DataList.combinedData=data;
+                    if(enableRealDelete) removeCases(ids,'cases',(res)=>console.log);
+                    setTimeout(() => {
+                        //fancyTable1.tableUpdate($("#pageOneTable"));
+                        $("#pageOneTable").trigger('create');
+                    }, 1000);
+                    
+                })
                 //_initRegTable(r,firstPageTableColumns,"pageOneTable");
                 
                 //$("#pageOneTable").hpaging({ limit: 5 });
@@ -447,6 +438,7 @@ $('.edit-header-btn').on('click',function(e){
                                 pageOnTable.updateTableData(values.data.values,$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
                                 
                                 DataList.combinedData=saveNewData2List(DataList.combinedData,values.data.values,'id');//tools.js
+                                
                             }else{
                                 console.log(r);
                                 $().minfo('show',{title:"错误",message:r.error});
@@ -456,7 +448,7 @@ $('.edit-header-btn').on('click',function(e){
                     }else{
                         DataList.combinedData=saveNewData2List(DataList.combinedData,values.data.values,'id');
                     }
-                    
+                    currentData.push(values.data.values);
                 }
                 
                 

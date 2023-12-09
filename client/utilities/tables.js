@@ -136,6 +136,38 @@ pageTable.prototype.init=function(arg){
         }
     }
 }
+pageTable.prototype.setSort=function(ths){
+    var _this=this;
+    var ids=Object.keys(_this.opt.template);
+    $.each(ids,function(index,id){
+        var columnData=_this.opt.template[id];
+        if(columnData.hasOwnProperty('sortable')){
+            $(ths[index]).css({'cursor':'pointer'})
+            var indicator=$('<i class="fa fa-caret-up" />');
+            if(id!='id') indicator.hide();
+            $(ths[index]).append(indicator);
+            $(ths[index]).on('click',function(e){
+                
+                //$().mloader("show",{message:"排序中...."});
+                //sortColumn(columnData.sortable);
+                _this.currentSort=columnData.sortable;
+                $(ths).find('i').hide();
+                var event=jQuery.Event("sort");
+                event.value=columnData.sortable;
+                columnData.sortable.isASC=!columnData.sortable.isASC;
+                $("#"+_this.opt.containerId).trigger(event);
+                $(this).find('i').show();
+                if(columnData.sortable.isASC) {
+                    $(this).find('i').removeClass('fa-caret-down').addClass('fa-caret-up');
+                }else{
+                    $(this).find('i').removeClass('fa-caret-up').addClass('fa-caret-down');
+                }
+            });
+            
+        }
+    });
+    
+}
 pageTable.prototype.buildTableColumns=function(){
     var _this=this;
     var columnTemplate=_this.opt.template;
@@ -255,7 +287,7 @@ pageTable.prototype.insertTableData=function(data){
         //console.log('scrollTop height1',$("#"+_this.opt.containerId).height());
         var table=$("#"+_this.opt.containerId);
         var tableHeight = table.height();
-        console.log($(tr).offset(),tableHeight);
+        //console.log($(tr).offset(),tableHeight);
         //var pageHeight = $(window).height();
         //var scrollAmount = tableHeight - pageHeight;
         //console.log('scrollTop',scrollAmount);
@@ -571,4 +603,22 @@ function getTdElement(columnSettings,value,key,_this){
     //if(columnSettings.isHidden) td.hide();
     if(columnSettings.style!=undefined) td.children().css(columnSettings.style);
     return td;
+}
+pageTable.prototype.sortColumn=function(data,columnData){
+    if (columnData.type=='number') {
+        if(!columnData.isASC){
+            data=data.sort(function(a,b){return b[columnData.id]-a[columnData.id]});
+        }else{
+            data=data.sort(function(a,b){return a[columnData.id]-b[columnData.id]});
+        }
+        
+    }else if (columnData.type=='date') {
+        if(!columnData.isASC){
+            data=data.sort(function(a,b){return new Date(b[columnData.id])>new Date(a[columnData.id])});
+        }else{
+            data=data.sort(function(a,b){return new Date(a[columnData.id])>new Date(b[columnData.id])});
+        }
+    }
+    //console.log(data);
+    this.addTableData(data);
 }

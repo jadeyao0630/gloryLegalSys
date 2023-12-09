@@ -2,7 +2,7 @@
 var form,//header filter form
 pageOnTable,//main table
 caseForm;
-
+var currentData;
 //getGlobal("currentId")
 //getGlobal("currentUser")
 
@@ -12,7 +12,7 @@ $('body').on(main_load_completed_event_name,function(){
     const intervalId = setInterval(() => {
         if (pageOnTable!=undefined) {
             clearInterval(intervalId);
-            console.log('currentUser',getGlobalJson('currentUser'));
+            currentData=DataList.combinedData;
             pageOnTable.addTableData(DataList.combinedData);
             setTableFunctionButonClickedEvent();
             //$('#pageOneTable').trigger('create');
@@ -28,7 +28,7 @@ $('body').on(main_load_completed_event_name,function(){
     }, 100);
 });
 $('body').on(preload_completed_event_name,function(){
-    console.log('resourceDatas',getGlobalJson('resourceDatas'));
+    //console.log('resourceDatas',getGlobalJson('resourceDatas'));
     var tb=$('.header-search-container').togglebuttonicon(form,function(e,isbefore){
         if(e){
             if(isbefore){
@@ -44,7 +44,13 @@ $('body').on(preload_completed_event_name,function(){
             }
         }
     },{distance:200});
-    
+    if(getGlobalJson('currentUser').level==1){
+        FormTemplate3.template.baseInfo.data.legalAgencies.isDisabled=true;
+        FormTemplate3.template.baseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
+        progress_form_template.template.legalAgencies.isDisabled=true;
+        header_filter_template.template.legalAgencies_f.isDisabled=true;
+        header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
+    }
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
 
     pageOnTable=new pageTable({
@@ -58,30 +64,35 @@ $('body').on(preload_completed_event_name,function(){
 			'<button name="fn_btn_update" class="btn-icon-red" data-icon="calendar" data-iconpos="notext" data-item={0}>更新</button>'+
 		'</div>'
 	});
+    $("#pageOneTable").on('sort',function(columnData){
+        //console.log(columnData.value);
+        pageOnTable.sortColumn(currentData,columnData.value);
+        //setTimeout(() => {
+            
+        setAvailableColumns('pageOneTable',1);
+            //syncHeaderCloneWidth();
+        //}, 100);
+        //$().mloader("hide");
+    })
     //设置主表格头固定顶部位置，需要克隆主表格的原有头
     var t1Header=$('#pageOneTable').find('thead').clone();
     $('#pageOneTable-fixed').append(t1Header);
+    pageOnTable.setSort($('#pageOneTable-fixed').find('th'));
     
     $('#header-filter-container').css({top:$('#main-header').css('height')});
     //添加头部过滤表格
-    var main_form= new mform({template:header_filter_template});
-    form=main_form.instance;
+    var filter_form= new mform({template:header_filter_template});
+    form=filter_form.instance;
     form.addClass('header-filter-from')
     var container=$('<div class="header-filter-container-div"></div>')
     container.append(form);
     $('#header-filter-container').prepend(container);
     form.hide();
+    filter_form.setEmptyData();
     form.trigger('create');
     $("#pageOneTable").trigger('create');
     //在过滤表格后同步表格头和身的宽度
-    $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
-        $('#pageOneTable').filterable({
-            filter: function( event, ui ) {
-                console.log('create');
-                syncHeaderCloneWidth();
-            }
-        });
-    });
+    
     
    
     $('.header-filter-btn').on('click',function(e){
@@ -89,15 +100,18 @@ $('body').on(preload_completed_event_name,function(){
             case "复位":
                 
                 
-                main_form.setEmptyData();
+                filter_form.setEmptyData();
+                currentData=DataList.combinedData;
+                pageOnTable.sortColumn(currentData,pageOnTable.currentSort);
+                setAvailableColumns('pageOneTable',1);
                 break;
             case "查询":
                 //console.log("filter...",$(form).find('select,input'));
-                var matched=DataList.combinedData;
+                var matched=currentData;
                 var penalty={};
                 var caseDate={};
                 $.each($(form).find('select,input'),(index,ele)=>{
-                    console.log("filter...",ele.nodeName,id,$(ele).val());
+                    //console.log("filter...",ele.nodeName,id,$(ele).val());
                     if($(ele).val()!=undefined && $(ele).val().length>0){
                         var id=ele.id.replace('_f','');
                         if(id=="penalty_0"){
@@ -165,7 +179,8 @@ $('body').on(preload_completed_event_name,function(){
                         return valDate.getTime()<=caseDate.to.getTime() && valDate.getTime()>=caseDate.from.getTime();
                     });
                 }
-                console.log(matched);
+                //console.log(matched);
+                currentData=matched;
                 pageOnTable.addTableData(matched);
                 tb.instance.isTargetToggle=false;
                 setTableFunctionButonClickedEvent();
@@ -184,10 +199,19 @@ $('body').on(preload_completed_event_name,function(){
     });
     
 })
+
 $(window).resize(function(e){
     //console.log('高度',window.innerHeight,'宽度',window.innerWidth)
     resizeTables();
     resizeColumnFilter();
+});
+$.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
+    $('#pageOneTable').filterable({
+        filter: function( event, ui ) {
+            console.log('create');
+            syncHeaderCloneWidth();
+        }
+    });
 });
 function syncHeaderCloneWidth(){//同步表格头和身的宽度
     var columnToggler=$('<i class="fa fa-gear"></i>');
@@ -220,7 +244,7 @@ function syncHeaderCloneWidth(){//同步表格头和身的宽度
             $('#pageOneTable').trigger('create');
             $('#pageOneTable-fixed').trigger('create'); 
         }
-        console.log('tableColumnToggle',$('.table-column-toggle'));
+        //console.log('tableColumnToggle',$('.table-column-toggle'));
         var columnFilter=tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
         columnFilter.on('columnChanged',function(){
             $('#pageOneTable').trigger('create');

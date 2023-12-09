@@ -212,9 +212,10 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
             $.each(Object.keys(_data),function(index,data_key){
                     //console.log(data_key+"--"+sub_key);
                 if (data_key!="template" && Object.keys(_data[data_key]).includes(sub_key)){
-                    var data=_summary_template[key].data[sub_key].data;
-                    var type=_summary_template[key].data[sub_key].type;
-                    var label=_summary_template[key].data[sub_key].label;
+                    var item=_summary_template[key].data[sub_key];
+                    var data=item.data;
+                    var type=item.type;
+                    var label=item.label;
                     
                     var val=_data[data_key][sub_key];
                     //console.log(_data);
@@ -222,16 +223,34 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                     var isMultiValue=false;
                     var multiValues=[];
                     if(data!=undefined){
-                        //console.log(data);
+                        console.log('setSumList',sub_key,data,val);
                         if(data instanceof Array){
-                            var v=val.toString().split('.');
-                            //console.log(v);
-                            if(v.length>1){
-                                val=data[v[0]][v[1]];
-                            }else if(v.length==1){
+                            //console.log('setSumList',sub_key,val);
+                            if(item.hasOwnProperty('displayFormat') && item.hasOwnProperty('value')){
+                                var displayFormat=item.displayFormat;
+                                console.log('setSumList',$.grep(data,(d)=>d[item.value]==val));
+                                var matched=$.grep(data,(d)=>d[item.value]==val);
+                                if(matched.length>0){
+                                    $.each(matched[0],(kk,vv)=>{
+                                        //console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
+                                        if(item.displayFormat.indexOf(kk)>-1){
+                                            displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                        }
+                                    })
+                                    val=displayFormat;
+                                }
                                 
-                                val=data[v[0]];
+                            }else{
+                                var v=val.toString().split('.');
+                                //console.log(v);
+                                if(v.length>1){
+                                    val=data[v[0]][v[1]];
+                                }else if(v.length==1){
+                                    
+                                    val=data[v[0]];
+                                }
                             }
+                            
                         }
                         else{
                             isMultiValue=true;

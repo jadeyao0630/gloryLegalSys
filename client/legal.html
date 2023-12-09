@@ -34,7 +34,7 @@
             
             <div class="header-search-bar">
                 <div class="header-search-container" href="#"><i class="fa fa-search header-btn-search"></i><span class="tooltip-serarch">开启搜索</span></div>
-                <input type="text" id="header-search-input" class="header-search-input" placeholder="关键字索引"></input>
+                <input type="search" id="header-search-input" class="search-input" data-icon="tag" placeholder="关键字索引"></input>
                 
             </div>
             <h1 style="font-size: 30px;">国瑞法务管理系统</h1>
@@ -176,11 +176,15 @@
 	</div>
     <!--首页读取界面-->
 	<div id="main-container">
-		<h1>国瑞法务管理系统</h1>
-		<div style="display: inline;">
-			<div class="fa fa-spinner fa-spin" style="font-size: 40px;color:steelblue;vertical-align:middle;"></div>
-			<h3 id="mainLoadingMessage" style="display: inline;margin-left: 10px;vertical-align:middle;">读取中</h3>
+		<div class="loading_logo_title">
+			<img src="https://img3.11467.com/2019/08-25/525155842.jpg" width="200px" height="200px"></img>
+			<h1>国瑞法务管理系统</h1>
+			<div class="loading_loading" style="display: inline;">
+				<div class="fa fa-spinner fa-spin" style="font-size: 40px;color:steelblue;vertical-align:middle;"></div>
+				<h3 id="mainLoadingMessage" style="display: inline;margin-left: 10px;vertical-align:middle;">读取中</h3>
+			</div>
 		</div>
+		
 	</div>
     <script type="text/javascript" src="./fakeData.js"></script>
 	<script type="text/javascript" src="./resourceData.js"></script>

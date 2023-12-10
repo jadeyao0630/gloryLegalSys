@@ -2,7 +2,7 @@
 
 var result=[];
 var collectDbList=true;
-$.mobile.navigate('#');
+goToPage('#');
 $('#mainFooter').hide();
 //getBasicDatabaseData();
 $('#mainLoadingMessage').text('读取中...');
@@ -147,12 +147,13 @@ waitTask(logingStatus(),function(){
             //setGlobalJson('resourceDatas',resourceDatas);
             result.push(true);
             
-            $('#main-container').addClass('hide');
+            
             const intervalId = setInterval(() => {
                 if (resourceDatas.hasOwnProperty('legalAgencies')) {
                     clearInterval(intervalId);
                     $('body').trigger(preload_completed_event_name);
                     if(collectDbList) $().mloader("show",{message:"加载表格数据....",overlay:true});
+                    $('#main-container').addClass('hide');
                 }
             }, 100);
             
@@ -162,10 +163,11 @@ waitTask(logingStatus(),function(){
     
     if(collectDbList){
         
-        console.log('caseTableList',caseTableList)
+        //console.log('caseTableList',caseTableList)
         getBasic(caseTableList,[]).then(d=>{
             console.log('caseTableList completed: ',d.data);
             //console.log(d.data);
+            
             var combinedData=[];
             d.data.casesDb.forEach((data)=>{
                 var matchedData=d.data.caseStatus.filter(sta => sta.id==data.id);
@@ -174,11 +176,13 @@ waitTask(logingStatus(),function(){
                     combinedData.push(Object.assign(data,matchedData[0]));
                 }
             });
+            
             //console.log(combinedData);
             DataList=d.data;
             DataList.combinedData=combinedData;
-            setGlobalJson("combinedData",combinedData);
-            setGlobalJson("datalist",d.data);
+            //DataList.combinedData=d.data.casesDb;
+            //setGlobalJson("combinedData",combinedData);
+            //setGlobalJson("datalist",d.data);
             //console.log("setGlobalJson datalist: ",getGlobalJson("datalist"));
         
             result.push(true);
@@ -206,18 +210,31 @@ function logingStatus(){
         console.log('currentUser',getGlobalJson('currentUser'));
         
 
-        if(getGlobalJson('currentUser').level==1){
-            //condtions.push('legalAgencies='+getGlobalJson('currentUser').id);
-            $.each(caseTableList,(key,settings)=>{
-                if(key!='caseStatus'){
+        //condtions.push('legalAgencies='+getGlobalJson('currentUser').id);
+        $.each(caseTableList,(key,settings)=>{
+            if(key=='caseStatus'){
+                if(getGlobalJson('currentUser').level==1){
+                    settings['conditions']=' WHERE isInactived=0 AND legalAgencies='+getGlobalJson('currentUser').id;
+                }else if (getGlobalJson('currentUser').level<adminLevel){
+                    settings['conditions']=' WHERE isInactived=0';
+                }
+            }else if(key=='casesDb'){
+                if(getGlobalJson('currentUser').level==1){
                     settings['conditions']=' JOIN caseStatus ON '+
                     settings.tablename+'.id=caseStatus.id AND caseStatus.isInactived=0 AND caseStatus.legalAgencies='+getGlobalJson('currentUser').id;
-                }else{
-                    settings['conditions']=' WHERE isInactived=0 AND legalAgencies='+getGlobalJson('currentUser').id;
+                }else if (getGlobalJson('currentUser').level<adminLevel){
+                    settings['conditions']=' JOIN caseStatus ON '+
+                    settings.tablename+'.id=caseStatus.id AND caseStatus.isInactived=0';
                 }
-                
-            });
-        }
+            }else{
+                if(getGlobalJson('currentUser').level==1){
+                    settings['conditions']=' WHERE id=( SELECT id caseStatus WHERE isInactived=0 AND legalAgencies='+getGlobalJson('currentUser').id+')';
+                }else if (getGlobalJson('currentUser').level<adminLevel){
+                    settings['conditions']=' WHERE id=( SELECT id caseStatus WHERE isInactived=0)';
+                }
+            }
+            
+        });
         //'JOIN caseStatus ON cases.id=caseStatus.id AND caseStatus.legalAgencies=1'
 		$('#name').text(getGlobalJson("currentUser").name);
         getCurrentUser({id:getGlobalJson("currentUser").id,pass:getGlobalJson("currentUser").pass,user:getGlobalJson("currentUser").user})

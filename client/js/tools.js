@@ -48,8 +48,14 @@ function saveNewData2List(sourceData,newData,indexName){
         return item[indexName] === Number(newData[indexName]);
       });
       if (index !== -1) {
-        sourceData[index] = newData;
-        console.log('saveNewData2List','保存新数据成功。。。');
+        var newDataKeys=Object.keys(newData);
+        $.each(sourceData[index],(k,v)=>{
+            if(newDataKeys.includes(k)){
+                sourceData[index][k]=newData[k];
+            }
+        })
+        //sourceData[index] = newData;
+        console.log('saveNewData2List','保存新数据成功。。。',sourceData);
       }else{
         sourceData.push(newData);
         console.log('saveNewData2List','无法找到新数据匹配。。。',sourceData,newData);
@@ -227,7 +233,7 @@ $.fn.extend({
             title:'提示',
             message:'此操作需要管理员密码的。',
             content:$('<input type="password" data-theme="a" value="" placeholder="请输入密码">')
-        },function(form){
+        },function(go,form){
             if($(form).find('input').val()==auth_code){
                 console.log("登陆成功。。")
                 response({success:true});
@@ -276,9 +282,11 @@ $.fn.extend({
             popup.popIn(popup_background);
             popup.trigger('create');
             popup_buts.find('a').on('click',function(e){
+                var go=false;
                 if($(this).text()=='确认'){
-                    response(content);
+                    go=true;
                 }
+                response(go,content);
                 $().hideMessage(popup,popup_background);
             });
             return [popup,popup_background];
@@ -379,6 +387,13 @@ $.fn.extend({
         
     }
 });
+function isNumber(a){
+    return !isNaN(Number(a,10));
+}
+function goToPage(pageId){
+    $.mobile.navigate( pageId);
+    sessionStorage.setItem('currentPage',pageId);
+}
 function setGlobal(key,value){
     sessionStorage.setItem(key,value);
 }

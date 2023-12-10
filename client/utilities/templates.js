@@ -143,7 +143,7 @@ var _summary_template;
                         data:resourceDatas.legalCounsels,
                         isFilterable:true,
                         table:'caseStatus',
-                        displayFormat:'{name} {contact}'//'{name} {contact} {institution}'
+                        displayFormat:'{name} {contact}',//'{name} {contact} {institution}'
                     },
                     requestAmount:{
                         placeholder:"本诉金额",
@@ -598,13 +598,13 @@ var _summary_template;
             isCollapsibleGrouping:false,
         },
         template:{
-          legalInstitution:{
+          legalInstitution_p:{
                 type:"combobox",
                 data:resourceDatas.legalInstitution,
                 label:"法院：",
                 isOptional:true,
             },
-            legalAgencies:{
+            legalAgencies_p:{
                 type:"combobox",
                 data:resourceDatas.legalAgencies,
                 label:"代理法务：",
@@ -659,11 +659,11 @@ var _summary_template;
           label:"开庭日期："
         },
         */
-        legalInstitution:{
+        legalInstitution_p:{
           type:"text",
           label:"法院："
         },
-        legalAgencies:{
+        legalAgencies_p:{
           label:"代理法务：",
           type:"combobox",
           data:resourceDatas.legalAgencies,
@@ -690,7 +690,7 @@ var _summary_template;
     
     
     list={
-        caseUpdated:{
+      updateDetails:{
           label:"进展",
           type:"textarea"
         },caseDisputed:{
@@ -705,16 +705,15 @@ var _summary_template;
         propertyName:{
           label:"资产",
           type:"text",
-          width:'70%',
         },propertyStatus:{
           label:"状态",
           type:"combobox",
           width:150,
           data:resourceDatas.propertyStatus,
-        },dateUpdated:{
-          label:"更新日期",
+        },dateOccur:{
+          label:"发生日期",
           type:"date",
-        }
+        },
       }
       list_evidence={
         fileName:{
@@ -723,47 +722,43 @@ var _summary_template;
         },numFile:{
           label:"份数",
           type:"number",
-          width:50,
+          numberOnly:true,
         },numCPage:{
           label:"页数",
           type:"number",
-          width:50,
+          numberOnly:true,
         },numOriginal:{
           label:"原件",
           type:"number",
-          width:50,
+          numberOnly:true,
         },numCopy:{
           label:"复印件",
           type:"number",
-          width:50,
+          numberOnly:true,
         },
         filePath:{
           label:"上传文件",
           type:"file",
-          width:50,
         }
       }
       list_executed={
         dateExecuted:{
           label:"执行日期",
           type:"date",
-          width:150,
-        },purposeExecute:{
+        },targetExecuted:{
           label:"执行标的",
           type:"text",
-          width:130,
         },personExecuted:{
           label:"执行经办人",
           type:"text",
-          width:130,
         },personContact:{
           label:"经办人电话",
           type:"tel",
-          width:130,
+          numberOnly:true,
         },exexuteAmount:{
           label:"执行金额(万)",
           type:"text",
-          width:100,
+          numberOnly:true,
         },sumExecuted:{
           label:"说明",
           type:"text",
@@ -1037,7 +1032,9 @@ var _summary_template;
           subType:"date",
           isOptional:true,
       },
-      
+      isInactived:{
+
+      },
       cutom:{
         type:"custom",
         data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+

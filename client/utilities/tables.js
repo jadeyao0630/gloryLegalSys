@@ -139,12 +139,15 @@ pageTable.prototype.init=function(arg){
 pageTable.prototype.setSort=function(ths){
     var _this=this;
     var ids=Object.keys(_this.opt.template);
+    
     $.each(ids,function(index,id){
         var columnData=_this.opt.template[id];
         if(columnData.hasOwnProperty('sortable')){
             $(ths[index]).css({'cursor':'pointer'})
             var indicator=$('<i class="fa fa-caret-up" />');
             if(id!='id') indicator.hide();
+            else
+                _this.currentSort=columnData.sortable;
             $(ths[index]).append(indicator);
             $(ths[index]).on('click',function(e){
                 
@@ -226,26 +229,62 @@ pageTable.prototype.updateTableData=function(data,tr){
     })
     _this.pageTable('refresh');
 }
-
-pageTable.prototype.removeTableItem=function(callback){
+pageTable.prototype.restoreTableItem=function(callback){
     var _this=this;
     var duration=200;
     var targetTable=$("#"+_this.opt.containerId)
     var trs=$(targetTable).find('input[type="checkbox"][name="item_checkbox"]:checked').closest('tr');
-    trs.addClass('slip-left-out');
+    
     var ids=[];
     // Remove the tr element after the animation completes
-    trs.on('animationend', function() {
-        ids.push($(this).data('item'));
-        
-        $(this).find('td').animate({
-            'padding-top': 0,
-            'padding-bottom':0,
-            }).wrapInner('<div />').children().slideUp(duration,function() {
-                $(this).closest('tr').remove();
-                
-            });
-    });
+    $(trs).removeClass('inactived-row');
+    $.each(trs,(index,tr)=>{
+        ids.push($(tr).data('item'));
+        var checkbox=$(tr).find("input[type=checkbox][name=item_checkbox]");
+        if(checkbox.length>0){
+            checkbox.prop('checked',false);
+        }
+    })
+    const intervalId = setInterval(() => {
+        if (ids.length==trs.length) {
+            clearInterval(intervalId);
+            if(callback!=undefined) callback(ids);
+            
+        }
+    }, 100);
+}
+pageTable.prototype.removeTableItem=function(auth,callback){
+    var _this=this;
+    var duration=200;
+    var targetTable=$("#"+_this.opt.containerId)
+    var trs=$(targetTable).find('input[type="checkbox"][name="item_checkbox"]:checked').closest('tr');
+    
+    var ids=[];
+    // Remove the tr element after the animation completes
+    console.log('auth',auth);
+    if (auth<3){
+        trs.addClass('slip-left-out');
+        trs.on('animationend', function() {
+            ids.push($(this).data('item'));
+            
+            $(this).find('td').animate({
+                'padding-top': 0,
+                'padding-bottom':0,
+                }).wrapInner('<div />').children().slideUp(duration,function() {
+                    $(this).closest('tr').remove();
+                    
+                });
+        });
+    }else{
+        $(trs).addClass('inactived-row');
+        $.each(trs,(index,tr)=>{
+            ids.push($(tr).data('item'));
+            var checkbox=$(tr).find("input[type=checkbox][name=item_checkbox]");
+            if(checkbox.length>0){
+                checkbox.prop('checked',false);
+            }
+        })
+    }
     const intervalId = setInterval(() => {
         if (ids.length==trs.length) {
             clearInterval(intervalId);
@@ -357,10 +396,15 @@ pageTable.prototype.addTableData=function(data,isAdd){
                 tbody.prepend(tr);
             }else
                 tbody.append(tr);
+            if(d.isInactived){
+                //tr.prop('disabled',true);
+                tr.addClass('inactived-row');
+            }
             setTimeout(() => {
                 
                 tr.slideDown();
             }, 500);
+            
         });
     }else{
         $.each(data,function(i,d){

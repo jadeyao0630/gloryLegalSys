@@ -235,7 +235,7 @@ mform.prototype={
             var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
             item_container.append(label);
             labelStyle(label,template);
-            var input=$('<input type="'+item.type+'" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'" '+setRequired(item.isOptional,"此项必须填写")+'>');
+            var input=$('<input type="'+item.type+'" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'" '+setRequired(item.isOptional,"此项必须正确填写")+'>');
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(input);
             item_container.append(subContainer);
@@ -496,7 +496,7 @@ mform.prototype={
             var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
             item_container.append(label);
             
-            //labelStyle(label,template);
+            labelStyle(label,template);
             //item_container.append(selectItem);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
@@ -567,7 +567,7 @@ mform.prototype={
             var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
             item_container.append(label);
             
-            //labelStyle(label,template);
+            labelStyle(label,template);
             //item_container.append(selectItem);
             var tooltip=$('<span id="'+id+'_tooltip" class="tooltip-form">开启搜索</span>')
             var subContainer=$('<div class="form-original"></div>');
@@ -1137,11 +1137,14 @@ $.fn.extend({
         loop1:
         for(var catelog_key of catelogs){
             var catelog=template[catelog_key];
-            
-            if(catelog.data!=undefined && Object.keys(catelog.data).length>0){
+            //console.log("form get value",catelog);
+            if(catelog.data!=undefined && Object.keys(catelog.data).length>0 && !catelog.hasOwnProperty('type')){
                 var catelog_item_keys=Object.keys(catelog.data);
                 loop2:
                 for(var item_key of catelog_item_keys){
+                    
+                
+                    
                     //form_item_ids[item_key]=catelog.data[item_key];
                     var hasError=false;
                     if(catelog.data[item_key].type.toLowerCase()=='radio'){
@@ -1158,7 +1161,6 @@ $.fn.extend({
                         }
                         
                     }else{
-                        console.log(item_key);
                         var element=document.getElementById(item_key);
                         var val = dataValidation(element,catelog.data[item_key],function(he){
                             if(he) {
@@ -1184,6 +1186,45 @@ $.fn.extend({
                         break loop1;
                     }
                 };
+            }else{
+                if(catelog.type.toLowerCase()=='radio'){
+                    //console.log(item_key);
+                    //console.log(_Self.find('input[name="'+item_key+'"]:checked'));
+                    var val=parseInt(_Self.find('input[name="'+catelog_key+'"]:checked').prop('id').replace(catelog_key+"-",""));
+                    if(catelog.table!=undefined){
+                        if(!vals.hasOwnProperty(catelog.table)){
+                            vals[catelog.table]={};
+                        }
+                        vals[catelog.table][catelog_key]=val;
+                    }else{
+                        values[catelog_key]=val;
+                    }
+                    
+                }else{
+                    var element=document.getElementById(catelog_key);
+                    var val = dataValidation(element,catelog,function(he){
+                        if(he) {
+                            response(error.FORM_EMPTY_VALUE,{data:values,success:!he});
+                            _hasError=true;
+                            hasError=true;
+                            return;
+                        }
+                        //console.log(item_key+"-->"+hasError);
+                    });
+                    console.log(catelog_key+"--->>"+catelog.table);
+                    if(catelog.table!=undefined){
+                        if(!vals.hasOwnProperty(catelog.table)){
+                            vals[catelog.table]={};
+                        }
+                        vals[catelog.table][catelog_key]=val;
+                    }else{
+                        values[catelog_key]=val;
+                    }
+                }
+                console.log(catelog_key+"-->"+hasError);
+                if(hasError) {
+                    break loop1;
+                }
             }
             //if(_hasError) return false;
         };
@@ -1204,10 +1245,10 @@ $.fn.extend({
         function dataValidation(element,itemTemplate,res){
             var hasError=false;
             var val=element.value;
-            $('#popupArrow').css({'margin-top':'20px;'})
+            //$('#popupArrow').css({'margin-top':'20px;'})
             switch (element.nodeName.toUpperCase()){
                 case "INPUT":
-                    
+                    console.log(itemTemplate.numberOnly,val,isNumber(val));
                     //console.log(element.type);
                     if(element.type.toLowerCase()=="date"||element.type.toLowerCase()=="time"||element.type.toLowerCase()=="datetime"){
                         if(val.length>0){
@@ -1228,6 +1269,11 @@ $.fn.extend({
                         //console.log('Date mform getvalue',val);
                         
                     }else if(itemTemplate.numberOnly){
+                        
+                        if(!isNumber(val)||val.length==0) {
+                            console.log(itemTemplate.label+"-- has error value"+val);
+                            hasError=true;
+                        }
                         if(eval.length==0) val=0;
                         else val=parseInt(val);
                     }
@@ -1247,7 +1293,7 @@ $.fn.extend({
                         _val=_greatVal;
                     }else{
                         $.each($(element).find(":selected"),function(index,opt){
-                            //console.log(itemTemplate.label+"--------->"+opt.value);
+                            console.log(itemTemplate.label+"--------->"+opt.value,$(element).val());
                             _val.push(opt.value);
                             _subVal.push($(opt).jqmData('statusValue'));
                             _greatVal.push(($(opt).jqmData('statusValue')==undefined?"":$(opt).jqmData('statusValue'))+opt.value);
@@ -1273,11 +1319,26 @@ $.fn.extend({
                     break;
             }
             if(hasError) {
-                $('#popupArrow').popup('open',{
+                var tooltip=$('<span class="tooltip-serarch">'+$(element).jqmData('message')+'</span>');
+                _Self.find('.tooltip-serarch').remove();
+                _Self.append(tooltip);
+                console.log($(element).position(),$(element).offset(),$(element).offsetParent().hasClass('ui-popup'));
+                var position=$(element).offsetParent().hasClass('ui-popup')?$(element).position():$(element).offset();
+                $(tooltip).css({visibility: 'visible',
+                    opacity: 1,'margin-left':"0px",
+                    padding: '5px',
+                    left:position.left,
+                    top:(position.top+$(element).height()+10)+'px'});
+                $(element).on('click',function(e){
+                    $(tooltip).remove();
+                })
+                    /*
+                $('#popupArrow').popup().popup('open',{
                     positionTo: "#"+element.id,
                     arrow:"true"
                 });
                 $('#popupArrow').text($(element).jqmData('message'));
+                */
             }
             return val;
             

@@ -17,27 +17,6 @@ nameInput.addEventListener("change", (event) => {
 passInput.oninput = (event) => {
     message.innerHTML="";
 };
-
-addBut.onclick = async function (){
-    const userInput = document.getElementById("user");
-    const user = userInput.value;
-    //nameInput.value="";
-    //alert(name);
-    await fetch("http://"+ip+":"+port+"/insertUser",{
-        headers:{
-            'Content-Type': 'application/json',
-            //'Access-Control-Allow-Origin':'*',
-            //'Access-Control-Allow-Credentials': 'true',
-            //'Access-Control-Allow-Methods': 'GET,POST',
-            //'Access-Control-Allow-Headers': 'x-requested-with,content-type',
-        },
-        method: 'POST',
-        body: JSON.stringify({ user: user,pass:$('#password').val()})
-    })
-    .then(response => response.json())
-    .then(data => insertRowIntoTable(data['data']));
-}
-
 const loginBut = document.getElementById("loginBut");
 loginBut.onclick = async function (){
     const name = nameInput.value;

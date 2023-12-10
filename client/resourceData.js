@@ -91,3 +91,9 @@ const caseInfoList={
     caseStatus:{tablename:"caseStatus",template:caseStatus},
     casesDb:{tablename:"cases",template:columns},
 }
+const tableNamesMatcher={
+    updatesId:"caseUpdates",
+    excutesId:"caseExcutes",
+    propertyId:"caseProperties",
+    evidenceId:"caseAttachments",
+}

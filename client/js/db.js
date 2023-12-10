@@ -15,6 +15,21 @@ async function getCaseLatestIndex(){
     });
     return latestId;
 }
+async function getRecordLatestIndex(table,key,where){
+    var latestId=-1;
+    var where_str=where!=undefined?" WHERE "+where:"";
+    var query="SELECT * FROM "+table+where_str+" ORDER BY "+key+" DESC LIMIT 1"
+    await fetch("http://"+ip+":"+port+"/select",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ query: query})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data['data'].length>0) latestId = data['data'][0][key];
+    });
+    return latestId;
+}
 async function getCasesData(res){
     var _data=undefined;
     var query="SELECT * FROM cases ORDER BY id ASC"
@@ -64,7 +79,7 @@ async function getUserList(res){
     await fetch('http://'+ip+':'+port+'/getAll')
     .then(response => response.json())
     .then(data => {if(data['data'].length>0) _data=data['data'];});
-    res(_data);
+    if(res!=undefined)res(_data);
 }
 async function getCurrentUser(userData){
     var where=[];
@@ -117,7 +132,59 @@ async function removeCase(id,table,res){
     .then(data => {
         console.log(data.error);
         
-        res(data);
+        if(res!=undefined)res(data);
+    });
+}
+async function restoreCases(ids,res){
+    await fetch("http://"+ip+":"+port+"/restoreCases",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ids:ids})
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.error);
+        
+        if(res!=undefined)res(data);
+    });
+}
+async function inactiveCases(ids,res){
+    await fetch("http://"+ip+":"+port+"/inactiveCases",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ids:ids})
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.error);
+        
+        if(res!=undefined)res(data);
+    });
+}
+async function inactiveItem(where,table,res){
+    await fetch("http://"+ip+":"+port+"/inactiveItem",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({where:where,table:table})
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.error);
+        
+        if(res!=undefined)res(data);
+    });
+}
+async function restoreItem(where,table,res){
+    await fetch("http://"+ip+":"+port+"/restoreItem",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({where:where,table:table})
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.error);
+        
+        if(res!=undefined)res(data);
     });
 }
 async function removeCases(ids,table,res){
@@ -134,7 +201,7 @@ async function removeCases(ids,table,res){
             console.log(data.data.error);
         }
         
-        res(data);
+        if(res!=undefined)res(data);
     });
 }
 async function insertCase(data,template,res){
@@ -150,7 +217,7 @@ async function insertCase(data,template,res){
         }else{
             console.log(data.data.error);
         }
-        res(data.data);
+        if(res!=undefined)res(data.data);
     });
 }
 async function insert(table,data,res){
@@ -166,7 +233,7 @@ async function insert(table,data,res){
         }else{
             console.log(data.data.error);
         }
-        res(data.data);
+        if(res!=undefined)res(data.data);
     });
 }
 async function insertRows(table,datas,res){
@@ -182,7 +249,23 @@ async function insertRows(table,datas,res){
         }else{
             console.log(data.data.error);
         }
-        res(data.data);
+        if(res!=undefined)res(data.data);
+    });
+}
+async function update(where,table,data,res){
+    await fetch("http://"+ip+":"+port+"/update",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ where:where, table: table, data:data})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.data.success){
+            console.log(data.data.id);
+        }else{
+            console.log(data.data.error);
+        }
+        if(res!=undefined)res(data.data);
     });
 }
 async function createTable(table,template,res){
@@ -235,7 +318,7 @@ async function getData(table,res){
     .then(data => {
         if(data['data'].length>0) _data=data['data'];
     });
-    res(_data);
+    if(res!=undefined)res(_data);
 }
 function createBasicDatabase(list){
     $.each(basicTableList,async function(k,v){

@@ -1,12 +1,14 @@
-var isRunLocal=true;
+var isRunLocal=false;
 var showDebug=false;
 let ip=isRunLocal?'localhost':'cn.luyao.site';
 let port=5555;
 var auth_code='1234';
+var adminLevel=3;
 var enableConsoleLog=true;
 var enableRealDelete=false;
 var functionButoonPostion="top";
 const mainPage="legal.html";
+var logoSrc='https://img3.11467.com/2019/08-25/525155842.jpg'
 var DataList={};
 var preload_completed_event_name="preloadCompleted";
 var main_load_completed_event_name="mainDataloadCompleted";
@@ -45,7 +47,7 @@ const columns={//案件主表
     caseCatelog:"INT NOT NULL DEFAULT '0'",//案件类别->caseCatelogs*
     //caseBelongs:"INT NOT NULL DEFAULT '0'",
     caseType:"INT NOT NULL DEFAULT '0'",//案件类型->caseTypes*
-    //caseAttachments:"varchar(1000)",//案件附件->attachments
+    caseAttachments:"varchar(1000)",//案件附件->attachments
     caseCause:"INT NOT NULL DEFAULT '0'",//案由->caseCauses*
     caseDate:"datetime NOT NULL",//立案日期
     //legalInstitution:"INT default '0' NOT NULL",//受理机构->legalInstitution*
@@ -76,6 +78,7 @@ const caseStatus={//案件状态
   //requestAmount:"VARCHAR(255) default '0.00'",//本诉金额
   penalty:"VARCHAR(255) default '0.00'",//判决金额
   paidAmount:"VARCHAR(255) default '0.00'",//执行金额
+  isInactived:"INT(1) default '0' NOT NULL"
 }
 const caseUpdates={//案件每个状态点对应的更新
     id:"INT(11) NOT NULL",//案件唯一序列号

@@ -407,6 +407,7 @@ ProgressesButton.prototype.init=function(arg){
                         'left':(left+_this.opt.size*0.5)+'px',
                         'top':(top-_this.opt.size*1.2)+'px',
                     },_counter.length);
+                    $(counter).data('index',(index+(sub==undefined?0:sub)/10));
                     _this.outter_frame.append(counter)
                 }
                 
@@ -425,7 +426,18 @@ ProgressesButton.prototype.init=function(arg){
         return Math.round((Math.asin(sinOfAngleX)*180)/Math.PI);
     }
 }
-
+ProgressesButton.prototype.updateCounterIndicator=function(data){
+    var counter=$.grep(this.instance.find('.progress-but-counter'),(cunter)=>{
+        console.log( $(cunter).data('index'),data.caseStatus,( $(cunter).data('index')==data.caseStatus.toString()));
+        return $(cunter).data('index')==data.caseStatus.toString();
+    });
+    console.log('updateCounterIndicator',counter);
+    if(counter.length>0){
+        $(counter[0]).text($.grep(this.opt.counterData,(item)=>{
+            return item.id==data.id && compareStatus(item.caseStatus,data.caseStatus)
+        }).length);
+    }
+}
 ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
     var _this=this;
     var currentPosition=_this.formatIndex();
@@ -547,7 +559,7 @@ ProgressesButton.prototype.setFlow=async function(target,duration,isSub){
                                 }
                               });
                           }else{
-                            setState($(_this.outter_frame).find(".main-indicator-index"+i),true,$(_this.outter_frame).find(".main-indicator-index"+(i+1)));
+                            setState($(_this.outter_frame).find(".main-indicator-index"+(i)),true,$(_this.outter_frame).find(".main-indicator-index"+(i+1)));
                           }
                           
                   });

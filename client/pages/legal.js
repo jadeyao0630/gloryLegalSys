@@ -1,7 +1,8 @@
 //global variations
 var form,//header filter form
 pageOnTable,//main table
-caseForm;
+caseForm,
+progressInfoForm;
 var currentData;
 //getGlobal("currentId")
 //getGlobal("currentUser")
@@ -44,12 +45,24 @@ $('body').on(preload_completed_event_name,function(){
             }
         }
     },{distance:200});
+    $('#case_reg_but_restore').hide();
     if(getGlobalJson('currentUser').level==1){
         FormTemplate3.template.baseInfo.data.legalAgencies.isDisabled=true;
         FormTemplate3.template.baseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
         progress_form_template.template.legalAgencies.isDisabled=true;
         header_filter_template.template.legalAgencies_f.isDisabled=true;
         header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
+    }else if(getGlobalJson('currentUser').level==adminLevel){
+        $('#case_reg_but_restore').show();
+        
+        header_filter_template.template['isInactived']={
+            label:"文档状态:",
+            type:"multicombobox",
+            data:['正常','删除'],
+            isOptional:true,
+            span:'3/3'
+        }
+        
     }
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
 
@@ -59,7 +72,7 @@ $('body').on(preload_completed_event_name,function(){
 		//data:DataList.combinedData,
 		//filterParent:"mainFooter",
 		rowButtons:'<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
-			'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-eye ui-btn-icon-notext" data-transition="slidefade" data-item={0}>查看</a>'+
+			'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext" data-transition="slidefade" data-item={0}>查看</a>'+
 			'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue" data-icon="edit" data-iconpos="notext" data-item={0}>修改</button>'+
 			'<button name="fn_btn_update" class="btn-icon-red" data-icon="calendar" data-iconpos="notext" data-item={0}>更新</button>'+
 		'</div>'
@@ -102,8 +115,8 @@ $('body').on(preload_completed_event_name,function(){
                 
                 filter_form.setEmptyData();
                 currentData=DataList.combinedData;
-                pageOnTable.sortColumn(currentData,pageOnTable.currentSort);
-                setAvailableColumns('pageOneTable',1);
+                //pageOnTable.sortColumn(currentData,pageOnTable.currentSort);
+                //setAvailableColumns('pageOneTable',1);
                 break;
             case "查询":
                 //console.log("filter...",$(form).find('select,input'));
@@ -111,7 +124,7 @@ $('body').on(preload_completed_event_name,function(){
                 var penalty={};
                 var caseDate={};
                 $.each($(form).find('select,input'),(index,ele)=>{
-                    //console.log("filter...",ele.nodeName,id,$(ele).val());
+                    console.log("filter...",ele.nodeName,ele.id.replace('_f',''),$(ele).val());
                     if($(ele).val()!=undefined && $(ele).val().length>0){
                         var id=ele.id.replace('_f','');
                         if(id=="penalty_0"){
@@ -182,6 +195,7 @@ $('body').on(preload_completed_event_name,function(){
                 //console.log(matched);
                 currentData=matched;
                 pageOnTable.addTableData(matched);
+                pageOnTable.sortColumn(matched,pageOnTable.currentSort);
                 tb.instance.isTargetToggle=false;
                 setTableFunctionButonClickedEvent();
                 

@@ -34,7 +34,7 @@ function getStageList(stageIdx,data){
     var caseAttachmentData=data.attachments.filter((item) => formatIndex(item.caseStatus).main==stageIndex.main && formatIndex(item.caseStatus).sub==stageIndex.sub);
     //console.log("getStageList",caseUpdateData);
     var newData=caseUpdateData.concat(caseExcuteData,casePropertyData,caseAttachmentData);
-    console.log('getFlowList',stageIdx,newData);
+    //console.log('getFlowList',stageIdx,newData);
     if(newData.length>0)
         return newData;
     else return [];
@@ -47,8 +47,9 @@ function getFlowList(data){
         label:"立案",
         date:caseData.caseDate,
         id:0,
-        //data:getStageList(-1,data)
+        data:getStageList(-1,data)
     });
+    //console.log('formatIndex....',progresses);
     if(progresses!=undefined){//---progresses需要植入到data
         progresses.forEach((stage,idx)=>{
             var index=idx+1;
@@ -58,7 +59,7 @@ function getFlowList(data){
                         label:stage,
                         date:caseData.FirstInstance,
                         id:index,
-                        //data:getStageList(index-1,data)
+                        data:getStageList(index-1,data)
                     });
                     break;
                 case "二审":
@@ -66,47 +67,50 @@ function getFlowList(data){
                         label:stage,
                         date:caseData.SecondInstance,
                         id:index,
-                        //data:getStageList(index-1,data)
+                        data:getStageList(index-1,data)
                     });
                     break;
                 case "执行":
                     //console.log('progresses....',progresses)
                     
-                    var statusId=index-1+formatIndex(caseData.caseStatus).sub/10;
-
-                    //console.log('formatIndex....',getStatusLabel(statusId,progresses))
-                    flowList.push({
-                        label:Number(caseData.caseStatus)>index?getStatusLabel(statusId,progresses):"",
-                        id:index,
-                        //data:getStageList(statusId,data)
-                    });
+                    
                     break;
                 case "结案":
                     flowList.push({
                         label:stage,
-                        id:index+1,
-                        //data:getStageList(index-1,data)
+                        id:index,
+                        data:getStageList(index-1,data)
                     });
                     break;
                 case "再审":
                     flowList.push({
                         label:stage,
                         id:index,
-                        //data:getStageList(index-1,data)
+                        data:getStageList(index-1,data)
                     });
                     break;
                 case "监督":
                     flowList.push({
                         label:stage,
                         id:index,
-                        //data:getStageList(index-1,data)
+                        data:getStageList(index-1,data)
+                    });
+                    break;
+                default:
+                    var statusId=index-1+formatIndex(caseData.caseStatus).sub/10;
+
+                    //console.log('formatIndex....',getStatusLabel(statusId,progresses))
+                    flowList.push({
+                        label:Number(caseData.caseStatus)>index?getStatusLabel(statusId,progresses):"",
+                        id:index,
+                        data:getStageList(statusId,data)
                     });
                     break;
             }
         })
     }
-    console.log('data............',data);
-    console.log('getFlowList1............',flowList);
+    //console.log('data............',data);
+    //console.log('getFlowList1............',flowList);
     return [flowList];
 }
 
@@ -151,7 +155,7 @@ timelinePage.prototype.setTimeline=function(data,canvas){
         //console.log(Object.keys(Object.getPrototypeOf(circle)).includes('addListener'));
 
         circle.addListener('click',function(e){
-            //console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
+            console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
             //dataList=[];
             var datas=_this.flowList.filter((item)=>item.id==this.sourceData.index);
             if(datas.length>0 && datas[0].data!= undefined && datas[0].data.length>0){
@@ -223,12 +227,12 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                     var isMultiValue=false;
                     var multiValues=[];
                     if(data!=undefined){
-                        console.log('setSumList',sub_key,data,val);
+                        //console.log('setSumList',sub_key,data,val);
                         if(data instanceof Array){
                             //console.log('setSumList',sub_key,val);
                             if(item.hasOwnProperty('displayFormat') && item.hasOwnProperty('value')){
                                 var displayFormat=item.displayFormat;
-                                console.log('setSumList',$.grep(data,(d)=>d[item.value]==val));
+                                //console.log('setSumList',$.grep(data,(d)=>d[item.value]==val));
                                 var matched=$.grep(data,(d)=>d[item.value]==val);
                                 if(matched.length>0){
                                     $.each(matched[0],(kk,vv)=>{
@@ -258,7 +262,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             if(type=="supermulticombobox"){
                                 values.forEach(_v=>{
                                     var _values=formatSuperMultiSelectOptionValue(_v);
-                                    console.log('setSumList',_values);
+                                    //console.log('setSumList',_values);
                                     if(_summary_template[key].data[sub_key].hasOwnProperty('displayFormat')){
                                         var displayFormat=_summary_template[key].data[sub_key].displayFormat;
                                         $.each(_values,(kk,vv)=>{
@@ -279,7 +283,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             }else if(type=="supermultiinput"){
                                 values.forEach(_v=>{
                                     var _values=formatSuperMultiSelectData(_v);
-                                    console.log('setSumList',_values);
+                                    //console.log('setSumList',_values);
                                     if(_summary_template[key].data[sub_key].hasOwnProperty('displayFormat')){
                                         var displayFormat=_summary_template[key].data[sub_key].displayFormat;
                                         $.each(_values,(kk,vv)=>{
@@ -381,8 +385,8 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                         
                         li.append(label_ele);
                         if(sub_key=="caseLabel"){
-                            console.log(val);
-                            console.log(resourceDatas['caseLabelsColors']);
+                            //console.log(val);
+                            //console.log(resourceDatas['caseLabelsColors']);
                             li.css(resourceDatas['caseLabelsColors'][val]);
                         }else if(sub_key=="caseStatus"){
                             info_ele=$('<div id="'+sub_key+'" style="margin-left:90px;margin-top:-7px;"></div>');
@@ -392,7 +396,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                         listview.append(li);
                         if(sub_key=="caseStatus"){
                             
-                            console.log("caseStatus................."+_data[data_key][sub_key]);
+                            //console.log("caseStatus................."+_data[data_key][sub_key]);
                             var but=new ProgressesButton({
                                 steps:progresses,
                                 deadSteps:deads,

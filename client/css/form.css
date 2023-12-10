@@ -105,3 +105,8 @@ padding:5px 10px;
     box-shadow: none;
 }
 */
+.inactived-row{
+  color:white;
+  background:orangered;
+  text-shadow: none;
+}

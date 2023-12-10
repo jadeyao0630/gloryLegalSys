@@ -208,7 +208,7 @@ ui-collapsible.collapsible-listview .ui-btn{
 
 .tooltip-serarch {
     visibility: hidden;
-    width: 120px;
+    min-width: 120px;
     background-color: #000;
     color: #fff;
     text-align: center;
@@ -225,6 +225,10 @@ ui-collapsible.collapsible-listview .ui-btn{
   }
 
 .header-search-container:hover .tooltip-serarch {
+    visibility: visible;
+    opacity: 1;
+  }
+  [name^="fn_btn_"]:hover .tooltip-serarch {
     visibility: visible;
     opacity: 1;
   }
@@ -302,7 +306,9 @@ ui-collapsible.collapsible-listview .ui-btn{
     padding:5px 0px;
     background: #262626;
 }
-
+#mainFooter{
+    height:50px;
+}
 .table-regularFont{
     font-size: 12px;
 }

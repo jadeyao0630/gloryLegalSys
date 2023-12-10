@@ -149,6 +149,11 @@ mform.prototype={
                         var replacement=replacementOfInput(item_key);
                         item_container.append(replacement);
                         replacement.hide();
+                        
+                        console.log('form label',item_container.find('label'),template.settings);
+                        if(template.settings.labelStyle!=undefined){
+                            item_container.find('label').css(template.settings.labelStyle);
+                        }
                         row_grid.append(item_container);
                     }
                     stepControler++;
@@ -178,7 +183,8 @@ mform.prototype={
             if(hasPlaceHolder&&item.placeholder!=undefined) placeholder=' placeholder="'+item.placeholder+'"';
             var val="";
             if(item.type.toLowerCase()=="date"||item.type.toLowerCase()=="time"||item.type.toLowerCase()=="datetime") val=getDateTime();
-            item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
             var input=$('<input type="'+item.type+'" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'" '+setRequired(item.isOptional,"此项必须填写")+'>');
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(input);
@@ -192,7 +198,8 @@ mform.prototype={
             if(hasPlaceHolder&&item.placeholder!=undefined) placeholder=' placeholder="'+item.placeholder+'"';
             var textarea=$('<textarea class="form-original" cols="40" rows="4" name="'+id+'" id="'+id+'"'+placeholder+'" '+setRequired(item.isOptional,"此项必须填写")+'></textarea>');
             
-            item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
             //item_container.append(textarea);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(textarea);
@@ -204,7 +211,8 @@ mform.prototype={
         }
         function generateFileItem(item_container,item,id){
             //var item_container=$('<div class="form_item_panel"></div>');
-            item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
             var input=$('<input class="form-original" type="file" name="'+id+'" id="'+id+'" value="" '+setRequired(item.isOptional,"此项必须填写")+'>');
             //item_container.append(input);
             var subContainer=$('<div class="form-original"></div>');
@@ -226,7 +234,8 @@ mform.prototype={
                 });
             }
             //var item_container=$('<div class="form_item_panel"></div>');
-            item_container.append($('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(radio_container);
             item_container.append(subContainer);
@@ -243,7 +252,8 @@ mform.prototype={
                 });
             }
             //var item_container=$('<div class="form_item_panel"></div>');
-            item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
             //item_container.append(selectItem);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
@@ -307,7 +317,8 @@ mform.prototype={
                 }
                 
             }
-            item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
             //item_container.append(selectItem);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
@@ -375,7 +386,8 @@ mform.prototype={
                 }
                 
             }
-            item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
             //item_container.append(selectItem);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
@@ -399,7 +411,8 @@ mform.prototype={
             var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="form-original multiSelect supermultiInput'+
             (item.isFilterable?" filterSelect":"")+'" multiple="multiple" data-native-menu="false"></select>');
 
-            item_container.append($('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>'));
+            var label=$('<label for="'+id+'" class="select">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
             //item_container.append(selectItem);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
@@ -922,6 +935,10 @@ $.fn.extend({
                     _self.find("#_"+id).text('');
                 }
                 
+            }else if(type=="file"){
+                
+                element.val(value);
+                _self.find("#_"+id).text(value);
             }else{
                 element.val(value);
                 _self.find("#_"+id).text(value);
@@ -976,6 +993,7 @@ $.fn.extend({
                             if(!vals.hasOwnProperty(catelog.data[item_key].table)){
                                 vals[catelog.data[item_key].table]={};
                             }
+                            
                             vals[catelog.data[item_key].table][item_key]=val;
                         }else{
                             values[item_key]=val;
@@ -1010,7 +1028,7 @@ $.fn.extend({
             switch (element.nodeName.toUpperCase()){
                 case "INPUT":
                     
-                    //console.log(element.type);
+                    console.log('file upload value',element.type);
                     if(element.type.toLowerCase()=="date"||element.type.toLowerCase()=="time"||element.type.toLowerCase()=="datetime"){
                         if(val.length>0){
                             val=new Date(val).toISOString().slice(0, 19).replace('T', ' ');
@@ -1032,6 +1050,15 @@ $.fn.extend({
                     }else if(itemTemplate.numberOnly){
                         if(eval.length==0) val=0;
                         else val=parseInt(val);
+                    }else if(element.type.toLowerCase()=="file"){
+                        //console.log('file upload value',element);
+                        var myFReader = new FileReader();
+                        myFReader.readAsDataURL(file);
+                        myFReader.onloadend = function(evc){
+                            var src = evc.target.result;
+                            //$('img').attr('src',src);
+                            console.log('file upload value',src);
+                        }
                     }
                     if(val.length==0 && !itemTemplate.isOptional){
                         console.log(itemTemplate.label+"-- has error value"+val);

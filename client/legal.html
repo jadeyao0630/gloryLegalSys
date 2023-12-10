@@ -65,12 +65,9 @@
 				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
 					<a href="#casePage" id="case_reg_but_add" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn">新增</a>
 					<a href="#" id="case_reg_but_remove" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but">删除</a>
+					<a href="#" id="case_reg_but_restore" class="ui-btn ui-btn-icon-left ui-icon-recycle btn-icon-blue case_reg_but">还原</a>
 				</div>
-				<div id="searchbar1">
-					<form class="ui-filterable filtertable1">
-						<input id="filterBasic-input1" placeholder="索引关键字" data-type="search" data-icon="tag">
-					</form>
-				</div>
+				
 			</div>
     </div>
     <!-- /主页面 -->
@@ -128,7 +125,7 @@
 			<form id="progress_popup_add_form"></form>
 			<fieldset class="ui-grid-a">
 				<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a></div>
-				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green">提交</a></div>
+				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green progress_popup_add_form_submit">提交</a></div>
 			</fieldset>
 		</div>
 		
@@ -168,7 +165,7 @@
 		<div data-role="header" data-position="fixed">
 			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
 			<h1 id="progress_details_info_title">My App</h1>
-			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
+			
 		</div><!-- /header -->
 		<div class="ui-body-d ui-content">
 			<ul data-role="listview" data-inset="true" data-theme="a" id="progress_details_info_body"></ul>
@@ -177,7 +174,7 @@
     <!--首页读取界面-->
 	<div id="main-container">
 		<div class="loading_logo_title">
-			<img src="https://img3.11467.com/2019/08-25/525155842.jpg" width="200px" height="200px"></img>
+			<img id="loadingLogo" src="" width="200px" height="200px"></img>
 			<h1>国瑞法务管理系统</h1>
 			<div class="loading_loading" style="display: inline;">
 				<div class="fa fa-spinner fa-spin" style="font-size: 40px;color:steelblue;vertical-align:middle;"></div>

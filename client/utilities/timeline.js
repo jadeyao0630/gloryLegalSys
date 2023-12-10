@@ -143,8 +143,12 @@ function drawTimeline(_data,ctx,dataList){
     _data.template.forEach((label,index)=>{
         drawIndicatorText(textPosition[index],{label:label,index:index},ctx,"white");
         //dataList=[];
-        //console.log('dataList',dataList);
+        //console.log('dataList',index,label,dataList);
         var data=dataList.filter(item=>{ return item.id==index});
+        $.each(dataList,(idx,itm)=>{
+            data=itm.filter(item=>{ return item.id==index});
+        })
+        //console.log('dataList',index,label,data);
         if(data.length>0){
             var val=data[0].label;
             if(data[0].date!=undefined){
@@ -188,7 +192,7 @@ function drawIndicatorText(startPos,data,ctx,color){
 function drawDateText(startPos,val,ctx,color){
     var text=val;
     if(val instanceof Date){
-        console.log('Date',val);
+        //console.log('Date',val);
         var offsetX=50;
         text=val.getFullYear()+" | "+val.getMonth()+"月"+val.getDate()+"日";
         ctx.font = 'bold 30px Arial';
@@ -224,7 +228,7 @@ function drawListText(startPos,data,ctx,color,isOppsite){
     ctx.fillStyle = color;
     if (data.length>0){
         data.forEach((item,i)=>{
-            console.log("drawListText...................",item);
+            //console.log("drawListText...................",item);
             //console.log(item);
             var _data=getEventsDetails(item);
             let text_size = getTextSize(_data.date+_data.description,ctx); 
@@ -238,20 +242,35 @@ function drawListText(startPos,data,ctx,color,isOppsite){
 function getEventsDetails(item){
     var date;
     var text;
+    var id;
+    var type;
+    var key;
     if(item.hasOwnProperty('updatesId')){//updates
         date=formatDateTime(new Date(item.dateUpdated),"MM月dd日 ");
         text=item.updateDetails;
+        id=item.updatesId;
+        type='caseUpdates';
+        key='updatesId';
     }else if(item.hasOwnProperty('evidenceId')){//evidence
         date=formatDateTime(new Date(item.dateUploaded),"MM月dd日 ");
         text=item.fileLabel+" 上传";
+        id=item.evidenceId;
+        type='caseAttachments';
+        key='evidenceId';
     }else if(item.hasOwnProperty('propertyId')){//property
         date=formatDateTime(new Date(item.dateOccur),"MM月dd日 ");
         text="资产(" + item.propertyName+ ")状态改为"+resourceDatas['propertyStatus'][Number(item.propertyStatus)];
+        id=item.propertyId;
+        type='caseProperties';
+        key='propertyId';
     }else if(item.hasOwnProperty('excutesId')){//excutes
         date=formatDateTime(new Date(item.dateExecuted),"MM月dd日 ");
-        text=item.personExecuted + "执行目标("+((item.targetExecuted.length>0)?item.targetExecuted:"未知")+")，金额为"+item.exexuteAmount+"万";
+        text=item.personExecuted + "执行目标("+((item.targetExecuted!=undefined && item.targetExecuted.length>0)?item.targetExecuted:"未知")+")，金额为"+item.exexuteAmount+"万";
+        id=item.excutesId;
+        type='caseExcutes';
+        key='excutesId';
     }
-    return {date:date,description:text};
+    return {date:date,description:text,id:id,type:type,key:key};
 }
 function drawOneStop(startPos,ctx,color,size,isOppsite,data){
     var insideCircleSize=size+8;

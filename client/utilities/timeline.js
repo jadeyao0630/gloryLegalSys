@@ -253,6 +253,7 @@ function getEventsDetails(item){
         id=item[add_update_template.settings.idkey];
         type=add_update_template.settings.type;
         key=add_update_template.settings.idkey;
+        typeName="进展";
     }else if(item.hasOwnProperty('evidenceId')){//evidence
         originalDate=new Date(item.dateUploaded);
         date=formatDateTime(new Date(item.dateUploaded),"MM月dd日 ");
@@ -260,6 +261,7 @@ function getEventsDetails(item){
         id=item[add_evidence_template.settings.idkey];
         type=add_evidence_template.settings.type;
         key=add_evidence_template.settings.idkey;
+        typeName="附件";
     }else if(item.hasOwnProperty('propertyId')){//property
         originalDate=new Date(item.dateOccur);
         date=formatDateTime(new Date(item.dateOccur),"MM月dd日 ");
@@ -267,6 +269,7 @@ function getEventsDetails(item){
         id=item[add_property_template.settings.idkey];
         type=add_property_template.settings.type;
         key=add_property_template.settings.idkey;
+        typeName="资产";
     }else if(item.hasOwnProperty('excutesId')){//excutes
         originalDate=new Date(item.dateExecuted);
         date=formatDateTime(new Date(item.dateExecuted),"MM月dd日 ");
@@ -274,8 +277,9 @@ function getEventsDetails(item){
         id=item[add_execute_template.settings.idkey];
         type=add_execute_template.settings.type;
         key=add_execute_template.settings.idkey;
+        typeName="执行";
     }
-    return {date:date,description:text,id:id,type:type,key:key,isInactived:item.isInactived,originalDate:originalDate};
+    return {date:date,description:text,id:id,type:type,key:key,isInactived:item.isInactived,originalDate:originalDate,typeName:typeName};
 }
 function getFormatString(template,item){
     var settings=template.settings;

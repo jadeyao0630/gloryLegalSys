@@ -44,11 +44,11 @@
                 <ul data-role="listview" data-inset="true" style="min-width:160px;" data-theme="b">
                     <li data-role="list-divider">操作</li>
                     <li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-power">退出</a></li>
-					<li><a href="#settings" class="ui-btn ui-btn-a ui-icon-gear ui-btn-icon-left popup-menu-btns" data-rel="back">设置</a></li>
-					<li data-role="list-divider">添加</li>
-					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-add-row" data-rel="back">添加记录</a></li>
-					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-add-table" data-rel="back">添加表</a></li>
-					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-read-table" data-rel="back">读取表</a></li>
+					<li><a href="#settingsPage" class="ui-btn ui-btn-a ui-icon-gear ui-btn-icon-left popup-menu-btns" data-rel="back">设置</a></li>
+					<li data-role="list-divider" class="admin-ui">添加</li>
+					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-add-row admin-ui" data-rel="back">添加记录</a></li>
+					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-add-table admin-ui" data-rel="back">添加表</a></li>
+					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-read-table admin-ui" data-rel="back">读取表</a></li>
                 </ul>
             </div>
             
@@ -66,7 +66,7 @@
 				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
 					<a href="#casePage" id="case_reg_but_add" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn">新增</a>
 					<a href="#" id="case_reg_but_remove" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but">删除</a>
-					<a href="#" id="case_reg_but_restore" class="ui-btn ui-btn-icon-left ui-icon-recycle btn-icon-blue case_reg_but">还原</a>
+					<a href="#" id="case_reg_but_restore" class="ui-btn ui-btn-icon-left ui-icon-recycle btn-icon-blue case_reg_but admin-ui">还原</a>
 				</div>
 				
 			</div>
@@ -121,7 +121,7 @@
 				</ul>
 			</ul>
 		</div><!-- /collapsible -->
-		<div data-role="popup" id="progress_popup_add" data-theme="a" style="z-index: 100;padding: 20px;">
+		<div data-role="popup" id="progress_popup_add" data-theme="a" style="z-index: 1100;padding: 20px;">
 			<h3 id="progress_popup_add_title">test</h3>
 			<form id="progress_popup_add_form"></form>
 			<fieldset class="ui-grid-a">
@@ -171,6 +171,24 @@
 		<div class="ui-body-d ui-content">
 			<ul data-role="listview" data-inset="true" data-theme="a" data-divider-theme="b" id="progress_details_info_body"></ul>
 		</div>
+		<div data-role="popup" id="progress_popup_edit" data-theme="a" style="z-index: 1100;padding: 20px;">
+			<h3 id="progress_popup_edit_title">test</h3>
+			<form id="progress_popup_edit_form"></form>
+			<fieldset class="ui-grid-a">
+				<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a></div>
+				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green progress_popup_edit_form_submit">提交</a></div>
+			</fieldset>
+		</div>
+	</div>
+	<div data-role="page" id="settingsPage" >
+		<div data-role="header" data-position="fixed">
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
+			<h1 id="settings_title">设置</h1>
+			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
+		</div><!-- /header -->
+		<div class="ui-body-d ui-content">
+			<ul data-role="listview" data-inset="true" data-theme="a" data-divider-theme="b" id="settings_body"></ul>
+		</div>
 	</div>
     <!--首页读取界面-->
 	<div id="main-container">
@@ -184,6 +202,7 @@
 		</div>
 		
 	</div>
+
     <script type="text/javascript" src="./fakeData.js"></script>
 	<script type="text/javascript" src="./resourceData.js"></script>
 	<script type="text/javascript" src="./js/db.js"></script>

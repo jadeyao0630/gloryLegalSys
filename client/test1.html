@@ -1,32 +1,55 @@
+<input type="file" id="fileInput">
+<button id="uploadButton">Upload</button>
 
-<!DOCTYPE html>
-<html>
-<head>
-  <title>File Upload</title>
-</head>
-<body>
-    <input type="file" name="file" id="fileInput">
+<!-- JavaScript -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    $('#uploadButton').on('click', function() {
+      var fileInput = document.getElementById('fileInput');
+      var file = fileInput.files[0];
+      var formData = new FormData();
+      formData.append('file', file);
+      
+      
+      $.ajax({
+        url: 'http://cn.luyao.site:5555/upload2',
+        type: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function(response) {
+          console.log(response);
+        },
+        error: function(xhr, status, error) {
+          console.error('Error uploading file:', error);
+        }
+      });
+      
+    });
+  });
+  const downloadFile = (filePath, customFileName) => {
+  fetch(`/getFileWithCustomName?filePath=${encodeURIComponent(filePath)}&customFileName=${encodeURIComponent(customFileName)}`)
+    .then(response => {
+      return response.blob();
+    })
+    .then(blob => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = customFileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    })
+    .catch(error => {
+      console.error('Error fetching the file:', error);
+    });
+};
 
-  <script>
-    const fileInput = document.getElementById('fileInput');
+const filePath = './uploads/'; // 替换为实际文件路径
+const customFileName = '1.xlsx'; // 替换为指定的文件名
 
-        fileInput.addEventListener('change', async (event) => {
-        const file = event.target.files[0];
-        const reader = new FileReader();
-
-        reader.onload = async (event) => {
-            const fileData = event.target.result;
-            await fetch('http://cn.luyao.site:5555/upload', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ file: fileData })
-            });
-        };
-
-        reader.readAsDataURL(file);
-        });
-  </script>
-</body>
-</html>
+downloadFile(filePath, customFileName);
+</script>

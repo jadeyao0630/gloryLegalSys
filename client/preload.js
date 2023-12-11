@@ -232,9 +232,9 @@ function logingStatus(){
                 }
             }else{
                 if(getGlobalJson('currentUser').level==1){
-                    settings['conditions']=' WHERE id=( SELECT id caseStatus WHERE isInactived=0 AND legalAgencies='+getGlobalJson('currentUser').id+')';
+                    settings['conditions']=' WHERE id IN ( SELECT id FROM caseStatus WHERE isInactived=0 AND legalAgencies='+getGlobalJson('currentUser').id+')';
                 }else if (getGlobalJson('currentUser').level<adminLevel){
-                    settings['conditions']=' WHERE id=( SELECT id caseStatus WHERE isInactived=0)';
+                    settings['conditions']=' WHERE id IN ( SELECT id FROM caseStatus WHERE isInactived=0)';
                 }
             }
             

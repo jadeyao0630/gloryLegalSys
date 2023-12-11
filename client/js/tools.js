@@ -215,7 +215,14 @@ $.fn.extend({
                     content=arg.content;
                 }
             }
-            var popup=$('<div class="popup-fullscreen"'+popup_style+'>'+content+'</div>');
+            var popup;
+            if(content instanceof String){
+                popup=$('<div class="popup-fullscreen"'+popup_style+'>'+content+'</div>');
+            }else{
+                popup=$('<div class="popup-fullscreen"'+popup_style+'></div>');
+                popup.append(content);
+            }
+            
             $('body').append(popup);
             popup.trigger('create');
             var index=$('div[data-position="fixed"][data-role="header"]').css('z-index');

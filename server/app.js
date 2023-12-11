@@ -12,6 +12,8 @@ const multer = require('multer');
 const ftp = require("basic-ftp");
 const fs = require("fs");
 
+var iconv = require('iconv-lite');
+
 const path = require('path');
 const { env } = process;
 dotenv.config({
@@ -35,7 +37,10 @@ app.use(cors(corsOptions)).use((req,res,next)=>{
     res.setHeader('Access-Control-Allow-Origin',"*");
     next();
 });
-app.use(fileUpload());
+app.use(fileUpload({
+    createParentPath: true,
+    defParamCharset: "utf8" // 添加utf8编码
+}));
 //app.use(express.json());
 //app.use(bodyParser.json());
 //app.use(express.urlencoded({extended:false}));
@@ -69,15 +74,47 @@ async function uploadFileToFTP(from, to) {
       client.close();
     }
   }
+  app.get('/getFileWithCustomName', (req, res) => {
+    const filePath = req.query.filePath; // 从查询参数中获取文件路径
+    const customFileName = req.query.customFileName; // 从查询参数中获取指定的文件名
+  
+    const fileStream = fs.createReadStream(filePath);
+    res.setHeader('Content-Disposition', `attachment; filename="${customFileName}"`);
+    res.setHeader('Content-Type', 'application/octet-stream');
+  
+    fileStream.pipe(res);
+  });
+  app.get('/download', async (req, res) => {
+    const client = new ftp.Client();
+    try {
+      // Connect to the FTP server
+      await client.access({
+        host: "192.168.10.241",
+        user: "luke",
+        password: "Qijiashe6",
+        secure: false 
+      });
+  
+      // Download the file from the FTP server
+      await client.downloadTo(res, '/path/to/file');
+  
+      // Send the file to the client
+      res.download('/path/to/file', 'filename.ext');
+    } catch (err) {
+      console.log(err);
+      res.status(500).send('Error downloading file from FTP server');
+    }
+    client.close();
+  });
   app.post('/upload', async (req, res) => {
     const client = new ftp.Client();
     try {
-      if (!req.body || !req.body.file) {
-        return res.status(400).send('No file was uploaded');
+      if (!req.files || Object.keys(req.files).length === 0) {
+        return res.status(400).send('No files were uploaded.');
       }
   
-      const fileData = req.body.file;
-      const fileBuffer = Buffer.from(fileData, 'base64');
+      const file = req.files.file;
+      const remoteFilePath = '/Downloads/'+file.name; // Replace 'filename.jpg' with the desired file name
   
       await client.access({
         host: "192.168.10.241",
@@ -86,24 +123,29 @@ async function uploadFileToFTP(from, to) {
         secure: false 
       });
   
-      const remoteFilePath = '/Downloads/temp.jpg';
+      const localFilePath = path.join(__dirname, 'uploads', file.name); // Save the uploaded file to the 'uploads' directory
+      file.mv(localFilePath, async function(err) {
+        if (err) {
+          console.error('Error saving file:', err);
+          return res.status(500).send('Error saving file');
+        }
   
-      const tempFilePath = './tempfile'; 
-      fs.writeFileSync(tempFilePath, fileBuffer);
-  
-      
-      await client.uploadFrom(tempFilePath, remoteFilePath);
-  
-      console.log('File uploaded successfully to FTP server');
-      res.status(200).send('File uploaded successfully');
+        try {
+          await client.uploadFrom(localFilePath, remoteFilePath);
+          console.log('File uploaded successfully to FTP server');
+          res.status(200).send(file.name+' File uploaded successfully'+file.name);
+        } catch (err) {
+          console.error('Error uploading file to FTP server:', err);
+          res.status(500).send('Error uploading file to FTP server');
+        } finally {
+          client.close();
+        }
+      });
     } catch (err) {
-      console.error('Error uploading file to FTP server:', err);
-      res.status(500).send('Error uploading file to FTP server');
-    } finally {
-      client.close();
+      console.error('Error handling file upload:', err);
+      res.status(500).send('Error handling file upload');
     }
   });
-
 // create
 app.post('/insertUser',(request,response) => {
     //console.log("request.body "+request.header('Content-Type'));

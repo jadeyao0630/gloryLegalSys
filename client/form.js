@@ -804,7 +804,12 @@ mform.prototype={
                 switch(ele.nodeName.toUpperCase()){
                     case "INPUT":
                         //console.log($(ele).prop('type'));
-                        _self.instance.find('#_'+id).text($(ele).val());
+                        if(ele.type=="date"||ele.type=="datetime"){
+                            _self.instance.find('#_'+id).text(formatDateTime(new Date($(ele).val()),"yyyy年MM月dd日"));
+                        }else{
+                            _self.instance.find('#_'+id).text($(ele).val());
+
+                        }
                         break;
                     case "TEXTAREA":
                         _self.instance.find('#_'+id).text($(ele).val());
@@ -1105,8 +1110,9 @@ $.fn.extend({
                 
                 if(value!='0000-00-00 00:00:00' && value!='0000-00-00' && value!='00:00:00'){
                     if(value=="") value=new Date();
-                    element.val(getDateTime(value));
-                    _self.find("#_"+id).text(getDateTime(value));
+                    //console.log("form date",formatDateTime(new Date(value),"yyyy-MM-dd"),getDateTime(value));
+                    element.val(formatDateTime(new Date(value),"yyyy-MM-dd"));
+                    _self.find("#_"+id).text(formatDateTime(new Date(value),"yyyy年MM月dd日"));
                 }else{
                     console.log('Date mform',value);
                     element.val('');

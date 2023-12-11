@@ -45,7 +45,8 @@ $('body').on(preload_completed_event_name,function(){
             }
         }
     },{distance:200});
-    $('#case_reg_but_restore').hide();
+    //$('#case_reg_but_restore').hide();
+    $('.admin-ui').hide();
     if(getGlobalJson('currentUser').level==1){
         FormTemplate3.template.baseInfo.data.legalAgencies.isDisabled=true;
         FormTemplate3.template.baseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
@@ -53,8 +54,8 @@ $('body').on(preload_completed_event_name,function(){
         header_filter_template.template.legalAgencies_f.isDisabled=true;
         header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
     }else if(getGlobalJson('currentUser').level==adminLevel){
-        $('#case_reg_but_restore').show();
-        
+        //$('#case_reg_but_restore').show();
+        $('.admin-ui').show();
         header_filter_template.template['isInactived']={
             label:"文档状态:",
             type:"multicombobox",
@@ -62,7 +63,6 @@ $('body').on(preload_completed_event_name,function(){
             isOptional:true,
             span:'3/3'
         }
-        
     }
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
 
@@ -85,7 +85,7 @@ $('body').on(preload_completed_event_name,function(){
         //setTimeout(() => {
             
         setAvailableColumns('pageOneTable',1);
-
+        setTableFunctionButonClickedEvent();
         
         $(window).trigger('hidepopup');
             //syncHeaderCloneWidth();

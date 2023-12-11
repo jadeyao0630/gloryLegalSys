@@ -394,23 +394,24 @@ ProgressesButton.prototype.init=function(arg){
                     return value.caseStatus==index+sub/10
             });
             console.log('setCounterIndecator',_counter.length,index,_counter);
-            if(_counter.length>0){
-                if(_this.opt.showCounter){
-                    var size=_this.opt.size*2*0.4;
-                    var counter=getElement("progress-but-counter",{
-                        width:(size)+"px",
-                        height:(size)+"px",
-                        "line-height":size+"px",
-                        "fontSize":_this.opt.fontSize*0.9+'px',
-                        "fontWeight":700,
-                        "borderRadius":(size*0.5)+"px",
-                        'left':(left+_this.opt.size*0.5)+'px',
-                        'top':(top-_this.opt.size*1.2)+'px',
-                    },_counter.length);
-                    $(counter).data('index',(index+(sub==undefined?0:sub)/10));
-                    _this.outter_frame.append(counter)
-                }
-                
+            
+            var size=_this.opt.size*2*0.4;
+            var counter=getElement("progress-but-counter",{
+                width:(size)+"px",
+                height:(size)+"px",
+                "line-height":size+"px",
+                "fontSize":_this.opt.fontSize*0.9+'px',
+                "fontWeight":700,
+                "borderRadius":(size*0.5)+"px",
+                'left':(left+_this.opt.size*0.5)+'px',
+                'top':(top-_this.opt.size*1.2)+'px',
+            },_counter.length);
+            $(counter).data('index',(index+(sub==undefined?0:sub)/10));
+            _this.outter_frame.append(counter)
+            if(_counter.length==0){
+                counter.hide();
+            }else{
+                counter.show();
             }
         }
     }
@@ -438,6 +439,9 @@ ProgressesButton.prototype.updateCounterIndicator=function(data){
         $(counter[0]).text($.grep(this.opt.counterData,(item)=>{
             return item.id==data.id && compareStatus(item.caseStatus,data.caseStatus)
         }).length);
+        $(counter[0]).show();
+    }else{
+        $(counter[0]).hide();
     }
 }
 ProgressesButton.prototype.setFlow=async function(target,duration,isSub){

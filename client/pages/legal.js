@@ -72,17 +72,22 @@ $('body').on(preload_completed_event_name,function(){
 		//data:DataList.combinedData,
 		//filterParent:"mainFooter",
 		rowButtons:'<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
-			'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext" data-transition="slidefade" data-item={0}>查看</a>'+
-			'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue" data-icon="edit" data-iconpos="notext" data-item={0}>修改</button>'+
-			'<button name="fn_btn_update" class="btn-icon-red" data-icon="calendar" data-iconpos="notext" data-item={0}>更新</button>'+
+			'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" data-item={0}>查看</a>'+
+			'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue btn-tooltip" data-icon="edit" data-iconpos="notext" data-tooltip="案件编辑修改" data-item={0}>修改</button>'+
+			'<button name="fn_btn_update" class="btn-icon-red btn-tooltip" data-icon="calendar" data-iconpos="notext" data-tooltip="更新案件进展" data-item={0}>更新</button>'+
 		'</div>'
 	});
+
     $("#pageOneTable").on('sort',function(columnData){
         //console.log(columnData.value);
+        $(window).trigger('waiting');
         pageOnTable.sortColumn(currentData,columnData.value);
         //setTimeout(() => {
             
         setAvailableColumns('pageOneTable',1);
+
+        
+        $(window).trigger('hidepopup');
             //syncHeaderCloneWidth();
         //}, 100);
         //$().mloader("hide");
@@ -120,98 +125,107 @@ $('body').on(preload_completed_event_name,function(){
                 break;
             case "查询":
                 //console.log("filter...",$(form).find('select,input'));
-                var matched=DataList.combinedData;
-                var penalty={};
-                var caseDate={};
-                $.each($(form).find('select,input'),(index,ele)=>{
-                    console.log("filter...",ele.nodeName,ele.id.replace('_f',''),$(ele).val());
-                    if($(ele).val()!=undefined && $(ele).val().length>0){
-                        var id=ele.id.replace('_f','');
-                        if(id=="penalty_0"){
-                            penalty['from']=$(ele).val();
-                        }else if(id=="penalty_1"){
-                            penalty['to']=$(ele).val();
-                        }else if(id=="caseDate_0"){
-                            caseDate['from']=new Date($(ele).val()+" 00:00:00");
-                        }else if(id=="caseDate_1"){
-                            caseDate['to']=new Date($(ele).val()+" 23:59:00");
-                        }else if(id=="caseStatus"){
-                            //if($(ele).val().constructor !== String){
-                                //console.log('数子');
-                                matched=$.grep(matched,(item)=>{
-                                    return $.grep($(ele).val(),(v)=>{
-                                        if(parseFloat(v)>2){
-                                            return Math.round(parseFloat(v))==Math.round(parseFloat(item[id]));
-                                        }else{
-                                            return parseFloat(v)==parseFloat(item[id]);
-                                        }
-                                        
-                                    }).length>0;
-                                });
-                            //}
-                        }
-                        else{
-                            matched=$.grep(matched,(item)=>{
-                                //console.log(item[id]);
-                                if(item[id].constructor !== String){
+                $(window).trigger('waiting');
+                setTimeout(() => {
+                    var matched=DataList.combinedData;
+                    var penalty={};
+                    var caseDate={};
+                    $.each($(form).find('select,input'),(index,ele)=>{
+                        console.log("filter...",ele.nodeName,ele.id.replace('_f',''),$(ele).val());
+                        if($(ele).val()!=undefined && $(ele).val().length>0){
+                            var id=ele.id.replace('_f','');
+                            if(id=="penalty_0"){
+                                penalty['from']=$(ele).val();
+                            }else if(id=="penalty_1"){
+                                penalty['to']=$(ele).val();
+                            }else if(id=="caseDate_0"){
+                                caseDate['from']=new Date($(ele).val()+" 00:00:00");
+                            }else if(id=="caseDate_1"){
+                                caseDate['to']=new Date($(ele).val()+" 23:59:00");
+                            }else if(id=="caseStatus"){
+                                //if($(ele).val().constructor !== String){
                                     //console.log('数子');
-                                    return $(ele).val().includes(item[id]+"");
-                                }else{
-                                    //console.log('数组');
-                                    return item[id].split(',').some(itm => $.grep($(ele).val(),(it)=>{
-                                        console.log(itm,it);
-                                        return itm.indexOf(it)>-1;
-                                    }));
-                                }
-                                //$(ele).val().includes(item[id]+"")
-                                //$.each($(ele).val(),(i,val)=>{
-                                    //if(item[id]==Number(val)) return true;
-                                //})
-    
-                            })
+                                    matched=$.grep(matched,(item)=>{
+                                        return $.grep($(ele).val(),(v)=>{
+                                            if(parseFloat(v)>2){
+                                                return Math.round(parseFloat(v))==Math.round(parseFloat(item[id]));
+                                            }else{
+                                                return parseFloat(v)==parseFloat(item[id]);
+                                            }
+                                            
+                                        }).length>0;
+                                    });
+                                //}
+                            }
+                            else{
+                                matched=$.grep(matched,(item)=>{
+                                    //console.log(item[id]);
+                                    if(item[id].constructor !== String){
+                                        //console.log('数子');
+                                        return $(ele).val().includes(item[id]+"");
+                                    }else{
+                                        //console.log('数组');
+                                        return item[id].split(',').some(itm => $.grep($(ele).val(),(it)=>{
+                                            console.log(itm,it);
+                                            return itm.indexOf(it)>-1;
+                                        }));
+                                    }
+                                    //$(ele).val().includes(item[id]+"")
+                                    //$.each($(ele).val(),(i,val)=>{
+                                        //if(item[id]==Number(val)) return true;
+                                    //})
+        
+                                })
+                            }
+                            
+                            
                         }
                         
                         
+                    });
+                    
+                    if(Object.keys(penalty).length==2){
+                        console.log('penalty',penalty,Object.keys(penalty).length);
+                        matched=$.grep(matched,(item)=>{
+                            console.log(parseFloat(item['penalty']),parseFloat(penalty.from),parseFloat(penalty.to));
+                            return parseFloat(item['penalty'])<=parseFloat(penalty.to) && parseFloat(item['penalty'])>=parseFloat(penalty.from);
+                        });
                     }
+                    if(Object.keys(caseDate).length==2){
+                        console.log('caseDate',caseDate,Object.keys(caseDate).length);
+                        matched=$.grep(matched,(item)=>{
+                            console.log(new Date(item['caseDate']),caseDate.from,caseDate.to);
+                            var valDate=new Date(item['caseDate']);
+                            return valDate.getTime()<=caseDate.to.getTime() && valDate.getTime()>=caseDate.from.getTime();
+                        });
+                    }
+                    //console.log(matched);
+                    currentData=matched;
+                    pageOnTable.addTableData(matched);
+                    pageOnTable.sortColumn(matched,pageOnTable.currentSort);
+                    tb.instance.isTargetToggle=false;
+                    setTableFunctionButonClickedEvent();
                     
-                    
-                });
+                    setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
+                    form.slideUp();
+                    $('#pageOneTable').animate({'margin-top':"0px"})
+                    $('#pageOneTable').trigger('create');
+                    setAvailableColumns('pageOneTable',1);
+                    $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height')});
+                    $('#header-filter-container').trigger('create');
+                    //resizeTables();
+                    //console.log('togglebuttonicon',);
+                    $(window).trigger('hidepopup');
+                }, 10);
+        
                 
-                if(Object.keys(penalty).length==2){
-                    console.log('penalty',penalty,Object.keys(penalty).length);
-                    matched=$.grep(matched,(item)=>{
-                        console.log(parseFloat(item['penalty']),parseFloat(penalty.from),parseFloat(penalty.to));
-                        return parseFloat(item['penalty'])<=parseFloat(penalty.to) && parseFloat(item['penalty'])>=parseFloat(penalty.from);
-                    });
-                }
-                if(Object.keys(caseDate).length==2){
-                    console.log('caseDate',caseDate,Object.keys(caseDate).length);
-                    matched=$.grep(matched,(item)=>{
-                        console.log(new Date(item['caseDate']),caseDate.from,caseDate.to);
-                        var valDate=new Date(item['caseDate']);
-                        return valDate.getTime()<=caseDate.to.getTime() && valDate.getTime()>=caseDate.from.getTime();
-                    });
-                }
-                //console.log(matched);
-                currentData=matched;
-                pageOnTable.addTableData(matched);
-                pageOnTable.sortColumn(matched,pageOnTable.currentSort);
-                tb.instance.isTargetToggle=false;
-                setTableFunctionButonClickedEvent();
-                
-                setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
-                form.slideUp();
-                $('#pageOneTable').animate({'margin-top':"0px"})
-                $('#pageOneTable').trigger('create');
-                setAvailableColumns('pageOneTable',1);
-                $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height')});
-                $('#header-filter-container').trigger('create');
-                //resizeTables();
-                //console.log('togglebuttonicon',);
                 break;
         }
     });
     
+})
+$(window).on('waiting',function(e){
+    $().mloader('show',{message:"请稍等..."});
 })
 $(window).on('saving',function(e){
     $().mloader('show',{message:"保存中..."});
@@ -232,6 +246,25 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
         }
     });
 });
+function setToolTip(element){
+    
+    //console.log($(element).position(),$(element).offset(),$(element).offsetParent().hasClass('ui-popup'));
+    
+    //console.log($(element));
+    $(element).on('mouseover',function(e){
+        //$('body').append(tooltip);
+        $('.ui-tooltip').text($(this).data('tooltip')!=undefined?$(this).data('tooltip'):$(this).text());
+        var position=$(this).offsetParent().hasClass('ui-popup')?$(this).position():$(this).offset();
+        $('.ui-tooltip').css({visibility: 'visible',
+        opacity: 1,
+        left:position.left,
+        top:(position.top+$(this).height()+10)+'px'});
+    })
+    $(element).on('mouseout',function(e){
+        $('.ui-tooltip').css({visibility: 'hidden',
+        opacity: 0});
+    })
+}
 function syncHeaderCloneWidth(){//同步表格头和身的宽度
     var columnToggler=$('<i class="fa fa-gear"></i>');
     var ref_ths=$('#pageOneTable').find('th');

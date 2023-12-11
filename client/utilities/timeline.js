@@ -241,36 +241,63 @@ function drawListText(startPos,data,ctx,color,isOppsite){
 }
 function getEventsDetails(item){
     var date;
+    var originalDate;
     var text;
     var id;
     var type;
     var key;
     if(item.hasOwnProperty('updatesId')){//updates
+        originalDate=new Date(item.dateUpdated);
         date=formatDateTime(new Date(item.dateUpdated),"MM月dd日 ");
-        text=item.updateDetails;
-        id=item.updatesId;
-        type='caseUpdates';
-        key='updatesId';
+        text=getFormatString(add_update_template,item);
+        id=item[add_update_template.settings.idkey];
+        type=add_update_template.settings.type;
+        key=add_update_template.settings.idkey;
     }else if(item.hasOwnProperty('evidenceId')){//evidence
+        originalDate=new Date(item.dateUploaded);
         date=formatDateTime(new Date(item.dateUploaded),"MM月dd日 ");
-        text=item.fileLabel+" 上传";
-        id=item.evidenceId;
-        type='caseAttachments';
-        key='evidenceId';
+        text=getFormatString(add_evidence_template,item);
+        id=item[add_evidence_template.settings.idkey];
+        type=add_evidence_template.settings.type;
+        key=add_evidence_template.settings.idkey;
     }else if(item.hasOwnProperty('propertyId')){//property
+        originalDate=new Date(item.dateOccur);
         date=formatDateTime(new Date(item.dateOccur),"MM月dd日 ");
-        text="资产(" + item.propertyName+ ")状态改为"+resourceDatas['propertyStatus'][Number(item.propertyStatus)];
-        id=item.propertyId;
-        type='caseProperties';
-        key='propertyId';
+        text=getFormatString(add_property_template,item);
+        id=item[add_property_template.settings.idkey];
+        type=add_property_template.settings.type;
+        key=add_property_template.settings.idkey;
     }else if(item.hasOwnProperty('excutesId')){//excutes
+        originalDate=new Date(item.dateExecuted);
         date=formatDateTime(new Date(item.dateExecuted),"MM月dd日 ");
-        text=item.personExecuted + "执行目标("+((item.targetExecuted!=undefined && item.targetExecuted.length>0)?item.targetExecuted:"未知")+")，金额为"+item.exexuteAmount+"万";
-        id=item.excutesId;
-        type='caseExcutes';
-        key='excutesId';
+        text=getFormatString(add_execute_template,item);
+        id=item[add_execute_template.settings.idkey];
+        type=add_execute_template.settings.type;
+        key=add_execute_template.settings.idkey;
     }
-    return {date:date,description:text,id:id,type:type,key:key};
+    return {date:date,description:text,id:id,type:type,key:key,isInactived:item.isInactived,originalDate:originalDate};
+}
+function getFormatString(template,item){
+    var settings=template.settings;
+    var _template=template.template;
+    var text="";
+    if(settings.hasOwnProperty('displayFormat')){
+        var format=settings.displayFormat;
+        $.each(item,(k,v)=>{
+            if(_template.hasOwnProperty(k) && _template[k].hasOwnProperty('data')){
+                format=format.replace("{"+k+"}",_template[k].data[isNumber(v)?Number(v):v]);
+            }else
+                format=format.replace("{"+k+"}",v);
+        })
+        text=format;
+    }else{
+        var vals=[];
+        $.each(item,(k,v)=>{
+            vals.push(v);
+        })
+        text=vals.join(' ');
+    }
+    return text;
 }
 function drawOneStop(startPos,ctx,color,size,isOppsite,data){
     var insideCircleSize=size+8;

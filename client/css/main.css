@@ -223,7 +223,25 @@ ui-collapsible.collapsible-listview .ui-btn{
     transition: opacity 0.3s;
     z-index: 1000;
   }
+.ui-tooltip{
+    visibility: hidden;
+    min-width: 120px;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    margin-top: 10px;
+    top: 50%;
+    left: -45%;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+}
+.btn-tooltip{
 
+}
 .header-search-container:hover .tooltip-serarch {
     visibility: visible;
     opacity: 1;

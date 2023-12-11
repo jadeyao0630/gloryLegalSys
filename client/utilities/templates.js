@@ -695,7 +695,8 @@ var _summary_template;
           type:"textarea"
         },caseDisputed:{
           label:"争议",
-          type:"textarea"
+          type:"textarea",
+          isOptional:true,
         },dateUpdated:{
           label:"更新日期",
           type:"date"
@@ -716,7 +717,7 @@ var _summary_template;
         },
       }
       list_evidence={
-        fileName:{
+        fileLabel:{
           label:"证据名",
           type:"text",
         },numFile:{
@@ -762,6 +763,7 @@ var _summary_template;
         },sumExecuted:{
           label:"说明",
           type:"text",
+          isOptional:true,
         }
       }
       _summary_template={
@@ -910,7 +912,9 @@ var _summary_template;
         width:'550px',
         textareaHeight:90,
         isCollapsibleGrouping:false,
-        displayFormat:"{updateDetails} （{caseDisputed}）"
+        displayFormat:"{updateDetails} （{caseDisputed}）",
+        type:'caseUpdates',
+        idkey:'updatesId',
       },
       template:list
     }
@@ -923,7 +927,9 @@ var _summary_template;
         width:'850px',
         textareaHeight:90,
         isCollapsibleGrouping:false,
-        displayFormat:"{personExecuted}({targetExecuted}) 为 {targetExecuted} 支付了 {exexuteAmount} 万元 ({sumExecuted})"
+        displayFormat:"{personExecuted} 为 ({targetExecuted}) 支付了 {exexuteAmount} 万元 ({sumExecuted})",
+        type:'caseExcutes',
+        idkey:'excutesId',
       },
       template:list_executed
     }
@@ -935,7 +941,9 @@ var _summary_template;
         width:'550px',
         textareaHeight:90,
         isCollapsibleGrouping:false,
-        displayFormat:"{propertyName} 状态为 {propertyStatus}"
+        displayFormat:"{propertyName} 状态为 {propertyStatus}",
+        type:'caseProperties',
+        idkey:'propertyId',
       },
       template:list_proerty
     }
@@ -947,6 +955,9 @@ var _summary_template;
         width:'550px',
         textareaHeight:90,
         isCollapsibleGrouping:false,
+        displayFormat:"{numCPage}页的 【{fileLabel}】 {numFile}份，有原件{numOriginal}份，复印件{numCopy}份",
+        type:'caseAttachments',
+        idkey:'evidenceId',
       },
       template:list_evidence
     }

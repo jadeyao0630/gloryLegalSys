@@ -179,6 +179,10 @@ waitTask(logingStatus(),function(){
             
             //console.log(combinedData);
             DataList=d.data;
+            if(!DataList.hasOwnProperty('caseUpdates')) DataList.caseUpdates=[];
+            if(!DataList.hasOwnProperty('caseExcutes')) DataList.caseExcutes=[];
+            if(!DataList.hasOwnProperty('caseProperties')) DataList.caseProperties=[];
+            if(!DataList.hasOwnProperty('caseAttachments')) DataList.caseAttachments=[];
             DataList.combinedData=combinedData;
             //DataList.combinedData=d.data.casesDb;
             //setGlobalJson("combinedData",combinedData);

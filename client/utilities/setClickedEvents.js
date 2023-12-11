@@ -42,9 +42,14 @@ function setTableFunctionButonClickedEvent(){
         $(but).off('click', functionBtnsEvent);
     })
     tableFuntionButListenerList=[];
+    $.each($("[name^='fn_btn']"),(index,btn)=>{
+        setToolTip($(btn));
+    })
+    
     $("[name^='fn_btn']").on('click', functionBtnsEvent);
 }
 function setTableRowFunctionButonClickedEvent(buttons){
+    
     $(buttons).on('click', functionBtnsEvent);
 }
 //#region 主表里的功能按钮
@@ -52,10 +57,10 @@ function functionBtnsEvent(but){
     tableFuntionButListenerList.push(but.currentTarget);
     var index=but.currentTarget.dataset.item;
     var matchItems=DataList.combinedData.filter((item) =>item.id == index);
-    var matchedUpdates=DataList.caseUpdates.filter((d)=>d.id==index&& d.isInactived==0);
-    var matchedExcutes=DataList.caseExcutes.filter((d)=>d.id==index&& d.isInactived==0);
-    var matchedProperties=DataList.caseProperties.filter((d)=>d.id==index&& d.isInactived==0);
-    var matchedAttachments=DataList.caseAttachments.filter((d)=>d.id==index&& d.isInactived==0);
+    var matchedUpdates=DataList.caseUpdates.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var matchedExcutes=DataList.caseExcutes.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var matchedProperties=DataList.caseProperties.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var matchedAttachments=DataList.caseAttachments.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     //console.log(index+"--"+but.currentTarget.name,matchItems);
 
     if(but.currentTarget.name=="fn_btn_details"){//主表里的删除按钮
@@ -196,11 +201,26 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
     var caseStatus_=$.grep(DataList.caseStatus,(d)=>Number(d.id)==index);
     
     console.log('currentId',index,caseStatus_,DataList.caseStatus)
-    var matchedUpdates=$.grep(DataList.caseUpdates,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && d.isInactived==0);
-    var matchedExcutes=$.grep(DataList.caseExcutes,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && d.isInactived==0);
-    var matchedProperties=$.grep(DataList.caseProperties,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && d.isInactived==0);
-    var matchedAttachments=$.grep(DataList.caseAttachments,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && d.isInactived==0);
+    var matchedUpdates=$.grep(DataList.caseUpdates,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var matchedExcutes=$.grep(DataList.caseExcutes,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var matchedProperties=$.grep(DataList.caseProperties,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var matchedAttachments=$.grep(DataList.caseAttachments,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     var greatMatched=matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments);
+    var dateSortItems={}
+    greatMatched.forEach(item=>{
+        var _data=getEventsDetails(item);
+        var date=_data.date.replace(" ","");
+        if(!dateSortItems.hasOwnProperty(date)){
+            dateSortItems[date]=[];
+        }
+        dateSortItems[date].push(_data);
+    })
+    var sortedItems=Object.keys(dateSortItems).sort(function(a,b){
+        //console.log(a,dateSortItems[a],b,dateSortItems[b]);
+        //console.log(dateSortItems[a][0].originalDate,dateSortItems[b][0].originalDate,dateSortItems[a][0].originalDate>dateSortItems[b][0].originalDate);
+        return dateSortItems[a][0].originalDate>dateSortItems[b][0].originalDate;
+    });
+    //console.log('dateSortItems',sortedItems,dateSortItems);
     var caseNo=caseStatus_[0].caseNo;
     switch($(this).text()){
         case '查看':
@@ -214,56 +234,70 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                 
                 console.log('查看...',greatMatched);
                 $('#progress_details_info_body').empty();
-                greatMatched.forEach((ite)=>{
-                    var _data=getEventsDetails(ite);
-                    var item_d=JSON.stringify(_data);
-                    var date_bar=$('<li data-role="list-divider">'+_data.date+'</li>');
-                   
-                    var item_container=$('<li data-item=\''+item_d+'\'></li>');
-                    //console.log('JSON.stringify',item_d);
-                    var del_btn;
-                    if(ite.hasOwnProperty('evidenceId')){
-                        var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+_data.description+'</h3>');
-                        
-                        item_container=$('<li style="padding:0px;" data-item=\''+item_d+'\'></li>');
-                        var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
-                        var view_btn=$('<a href="#" class="ui-btn ui-icon-eye ui-btn-icon-notext btn-icon-green view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">查看</a>')
-                        del_btn=$('<a href="#" class="ui-btn ui-icon-delete ui-btn-icon-notext btn-icon-red view-list-button" style="padding:10px 5px;border: none;">删除</a>')
-                        
-                        if(ite.isInactived){
-                            del_btn=$('<a href="#" class="ui-btn ui-icon-recycle ui-btn-icon-notext btn-icon-blue view-list-button" style="padding:10px 5px;border: none;">还原</a>')
-                        }
-                        group.append(list_item);
-                        group.append(view_btn);
-                        group.append(del_btn);
-                        item_container.append(group);
-                    }else{
-                        var list_item=$('<a href="#">'+_data.description+'</a>');
-                        
-                        item_container.append(list_item);
-                        del_btn=$('<a href="#" title="删除" class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-right ui-btn-icon-notext btn-icon-red view-list-button">删除</a>');
-                        if(ite.isInactived){
-                            del_btn=$('<a href="#" title="还原" class="ui-btn ui-btn-inline ui-icon-recycle ui-btn-icon-right ui-btn-icon-notext btn-icon-blue view-list-button">还原</a>');
-                        }
-                        item_container.append(del_btn);
-                    }
-                    
+                sortedItems.forEach(date=>{
+                    var items=dateSortItems[date];
+                    console.log('items',items);
+                //$.each(dateSortItems,(date,items)=>{
+                    var date_bar=$('<li data-role="list-divider">'+date+'<span class="ui-li-count">'+items.length+'</span></li>');
                     $('#progress_details_info_body').append(date_bar);
-                    
-                    $('#progress_details_info_body').append(item_container);
-                });
+                    items.forEach(item=>{
+                        var item_container=$('<li data-item=\''+JSON.stringify(item)+'\'></li>');
+                        //console.log('JSON.stringify',item_d);
+                        var del_btn;
+                        if(item.hasOwnProperty('evidenceId')){
+                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+item.description+'</h3>');
+                            
+                            item_container=$('<li style="padding:0px;" data-item=\''+JSON.stringify(item)+'\'></li>');
+                            var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
+                            var view_btn=$('<a href="#" class="ui-btn ui-icon-eye ui-btn-icon-notext btn-icon-blue view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">查看</a>')
+                            del_btn=$('<a href="#" class="ui-btn ui-icon-delete ui-btn-icon-notext btn-icon-red view-list-button" style="padding:10px 5px;border: none;">删除</a>')
+                            
+                            if(item.isInactived){
+                                del_btn=$('<a href="#" class="ui-btn ui-icon-recycle ui-btn-icon-notext btn-icon-green view-list-button" style="padding:10px 5px;border: none;">还原</a>')
+                            }
+                            group.append(list_item);
+                            group.append(view_btn);
+                            group.append(del_btn);
+                            item_container.append(group);
+                        }else{
+                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+item.description+'</h3>');
+                            
+                            item_container=$('<li style="padding:0px;" data-item=\''+JSON.stringify(item)+'\'></li>');
+                            var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
+                            var view_btn=$('<a href="#" class="ui-btn ui-icon-edit ui-btn-icon-notext btn-icon-blue view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">编辑</a>')
+                            del_btn=$('<a href="#" class="ui-btn ui-icon-delete ui-btn-icon-notext btn-icon-red view-list-button" style="padding:10px 5px;border: none;">删除</a>')
+                            
+                            if(item.isInactived){
+                                del_btn=$('<a href="#" class="ui-btn ui-icon-recycle ui-btn-icon-notext btn-icon-green view-list-button" style="padding:10px 5px;border: none;">还原</a>')
+                            }
+                            group.append(list_item);
+                            group.append(view_btn);
+                            group.append(del_btn);
+                            item_container.append(group);
+                        }
+                        
+                        
+                        
+                        $('#progress_details_info_body').append(item_container);
+                    })
+                })
+            
                 $('#progress_details_info_body').find('a.view-list-button').on('click',function(e){
                     //console.log($(this));
                     var _this=this;
                     var typeName=$(this).text().length==0?$(this).attr('title'):$(this).text();
                     var data=$(this).closest('li').data('item');
-                    console.log(data.id,data.type,data.key,typeName);
+                    console.log($(this).closest('li'),data.id,data.type,data.key,typeName);
                     switch(typeName){
                         case '查看':
                             break;
                         case '删除':
                             console.log('删除');
                             inactiveItem(data.key+'='+data.id,data.type,function(r){
+                                var value={isInactived:1}
+                                value[data.key]=data.id;
+                                DataList[data.type]=updateOriginalData(DataList[data.type],value,data.key);
+                                currentProgress['currentDiagramButton'].opt.counterData=updateOriginalData(currentProgress['currentDiagramButton'].opt.counterData,value,data.key);
                                 $(_this).removeClass('ui-icon-delete').addClass('ui-icon-recycle');
                                 $(_this).removeClass('btn-icon-red').addClass('btn-icon-blue');
                                 $(_this).text('还原');
@@ -273,8 +307,12 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                             
                             break;
                         case '还原':
+                            
                             restoreItem(data.key+'='+data.id,data.type,function(r){
-                                
+                                var value={isInactived:0}
+                                value[data.key]=data.id;
+                                DataList[data.type]=updateOriginalData(DataList[data.type],value,data.key);
+                                currentProgress['currentDiagramButton'].opt.counterData=updateOriginalData(currentProgress['currentDiagramButton'].opt.counterData,value,data.key);
                                 $(_this).removeClass('ui-icon-recycle').addClass('ui-icon-delete');
                                 $(_this).removeClass('btn-icon-blue').addClass('btn-icon-red');
                                 $(_this).text('删除');
@@ -346,7 +384,7 @@ $('.progress_popup_add_form_submit').on('click', function(e){
                 var tables={};
                 var deleteItem=currentProgress['currentDiagramButton'].opt.counterData.filter((d)=>{
                     var isMatched=false;
-                    if(formatIndex(d.caseStatus).main>currentProgress['targetPosition'].main ||formatIndex(d.caseStatus).sub!=currentProgress['targetPosition'].sub){
+                    if(formatIndex(d.caseStatus).main>=currentProgress['targetPosition'].main && formatIndex(d.caseStatus).sub!=currentProgress['targetPosition'].sub){
                         var matcher=Object.keys(tableNamesMatcher);
                         matcher.forEach(match=>{
                             if(d.hasOwnProperty(match)){
@@ -389,10 +427,13 @@ $('.progress_popup_add_form_submit').on('click', function(e){
                     clearInterval(intervalId);
                     $().mloader("show",{message:"提交中...."});
                     var idx=await getRecordLatestIndex(data.table,data.key);
-                    var subidx=await getRecordLatestIndex(data.table,'subId','caseStatus='+data.caseStatus)
-                    console.log(data.table+" id",idx,data.table+" subid",subidx);
+                    if(data.table!='caseAttachments'){
+                        var subidx=await getRecordLatestIndex(data.table,'subId','caseStatus='+data.caseStatus);
+                        values.data.values.subId=subidx+1;
+                    }
+                    
+                    //console.log(data.table+" id",idx,data.table+" subid",subidx);
                     values.data.values[data.key]=idx+1;
-                    values.data.values.subId=subidx+1;
                     values.data.values.caseNo=data.caseNo;
                     values.data.values.id=data.id;
                     values.data.values.isInactived=0;

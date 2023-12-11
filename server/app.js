@@ -1,8 +1,16 @@
 const express = require('express');
 const app = express();
+const fileUpload = require('express-fileupload');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const $ = require("jquery");
+
+const bodyParser = require('body-parser');
+const formidable = require('formidable');
+const busboy = require('busboy');
+const multer = require('multer');
+const ftp = require("basic-ftp");
+const fs = require("fs");
 
 const path = require('path');
 const { env } = process;
@@ -27,11 +35,74 @@ app.use(cors(corsOptions)).use((req,res,next)=>{
     res.setHeader('Access-Control-Allow-Origin',"*");
     next();
 });
-app.use(express.json());
-app.use(express.urlencoded({extended:false}));
+app.use(fileUpload());
+//app.use(express.json());
+//app.use(bodyParser.json());
+//app.use(express.urlencoded({extended:false}));
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-
-
+async function uploadFileToFTP(from, to) {
+    const client = new ftp.Client();
+  
+    try {
+      // Connect to the FTP server
+      await client.access({
+        host: "192.168.10.241",
+        user: "luke",
+        password: "Qijiashe6",
+        secure: false // Set to true if using FTPS
+      });
+  
+  
+      // Read the local file
+      const fileData = await fs.promises.readFile(from);
+  
+      // Upload the file to the FTP server
+      await client.uploadFrom(fileData, to);
+  
+      console.log("File uploaded successfully to FTP server");
+    } catch (err) {
+      console.error("Error uploading file to FTP server:", err);
+    } finally {
+      // Close the FTP client connection
+      client.close();
+    }
+  }
+  app.post('/upload', async (req, res) => {
+    const client = new ftp.Client();
+    try {
+      if (!req.body || !req.body.file) {
+        return res.status(400).send('No file was uploaded');
+      }
+  
+      const fileData = req.body.file;
+      const fileBuffer = Buffer.from(fileData, 'base64');
+  
+      await client.access({
+        host: "192.168.10.241",
+        user: "luke",
+        password: "Qijiashe6",
+        secure: false 
+      });
+  
+      const remoteFilePath = '/Downloads/temp.jpg';
+  
+      const tempFilePath = './tempfile'; 
+      fs.writeFileSync(tempFilePath, fileBuffer);
+  
+      
+      await client.uploadFrom(tempFilePath, remoteFilePath);
+  
+      console.log('File uploaded successfully to FTP server');
+      res.status(200).send('File uploaded successfully');
+    } catch (err) {
+      console.error('Error uploading file to FTP server:', err);
+      res.status(500).send('Error uploading file to FTP server');
+    } finally {
+      client.close();
+    }
+  });
 
 // create
 app.post('/insertUser',(request,response) => {
@@ -146,7 +217,17 @@ app.post('/insertCase',(request,response) => {
     });
 
 });
-
+app.post('/update',(request,response) => {
+    //console.log("request.body "+request.header('Content-Type'));
+    const {data} = request.body;
+    const {table} = request.body;
+    const {where} = request.body;
+    const  db= DbService.getDbServiceInstance();
+    const result = db.update(where,table,data);
+    result
+    .then(data => response.json({data:data}) )
+    .catch(err => console.log(err));
+});
 // read
 app.get('/getAll',(request,response) => {
     const db = DbService.getDbServiceInstance();
@@ -238,6 +319,44 @@ app.post('/deleteRows',(request,response) => {
     const {table} = request.body;
     const  db= DbService.getDbServiceInstance();
     const result = db.removeRows(ids,table);
+    result
+    .then(data => response.json({data:data}) )
+    .catch(err => console.log(err));
+});
+app.post('/inactiveCases',(request,response) => {
+    //console.log("request.body "+request.header('Content-Type'));
+    const {ids} = request.body;
+    const  db= DbService.getDbServiceInstance();
+    const result = db.constrolRows(ids,1);
+    result
+    .then(data => response.json({data:data}) )
+    .catch(err => console.log(err));
+});
+app.post('/restoreCases',(request,response) => {
+    //console.log("request.body "+request.header('Content-Type'));
+    const {ids} = request.body;
+    const  db= DbService.getDbServiceInstance();
+    const result = db.constrolRows(ids,0);
+    result
+    .then(data => response.json({data:data}) )
+    .catch(err => console.log(err));
+});
+app.post('/inactiveItem',(request,response) => {
+    //console.log("request.body "+request.header('Content-Type'));
+    const {where} = request.body;
+    const {table} = request.body;
+    const  db= DbService.getDbServiceInstance();
+    const result = db.constrolItem(where,table,1);
+    result
+    .then(data => response.json({data:data}) )
+    .catch(err => console.log(err));
+});
+app.post('/restoreItem',(request,response) => {
+    //console.log("request.body "+request.header('Content-Type'));
+    const {where} = request.body;
+    const {table} = request.body;
+    const  db= DbService.getDbServiceInstance();
+    const result = db.constrolItem(where,table,0);
     result
     .then(data => response.json({data:data}) )
     .catch(err => console.log(err));

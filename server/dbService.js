@@ -303,7 +303,70 @@ class DbService{
             console.log(error);
         }
     }
+    async constrolRows(ids,isInactived){
+        try{
+            const response = await new Promise((resolve,reject)=>{
+                //console.log(table);
+                const query = `UPDATE caseStatus SET isInactived=`+isInactived+` WHERE \`id\` IN (`+ids.join()+`);`;
+                connection.query(query, (err,result)=>{
+                    if (err) reject(new Error(err.message));
+                    //console.log(result);
+                    resolve(result);
+                });
+            });
+            
+            //console.log("typeof: "+(typeof response));
+            return {
+                success : response.length>0,
+                data: JSON.stringify(response[0])
+            };
+        }catch(error){
+            console.log(error);
+        }
+    }
+    async constrolItem(where,table,isInactived){
+        try{
+            const response = await new Promise((resolve,reject)=>{
+                const query = `UPDATE `+table+` SET isInactived=`+isInactived+` WHERE `+where;
+                connection.query(query, (err,result)=>{
+                    if (err) reject(new Error(err.message));
+                    //console.log(result);
+                    resolve(result);
+                });
+            });
+            
+            //console.log("typeof: "+(typeof response));
+            return {
+                success : response.length>0,
+                data: JSON.stringify(response[0])
+            };
+        }catch(error){
+            console.log(error);
+        }
+    }
     //#endregion 删除
+
+    async update(where,table,value){
+        try{
+            const response = await new Promise((resolve,reject)=>{
+                const query = `UPDATE `+table+` SET `+value+` WHERE `+where;
+                connection.query(query, (err,result)=>{
+                    if (err) reject(new Error(err.message));
+                    //console.log(result);
+                    resolve(result);
+                });
+            });
+            
+            //console.log("typeof: "+(typeof response));
+            return {
+                success: true,
+                data: response,
+            };
+        }catch(error){
+            console.log(error);
+        }
+    }
+
     //#region 功能
     async login(name, pass){
         try{

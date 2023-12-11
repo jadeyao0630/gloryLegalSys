@@ -101,6 +101,7 @@ function functionBtnsEvent(but){
             _setTitleBar("progress_title",'caseNo');
             var status_val=-1;
             if(matchItems.length>0){
+                console.log("matchItems",matchItems[0]);
                 progressInfoForm.setData(matchItems[0]).readOnly(matchItems[0].isReadOnly);
                 //$("#progress_diagram").empty();
                 status_val=Number(matchItems[0].caseStatus);
@@ -193,6 +194,8 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
     var index=Number(sessionStorage.getItem("currentId"));
     var caseStatus=currentProgress['targetPosition'].main+currentProgress['targetPosition'].sub/10;
     var caseStatus_=$.grep(DataList.caseStatus,(d)=>Number(d.id)==index);
+    
+    console.log('currentId',index,caseStatus_,DataList.caseStatus)
     var matchedUpdates=$.grep(DataList.caseUpdates,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && d.isInactived==0);
     var matchedExcutes=$.grep(DataList.caseExcutes,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && d.isInactived==0);
     var matchedProperties=$.grep(DataList.caseProperties,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && d.isInactived==0);
@@ -656,6 +659,7 @@ $('.edit-header-btn').on('click',function(e){
         //console.log($(pageOnTable).html())
         if(sessionStorage.getItem('currentPage')=="#casePage"){
             caseForm.instance.getValues(getGlobal("currentId"),FormTemplate3.template,function(message,values){
+                console.log('getvalues',values);
                 if(values.success){
                     //console.log(message.message);
                     if(isAddPage){
@@ -701,8 +705,8 @@ $('.edit-header-btn').on('click',function(e){
                                     console.log('pageOneTable id',$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
                                     pageOnTable.updateTableData(values.data.values,$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
                                     
-                                    DataList.combinedData=saveNewData2List(DataList.combinedData,values.data.values,'id');//tools.js
-                                    
+                                    DataList.combinedData=updateOriginalData(DataList.combinedData,values.data.values,'id');//tools.js
+                                    DataList.caseStatus=updateOriginalData(DataList.caseStatus,values.data.values,'id');//tools.js
                                 }else{
                                     console.log(r);
                                     $().minfo('show',{title:"错误",message:r.error});
@@ -712,9 +716,18 @@ $('.edit-header-btn').on('click',function(e){
                         }else{
                             
                             pageOnTable.updateTableData(values.data.values,$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
-                            DataList.combinedData=saveNewData2List(DataList.combinedData,values.data.values,'id');
+                            DataList.combinedData=updateOriginalData(DataList.combinedData,values.data.values,'id');
+                            DataList.caseStatus=updateOriginalData(DataList.caseStatus,values.data.values,'id');//tools.js
+                            currentData=updateOriginalData(currentData,values.data.values,'id');//tools.js
                         }
-                        currentData.push(values.data.values);
+                        if(isAddPage){
+                            currentData.push(values.data.values);
+                            DataList.combinedData.push(values.data.values);
+                            DataList.caseStatus.push(values.data.values);
+                        }
+                        setTimeout(() => {
+                            //syncHeaderCloneWidth();
+                        }, 100);
                     }
                     
                     
@@ -725,16 +738,25 @@ $('.edit-header-btn').on('click',function(e){
         
         }else if(sessionStorage.getItem('currentPage')=="#progress"){
             progressInfoForm.instance.getValues(getGlobal("currentId"),progress_form_template.template,function(message,values){
-                console.log(values)
+                //console.log(values)
                 if(values.success){
+                    $(window).trigger('saving');
                     var data=[];
+                    var newValue={};
                     $.each(values.data.values,(key,val)=>{
                         if(key!='id'){
                             data.push(key.replace("_p","")+"=\""+val+"\"");
                         }
+                        newValue[key.replace("_p","")]=val;
                     })
-                    update('id='+values.data.values.id,'caseStatus',data.join(),function(r){
-                        console.log(r);
+                    //console.log(data.join());
+                    update('id='+newValue.id,'caseStatus',data.join(),function(r){
+                        pageOnTable.updateTableData(newValue,$('#pageOneTable').find('tr[data-item='+newValue.id+']'));
+                        DataList.caseStatus=updateOriginalData(DataList.caseStatus,newValue,'id');
+                        DataList.combinedData=updateOriginalData(DataList.combinedData,newValue,'id');
+                        currentData=updateOriginalData(currentData,newValue,'id');//tools.js
+                        console.log(DataList.caseStatus);
+                        $(window).trigger('hidepopup');
                     });
                 }
             });
@@ -1012,4 +1034,17 @@ function formatCasesData(data){
 		
 	});
 	return data;
+}
+function updateOriginalData(source,newData,matchKey){
+    var matchedIndex=-1;
+    $.each(source,(index,item)=>{
+        if(item[matchKey]==newData[matchKey]){
+            matchedIndex=index;
+            source[index]=Object.assign(source[index],newData);
+            
+            return false;
+        }
+    })
+    //console.log(matchedIndex,source[matchedIndex],newData);
+    return source;
 }

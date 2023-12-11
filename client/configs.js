@@ -1,11 +1,11 @@
 var isRunLocal=false;
 var showDebug=false;
-let ip=isRunLocal?'localhost':'cn.luyao.site';
+let ip=isRunLocal?'192.168.10.69':'cn.luyao.site';
 let port=5555;
 var auth_code='1234';
 var adminLevel=3;
 var enableConsoleLog=true;
-var enableRealDelete=false;
+var enableRealDelete=true;
 var functionButoonPostion="top";
 const mainPage="legal.html";
 var logoSrc='https://img3.11467.com/2019/08-25/525155842.jpg'
@@ -66,13 +66,13 @@ const caseStatus={//案件状态
   id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
   caseNo:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
   caseStatus:"VARCHAR(100) default '0.0'",//案件状态->caseStatus*
-  legalAgencies:"INT NOT NULL",//代理法务->legalAgencies*
-  lawFirm:"INT NOT NULL",//代理律所->lawFirms*
-  attorney:"INT NOT NULL",//代理律师->attorneys*
+  legalAgencies:"INT(11) NOT NULL",//代理法务->legalAgencies*
+  lawFirm:"INT(11) NOT NULL",//代理律所->lawFirms*
+  attorney:"VARCHAR(100) default '无0'",//代理律师->attorneys*
   FirstInstance:"datetime",//一审日期
   SecondInstance:"datetime",//二审日期
   //court:"VARCHAR(255)",//法院->courts
-  legalInstitution:"INT default '0' NOT NULL",//受理机构->legalInstitution*
+  legalInstitution:"INT(11) default '0' NOT NULL",//受理机构->legalInstitution*
   legalCounsel:"varchar(255)",//受理相关人->legalCounsel*
   //appealAmount:"VARCHAR(255) default '0.00'",//反诉金额
   //requestAmount:"VARCHAR(255) default '0.00'",//本诉金额

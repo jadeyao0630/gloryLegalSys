@@ -690,7 +690,7 @@ var _summary_template;
     
     
     list={
-      updateDetails:{
+        updateDetails:{
           label:"进展",
           type:"textarea"
         },caseDisputed:{
@@ -910,6 +910,7 @@ var _summary_template;
         width:'550px',
         textareaHeight:90,
         isCollapsibleGrouping:false,
+        displayFormat:"{updateDetails} （{caseDisputed}）"
       },
       template:list
     }
@@ -922,6 +923,7 @@ var _summary_template;
         width:'850px',
         textareaHeight:90,
         isCollapsibleGrouping:false,
+        displayFormat:"{personExecuted}({targetExecuted}) 为 {targetExecuted} 支付了 {exexuteAmount} 万元 ({sumExecuted})"
       },
       template:list_executed
     }
@@ -933,6 +935,7 @@ var _summary_template;
         width:'550px',
         textareaHeight:90,
         isCollapsibleGrouping:false,
+        displayFormat:"{propertyName} 状态为 {propertyStatus}"
       },
       template:list_proerty
     }

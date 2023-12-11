@@ -926,16 +926,17 @@ $.fn.extend({
     },
     setData:function(data,template){
         
-        console.log("setData....")
+        //console.log("setData....")
         
         var data_keys=Object.keys(data);
         var _self=$(this);
         if(template==undefined) template=_self.template;
-        console.log(data)
+        console.log("setData....",data)
         $.each(template,(k,v)=>{
             if(v.hasOwnProperty('type')){
-                var val=data[k];
-                if(data_keys.includes(k)||(v.type=="textrange" && (data_keys.includes(k.replace('_0',''))||data_keys.includes(k.replace('_1',''))))){
+                var val=data[k.replace('_p','')];
+                console.log(k.replace('_p',''),val)
+                if(data_keys.includes(k.replace('_p',''))||(v.type=="textrange" && (data_keys.includes(k.replace('_0',''))||data_keys.includes(k.replace('_1',''))))){
                     if(v.defaultValue!=undefined && (val==undefined || val.length==0)) val=v.defaultValue;
                     _self.addData(v.type,k,val);
                 }

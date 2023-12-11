@@ -427,8 +427,10 @@ ProgressesButton.prototype.init=function(arg){
     }
 }
 ProgressesButton.prototype.updateCounterIndicator=function(data){
+    
+    console.log('updateCounterIndicator',this.instance.find('.progress-but-counter'));
     var counter=$.grep(this.instance.find('.progress-but-counter'),(cunter)=>{
-        console.log( $(cunter).data('index'),data.caseStatus,( $(cunter).data('index')==data.caseStatus.toString()));
+        console.log('updateCounterIndicator', $(cunter).data('index'),data.caseStatus,( $(cunter).data('index')==data.caseStatus.toString()));
         return $(cunter).data('index')==data.caseStatus.toString();
     });
     console.log('updateCounterIndicator',counter);

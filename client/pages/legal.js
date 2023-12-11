@@ -49,7 +49,7 @@ $('body').on(preload_completed_event_name,function(){
     if(getGlobalJson('currentUser').level==1){
         FormTemplate3.template.baseInfo.data.legalAgencies.isDisabled=true;
         FormTemplate3.template.baseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
-        progress_form_template.template.legalAgencies.isDisabled=true;
+        progress_form_template.template.legalAgencies_p.isDisabled=true;
         header_filter_template.template.legalAgencies_f.isDisabled=true;
         header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
     }else if(getGlobalJson('currentUser').level==adminLevel){
@@ -120,7 +120,7 @@ $('body').on(preload_completed_event_name,function(){
                 break;
             case "查询":
                 //console.log("filter...",$(form).find('select,input'));
-                var matched=currentData;
+                var matched=DataList.combinedData;
                 var penalty={};
                 var caseDate={};
                 $.each($(form).find('select,input'),(index,ele)=>{
@@ -213,7 +213,12 @@ $('body').on(preload_completed_event_name,function(){
     });
     
 })
-
+$(window).on('saving',function(e){
+    $().mloader('show',{message:"保存中..."});
+})
+$(window).on('hidepopup',function(e){
+    $().mloader('hide');
+})
 $(window).resize(function(e){
     //console.log('高度',window.innerHeight,'宽度',window.innerWidth)
     resizeTables();

@@ -1,4 +1,4 @@
-<input type="file" id="fileInput">
+<input type="file" id="fileInput" multiple="multiple">
 <button id="uploadButton">Upload</button>
 
 <!-- JavaScript -->
@@ -7,13 +7,14 @@
   $(document).ready(function() {
     $('#uploadButton').on('click', function() {
       var fileInput = document.getElementById('fileInput');
+      $.each()
       var file = fileInput.files[0];
       var formData = new FormData();
       formData.append('file', file);
       
       
       $.ajax({
-        url: 'http://cn.luyao.site:5555/upload2',
+        url: 'http://cn.luyao.site:5555/upload',
         type: 'POST',
         data: formData,
         processData: false,
@@ -28,6 +29,7 @@
       
     });
   });
+  /*
   const downloadFile = (filePath, customFileName) => {
   fetch(`/getFileWithCustomName?filePath=${encodeURIComponent(filePath)}&customFileName=${encodeURIComponent(customFileName)}`)
     .then(response => {
@@ -52,4 +54,5 @@ const filePath = './uploads/'; // 替换为实际文件路径
 const customFileName = '1.xlsx'; // 替换为指定的文件名
 
 downloadFile(filePath, customFileName);
+*/
 </script>

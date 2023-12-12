@@ -235,7 +235,9 @@ mform.prototype={
             var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
             item_container.append(label);
             labelStyle(label,template);
-            var input=$('<input type="'+item.type+'" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'" '+setRequired(item.isOptional,"此项必须正确填写")+'>');
+            var fileType='';
+            if(item.type.toLowerCase()=="file") fileType=' multiple="multiple"';
+            var input=$('<input type="'+item.type+'" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'"'+fileType+' '+setRequired(item.isOptional,"此项必须正确填写")+'>');
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(input);
             item_container.append(subContainer);

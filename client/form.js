@@ -121,6 +121,9 @@ mform.prototype={
                             case "text":
                                 _self.elements[item_key]=generateInputTypeBase(item_container,item,item_key,template.settings.hasPlaceHolder);
                                 break;
+                            case "checkbox":
+                                _self.elements[item_key]=generateInputTypeBase(item_container,item,item_key,template.settings.hasPlaceHolder);
+                                break;
                             case "textrange":
                                 _self.elements[item_key]=generateInputRange(item_container,item,item_key,template.settings.hasPlaceHolder);
                                 break;
@@ -258,9 +261,9 @@ mform.prototype={
             labelStyle(label,template);
             var input=$('<input type="password" data-wrapper-class="controlgroup-textinput ui-btn" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'" '+setRequired(item.isOptional,"此项必须正确填写")+'>');
             
-            var subContainer=$('<div data-role="controlgroup" data-type="horizontal" class="form-original"></div>');
-            var showHideBtn=$('<button data-icon="eye" data-iconpos="notext">显示关闭</button>');
-            var changePassBtn=$('<a herf="#" class="ui-btn ui-btn-icon-notext btn-icon-blue ui-icon-edit">修改</a>');
+            var subContainer=$('<div id="'+id+'_controlgroup" data-role="controlgroup" data-type="horizontal" class="form-original"></div>');
+            var showHideBtn=$('<a herf="#" class="ui-btn ui-btn-icon-notext ui-icon-eye btn-eye">显示关闭</a>');
+            var changePassBtn=$('<a herf="#" class="ui-btn ui-btn-icon-notext btn-icon-blue ui-icon-edit btn-edit">修改</a>');
             subContainer.append(input);
             //subContainer.append(pass);
             subContainer.append(showHideBtn);
@@ -273,63 +276,40 @@ mform.prototype={
                         if(!showHideBtn.hasClass('btn-icon-green')){
                             $().requestPasswordToChange(function(res){
                                 if(res.success){
-                                    console.log("登陆成功。。")
-                                    input.removeClass("ui-state-disabled");
-                                    input.trigger('create')
-                                    //input.val("changed")
-                                    subContainer.trigger('create');
-                                    changePassBtn.removeClass('ui-icon-edit').addClass('ui-icon-check');;
-                                    changePassBtn.removeClass('btn-icon-blue').addClass('btn-icon-green');
-                                    changePassBtn.trigger('create');
-                                    subContainer.trigger('create');
+                                    setChangeBtnState(changePassBtn,input,true);
                                 }else{
                                     $().minfo("show",{message:'密码无效。',type:'alert',title:'错误'});
                                 }
                             },'需要输入您的密码以进行下一步。')
                         }else{
-                            input.removeClass("ui-state-disabled");
-                            input.trigger('create')
-                            //input.val("changed")
-                            subContainer.trigger('create');
-                            changePassBtn.removeClass('ui-icon-edit').addClass('ui-icon-check');;
-                            changePassBtn.removeClass('btn-icon-blue').addClass('btn-icon-green');
-                            changePassBtn.trigger('create');
-                            subContainer.trigger('create');
+                            setChangeBtnState(changePassBtn,input,true);
                         }
                         
                     }else{
-                        input.addClass("ui-state-disabled");
-                        input.trigger('create')
-                        //input.val("changed")
-                        subContainer.trigger('create');
-                        changePassBtn.removeClass('ui-icon-check').addClass('ui-icon-edit');;
-                        changePassBtn.removeClass('btn-icon-green').addClass('btn-icon-blue');
-                        changePassBtn.trigger('create');
-                        subContainer.trigger('create');
+                        setChangeBtnState(changePassBtn,input,false);
                     }
                     
                 });
             }
             showHideBtn.on('click',function(e){
                 var _this=this;
+                console.log('showHideBtn');
                 if($(input).attr('type')=="text"){
-                    $(input).attr('type',"password");
-                    $(this).removeClass('btn-icon-green');
+                    
+                    setShowHideBtnState(_this,input,true);
                 }
                 else{
-                    if(!changePassBtn.hasClass('ui-icon-check')){
+                    if(!changePassBtn.hasClass('ui-icon-check')&&item.isChangeable){
                         $().requestPasswordToChange(function(res){
                             if(res.success){
                                 console.log("登陆成功。。")
-                                $(input).attr('type',"text");
-                                $(_this).addClass('btn-icon-green');
+                                setShowHideBtnState(_this,input,false);
                             }else{
                                 $().minfo("show",{message:'密码无效。',type:'alert',title:'错误'});
                             }
                         },'需要输入您的密码以进行下一步。')
                     }else{
-                        $(input).attr('type',"text");
-                        $(_this).addClass('btn-icon-green');
+                        setShowHideBtnState(_this,input,false);
                     }
                     
                     
@@ -342,6 +322,38 @@ mform.prototype={
             item_container.append(subContainer);
             return input;
             //return item_container;
+        }
+        function setChangeBtnState(btn,input,isActived){
+            if(isActived){
+                input.removeClass("ui-state-disabled");
+                input.trigger('create')
+                //input.val("changed")
+                //subContainer.trigger('create');
+                btn.removeClass('ui-icon-edit').addClass('ui-icon-check');;
+                btn.removeClass('btn-icon-blue').addClass('btn-icon-green');
+                btn.trigger('create');
+                //subContainer.trigger('create');
+            }else{
+                input.addClass("ui-state-disabled");
+                input.trigger('create')
+                //input.val("changed")
+                //subContainer.trigger('create');
+                btn.removeClass('ui-icon-check').addClass('ui-icon-edit');;
+                btn.removeClass('btn-icon-green').addClass('btn-icon-blue');
+                btn.trigger('create');
+                //subContainer.trigger('create');
+            }
+            
+        }
+        function setShowHideBtnState(btn,input,isShown){
+            if(isShown){
+                $(input).attr('type',"password");
+                $(btn).removeClass('btn-icon-green');
+            }else{
+                $(input).attr('type',"text");
+                $(btn).addClass('btn-icon-green');
+            }
+            
         }
         function generateInputRange(item_container,item,id,hasPlaceHolder){
             //var item_container=$('<div class="form_item_panel"></div>');
@@ -1379,7 +1391,7 @@ $.fn.extend({
                         
                     }else if(itemTemplate.numberOnly){
                         
-                        if(!isNumber(val)||val.length==0) {
+                        if(!isNumber(val)||val.length===0) {
                             console.log(itemTemplate.label+"-- has error value"+val);
                             hasError=true;
                         }
@@ -1388,10 +1400,11 @@ $.fn.extend({
                     }else if(element.type.toLowerCase()=="file"){
                         val=$(element).prop('files');
                     }
-                    if(val.length==0 && !itemTemplate.isOptional){
+                    if(val.length===0 && !itemTemplate.isOptional){
                         console.log(itemTemplate.label+"-- has error value"+val);
                         hasError=true;
                     }
+                    console.log(element.id,hasError,val.length,itemTemplate.isOptional)
                     res(hasError);
                     break;
                 case "SELECT":
@@ -1422,7 +1435,7 @@ $.fn.extend({
                     val=_greatVal.join(",");
                     break;
                 case "TEXTAREA":
-                    if(val.length==0 && !itemTemplate.isOptional){
+                    if(val.length===0 && !itemTemplate.isOptional){
                         console.log(itemTemplate.label+"-- has error value"+val);
                         hasError=true;
                     }

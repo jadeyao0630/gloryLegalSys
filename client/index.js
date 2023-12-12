@@ -1,9 +1,10 @@
-
+/*
 document.addEventListener('DOMContentLoaded',function(){
     fetch('http://'+ip+':'+port+'/getAll')
     .then(response => response.json())
     .then(data => loadHTML(data['data']));
 });
+*/
 const log = document.getElementById("debug");
 const message = document.getElementById("message");
 const addBut = document.getElementById("addBut");
@@ -64,7 +65,7 @@ function loadHTML(data){
     }
     let tableHtml = "";
     data.forEach(function ({user,pass,position,level,createDate}){
-        tableHtml += user + ", "+pass + ", "+position + ", "+level + ", "+new Date(createDate).toLocaleDateString();
+        //tableHtml += user + ", "+pass + ", "+position + ", "+level + ", "+new Date(createDate).toLocaleDateString();
     });
     log.innerHTML=tableHtml;
 }

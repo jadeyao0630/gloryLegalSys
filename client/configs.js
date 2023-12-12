@@ -1,6 +1,7 @@
 var isRunLocal=true;
+var IPS=['localhost','192.168.10.69','cn.luyao.site']
 var showDebug=false;
-let ip=isRunLocal?'192.168.10.69':'cn.luyao.site';
+let ip=isRunLocal?IPS[0]:IPS[2];
 let port=5555;
 var auth_code='1234';
 var adminLevel=3;
@@ -19,7 +20,7 @@ class Message{
     static LOGIN_WELCOME_F='<p style="color:red;">欢迎{0}回来</p>';
     static PROGRESS_DELETE_WARNING_F='确定删除此流程点[{0}]后已存在其它流程点吗？';
 }
-
+var position=['无','法务人员','法务管理']
 var deads=["无需执行"]; 
 const TextColor="rgb(51, 51, 51)";
 const users={

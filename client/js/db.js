@@ -98,7 +98,7 @@ async function getLegalAgencies(){
         await fetch("http://"+ip+":"+port+"/select",{
             headers:headers,
             method: 'POST',
-            body: JSON.stringify({ query: 'SELECT id,name,position FROM '+userDbTableName+' WHERE isInactived=0'})
+            body: JSON.stringify({ query: 'SELECT id,name,position,isInactived FROM '+userDbTableName})
         })
         .then(response => response.json())
         .then(data => {
@@ -137,9 +137,10 @@ async function getCurrentUser(userData){
     });
     return await response;
 }
-async function saveCurrentUser(userData){
+async function saveCurrentUser(userData,isRealInsert){
+    var type=isRealInsert?'pureinsert':'insert';
     const response = new Promise(async(resolve,reject)=>{
-        await fetch("http://"+ip+":"+port+"/insert",{
+        await fetch("http://"+ip+":"+port+"/"+type,{
             headers:headers,
             method: 'POST',
             body: JSON.stringify({ table: userDbTableName, data:userData})
@@ -147,11 +148,11 @@ async function saveCurrentUser(userData){
         .then(response => response.json())
         .then(data => {
             if (data.data.success){
-                resolve(data);
+                //resolve(data);
             }else{
                 console.log(data.data.error);
             }
-            
+            resolve(data.data);
         }).catch(err => console.log(err));
         
     });
@@ -285,6 +286,18 @@ async function insertRows(table,datas,res){
             console.log(data.data.error);
         }
         if(res!=undefined)res(data.data);
+    });
+}
+async function updateLastLogin(id){
+    
+    return await fetch("http://"+ip+":"+port+"/update",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ where:"id="+id, table: userDbTableName, data:{lastLogin:new Date().toLocaleString().substr(0,20)}})
+    })
+    .then(response => {
+        console.log('updateLastLogin',response);
+        return response.json();
     });
 }
 async function update(where,table,data,res){

@@ -24,8 +24,55 @@ $('.popup-add-row').on('click', function(e){
 $('#popupMenu').find('a').on('click',function(e){
     e.preventDefault();
     switch($(this).text()){
-        case '设置':
+        case '个人信息':
+            setting_info_form= new mform({template:settingPage_form});
+            setting_info_form.setData(getGlobalJson("currentUser"));
+            $('#info_container').empty();
+            $('#info_container').append(setting_info_form.instance);
+            $('#info_container').trigger('create');
+            $($(this).attr( "href" )).find('.edit-header-btn.ui-icon-check').text('保存');
             goToPage( $(this).attr( "href" ));
+            break;
+        case '添加用户':
+            setting_add_form= new mform({template:settingPage_add_form});
+            setting_add_form.setEmptyData();
+            $('#info_container').empty();
+            $('#info_container').append(setting_add_form.instance);
+            $('#info_container').trigger('create');
+            $($(this).attr( "href" )).find('.edit-header-btn.ui-icon-check').text('添加');
+            goToPage( $(this).attr( "href" ));
+            break;
+        case '修改用户':
+            var _this=this;
+            var select=$('<select id="user_edit_select"></select>');
+            $.each(resourceDatas['users'],(index,user)=>{
+                select.append($('<option value="'+(index+1)+'">'+user.name+'</option>'));
+            });
+            select.trigger('create');
+            $().requestDialog({content:select,message:"请选择一个用户"},function(isYes,selt){
+                if(isYes){
+                    console.log($(selt).find('option:selected').val())
+                
+                    getCurrentUser({'id':$(selt).find('option:selected').val()}).then((d)=>{
+                        //console.log(d,d.data.length);
+                        if(d.data.length>0){
+                            var userD=d.data[0];
+                            userD.isInactived_a=userD.isInactived;
+                            console.log(userD.name);
+                            setting_add_form= new mform({template:settingPage_add_form});
+                            setting_add_form.setData(userD);
+                            $('#info_container').empty();
+                            $('#info_container').append(setting_add_form.instance);
+                            $('#info_container').trigger('create');
+                            $($(_this).attr( "href" )).find('.edit-header-btn.ui-icon-check').text('修改');
+                            $($(_this).attr( "href" )).find('.edit-header-btn.ui-icon-check').data('item',JSON.stringify(userD));
+                            goToPage( $(_this).attr( "href" ));
+                        }
+                        
+                    });
+                }
+                
+            });
             break;
         case '退出':
             //goToPage( $(this).attr( "href" ));
@@ -850,7 +897,7 @@ function showProgressDetails(datas,updates,excutes,properties,attachments){
     },10);
 }
 //#region 保存按钮事件
-$('.edit-header-btn').on('click',function(e){
+$('.edit-header-btn').on('click',async function(e){
     console.log('currentPage',sessionStorage.getItem('currentPage'));
     if($(this).text()=="保存"){
         //console.log("保存");
@@ -958,17 +1005,113 @@ $('.edit-header-btn').on('click',function(e){
                     });
                 }
             });
-        }else if(sessionStorage.getItem('currentPage')=="#settingsPage"){
-            setting_info_form.instance.getValues(0,settingPage_form.template,function(message,values){
+        }else if(sessionStorage.getItem('currentPage')=="#infoPage"){
+           
+            setting_info_form.instance.getValues(getGlobalJson("currentUser").id,settingPage_form.template,function(message,values){
                 //console.log(values)
                 if(values.success){
                     console.log(values);
+                    var data=[];
+                    $.each(values.data.values,(key,val)=>{
+                        if(key!='id'){
+                            data.push(key.replace("_p","")+"=\""+val+"\"");
+                        }
+                    })
+                    update('id='+getGlobalJson("currentUser").id,userDbTableName,data.join(),function(r){
+                        resetPassChangeState(setting_info_form.instance);
+                        setGlobalJson("currentUser",updateOriginalData(getGlobalJson("currentUser"),values.data.values));
+                        $('#username').text(getGlobalJson("currentUser").name);
+                        resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,values.data.values,'id');
+                        console.log(getGlobalJson("currentUser"),resourceDatas.legalAgencies);
+                        $('#legalAgencies_f').trigger('create').selectmenu().selectmenu( "refresh" );
+                        $('#legalAgencies_p').trigger('create').selectmenu().selectmenu( "refresh" );
+                        $('#legalAgencies').trigger('create').selectmenu().selectmenu( "refresh" );
+                    });
+                    
+                }
+            });
+        }
+    }else if($(this).text()=="添加"){
+        if(sessionStorage.getItem('currentPage')=="#infoPage"){
+            setting_add_form.instance.getValues((await getRecordLatestIndex(userDbTableName,'id'))+1,settingPage_add_form.template,function(message,values){
+                //console.log(values)
+                if(values.success){
+                    console.log(values);
+                    values.data.values.createDate=getDateTime();
+                    values.data.values[isInactived]=values.data.values.isInactived_a;
+                    delete values.data.values.isInactived_a;
+                    saveCurrentUser(values.data.values,true).then((r)=>{
+                        if(r.success){
+                            console.log("添加成功。");
+                            $().minfo('show',{title:"提示",message:"添加成功。"},function(){
+
+                            });
+                        }else{
+                            console.log(r);
+                            $().minfo('show',{title:"错误",message:r.error});
+                        }
+                    });
+                }
+            });
+        }
+    }else if($(this).text()=="修改"){
+        var _this=this;
+        if(sessionStorage.getItem('currentPage')=="#infoPage"){
+            setting_add_form.instance.getValues(0,settingPage_add_form.template,function(message,values){
+                //console.log(values)
+                if(values.success){
+                    var userD=JSON.parse($(_this).data('item'));
+                    //values.data.values.createDate=getDateTime(userD.createDate);
+                    //values.data.values['isInactived']=values.data.values.isInactived_a;
+                    //delete values.data.values.isInactived_a;
+                    //console.log(values,userD);
+                    var data=[];
+                    $.each(values.data.values,(key,val)=>{
+                        if(key!='id'){
+                            data.push(key.replace("_a","")+"=\""+val+"\"");
+                        }
+                    })
+                    update('id='+userD.id,userDbTableName,data.join(),function(r){
+                        
+                        
+                        if(r.data.affectedRows>0){
+                            console.log("修改成功。");
+                            $().minfo('show',{title:"提示",message:"修改成功。"},function(){
+
+                            });
+                        }else{
+                            console.log(r);
+                            $().minfo('show',{title:"错误",message:r.error});
+                        }
+                        
+                    });
+                    
                 }
             });
         }
     }
         
 })
+$('.edit-header-btn[data-rel="back"]').on('click',function(e){
+    if(sessionStorage.getItem('currentPage')=="#infoPage"){
+        console.log('back');
+        //resetPassChangeState(setting_info_form.instance);
+    }
+});
+function resetPassChangeState(form){
+    var change_btn=form.find('#pass_controlgroup').find('a.btn-edit');
+    var showHide_btn=form.find('#pass_controlgroup').find('a.btn-eye');
+    var input=form.find('#pass_controlgroup').find('input');
+
+    showHide_btn.removeClass('btn-icon-green');
+    showHide_btn.trigger('create');
+    input.attr('type',"password");
+    input.addClass("ui-state-disabled");
+    input.trigger('create')
+    change_btn.removeClass('ui-icon-check').addClass('ui-icon-edit');;
+    change_btn.removeClass('btn-icon-green').addClass('btn-icon-blue');
+    change_btn.trigger('create');
+}
 //#endregion
 function _setTitleBar(titlebarId,displayKey){
     var lockedTitle="查看案件";
@@ -1246,15 +1389,26 @@ function getDataById(source,idKey,matchValue){
 }
 function updateOriginalData(source,newData,matchKey){
     var matchedIndex=-1;
-    $.each(source,(index,item)=>{
-        //console.log(matchKey,item[matchKey],"=="+newData[matchKey]);
-        if(item[matchKey]==newData[matchKey]){
-            matchedIndex=index;
-            source[index]=Object.assign(source[index],newData);
-            
-            return false;
-        }
-    })
+    if(source instanceof Array){
+        $.each(source,(index,item)=>{
+            //console.log(matchKey,item[matchKey],"=="+newData[matchKey]);
+            if(item[matchKey]==newData[matchKey]){
+                matchedIndex=index;
+                source[index]=Object.assign(source[index],newData);
+                
+                return false;
+            }
+        })
+    }else{
+        var keys=Object.keys(newData);
+        $.each(source,(key,item)=>{
+            //console.log(matchKey,item[matchKey],"=="+newData[matchKey]);
+            if(keys.includes(key)){
+                source[key]=newData[key];
+            }
+        })
+    }
+    
     //console.log(matchedIndex,source[matchedIndex],newData);
     return source;
 }

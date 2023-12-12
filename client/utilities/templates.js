@@ -1001,12 +1001,96 @@ var _summary_template;
                       isOptional:true,
                       isChangeable:true,
                   },
+                  position:{
+                      placeholder:"职务",
+                      label:"职务:",
+                      type:"combobox",
+                      isOptional:true,
+                      data:position,
+                      isAdminOnly:true
+                  },
                   level:{
                       placeholder:"权限",
                       label:"权限:",
                       type:"combobox",
                       isOptional:true,
                       data:resourceDatas.authLevels,
+                      isAdminOnly:true
+                  },
+              }
+              
+          },
+        }
+      };
+      
+    settingPage_add_form={
+      settings:{
+        templateColumn:"33.3% 33.3% 33.3%",
+          hasLabel:true,
+          hasPlaceHolder:true,
+          labelPosition:"left",
+          width:"100%",
+          textareaHeight:50,
+          isCollapsibleGrouping:true
+      },
+      template:{
+          personInfo:{
+              label:"个人信息",
+              data:{
+                name:{
+                      placeholder:"姓名",
+                      label:"姓名:",
+                      type:"text",
+                      isOptional:false,
+                  },
+                  contact:{
+                      placeholder:"联系方式",
+                      label:"联系方式:",
+                      type:"tel",
+                      isOptional:true,
+                  },
+                  email:{
+                      placeholder:"电子邮箱",
+                      label:"电子邮箱:",
+                      type:"email",
+                      isOptional:true,
+                  },
+                  pass:{
+                      placeholder:"登录密码",
+                      label:"登录密码:",
+                      type:"password",
+                      isOptional:false,
+                      isChangeable:false,
+                  },
+                  user:{
+                      placeholder:"登录名",
+                      label:"登录名:",
+                      type:"text",
+                      isOptional:false,
+                      isAdminOnly:true
+                  },
+                  position:{
+                      placeholder:"职务",
+                      label:"职务:",
+                      type:"combobox",
+                      isOptional:true,
+                      data:position,
+                      isAdminOnly:true
+                  },
+                  level:{
+                      placeholder:"权限",
+                      label:"权限:",
+                      type:"combobox",
+                      isOptional:true,
+                      data:resourceDatas.authLevels,
+                      isAdminOnly:true
+                  },
+                  isInactived_a:{
+                      placeholder:"禁用账户",
+                      label:"是否禁用此账户",
+                      type:"radio",
+                      data:["否","是"],
+                      isOptional:true,
                       isAdminOnly:true
                   },
               }

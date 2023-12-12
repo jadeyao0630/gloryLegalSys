@@ -90,12 +90,18 @@ function formatDateTime(date, format) {
   }
   function getDateTime(dateTimeStr){
       if (dateTimeStr==undefined||dateTimeStr=='0000-00-00 00:00:00')
-          return new Date().toISOString().substr(0,10);
+          return new Date().toLocaleString().substr(0,20);
       else
-          return new Date(dateTimeStr).toISOString().substr(0,10);
+          return new Date(dateTimeStr).toLocaleString().substr(0,20);
   }
+  function getDate(dateStr){
+    if (dateStr==undefined||dateStr=='0000-00-00')
+        return new Date().toLocaleString().substr(0,10);
+    else
+        return new Date(dateStr).toLocaleString().substr(0,10);
+}
   function formatDateTimeStr2Mysql(dateTimeStr){
-    return new Date(dateTimeStr).toISOString().substr(0,10);
+    return new Date(dateTimeStr).toLocaleString().substr(0,20);
   }
 function formatIndex(position){
     var main=Math.floor(position);

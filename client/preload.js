@@ -7,12 +7,12 @@ $('#mainFooter').hide();
 //getBasicDatabaseData();
 $('#mainLoadingMessage').text('读取中...');
 waitTask(logingStatus(),function(){
-
+    updateLastLogin(getGlobalJson("currentUser").id).then((r)=>console.log);
     getLegalAgencies().then(d=>{
         console.log('getLegalAgencies',d)
-        var agencies=d.data.filter(dd=>dd.position>0);
+        var agencies=d.data.filter(dd=>dd.position>0 && dd.isInactived==0);
         resourceDatas['legalAgencies']=agencies;
-        resourceDatas['users']=d.data;
+        resourceDatas['users']=d.data.filter(dd=>dd.id>0);
     })
     getBasic(basicTableList,[]).then(d=>{
         //console.log(d.data.attorneys);
@@ -243,13 +243,13 @@ function logingStatus(){
 		$('#username').text(getGlobalJson("currentUser").name);
         getCurrentUser({id:getGlobalJson("currentUser").id,pass:getGlobalJson("currentUser").pass,user:getGlobalJson("currentUser").user})
         .then((d)=>{
-            if(d.data.length>0 && d.data[0].hasOwnProperty('name')){
+            if(d.data.length>0 && d.data[0].hasOwnProperty('isInactived') && d.data[0].isInactived==0){
                 setGlobalJson("currentUser",d.data[0]);
             }else{
                 showAutoLogin();
                 return false;
             }
-            
+           
         });
         return true;
 	}else{

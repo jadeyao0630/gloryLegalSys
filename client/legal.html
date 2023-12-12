@@ -39,7 +39,7 @@
                 
             </div>
             <h1 style="font-size: 30px;">国瑞法务管理系统</h1>
-            <a id="name" href="#popupMenu" data-rel="popup" data-transition="slideup" data-icon="user" class="ui-btn-right">登录</a>
+            <a id="username" href="#popupMenu" data-rel="popup" data-transition="slideup" data-icon="user" class="ui-btn-right">登录</a>
             <div data-role="popup" id="popupMenu" data-theme="b" data-history="false">
                 <ul data-role="listview" data-inset="true" style="min-width:160px;" data-theme="b">
                     <li data-role="list-divider">操作</li>
@@ -49,6 +49,7 @@
 					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-add-row admin-ui" data-rel="back">添加记录</a></li>
 					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-add-table admin-ui" data-rel="back">添加表</a></li>
 					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-read-table admin-ui" data-rel="back">读取表</a></li>
+					<li><a class="ui-btn ui-btn-a ui-btn-icon-left ui-icon-plus popup-menu-btns popup-add-user-table admin-ui" data-rel="back">用户</a></li>
                 </ul>
             </div>
             
@@ -187,6 +188,7 @@
 			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
 		</div><!-- /header -->
 		<div class="ui-body-d ui-content">
+			<div id="settings_container"></div>
 			<ul data-role="listview" data-inset="true" data-theme="a" data-divider-theme="b" id="settings_body"></ul>
 		</div>
 	</div>

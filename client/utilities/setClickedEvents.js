@@ -247,7 +247,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                         var item_container=$('<li data-item=\''+JSON.stringify(item)+'\'></li>');
                         //console.log('JSON.stringify',item_d);
                         var del_btn;
-                        if(item.hasOwnProperty('evidenceId')){
+                        if(item.type=='caseAttachments'){
                             var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+"["+item.typeName+"] "+item.description+'</h3>');
                             
                             item_container=$('<li style="padding:0px;" data-item=\''+JSON.stringify(item)+'\'></li>');
@@ -295,6 +295,9 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                     //console.log($(this).closest('li'),data.id,data.type,data.key,typeName);
                     switch(typeName){
                         case '查看':
+                            var itemData=getDataById(DataList[data.type],data.key,data.id);
+                            console.log('查看',data,itemData);
+                            downloadFile(itemData.id,itemData.filePath);
                             break;
                         case '编辑':
                             //console.log(data.id,data.type,data.key,typeName)
@@ -359,7 +362,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                                     break;
                                 case 'caseAttachments':
                                     console.log("附件");
-                                    var form= new mform({template:add_property_template});
+                                    var form= new mform({template:add_evidence_template});
                                     var data={table:data.type,idkey:'evidenceId',dateKey:'dateUploaded',data:itemData};
                                     
                                     itemData['dateUploaded']=getDateTime();
@@ -559,7 +562,16 @@ function updateSubmitEvent(e){
                     }else{
                         //files=values.data.caseAttachments;
                         if(values.data.values.filePath.length>0){
+                            uploadFiles(data.id,values.data.values.filePath).then(r=>{
+                                //console.log(r);
+                                $.each(r,(index,uploadResult)=>{
+                                    if(!uploadResult.success){
+                                        console.log(uploadResult.fileName.name+" 上传失败！");
+                                    }
+                                });
+                            });
                             values.data.values.filePath=values.data.values.filePath[0].name;
+                            
                         }
                         
                         //values.data.caseAttachments
@@ -944,6 +956,13 @@ $('.edit-header-btn').on('click',function(e){
                         console.log(DataList.caseStatus);
                         $(window).trigger('hidepopup');
                     });
+                }
+            });
+        }else if(sessionStorage.getItem('currentPage')=="#settingsPage"){
+            setting_info_form.instance.getValues(0,settingPage_form.template,function(message,values){
+                //console.log(values)
+                if(values.success){
+                    console.log(values);
                 }
             });
         }

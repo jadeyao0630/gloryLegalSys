@@ -48,7 +48,7 @@
 .hide{
     display: none;
 }
-#name{
+#username{
     text-align: right;
     margin-right: 20px;
     margin-top: 8px;
@@ -238,6 +238,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     opacity: 0;
     transition: opacity 0.3s;
     z-index: 1000;
+    text-shadow: none;
 }
 .btn-tooltip{
 

@@ -146,7 +146,7 @@ mform.prototype={
                                 _self.elements[item_key]=generateInputTypeBase(item_container,item,item_key,template.settings.hasPlaceHolder);
                                 break;
                             case "password":
-                                _self.elements[item_key]=generateInputTypeBase(item_container,item,item_key,template.settings.hasPlaceHolder);
+                                _self.elements[item_key]=generateInputPassword(item_container,item,item_key,template.settings.hasPlaceHolder);
                                 break;
                             case "combobox":
                                 _self.elements[item_key]=generateComboBoxItem(item_container,item,item_key);
@@ -189,6 +189,10 @@ mform.prototype={
                         }
                         if(item.isDisabled){
                             _self.elements[item_key].attr("disabled",true);
+                        }
+                        
+                        if(item.isAdminOnly){
+                            item_container.addClass('admin-ui');
                         }
                         var replacement=replacementOfInput(item_key);
                         item_container.append(replacement);
@@ -240,6 +244,101 @@ mform.prototype={
             var input=$('<input type="'+item.type+'" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'"'+fileType+' '+setRequired(item.isOptional,"此项必须正确填写")+'>');
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(input);
+            item_container.append(subContainer);
+            return input;
+            //return item_container;
+        }
+        function generateInputPassword(item_container,item,id,hasPlaceHolder){
+            //var item_container=$('<div class="form_item_panel"></div>');
+            var placeholder="";
+            if(hasPlaceHolder&&item.placeholder!=undefined) placeholder=' placeholder="'+item.placeholder+'"';
+            var val="";
+            var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
+            item_container.append(label);
+            labelStyle(label,template);
+            var input=$('<input type="password" data-wrapper-class="controlgroup-textinput ui-btn" class="form-original" name="'+id+'" id="'+id+'"'+placeholder+'" value="'+val+'" '+setRequired(item.isOptional,"此项必须正确填写")+'>');
+            
+            var subContainer=$('<div data-role="controlgroup" data-type="horizontal" class="form-original"></div>');
+            var showHideBtn=$('<button data-icon="eye" data-iconpos="notext">显示关闭</button>');
+            var changePassBtn=$('<a herf="#" class="ui-btn ui-btn-icon-notext btn-icon-blue ui-icon-edit">修改</a>');
+            subContainer.append(input);
+            //subContainer.append(pass);
+            subContainer.append(showHideBtn);
+            if(item.isChangeable) {
+                subContainer.append(changePassBtn);
+                input.addClass("ui-state-disabled");
+                changePassBtn.on('click',function(e){
+                    console.log(changePassBtn.jqmData('icon'));
+                    if(changePassBtn.hasClass('ui-icon-edit')){
+                        if(!showHideBtn.hasClass('btn-icon-green')){
+                            $().requestPasswordToChange(function(res){
+                                if(res.success){
+                                    console.log("登陆成功。。")
+                                    input.removeClass("ui-state-disabled");
+                                    input.trigger('create')
+                                    //input.val("changed")
+                                    subContainer.trigger('create');
+                                    changePassBtn.removeClass('ui-icon-edit').addClass('ui-icon-check');;
+                                    changePassBtn.removeClass('btn-icon-blue').addClass('btn-icon-green');
+                                    changePassBtn.trigger('create');
+                                    subContainer.trigger('create');
+                                }else{
+                                    $().minfo("show",{message:'密码无效。',type:'alert',title:'错误'});
+                                }
+                            },'需要输入您的密码以进行下一步。')
+                        }else{
+                            input.removeClass("ui-state-disabled");
+                            input.trigger('create')
+                            //input.val("changed")
+                            subContainer.trigger('create');
+                            changePassBtn.removeClass('ui-icon-edit').addClass('ui-icon-check');;
+                            changePassBtn.removeClass('btn-icon-blue').addClass('btn-icon-green');
+                            changePassBtn.trigger('create');
+                            subContainer.trigger('create');
+                        }
+                        
+                    }else{
+                        input.addClass("ui-state-disabled");
+                        input.trigger('create')
+                        //input.val("changed")
+                        subContainer.trigger('create');
+                        changePassBtn.removeClass('ui-icon-check').addClass('ui-icon-edit');;
+                        changePassBtn.removeClass('btn-icon-green').addClass('btn-icon-blue');
+                        changePassBtn.trigger('create');
+                        subContainer.trigger('create');
+                    }
+                    
+                });
+            }
+            showHideBtn.on('click',function(e){
+                var _this=this;
+                if($(input).attr('type')=="text"){
+                    $(input).attr('type',"password");
+                    $(this).removeClass('btn-icon-green');
+                }
+                else{
+                    if(!changePassBtn.hasClass('ui-icon-check')){
+                        $().requestPasswordToChange(function(res){
+                            if(res.success){
+                                console.log("登陆成功。。")
+                                $(input).attr('type',"text");
+                                $(_this).addClass('btn-icon-green');
+                            }else{
+                                $().minfo("show",{message:'密码无效。',type:'alert',title:'错误'});
+                            }
+                        },'需要输入您的密码以进行下一步。')
+                    }else{
+                        $(input).attr('type',"text");
+                        $(_this).addClass('btn-icon-green');
+                    }
+                    
+                    
+                }
+                //console.log(input.type)
+                input.trigger('create')
+                //input.val("changed")
+                subContainer.trigger('create');
+            })
             item_container.append(subContainer);
             return input;
             //return item_container;

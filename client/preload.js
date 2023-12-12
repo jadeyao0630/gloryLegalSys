@@ -240,7 +240,7 @@ function logingStatus(){
             
         });
         //'JOIN caseStatus ON cases.id=caseStatus.id AND caseStatus.legalAgencies=1'
-		$('#name').text(getGlobalJson("currentUser").name);
+		$('#username').text(getGlobalJson("currentUser").name);
         getCurrentUser({id:getGlobalJson("currentUser").id,pass:getGlobalJson("currentUser").pass,user:getGlobalJson("currentUser").user})
         .then((d)=>{
             if(d.data.length>0 && d.data[0].hasOwnProperty('name')){

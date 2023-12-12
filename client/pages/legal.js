@@ -2,7 +2,8 @@
 var form,//header filter form
 pageOnTable,//main table
 caseForm,
-progressInfoForm;
+progressInfoForm,
+setting_info_form;
 var currentData;
 //getGlobal("currentId")
 //getGlobal("currentUser")
@@ -29,6 +30,14 @@ $('body').on(main_load_completed_event_name,function(){
     }, 100);
 });
 $('body').on(preload_completed_event_name,function(){
+
+    setting_info_form= new mform({template:settingPage_form});
+    info_form=setting_info_form.instance;
+    var container=$('#settings_container')
+    container.append(info_form);
+    container.trigger('create');
+    setting_info_form.setData(getGlobalJson("currentUser"));
+
     //console.log('resourceDatas',getGlobalJson('resourceDatas'));
     var tb=$('.header-search-container').togglebuttonicon(form,function(e,isbefore){
         if(e){

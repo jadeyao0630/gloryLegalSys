@@ -102,8 +102,9 @@ var _summary_template;
                         placeholder:"上传文件",
                         label:"附件:",
                         type:"file",
+                        isMultiple:true,
                         isOptional:true,
-                        data:"支持扩展名：rar. zip. doc. docx. pdf. jpg… 单个文件不超过200MB",
+                        data:"支持扩展名：rar. zip. doc. docx. pdf. jpg… 单个文件不超过50MB",
                         table:'caseAttachments'
                     }
                 }
@@ -961,6 +962,58 @@ var _summary_template;
       },
       template:list_evidence
     }
+    settingPage_form={
+      settings:{
+        templateColumn:"33.3% 33.3% 33.3%",
+          hasLabel:true,
+          hasPlaceHolder:true,
+          labelPosition:"left",
+          width:"100%",
+          textareaHeight:50,
+          isCollapsibleGrouping:true
+      },
+      template:{
+          personInfo:{
+              label:"个人信息",
+              data:{
+                name:{
+                      placeholder:"姓名",
+                      label:"姓名:",
+                      type:"text",
+                      isOptional:true,
+                  },
+                  contact:{
+                      placeholder:"联系方式",
+                      label:"联系方式:",
+                      type:"tel",
+                      isOptional:true,
+                  },
+                  email:{
+                      placeholder:"电子邮箱",
+                      label:"电子邮箱:",
+                      type:"email",
+                      isOptional:true,
+                  },
+                  pass:{
+                      placeholder:"密码",
+                      label:"密码:",
+                      type:"password",
+                      isOptional:true,
+                      isChangeable:true,
+                  },
+                  level:{
+                      placeholder:"权限",
+                      label:"权限:",
+                      type:"combobox",
+                      isOptional:true,
+                      data:resourceDatas.authLevels,
+                      isAdminOnly:true
+                  },
+              }
+              
+          },
+        }
+      };
   header_filter_template={
     settings:{
       hasLabel:true,

@@ -6,8 +6,11 @@
 <!-- JavaScript -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  $('#downloadBtn').click(function() {
-    window.location = 'http://localhost:5555/download';
+  var headers={
+    'Content-Type': 'application/json'
+};
+  $('#downloadBtn').click(async function() {
+    window.location = 'http://192.168.10.69:5555/downloadLocal?fileName=国瑞信息软件表.xlsx&folder=Downloads';
   });
 </script>
 <script>
@@ -18,15 +21,14 @@
       var file = fileInput.files[0];
       var formData = new FormData();
       formData.append('file', file);
-      formData.append('filePath','Downloads');
+      formData.append('folder','Downloads');
       
       $.ajax({
-        url: 'http://localhost:5555/upload1s',
+        url: 'http://192.168.10.69:5555/uploadLocal',
         type: 'POST',
         data: formData,
         processData: false,
         contentType: false,
-        body:'2',
         success: function(response) {
           console.log(response);
         },

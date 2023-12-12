@@ -215,14 +215,7 @@ $.fn.extend({
                     content=arg.content;
                 }
             }
-            var popup;
-            if(content instanceof String){
-                popup=$('<div class="popup-fullscreen"'+popup_style+'>'+content+'</div>');
-            }else{
-                popup=$('<div class="popup-fullscreen"'+popup_style+'></div>');
-                popup.append(content);
-            }
-            
+            var popup=$('<div class="popup-fullscreen"'+popup_style+'>'+content+'</div>');
             $('body').append(popup);
             popup.trigger('create');
             var index=$('div[data-position="fixed"][data-role="header"]').css('z-index');
@@ -235,10 +228,27 @@ $.fn.extend({
             $().hideMessage("popup-fullscreen");
         }
     },
-    requestPassword:function(response){
+    requestPasswordToChange:function(response,messages){
+        if(messages==undefined) messages='此操作需要管理员密码的。';
         $().requestDialog({
             title:'提示',
-            message:'此操作需要管理员密码的。',
+            message:messages,
+            content:$('<input type="password" data-theme="a" value="" placeholder="请输入密码">')
+        },function(go,form){
+            if($(form).find('input').val()==getGlobalJson("currentUser").pass){
+                console.log("登陆成功。。")
+                response({success:true});
+            }else{
+
+                response({success:false});
+            }
+        });
+    },
+    requestPassword:function(response,messages){
+        if(messages==undefined) messages='此操作需要管理员密码的。';
+        $().requestDialog({
+            title:'提示',
+            message:messages,
             content:$('<input type="password" data-theme="a" value="" placeholder="请输入密码">')
         },function(go,form){
             if($(form).find('input').val()==auth_code){

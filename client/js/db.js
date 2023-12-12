@@ -1,6 +1,41 @@
 var headers={
     'Content-Type': 'application/json'
 };
+async function downloadFile(folder,fileName){
+    window.location = "http://"+ip+":"+port+"/downloadLocal?fileName="+fileName+"&folder="+folder;
+}
+async function uploadFiles(folder,files){
+    var results=[];
+    $.each(files,(index,file)=>{
+        var formData = new FormData();
+        formData.append('file', file);
+        formData.append('folder',folder);
+        
+        $.ajax({
+          url: "http://"+ip+":"+port+"/uploadLocal",
+          type: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(response) {
+            console.log(response);
+            results.push({success:true,fileName:file});
+          },
+          error: function(xhr, status, error) {
+            console.error('Error uploading file:', error);
+            results.push({success:false,fileName:file,error:error});
+          }
+        });
+    })
+    return new Promise(resolve => {
+        const intervalId = setInterval(() => {
+        if (Object.keys(results).length === files.length) {
+            clearInterval(intervalId);
+            resolve(results);
+        }
+        }, 100);
+    });
+}
 async function getCaseLatestIndex(){
     var latestId=-1;
     var query="SELECT * FROM cases ORDER BY id DESC LIMIT 1"

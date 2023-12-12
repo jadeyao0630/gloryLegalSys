@@ -67,8 +67,8 @@ ProgressesButton.prototype.init=function(arg){
     //if(this.instance!=null) this.instance.remove();
     //console.log(_this.opt.containerId);
     
-    var steps=_this.opt.steps;
-    var step=parseInt((_this.opt.width-_this.opt.size*2)/(steps.length-1));
+    this.steps=_this.opt.steps;
+    var step=parseInt((_this.opt.width-_this.opt.size*2)/(_this.steps.length-1));
     this.step=step;
     //console.log("step: "+(step*this.opt.currentPosition-_this.opt.size));
     if(this.instance==null){
@@ -92,16 +92,20 @@ ProgressesButton.prototype.init=function(arg){
     var v_step=_this.opt.size*2+v_gap;
     var arrayIndex=[];
     if(!_this.opt.showSubSteps){
-        steps.forEach(function(step_item,index){
-            if(step_item instanceof Array){
-                arrayIndex.push(index);
-            }
-        });
-        steps = $.grep(steps,function (step){
-            return !(step instanceof Array);
-        });
+        
+            _this.steps.forEach(function(step_item,index){
+                if(step_item instanceof Array){
+                    //_this.steps[index]="执行"
+                    arrayIndex.push(index);
+                }
+                //arrayIndex.push(index);
+            });
+            _this.steps = $.grep(_this.steps,function (step){
+                return !(step instanceof Array);
+            });
+        
     }
-    steps.forEach(function(step_item,index){
+    _this.steps.forEach(function(step_item,index){
         if(index>0){
             //var line_left=_this.opt.size+step*(index-1);
             lefts.push(_this.opt.size+step*(index));
@@ -130,7 +134,7 @@ ProgressesButton.prototype.init=function(arg){
     //this.instance.css({height:(tops[tops.length-2]+_this.opt.size+_this.opt.line_size*2)+"px"});
     //console.log("H: "+(tops[1]-tops[0])+"--W: "+step+"="+Math.sqrt(v_h*v_h+step*step));
     var drawNextLine=true;
-    steps.forEach(function(step_item,index){
+    _this.steps.forEach(function(step_item,index){
         if(step_item instanceof Array){
             
             option_index=index;
@@ -308,7 +312,7 @@ ProgressesButton.prototype.init=function(arg){
             
             //#endregion
         }
-        if(index+1<steps.length && drawNextLine){
+        if(index+1<_this.steps.length && drawNextLine){
             //var line_left=_this.opt.size+step*(index-1);
             //lefts.push(_this.opt.size+step*(index-1));
             //console.log(index+"-"+step_item+": "+lefts[index]);

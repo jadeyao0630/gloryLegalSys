@@ -47,19 +47,19 @@ function getFlowList(data){
         label:"立案",
         date:caseData.caseDate,
         id:0,
-        data:getStageList(-1,data)
+        data:getStageList(0,data)
     });
     //console.log('formatIndex....',progresses);
     if(progresses!=undefined){//---progresses需要植入到data
         progresses.forEach((stage,idx)=>{
-            var index=idx+1;
+            var index=idx;
             switch(stage){
                 case "一审":
                     flowList.push({
                         label:stage,
                         date:caseData.FirstInstance,
                         id:index,
-                        data:getStageList(index-1,data)
+                        data:getStageList(index,data)
                     });
                     break;
                 case "二审":
@@ -67,7 +67,7 @@ function getFlowList(data){
                         label:stage,
                         date:caseData.SecondInstance,
                         id:index,
-                        data:getStageList(index-1,data)
+                        data:getStageList(index,data)
                     });
                     break;
                 case "执行":
@@ -79,25 +79,25 @@ function getFlowList(data){
                     flowList.push({
                         label:stage,
                         id:index,
-                        data:getStageList(index-1,data)
+                        data:getStageList(index,data)
                     });
                     break;
                 case "再审":
                     flowList.push({
                         label:stage,
                         id:index,
-                        data:getStageList(index-1,data)
+                        data:getStageList(index,data)
                     });
                     break;
                 case "监督":
                     flowList.push({
                         label:stage,
                         id:index,
-                        data:getStageList(index-1,data)
+                        data:getStageList(index,data)
                     });
                     break;
                 default:
-                    var statusId=index-1+formatIndex(caseData.caseStatus).sub/10;
+                    var statusId=index+formatIndex(caseData.caseStatus).sub/10;
 
                     //console.log('formatIndex....',getStatusLabel(statusId,progresses))
                     flowList.push({

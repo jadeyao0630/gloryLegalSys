@@ -1,24 +1,32 @@
 <input type="file" id="fileInput" multiple="multiple">
 <button id="uploadButton">Upload</button>
+<button id="downloadBtn">下载文件</button>
+
 
 <!-- JavaScript -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+  $('#downloadBtn').click(function() {
+    window.location = 'http://localhost:5555/download';
+  });
+</script>
+<script>
   $(document).ready(function() {
     $('#uploadButton').on('click', function() {
       var fileInput = document.getElementById('fileInput');
-      $.each()
+      //$.each()
       var file = fileInput.files[0];
       var formData = new FormData();
       formData.append('file', file);
-      
+      formData.append('filePath','Downloads');
       
       $.ajax({
-        url: 'http://cn.luyao.site:5555/upload',
+        url: 'http://localhost:5555/upload1s',
         type: 'POST',
         data: formData,
         processData: false,
         contentType: false,
+        body:'2',
         success: function(response) {
           console.log(response);
         },
@@ -29,6 +37,7 @@
       
     });
   });
+
   /*
   const downloadFile = (filePath, customFileName) => {
   fetch(`/getFileWithCustomName?filePath=${encodeURIComponent(filePath)}&customFileName=${encodeURIComponent(customFileName)}`)

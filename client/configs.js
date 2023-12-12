@@ -1,4 +1,4 @@
-var isRunLocal=false;
+var isRunLocal=true;
 var showDebug=false;
 let ip=isRunLocal?'192.168.10.69':'cn.luyao.site';
 let port=5555;

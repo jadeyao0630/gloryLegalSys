@@ -551,12 +551,33 @@ function updateSubmitEvent(e){
                 if (goNext) {
                     clearInterval(intervalId);
                     $().mloader("show",{message:"提交中...."});
+                    //var files=[];
                     var idx=await getRecordLatestIndex(data.table,data.key);
                     if(data.table!='caseAttachments'){
                         var subidx=await getRecordLatestIndex(data.table,'subId','caseStatus='+data.caseStatus);
                         values.data.values.subId=subidx+1;
+                    }else{
+                        //files=values.data.caseAttachments;
+                        if(values.data.values.filePath.length>0){
+                            values.data.values.filePath=values.data.values.filePath[0].name;
+                        }
+                        
+                        //values.data.caseAttachments
                     }
-                    
+                    /*
+                    if(files.length>0){
+                        var filePath=[];
+                        $.each(files,(index,file)=>{
+                            filePath.push({
+                                id:data.id,
+                                caseNo:data.caseNo,
+                                evidenceId:idx+1,
+                                aseStatus:data.caseStatus,
+                            });
+                        });
+                        //values.data.caseAttachments=
+                    }
+                    */
                     //console.log(data.table+" id",idx,data.table+" subid",subidx);
                     values.data.values[data.key]=idx+1;
                     values.data.values.caseNo=data.caseNo;
@@ -599,7 +620,7 @@ function updateSubmitEvent(e){
                         }
                     }
                     
-                    //console.log("final values",data.table,values.data.values);
+                    console.log("final values",data.table,values.data.values);
                     insert(data.table,values.data.values,(r)=>{
                         console.log('insert result',data.table,r,currentProgress['target']);
                         

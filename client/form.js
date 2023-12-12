@@ -297,7 +297,8 @@ mform.prototype={
             item_container.append(label);
             
             labelStyle(label,template);
-            var input=$('<input class="form-original" type="file" name="'+id+'" id="'+id+'" value="" '+setRequired(item.isOptional,"此项必须填写")+'>');
+            var multiple=item.isMultiple?' multiple="multiple"':'';
+            var input=$('<input class="form-original" type="file" name="'+id+'" id="'+id+'" value=""'+multiple+' '+setRequired(item.isOptional,"此项必须填写")+'>');
             //item_container.append(input);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(input);
@@ -1285,6 +1286,8 @@ $.fn.extend({
                         }
                         if(eval.length==0) val=0;
                         else val=parseInt(val);
+                    }else if(element.type.toLowerCase()=="file"){
+                        val=$(element).prop('files');
                     }
                     if(val.length==0 && !itemTemplate.isOptional){
                         console.log(itemTemplate.label+"-- has error value"+val);

@@ -466,3 +466,16 @@ ui-collapsible.collapsible-listview .ui-btn{
     background-color: #1362B7;
     text-shadow: none;
   }
+  .logo-image{
+    animation: blink 6s infinite;
+  }
+  @keyframes blink{
+    10%{
+        opacity: 1;
+    }50%{
+        opacity: 0.1;
+    }
+    90% {
+      opacity: 1;
+    }
+  }

@@ -10,6 +10,7 @@ function databaseBatchForm(data){
         form.instance.getValues(0,databasePage_form.template,function(message,values){
             console.log('databaseBatchForm',values)
             if(values.success){
+                $().mloader("show",{message:"提交中...."});
                 var tableName=combineDB[values.data.values.dbName].tablename;
 
                 var range0=values.data.values["matchRange"].split(',')[0];
@@ -21,7 +22,12 @@ function databaseBatchForm(data){
                 update(values.data.values.matchId+rangeStr,
                     tableName,
                     values.data.values.targetId+"=\""+values.data.values.targetValue+"\"",(e)=>{
-                        console.log(e);
+                        console.log(e.data.message);
+                        $().mloader("hide");
+                        $().minfo('show',{title:"提示",message:"保存完成。"+e.data.message},function(){
+                           // goToPage('#');
+                        });
+
                 })
                 
             }
@@ -31,6 +37,7 @@ function databaseBatchForm(data){
         form.setEmptyData();
     });
     $('#database_container').find('#dbName').on('change',function(e){
+        /*
         form.instance.getValues(0,databasePage_form.template,function(message,values){
             //console.log("changed",values);
             if(values.data.dbName!="无" && values.key=="dbName"){
@@ -39,6 +46,7 @@ function databaseBatchForm(data){
             
 
         });
+        */
         //basicTableList[]
         //$('#database_container').find('#matchId')
     });

@@ -1023,6 +1023,36 @@ var _summary_template;
               }
               
           },
+          databseInsert:{
+            label:"数据库批处理",
+            data:{
+              dbName_insert:{
+                    placeholder:"数据库名",
+                    label:"数据库名:",
+                    type:"combobox",
+                    isOptional:false,
+                    data:addEmptyValueToArray(Object.keys(Object.assign(basicTableList,caseTableList))),
+                    isValueCanNotBeNone:true,
+                    valueKey:"*"
+                },
+                insertQuery:{
+                    placeholder:"插入命令",
+                    label:"插入命令:",
+                    type:"textarea",
+                    isOptional:false,
+                },
+                cutom:{
+                  type:"custom",
+                  data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
+                  '<a class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left database-insert-reset">复位</a>'+
+                  '<a class="ui-btn ui-corner-all ui-shadow ui-icon-check btn-icon-green ui-btn-icon-left database-insert-submit">修改</a>'+
+                  '</div>',
+                  
+                  //span:'4/4'
+              },
+            }
+            
+          },
         }
       };
     settingPage_form={

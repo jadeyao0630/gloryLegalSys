@@ -626,6 +626,7 @@ function updateSubmitEvent(e){
                     clearInterval(intervalId);
                     $().mloader("show",{message:"提交中...."});
                     //var files=[];
+                    //var cango=true;
                     var idx=await getRecordLatestIndex(data.table,data.key);
                     if(data.table!='caseAttachments'){
                         var subidx=await getRecordLatestIndex(data.table,'subId','caseStatus='+data.caseStatus);
@@ -638,6 +639,8 @@ function updateSubmitEvent(e){
                                 $.each(r,(index,uploadResult)=>{
                                     if(!uploadResult.success){
                                         console.log(uploadResult.fileName.name+" 上传失败！");
+                                        //cango=false;
+                                        //$().mloader("hide");
                                     }
                                 });
                             });
@@ -647,21 +650,7 @@ function updateSubmitEvent(e){
                         
                         //values.data.caseAttachments
                     }
-                    /*
-                    if(files.length>0){
-                        var filePath=[];
-                        $.each(files,(index,file)=>{
-                            filePath.push({
-                                id:data.id,
-                                caseNo:data.caseNo,
-                                evidenceId:idx+1,
-                                aseStatus:data.caseStatus,
-                            });
-                        });
-                        //values.data.caseAttachments=
-                    }
-                    */
-                    //console.log(data.table+" id",idx,data.table+" subid",subidx);
+
                     values.data.values[data.key]=idx+1;
                     values.data.values.caseNo=data.caseNo;
                     values.data.values.id=data.id;

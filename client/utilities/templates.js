@@ -98,6 +98,7 @@ var _summary_template;
                       displayFormat:'{name}',
                       isFilterable:false,
                     },
+                    /*
                     caseAttachments:{
                         placeholder:"上传文件",
                         label:"附件:",
@@ -107,6 +108,7 @@ var _summary_template;
                         data:"支持扩展名：rar. zip. doc. docx. pdf. jpg… 单个文件不超过50MB",
                         table:'caseAttachments'
                     }
+                    */
                 }
                 
             },
@@ -962,6 +964,67 @@ var _summary_template;
       },
       template:list_evidence
     }
+    databasePage_form={
+      settings:{
+        templateColumn:"33.3% 33.3% 33.3%",
+          hasLabel:true,
+          hasPlaceHolder:true,
+          labelPosition:"left",
+          width:"100%",
+          textareaHeight:50,
+          isCollapsibleGrouping:true
+      },
+      template:{
+          databseBatch:{
+              label:"数据库批处理",
+              data:{
+                dbName:{
+                      placeholder:"数据库名",
+                      label:"数据库名:",
+                      type:"combobox",
+                      isOptional:false,
+                      data:addEmptyValueToArray(Object.keys(Object.assign(basicTableList,caseTableList))),
+                      isValueCanNotBeNone:true,
+                      valueKey:"*"
+                  },
+                  matchId:{
+                      placeholder:"索引ID",
+                      label:"索引ID:",
+                      type:"text",
+                      isOptional:false,
+                  },
+                  matchRange:{
+                      placeholder:"索引范围",
+                      label:"索引范围:",
+                      type:"textrange",
+                      isOptional:false,
+                  },
+                  targetId:{
+                      placeholder:"目标ID",
+                      label:"目标ID:",
+                      type:"text",
+                      isOptional:false,
+                  },
+                  targetValue:{
+                      placeholder:"目标值",
+                      label:"目标值:",
+                      type:"text",
+                      isOptional:false,
+                  },
+                  cutom:{
+                    type:"custom",
+                    data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
+                    '<a class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left database-reset">复位</a>'+
+                    '<a class="ui-btn ui-corner-all ui-shadow ui-icon-check btn-icon-green ui-btn-icon-left database-submit">修改</a>'+
+                    '</div>',
+                    
+                    //span:'4/4'
+                },
+              }
+              
+          },
+        }
+      };
     settingPage_form={
       settings:{
         templateColumn:"33.3% 33.3% 33.3%",
@@ -1183,7 +1246,7 @@ var _summary_template;
           subType:"date",
           isOptional:true,
       },
-      isInactived:{
+      isInactived_f:{
 
       },
       cutom:{

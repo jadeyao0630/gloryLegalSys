@@ -397,7 +397,7 @@ ProgressesButton.prototype.init=function(arg){
                 else
                     return value.caseStatus==index+sub/10
             });
-            console.log('setCounterIndecator',_counter.length,index,_counter);
+            //console.log('setCounterIndecator',_counter.length,index,_counter);
             
             var size=_this.opt.size*2*0.4;
             var counter=getElement("progress-but-counter",{

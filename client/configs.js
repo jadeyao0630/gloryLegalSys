@@ -1,12 +1,13 @@
 var isRunLocal=true;
 var IPS=['localhost','192.168.10.69','cn.luyao.site']
 var showDebug=false;
-let ip=isRunLocal?IPS[0]:IPS[2];
+let ip=isRunLocal?IPS[1]:IPS[2];
 let port=5555;
 var auth_code='1234';
 var adminLevel=3;
 var enableConsoleLog=true;
 var enableRealDelete=true;
+var enableReadOnlyMode=false;
 var functionButoonPostion="top";
 const mainPage="legal.html";
 var logoSrc='https://img3.11467.com/2019/08-25/525155842.jpg'

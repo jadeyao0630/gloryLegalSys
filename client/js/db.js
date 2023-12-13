@@ -296,7 +296,7 @@ async function updateLastLogin(id){
         body: JSON.stringify({ where:"id="+id, table: userDbTableName, data:{lastLogin:new Date().toLocaleString().substr(0,20)}})
     })
     .then(response => {
-        console.log('updateLastLogin',response);
+        //console.log('updateLastLogin',response);
         return response.json();
     });
 }

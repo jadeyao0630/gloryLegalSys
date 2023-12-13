@@ -1282,25 +1282,62 @@ $.fn.extend({
                         }
                         
                     }else{
-                        var element=document.getElementById(item_key);
-                        var val = dataValidation(element,catelog.data[item_key],function(he){
-                            if(he) {
-                                response(error.FORM_EMPTY_VALUE,{data:values,success:!he});
-                                _hasError=true;
-                                hasError=true;
-                                return;
+                        //console.log(catelog.data[item_key].type);
+                        if(catelog.data[item_key].type.toLowerCase()=="textrange"){
+                            for(var idx=0;idx<2;idx++){
+                                var element=document.getElementById(item_key+"_"+idx);
+                                var val = dataValidation(element,catelog.data[item_key],function(he){
+                                    if(he) {
+                                        response(error.FORM_EMPTY_VALUE,{data:values,success:!he,key:item_key});
+                                        _hasError=true;
+                                        hasError=true;
+                                        return;
+                                    }
+                                    //console.log(item_key+"-->"+hasError);
+                                });
+                                console.log(item_key+"--->>"+catelog.data[item_key].table);
+                                if(catelog.data[item_key].table!=undefined){
+                                    if(!vals.hasOwnProperty(catelog.data[item_key].table)){
+                                        vals[catelog.data[item_key].table]={};
+                                    }
+                                    if(vals[catelog.data[item_key].table][item_key]!=undefined){
+                                        vals[catelog.data[item_key].table][item_key]+=","+val;
+                                    }else{
+                                        vals[catelog.data[item_key].table][item_key]=val;
+                                    }
+                                    
+                                }else{
+                                    if(values[item_key]!=undefined){
+                                        values[item_key]+=","+val;
+                                    }else{
+                                        values[item_key]=val;
+                                    }
+                                }
                             }
-                            //console.log(item_key+"-->"+hasError);
-                        });
-                        console.log(item_key+"--->>"+catelog.data[item_key].table);
-                        if(catelog.data[item_key].table!=undefined){
-                            if(!vals.hasOwnProperty(catelog.data[item_key].table)){
-                                vals[catelog.data[item_key].table]={};
-                            }
-                            vals[catelog.data[item_key].table][item_key]=val;
+                        }else if(catelog.data[item_key].type.toLowerCase()=="custom"){
+
                         }else{
-                            values[item_key]=val;
+                            var element=document.getElementById(item_key);
+                            var val = dataValidation(element,catelog.data[item_key],function(he){
+                                if(he) {
+                                    response(error.FORM_EMPTY_VALUE,{data:values,success:!he,key:item_key});
+                                    _hasError=true;
+                                    hasError=true;
+                                    return;
+                                }
+                                //console.log(item_key+"-->"+hasError);
+                            });
+                            console.log(item_key+"--->>"+catelog.data[item_key].table);
+                            if(catelog.data[item_key].table!=undefined){
+                                if(!vals.hasOwnProperty(catelog.data[item_key].table)){
+                                    vals[catelog.data[item_key].table]={};
+                                }
+                                vals[catelog.data[item_key].table][item_key]=val;
+                            }else{
+                                values[item_key]=val;
+                            }
                         }
+                        
                     }
                     console.log(item_key+"-->"+hasError);
                     if(hasError) {
@@ -1325,7 +1362,7 @@ $.fn.extend({
                     var element=document.getElementById(catelog_key);
                     var val = dataValidation(element,catelog,function(he){
                         if(he) {
-                            response(error.FORM_EMPTY_VALUE,{data:values,success:!he});
+                            response(error.FORM_EMPTY_VALUE,{data:values,success:!he,key:item_key});
                             _hasError=true;
                             hasError=true;
                             return;
@@ -1364,12 +1401,13 @@ $.fn.extend({
         vals.values=values;
         response(error.FORM_VALIDATION_COMPLETED,{data:vals,success:!_hasError});
         function dataValidation(element,itemTemplate,res){
+            console.log(itemTemplate);
             var hasError=false;
             var val=element.value;
             //$('#popupArrow').css({'margin-top':'20px;'})
             switch (element.nodeName.toUpperCase()){
                 case "INPUT":
-                    console.log(itemTemplate.numberOnly,val,isNumber(val));
+                    //console.log(itemTemplate.numberOnly,val,isNumber(val));
                     //console.log(element.type);
                     if(element.type.toLowerCase()=="date"||element.type.toLowerCase()=="time"||element.type.toLowerCase()=="datetime"){
                         if(val.length>0){
@@ -1392,7 +1430,7 @@ $.fn.extend({
                     }else if(itemTemplate.numberOnly){
                         
                         if(!isNumber(val)||val.length===0) {
-                            console.log(itemTemplate.label+"-- has error value"+val);
+                            //console.log(itemTemplate.label+"-- has error value"+val);
                             hasError=true;
                         }
                         if(eval.length==0) val=0;
@@ -1404,7 +1442,7 @@ $.fn.extend({
                         console.log(itemTemplate.label+"-- has error value"+val);
                         hasError=true;
                     }
-                    console.log(element.id,hasError,val.length,itemTemplate.isOptional)
+                    //console.log(element.id,hasError,val.length,itemTemplate.isOptional)
                     res(hasError);
                     break;
                 case "SELECT":
@@ -1417,22 +1455,55 @@ $.fn.extend({
                         _val=_greatVal;
                     }else{
                         $.each($(element).find(":selected"),function(index,opt){
-                            console.log(itemTemplate.label+"--------->"+opt.value,$(element).val());
+                            //console.log(itemTemplate.label+"--------->"+opt.value,$(element).val());
                             _val.push(opt.value);
                             _subVal.push($(opt).jqmData('statusValue'));
                             _greatVal.push(($(opt).jqmData('statusValue')==undefined?"":$(opt).jqmData('statusValue'))+opt.value);
                         });
                         
                     }
+                    
                     if(_val.length==0 && !itemTemplate.isOptional) {
                         console.log(itemTemplate.label+"-- has empty value"+_val.join(","));
                         hasError=true;
+                    }else{
+                        //console.log("combobox check...",_val,(itemTemplate.data!=undefined),(itemTemplate.isValueCanNotBeNone));
+                        if(itemTemplate.data!=undefined && itemTemplate.isValueCanNotBeNone && !itemTemplate.isOptional){
+                            //console.log("combobox check...",_val,$.grep(_val,(v)=>itemTemplate.data[v]=="无").length)
+                            if($.grep(_val,(v)=>itemTemplate.data[v]=="无").length>0){
+                                console.log(itemTemplate.label+"-- has empty value"+_val.join(","));
+                                hasError=true;
+                            }
+                        }
                     }
                     res(hasError);
-                    console.log(itemTemplate.label,_subVal);
-                    console.log(itemTemplate.label,_val);
-                    console.log(itemTemplate.label,_greatVal);
-                    val=_greatVal.join(",");
+                    //console.log(itemTemplate.label,_subVal);
+                    //console.log(itemTemplate.label,_val);
+                    //console.log(itemTemplate.label,_greatVal);
+                    if(itemTemplate.hasOwnProperty('valueKey')){
+                        var _v=[];
+                        if(itemTemplate.valueKey=="*"){
+                            $.each(_val,(i,v)=>{
+                                //console.log('itemTemplate.valueKey',v)
+                                if(itemTemplate.data instanceof Array){
+                                    _v.push(itemTemplate.data[parseInt(v)]);
+                                }else{
+                                    _v.push(itemTemplate.data[v]);
+                                }
+                               
+                            });
+                            val=_v.join(",");
+                        }else{
+                            $.each(_val,(v)=>{
+                                _v.push(itemTemplate.data[v][itemTemplate.valueKey]);
+                            });
+                            val=_v.join(",");
+                        }
+                        
+                    }else{
+                        val=_greatVal.join(",");
+                    }
+                    
                     break;
                 case "TEXTAREA":
                     if(val.length===0 && !itemTemplate.isOptional){
@@ -1446,7 +1517,7 @@ $.fn.extend({
                 var tooltip=$('<span class="tooltip-serarch">'+$(element).jqmData('message')+'</span>');
                 _Self.find('.tooltip-serarch').remove();
                 _Self.append(tooltip);
-                console.log($(element).position(),$(element).offset(),$(element).offsetParent().hasClass('ui-popup'));
+                //console.log($(element).position(),$(element).offset(),$(element).offsetParent().hasClass('ui-popup'));
                 var position=$(element).offsetParent().hasClass('ui-popup')?$(element).position():$(element).offset();
                 $(tooltip).css({visibility: 'visible',
                     opacity: 1,'margin-left':"0px",

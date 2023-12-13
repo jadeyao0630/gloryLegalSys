@@ -3,7 +3,7 @@ var value_format="{value} ({status})";
 //#region superMultiSelectWithInput
 function superMultiSelectSetDatas(elementId,datas){//2中国人寿,3中国银行
     var listbox=$('#'+elementId+'-menu');
-    console.log('listbox',listbox);
+    //console.log('listbox',listbox);
     listbox.empty();
     $.each(datas,(index,data)=>{
         var fdata=formatSuperMultiSelectData(data);
@@ -77,7 +77,7 @@ function superMultiSelectRowItem(listbox,idx,format,data,notLast){
     });
     button.on('click',function(e){
         var id=$(this).jqmData('option-index');
-        console.log(id);
+        //console.log(id);
         var elementId=listbox.attr('id').replace('-menu','');
         if($(this).hasClass('ui-icon-plus')){
             //打印到selectbutton
@@ -99,11 +99,11 @@ function superMultiSelectRowItem(listbox,idx,format,data,notLast){
 
 function _getSuperValue(elementid,format){
 
-    console.log('formatSuperValue elementId',elementid);
+    //console.log('formatSuperValue elementId',elementid);
     var listbox_popup=$('#'+elementid.replace('#','')+'-listbox');
     var values=[];
 
-    console.log("formatSuperValue listbox_popup",listbox_popup);
+    //console.log("formatSuperValue listbox_popup",listbox_popup);
     $.each(listbox_popup.find('div[data-role="controlgroup"]'),function(i,cg){
         var input=$(cg).find('input');
         
@@ -198,7 +198,7 @@ function setSuperValue(element,values,vformat){
         
 
     })
-    console.log('setSuperValue selected',selected);
+    //console.log('setSuperValue selected',selected);
     selected.forEach((s)=>{
         $(s).prop('selected',true);
         $(s).parent().selectmenu().selectmenu("refresh");

@@ -35,6 +35,7 @@ $('body').on(preload_completed_event_name,function(){
     
     
 
+    databaseBatchForm();
     //console.log('resourceDatas',getGlobalJson('resourceDatas'));
     var tb=$('.header-search-container').togglebuttonicon(form,function(e,isbefore){
         if(e){
@@ -62,7 +63,7 @@ $('body').on(preload_completed_event_name,function(){
     }else if(getGlobalJson('currentUser').level==adminLevel){
         //$('#case_reg_but_restore').show();
         $('.admin-ui').show();
-        header_filter_template.template['isInactived']={
+        header_filter_template.template['isInactived_f']={
             label:"文档状态:",
             type:"multicombobox",
             data:['正常','删除'],

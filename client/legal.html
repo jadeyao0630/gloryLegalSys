@@ -48,6 +48,8 @@
 					<li data-role="list-divider" class="admin-ui">用户</li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-user admin-ui" data-rel="back">修改用户</a></li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue ui-icon-plus popup-menu-btns popup-add-user admin-ui" data-rel="back">添加用户</a></li>
+					<li data-role="list-divider" class="admin-ui">数据库</li>
+					<li><a href="#databasePage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-gear admin-ui" data-rel="back">数据库管理</a></li>
                 </ul>
             </div>
             
@@ -190,6 +192,15 @@
 			<ul data-role="listview" data-inset="true" data-theme="a" data-divider-theme="b" id="info_listview"></ul>
 		</div>
 	</div>
+	<div data-role="page" id="databasePage" >
+		<div data-role="header" data-position="fixed">
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
+			<h1 id="database_title">数据库管理</h1>
+		</div><!-- /header -->
+		<div class="ui-body-d ui-content admin-ui">
+			<div id="database_container"></div>
+		</div>
+	</div>
     <!--首页读取界面-->
 	<div id="main-container">
 		<div class="loading_logo_title">
@@ -208,6 +219,7 @@
 	<script type="text/javascript" src="./js/db.js"></script>
 	<script type="text/javascript" src="./preload.js"></script>
 	<script type="text/javascript" src="./utilities/templates.js"></script>
+	<script type="text/javascript" src="./utilities/formGenerator.js"></script>
     <script type="text/javascript" src="./timelinePage.js"></script>
     <script type="text/javascript" src="./utilities/setClickedEvents.js"></script>
     

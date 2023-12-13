@@ -165,7 +165,7 @@ waitTask(logingStatus(),function(){
         
         //console.log('caseTableList',caseTableList)
         getBasic(caseTableList,[]).then(d=>{
-            console.log('caseTableList completed: ',d.data);
+            output('caseTableList completed: ',d.data);
             //console.log(d.data);
             
             var combinedData=[];
@@ -211,7 +211,7 @@ const intervalId = setInterval(() => {
 function logingStatus(){
 	//setGlobalJson("currentUser","{}");
 	if(getGlobalJson("currentUser") && getGlobalJson("currentUser").name){
-        console.log('currentUser',getGlobalJson('currentUser'));
+        output('currentUser',getGlobalJson('currentUser'));
         
 
         //condtions.push('legalAgencies='+getGlobalJson('currentUser').id);

@@ -1,10 +1,18 @@
-function output(message){
-    if (enableConsoleLog) console.log(message);
+function output(...args){
+    if (enableConsoleLog) console.log(...args);
 }
 function extendOpt(opt1,opt2){
     for(var attr in opt2){
         //console.log(attr+": "+opt1[attr]+"-->"+opt2[attr]);
         opt1[attr] = opt2[attr];
+    }
+}
+function setAuthFunctions(){
+    if(getGlobalJson('currentUser').level==adminLevel){
+        //$('#case_reg_but_restore').show();
+        $('.admin-ui').show();
+    }else{
+        $('.admin-ui').hide();
     }
 }
 function waitTask(condition, callback){
@@ -391,7 +399,7 @@ $.fn.extend({
             popup_background.css("z-index",parseInt($('div[data-position="fixed"][data-role="header"]').css('z-index'))+1);
             popup.css("z-index",parseInt(popup_background.css('z-index'))+1);
             popup.popIn(popup_background);
-            console.log($('div[data-position="fixed"][data-role="header"]').css('z-index'));
+            //console.log($('div[data-position="fixed"][data-role="header"]').css('z-index'));
             return [popup,popup_background];
         }else{
             $().hideMessage();

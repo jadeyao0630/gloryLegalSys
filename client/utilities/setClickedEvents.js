@@ -29,6 +29,8 @@ $('#popupMenu').find('a').on('click',function(e){
             setting_info_form.setData(getGlobalJson("currentUser"));
             $('#info_container').empty();
             $('#info_container').append(setting_info_form.instance);
+                            
+            setAuthFunctions();
             $('#info_container').trigger('create');
             $($(this).attr( "href" )).find('.edit-header-btn.ui-icon-check').text('保存');
             goToPage( $(this).attr( "href" ));
@@ -38,6 +40,8 @@ $('#popupMenu').find('a').on('click',function(e){
             setting_add_form.setEmptyData();
             $('#info_container').empty();
             $('#info_container').append(setting_add_form.instance);
+                            
+            setAuthFunctions();
             $('#info_container').trigger('create');
             $($(this).attr( "href" )).find('.edit-header-btn.ui-icon-check').text('添加');
             goToPage( $(this).attr( "href" ));
@@ -63,6 +67,8 @@ $('#popupMenu').find('a').on('click',function(e){
                             setting_add_form.setData(userD);
                             $('#info_container').empty();
                             $('#info_container').append(setting_add_form.instance);
+                            
+                            setAuthFunctions();
                             $('#info_container').trigger('create');
                             $($(_this).attr( "href" )).find('.edit-header-btn.ui-icon-check').text('修改');
                             $($(_this).attr( "href" )).find('.edit-header-btn.ui-icon-check').data('item',JSON.stringify(userD));
@@ -73,6 +79,10 @@ $('#popupMenu').find('a').on('click',function(e){
                 }
                 
             });
+            break;
+        case '数据库管理':
+
+            goToPage( $(this).attr( "href" ));
             break;
         case '退出':
             //goToPage( $(this).attr( "href" ));
@@ -130,7 +140,7 @@ function functionBtnsEvent(but){
                 //
                 //console.log("data-role------"+$('.edit-header-btn[name="save_btn"').jqmData('role'));
                 caseForm.setData(matchItems[0]);
-                caseForm.readOnly(matchItems[0].isReadOnly);
+                if(enableReadOnlyMode) caseForm.readOnly(matchItems[0].isReadOnly);
                 _setTitleBar("reg_form_title");
                 $().mloader("hide");
             }, 500);
@@ -153,8 +163,9 @@ function functionBtnsEvent(but){
             _setTitleBar("progress_title",'caseNo');
             var status_val=-1;
             if(matchItems.length>0){
-                console.log("matchItems",matchItems[0]);
-                progressInfoForm.setData(matchItems[0]).readOnly(matchItems[0].isReadOnly);
+                //console.log("matchItems",matchItems[0]);
+                progressInfoForm.setData(matchItems[0])
+                if(enableReadOnlyMode) progressInfoForm.readOnly(matchItems[0].isReadOnly);
                 //$("#progress_diagram").empty();
                 status_val=Number(matchItems[0].caseStatus);
                 
@@ -178,7 +189,7 @@ function functionBtnsEvent(but){
                 //verticalGap:2,
                 //labelPosition:"bottom",
                 showSubSteps:true,
-                readOnly:matchItems[0].isReadOnly,
+                readOnly:enableReadOnlyMode? matchItems[0].isReadOnly:false,
                 showCounter:true,
                 counterData:matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments),
             });
@@ -190,7 +201,7 @@ function functionBtnsEvent(but){
                 currentProgress['targetPosition']=e.Position;
                 currentProgress['target']=e.target;
                 currentProgress['originalPosition']=formatIndex(but.opt.currentPosition);
-                currentProgress['isReadOnly']=matchItems[0].isReadOnly;
+                if(enableReadOnlyMode) currentProgress['isReadOnly']=matchItems[0].isReadOnly;
                 
             //console.log('targetPosition...',currentProgress['targetPosition']);
 
@@ -198,7 +209,7 @@ function functionBtnsEvent(but){
                 var title=progresses[e.Position.main] instanceof Array?progresses[e.Position.main][e.Position.sub]:progresses[e.Position.main];
                 
                 $("#progress_popupMenu_title").text('请选择对 '+title+' 的操作');
-                if(matchItems[0].isReadOnly) $('.progress_popupMenu_add_group').hide();
+                if(enableReadOnlyMode && matchItems[0].isReadOnly) $('.progress_popupMenu_add_group').hide();
                 else {
                     $('.progress_popupMenu_add_group').show();
                     
@@ -208,11 +219,16 @@ function functionBtnsEvent(but){
                     return $(a).text()=="执行";
                 });
                 //console.log('setMainForm',e.Position.main);
-                if((e.Position.main==3||e.Position.main==excutePoint)&&!matchItems[0].isReadOnly){
+                if((e.Position.main==3||e.Position.main==excutePoint)&&!matchItems[0].isReadOnly ){
                     $(exeBtn).show();
                     $(exeBtn).css({'display':'block'});
                 }else{
-                    $(exeBtn).hide();
+                    if(enableReadOnlyMode) 
+                        $(exeBtn).hide();
+                    else{
+                        $(exeBtn).show();
+                        $(exeBtn).css({'display':'block'});
+                    }
                 }
                 //$('#progress_popupMenu_add').find('ul').trigger('create').listview().listview('refresh');
                // $('#progress_popupMenu_add').find('div').trigger('create');
@@ -927,7 +943,7 @@ $('.edit-header-btn').on('click',async function(e){
                         });
                     }else{
                         values.data.values["caseApplicant"]=getGlobalJson("currentUser").id;
-                        values.data.values["isReadOnly"]=_isReadOnlyCurrentForm();
+                        if(enableReadOnlyMode) values.data.values["isReadOnly"]=_isReadOnlyCurrentForm();
                         values.data.values["id"]=Number(values.data.values["id"]);
                         history.back();
                         if(isAddPage){
@@ -1123,13 +1139,18 @@ function _setTitleBar(titlebarId,displayKey){
             lockedTitle=matched[0][displayKey];
             unlockedTitle=matched[0][displayKey];
         }
-        if(matched[0].isReadOnly) {
-            $("#"+titlebarId).html('<i class="fa fa-lock text-red edit-lock"></i>'+lockedTitle);
-            $('.edit-header-btn[name="save_btn"').hide();
-        }
-        else {
-            $("#"+titlebarId).html('<i class="fa fa-unlock text-green edit-lock"></i>'+unlockedTitle);
-            $('.edit-header-btn[name="save_btn"').show();
+        if(enableReadOnlyMode) {
+            if(matched[0].isReadOnly) {
+                $("#"+titlebarId).html('<i class="fa fa-lock text-red edit-lock"></i>'+lockedTitle);
+                $('.edit-header-btn[name="save_btn"').hide();
+            }
+            else {
+                $("#"+titlebarId).html('<i class="fa fa-unlock text-green edit-lock"></i>'+unlockedTitle);
+                $('.edit-header-btn[name="save_btn"').show();
+            }
+
+        }else{
+            $("#"+titlebarId).text(unlockedTitle);
         }
     }
     if(!lockeventListener.includes(titlebarId)){
@@ -1141,6 +1162,7 @@ function _setTitleBar(titlebarId,displayKey){
 
 }
 function lockEvent(e){
+    if(!enableReadOnlyMode) return;
     var _this=this;
     $().requestPassword(function(res){
         if(res.success){

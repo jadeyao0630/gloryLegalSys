@@ -990,8 +990,9 @@ var _summary_template;
                   matchId:{
                       placeholder:"索引ID",
                       label:"索引ID:",
-                      type:"text",
+                      type:"combobox",
                       isOptional:false,
+                      valueKey:"*"
                   },
                   matchRange:{
                       placeholder:"索引范围",
@@ -1002,8 +1003,9 @@ var _summary_template;
                   targetId:{
                       placeholder:"目标ID",
                       label:"目标ID:",
-                      type:"text",
+                      type:"combobox",
                       isOptional:false,
+                      valueKey:"*"
                   },
                   targetValue:{
                       placeholder:"目标值",
@@ -1024,7 +1026,7 @@ var _summary_template;
               
           },
           databseInsert:{
-            label:"数据库批处理",
+            label:"数据库插入",
             data:{
               dbName_insert:{
                     placeholder:"数据库名",
@@ -1036,8 +1038,8 @@ var _summary_template;
                     valueKey:"*"
                 },
                 insertQuery:{
-                    placeholder:"插入命令",
-                    label:"插入命令:",
+                    placeholder:'{”name“:”John“, ”age“:30, ”city“:”New York“}',
+                    label:"插入数据:",
                     type:"textarea",
                     isOptional:false,
                 },

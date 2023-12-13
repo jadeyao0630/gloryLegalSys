@@ -308,12 +308,9 @@ async function update(where,table,data,res){
     })
     .then(response => response.json())
     .then(data => {
-        if (data.data.success){
-            console.log(data.data.id);
-        }else{
-            console.log(data.data.error);
-        }
-        if(res!=undefined)res(data.data);
+        console.log(data);
+        
+        if(res!=undefined)res(data);
     });
 }
 async function createTable(table,template,res){

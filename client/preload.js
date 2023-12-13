@@ -2,6 +2,7 @@
 
 var result=[];
 var collectDbList=true;
+$('#loadingLogo').attr('src',logoSrc)
 goToPage('#');
 $('#mainFooter').hide();
 //getBasicDatabaseData();

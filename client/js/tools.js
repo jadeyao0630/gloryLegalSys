@@ -483,3 +483,105 @@ function getFormItemsId(template){
 }
 
 //#endregion 
+
+$.fn.extend.setFilterableCombobox=function(){
+    function pageIsSelectmenuDialog( page ) {
+        var isDialog = false,
+        id = page && page.attr( "id" );
+        $( ".filterable-select" ).each( function() {
+            if ( $( this ).attr( "id" ) + "-dialog" === id ) {
+                isDialog = true;
+                return false;
+            }
+        });
+        return isDialog;
+    }
+    $.mobile.document
+            // Upon creation of the select menu, we want to make use of the fact that the ID of the
+            // listview it generates starts with the ID of the select menu itself, plus the suffix "-menu".
+            // We retrieve the listview and insert a search input before it.
+            .on( "selectmenucreate", ".filterSelect", function( event ) {
+                //console.log(" filterSelect--->",$( event.target ).hasClass('supermultiSelect'));
+                //if($( event.target ).hasClass('supermultiSelect')) return;
+                var input,
+                    selectmenu = $( event.target ),
+                    list = $( "#" + selectmenu.attr( "id" ) + "-menu" ),
+                    form = list.jqmData( "filter-form" );
+                // We store the generated form in a variable attached to the popup so we avoid creating a
+                // second form/input field when the listview is destroyed/rebuilt during a refresh.
+                
+                if ( !form ) {
+                    //$("#filterForm").remove();
+                    input = $( "<input data-type='search'></input>" );
+                    form = $( "<form id='searchInput'></form>" ).append( input );
+                    input.textinput();
+                    list
+                        .before( form )
+                        .jqmData( "filter-form", form ) ;
+                    form.jqmData( "listview", list );
+                    list.jqmData('theme','a');
+                    
+                    //list.listview( "refresh" );
+                }
+                
+                //console.log(list.html());
+                // Instantiate a filterable widget on the newly created selectmenu widget and indicate that
+                // the generated input form element is to be used for the filtering.
+                //console.log($(form).html());
+                var isOptgroup=$(selectmenu).find('optgroup').length>0;
+                selectmenu
+                    .filterable({
+                        input: input,
+                        children: "> "+(isOptgroup?"optgroup":"")+" option[value]"
+                    })
+                    // Rebuild the custom select menu's list items to reflect the results of the filtering
+                    // done on the select menu.
+                    .on( "filterablefilter", function() {
+                        selectmenu.selectmenu().selectmenu( "refresh" );
+                    });
+            })
+            // The custom select list may show up as either a popup or a dialog, depending on how much
+            // vertical room there is on the screen. If it shows up as a dialog, then the form containing
+            // the filter input field must be transferred to the dialog so that the user can continue to
+            // use it for filtering list items.
+            .on( "pagecontainerbeforeshow", function( event, data ) {
+                
+                var listview, form;
+                if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                    
+                    //return;
+                }
+                data.toPage.find('a.ui-icon-delete').on('click',function(e){
+                    //console.log('pagecontainerhide',$(data.toPage).find('input[data-type="search"]').val());
+                    $(data.toPage).find('input[data-type="search"]').val('');
+                    $(data.toPage).find('input[data-type="search"]').trigger('keyup');
+                })
+                listview = data.toPage.find( "ul" );
+                //console.log(listview.html());
+                form = listview.jqmData( "filter-form" );
+                // Attach a reference to the listview as a data item to the dialog, because during the
+                // pagecontainerhide handler below the selectmenu widget will already have returned the
+                // listview to the popup, so we won't be able to find it inside the dialog with a selector.
+                data.toPage.jqmData( "listview", listview );
+                // Place the form before the listview in the dialog.
+                if($(listview).parent().find('#searchInput').length==0)
+                    listview.before( form );
+                
+                //listview.trigger('create').listview().listview( "refresh" );
+                //listview.parent().trigger('create');
+            })
+            // After the dialog is closed, the form containing the filter input is returned to the popup.
+            .on( "pagecontainerhide", function( event, data ) {
+                var listview, form;
+                if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                    //console.log('pagecontainerhide1',$(data.toPage).find('input[data-type="search"]').val());
+                    return;
+                }
+                listview = data.prevPage.jqmData( "listview" ),
+                //console.log(data);
+                form = listview.jqmData( "filter-form" );
+                // Put the form back in the popup. It goes ahead of the listview.
+                if($(listview).parent().find('#searchInput').length==0)
+                    listview.before( form );
+            });
+}

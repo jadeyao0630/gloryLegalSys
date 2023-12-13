@@ -48,13 +48,20 @@ $('#popupMenu').find('a').on('click',function(e){
             break;
         case '修改用户':
             var _this=this;
-            var select=$('<select id="user_edit_select"></select>');
+            var select=$('<select id="user_edit_select" data-native-menu="false" class="filterSelect"></select>');
             $.each(resourceDatas['users'],(index,user)=>{
-                select.append($('<option value="'+(index+1)+'">'+user.name+'</option>'));
+                console.log(user);
+                var option=$('<option value="'+(index+1)+'">'+user.name+'</option>');
+                if(user.isInactived){
+                    option.addClass('item-inActived');
+                }
+                select.append(option);
             });
+            //select.selectmenu().selectmenu('refresh', true);
             select.trigger('create');
             $().requestDialog({content:select,message:"请选择一个用户"},function(isYes,selt){
                 if(isYes){
+                    $().mloader('show',{message:"读取中..."});
                     console.log($(selt).find('option:selected').val())
                 
                     getCurrentUser({'id':$(selt).find('option:selected').val()}).then((d)=>{
@@ -73,6 +80,7 @@ $('#popupMenu').find('a').on('click',function(e){
                             $($(_this).attr( "href" )).find('.edit-header-btn.ui-icon-check').text('修改');
                             $($(_this).attr( "href" )).find('.edit-header-btn.ui-icon-check').data('item',JSON.stringify(userD));
                             goToPage( $(_this).attr( "href" ));
+                            $().mloader('hide');
                         }
                         
                     });
@@ -1038,6 +1046,7 @@ $('.edit-header-btn').on('click',async function(e){
                         setGlobalJson("currentUser",updateOriginalData(getGlobalJson("currentUser"),values.data.values));
                         $('#username').text(getGlobalJson("currentUser").name);
                         resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,values.data.values,'id');
+                        resourceDatas['users']=updateOriginalData(resourceDatas['users'],values.data.values,'id');
                         console.log(getGlobalJson("currentUser"),resourceDatas.legalAgencies);
                         $('#legalAgencies_f').trigger('create').selectmenu().selectmenu( "refresh" );
                         $('#legalAgencies_p').trigger('create').selectmenu().selectmenu( "refresh" );
@@ -1059,8 +1068,11 @@ $('.edit-header-btn').on('click',async function(e){
                     saveCurrentUser(values.data.values,true).then((r)=>{
                         if(r.success){
                             console.log("添加成功。");
+                            if(values.data.values.position>0)
+                                resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,values.data.values,'id');
+                            resourceDatas['users']=updateOriginalData(resourceDatas['users'],values.data.values,'id');
                             $().minfo('show',{title:"提示",message:"添加成功。"},function(){
-
+                                
                             });
                         }else{
                             console.log(r);
@@ -1073,13 +1085,14 @@ $('.edit-header-btn').on('click',async function(e){
     }else if($(this).text()=="修改"){
         var _this=this;
         if(sessionStorage.getItem('currentPage')=="#infoPage"){
-            setting_add_form.instance.getValues(0,settingPage_add_form.template,function(message,values){
+            
+            var userD=JSON.parse($(_this).data('item'));
+            setting_add_form.instance.getValues(userD.id,settingPage_add_form.template,function(message,values){
                 //console.log(values)
                 if(values.success){
-                    var userD=JSON.parse($(_this).data('item'));
                     //values.data.values.createDate=getDateTime(userD.createDate);
-                    //values.data.values['isInactived']=values.data.values.isInactived_a;
-                    //delete values.data.values.isInactived_a;
+                    values.data.values['isInactived']=values.data.values.isInactived_a;
+                    delete values.data.values.isInactived_a;
                     //console.log(values,userD);
                     var data=[];
                     $.each(values.data.values,(key,val)=>{
@@ -1090,10 +1103,13 @@ $('.edit-header-btn').on('click',async function(e){
                     update('id='+userD.id,userDbTableName,data.join(),function(r){
                         
                         
-                        if(r.data.affectedRows>0){
+                        if(r.data.data.affectedRows>0){
                             console.log("修改成功。");
+                            if(values.data.values.position>0)
+                                resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,values.data.values,'id');
+                            resourceDatas['users']=updateOriginalData(resourceDatas['users'],values.data.values,'id');
                             $().minfo('show',{title:"提示",message:"修改成功。"},function(){
-
+                                
                             });
                         }else{
                             console.log(r);
@@ -1108,12 +1124,7 @@ $('.edit-header-btn').on('click',async function(e){
     }
         
 })
-$('.edit-header-btn[data-rel="back"]').on('click',function(e){
-    if(sessionStorage.getItem('currentPage')=="#infoPage"){
-        console.log('back');
-        //resetPassChangeState(setting_info_form.instance);
-    }
-});
+
 function resetPassChangeState(form){
     var change_btn=form.find('#pass_controlgroup').find('a.btn-edit');
     var showHide_btn=form.find('#pass_controlgroup').find('a.btn-eye');
@@ -1413,7 +1424,7 @@ function updateOriginalData(source,newData,matchKey){
     var matchedIndex=-1;
     if(source instanceof Array){
         $.each(source,(index,item)=>{
-            //console.log(matchKey,item[matchKey],"=="+newData[matchKey]);
+            console.log(matchKey,item[matchKey],"=="+newData[matchKey]);
             if(item[matchKey]==newData[matchKey]){
                 matchedIndex=index;
                 source[index]=Object.assign(source[index],newData);
@@ -1431,6 +1442,6 @@ function updateOriginalData(source,newData,matchKey){
         })
     }
     
-    //console.log(matchedIndex,source[matchedIndex],newData);
+    output('updateOriginalData',source,newData);
     return source;
 }

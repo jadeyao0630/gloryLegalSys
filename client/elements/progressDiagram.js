@@ -50,6 +50,7 @@ ProgressesButton.prototype.init=function(arg){
     this.outter_frame=getElement("outter",{
     });
 
+    
     this.breakpoint=[];
     this.items=[];
     var v_dist=_this.opt.size*1.5;//节点垂直距离

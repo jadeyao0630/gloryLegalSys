@@ -818,6 +818,7 @@ mform.prototype={
             // listview it generates starts with the ID of the select menu itself, plus the suffix "-menu".
             // We retrieve the listview and insert a search input before it.
             .on( "selectmenucreate", ".filterSelect", function( event ) {
+                console.log('selectmenucreate');
                 //console.log(" filterSelect--->",$( event.target ).hasClass('supermultiSelect'));
                 //if($( event.target ).hasClass('supermultiSelect')) return;
                 var input,
@@ -840,7 +841,17 @@ mform.prototype={
                     
                     //list.listview( "refresh" );
                 }
-                
+                selectmenu.jqmData('theme','a');
+                var listbox=$( "#" + selectmenu.attr( "id" ) + "-listbox" );
+                listbox.addClass('filterable-select-listbox');
+                list.addClass('filterable-select-option');
+                //selectmenu.addClass('filterable-select-option');
+                //listbox.trigger('create');
+                //listbox.find('a').css({'color':"#333",'border-color':"gray"});
+                //selectmenu.selectmenu().selectmenu('refresh', true);
+                //$( "#" + selectmenu.attr( "id" ) + "-listbox-popup" ).popup();
+                //list.listview( "refresh" ).trigger('create');
+                //selectmenu.trigger('create');
                 //console.log(list.html());
                 // Instantiate a filterable widget on the newly created selectmenu widget and indicate that
                 // the generated input form element is to be used for the filtering.
@@ -874,6 +885,7 @@ mform.prototype={
                     $(data.toPage).find('input[data-type="search"]').trigger('keyup');
                 })
                 listview = data.toPage.find( "ul" );
+                console.log('pagecontainerbeforeshow',listview);
                 //console.log(listview.html());
                 form = listview.jqmData( "filter-form" );
                 // Attach a reference to the listview as a data item to the dialog, because during the
@@ -884,6 +896,7 @@ mform.prototype={
                 if($(listview).parent().find('#searchInput').length==0)
                     listview.before( form );
                 
+                listview.addClass('filterable-select-option');
                 //listview.trigger('create').listview().listview( "refresh" );
                 //listview.parent().trigger('create');
             })
@@ -1020,15 +1033,15 @@ $.fn.extend({
     setEmptyData:function(template){
         var _self=this;
         if(template==undefined) template=_self.template;
-        
+        console.log('setEmptyData template',template);
         $.each(template,(k,v)=>{
             var val=undefined;
-            if(v.hasOwnProperty('type')){
+            if(v.hasOwnProperty('type')){//如果是表格元素
                 if(k.nodeName=="input") val="";
                 if(v.defaultValue!=undefined) val=v.defaultValue;
                 _self.addData(v.type,k,val);
             }else{
-                if(v.hasOwnProperty('data')){
+                if(v.hasOwnProperty('data')){//如果是元素父级
                     
                     $.each(v.data,(kk,vv)=>{
                         var _val=undefined;
@@ -1359,24 +1372,59 @@ $.fn.extend({
                     }
                     
                 }else{
-                    var element=document.getElementById(catelog_key);
-                    var val = dataValidation(element,catelog,function(he){
-                        if(he) {
-                            response(error.FORM_EMPTY_VALUE,{data:values,success:!he,key:item_key});
-                            _hasError=true;
-                            hasError=true;
-                            return;
+                    
+                    if(catelog.type.toLowerCase()=="textrange"){
+                        for(var idx=0;idx<2;idx++){
+                            var element=document.getElementById(catelog_key+"_"+idx);
+                            var val = dataValidation(element,catelog,function(he){
+                                if(he) {
+                                    response(error.FORM_EMPTY_VALUE,{data:values,success:!he,key:catelog_key});
+                                    _hasError=true;
+                                    hasError=true;
+                                    return;
+                                }
+                                //console.log(item_key+"-->"+hasError);
+                            });
+                            console.log(catelog_key+"--->>"+catelog.table);
+                            if(catelog.table!=undefined){
+                                if(!vals.hasOwnProperty(catelog.table)){
+                                    vals[catelog.table]={};
+                                }
+                                if(vals[catelog.table][catelog_key]!=undefined){
+                                    vals[catelog.table][catelog_key]+=","+val;
+                                }else{
+                                    vals[catelog.table][catelog_key]=val;
+                                }
+                            }else{
+                                if(values[catelog_key]!=undefined){
+                                    values[catelog_key]+=","+val;
+                                }else{
+                                    values[catelog_key]=val;
+                                }
+                            }
                         }
-                        //console.log(item_key+"-->"+hasError);
-                    });
-                    console.log(catelog_key+"--->>"+catelog.table);
-                    if(catelog.table!=undefined){
-                        if(!vals.hasOwnProperty(catelog.table)){
-                            vals[catelog.table]={};
-                        }
-                        vals[catelog.table][catelog_key]=val;
+                    }else if(catelog.type.toLowerCase()=="custom"){
+
                     }else{
-                        values[catelog_key]=val;
+                        var element=document.getElementById(catelog_key);
+                        var val = dataValidation(element,catelog,function(he){
+                            if(he) {
+                                response(error.FORM_EMPTY_VALUE,{data:values,success:!he,key:item_key});
+                                _hasError=true;
+                                hasError=true;
+                                return;
+                            }
+                            //console.log(item_key+"-->"+hasError);
+                        });
+                        console.log(catelog_key+"--->>"+catelog.table);
+                        if(catelog.table!=undefined){
+                            if(!vals.hasOwnProperty(catelog.table)){
+                                vals[catelog.table]={};
+                            }
+                            vals[catelog.table][catelog_key]=val;
+                        }else{
+                            values[catelog_key]=val;
+                        }
                     }
                 }
                 console.log(catelog_key+"-->"+hasError);

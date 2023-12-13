@@ -1,7 +1,7 @@
 var isRunLocal=true;
 var IPS=['localhost','192.168.10.69','cn.luyao.site']
 var showDebug=false;
-let ip=isRunLocal?IPS[0]:IPS[2];
+let ip=isRunLocal?IPS[1]:IPS[2];
 let port=5555;
 var auth_code='1234';
 var adminLevel=3;
@@ -10,7 +10,7 @@ var enableRealDelete=true;
 var enableReadOnlyMode=false;
 var functionButoonPostion="top";
 const mainPage="legal.html";
-var logoSrc='https://img3.11467.com/2019/08-25/525155842.jpg'
+var logoSrc='./images/logo.png'
 var DataList={};
 var preload_completed_event_name="preloadCompleted";
 var main_load_completed_event_name="mainDataloadCompleted";
@@ -38,7 +38,7 @@ const users={
 }
 const columns={//案件主表
     id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
-    caseNo:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
+    caseNo:"VARCHAR(255),UNIQUE",//案件编号
     caseName:"VARCHAR(255) NOT NULL",//案件名称
     caseLabel:"INT NOT NULL DEFAULT '0'",//案件标签->caseLabels*
     //caseDepartment:"INT NOT NULL DEFAULT '0'",

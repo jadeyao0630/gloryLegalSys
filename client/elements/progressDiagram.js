@@ -93,7 +93,7 @@ ProgressesButton.prototype.init=function(arg){
         
         if(stepPointName instanceof Object){
             var breakpointData={'id':index,'name':stepPointName.name,'sub':[],'isMain':true};
-            _this.breakpoint.push(index);
+            _this.breakpoint=index;
             if(stepPointName.hasOwnProperty('data')){
                 if(stepPointName.data instanceof Array){
                     stepPointName.data.forEach(function(subStepPointName,subIndex){
@@ -129,6 +129,7 @@ ProgressesButton.prototype.init=function(arg){
             point.jqmData('stepoint',lines[1]);
             _this.pointMap[index]={
                 self:point,
+                isMain:true,
                 line:lines[1]==undefined?[]:[lines[1]],
                 isSelectable:index<=_this.opt.currentPosition+1,
                 isActived:index<=_this.opt.currentPosition,
@@ -196,6 +197,7 @@ ProgressesButton.prototype.init=function(arg){
                     subPoint.jqmData('stepoint',subLines[1]);
                     _this.pointMap[index+subIndex/10]={
                         self:subPoint,
+                        isMain:false,
                         line:[subLines[1]],
                         isSelectable:index<=formatIndex(_this.opt.currentPosition+1).main,
                         isActived:index==formatIndex(_this.opt.currentPosition).main&&subIndex==formatIndex(_this.opt.currentPosition).sub||index<formatIndex(_this.opt.currentPosition).main,
@@ -312,7 +314,14 @@ ProgressesButton.prototype.init=function(arg){
                 $('.stepPoint[data-index="'+idx+'"]').addClass('stepPoint-selectable');
             })
         }
-        _this.opt.currentPosition=$(point).data('index')+formatIndex(_this.opt.currentPosition).sub;
+        var pointPosition=formatIndex($(point).data('index'));
+        var currentPosition=formatIndex(_this.opt.currentPosition);
+        //console.log('currentPosition active b',_this.opt.currentPosition,currentPosition,pointPosition,$(point).data('index'));
+        if(pointPosition.main<=_this.breakpoint)
+            _this.opt.currentPosition=$(point).data('index');
+        else
+            _this.opt.currentPosition=pointPosition.main+currentPosition.sub/10;
+        //console.log('currentPosition active a',_this.opt.currentPosition,currentPosition,pointPosition);
       
     }
     
@@ -321,15 +330,24 @@ ProgressesButton.prototype.init=function(arg){
         if(nextPointIndexs!=undefined && nextPointIndexs.length>0){
             nextPointIndexs.forEach(idx=>{
                 $('.stepPoint[data-index="'+idx+'"]').removeClass('stepPoint-selectable');
-            })
+            });
         }
-        _this.opt.currentPosition=$(point).data('index')-1;
+        var pointPosition=formatIndex($(point).data('index'));
+        var currentPosition=formatIndex(_this.opt.currentPosition);
+        //console.log('currentPosition deactive b',currentPosition,pointPosition);
+        if(pointPosition.main<_this.breakpoint)
+            _this.opt.currentPosition=pointPosition.main-1;
+        else
+            _this.opt.currentPosition=pointPosition.main-1+currentPosition.sub/10;
+        //console.log('currentPosition deactive a',_this.opt.currentPosition);
       
     }
     function isSameMainIndex(index){
         return formatIndex(_this.opt.currentPosition).main==formatIndex(index).main;
     }
-    function getPointByIndex(index){
+    function getPointByIndex(index){//这里牵扯到分离点，就这个案例只有一个，如果有多个可能需要改进
+        if(index>=_this.breakpoint+1) index=formatIndex(index).main;
+        console.log(index,_this.pointMap);
         return _this.pointMap[index].self;
     }
     async function setPointState(point,isActived){
@@ -341,6 +359,7 @@ ProgressesButton.prototype.init=function(arg){
         var clickedIndex=$(point).data('index');
         var pointData=_this.pointMap[clickedIndex];
         if(!isActived){//激活节点
+            console.log('激活节点');
             if(isSameMainIndex(clickedIndex)){
                 var currentPoint=getPointByIndex(_this.opt.currentPosition);
                 await setPointState(currentPoint,true);
@@ -352,6 +371,37 @@ ProgressesButton.prototype.init=function(arg){
                             activePoint(point,pointData.nextPointIndex);
                           })
                 }
+            }else if(formatIndex(clickedIndex).main==_this.breakpoint && _this.opt.currentPosition>_this.breakpoint){
+                
+                /*
+                var currentPoint=getPointByIndex(_this.opt.currentPosition);
+                var currentPointData=_this.pointMap[$(currentPoint).data('index')];
+                await setPointState(currentPoint,true);
+
+                if(currentPointData.line.length==1){//如果当前节点不是交汇点
+                    var line=currentPointData.line[0];
+                    await $(line).animate({
+                        width: 0+"px",
+                          }, 500 , function(){
+                            //activePoint(point,pointData.nextPointIndex);
+                          })
+                    */
+                }else if(currentPointData.line.length==2){
+                    var line=$.grep(currentPointData.line,(ln)=>{
+                        //console.log($(ln).data('index'),_this.opt.currentPosition);
+                        return $(ln).data('index')==_this.opt.currentPosition;
+                    });
+                    //console.log(line);
+                    if(line.length>0){
+                        line=line[0];
+                        await $(line).animate({
+                        width: 0+"px",
+                          }, 500 ,function(){
+                            //activePoint(point,pointData.nextPointIndex);
+                          })
+                    }
+                }
+                await delay(500-100);
             }
             else if(pointData.line.length==1){//如果当前节点不是交汇点
                 var line=pointData.line[0];
@@ -387,10 +437,15 @@ ProgressesButton.prototype.init=function(arg){
                         })
                 }
             }else{
-                for(var i=_this.opt.currentPosition;i>clickedIndex;i--){
-                    console.log(i);
-                    var currentPoint=getPointByIndex(i);
-                    var pointData=_this.pointMap[i];
+                var currentPosition=formatIndex(_this.opt.currentPosition);
+                for(var i=currentPosition.main;i>formatIndex(clickedIndex).main;i--){
+                    console.log(currentPosition);
+                    var subIndex=currentPosition.sub/10;
+                    if(i!=_this.breakpoint) subIndex=0;
+                    //console.log();
+                    var currentPoint=getPointByIndex(i+subIndex);
+                    var pointData=_this.pointMap[i+subIndex];
+                    console.log(i+subIndex,_this.opt.currentPosition,pointData,currentPoint)
                     deactivePoint(currentPoint,pointData.nextPointIndex)
                     if(pointData.line.length==1){
                         var line=pointData.line[0];
@@ -399,15 +454,15 @@ ProgressesButton.prototype.init=function(arg){
                             }, 500 ,function(){
                             })
                     }else if(pointData.line.length==2){
-                        deactivePoint(currentPoint,pointData.nextPointIndex)
                         var line=$.grep(pointData.line,(ln)=>{
-                            console.log($(ln).data('index'),_this.opt.currentPosition-1);
-                            $(ln).data('index')==_this.opt.currentPosition-1;
+                            //console.log($(ln).data('index'),_this.opt.currentPosition);
+                            return $(ln).data('index')==_this.opt.currentPosition;
                         });
+                        //console.log(line);
                         if(line.length>0){
                             line=line[0];
                             await $(line).animate({
-                            width: $(line).data('width')+"px",
+                            width: 0+"px",
                               }, 500 ,function(){
                                 //activePoint(point,pointData.nextPointIndex);
                               })

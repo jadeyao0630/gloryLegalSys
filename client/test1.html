@@ -10,10 +10,6 @@
 	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
 	<script type="text/javascript" src="./elements/progressDiagram.js"></script>
   <style>
-    #progress_diagram{
-      width:840px;
-      background-color: antiquewhite;
-    }
     .ProgressesButton-container{
       position: relative;
     }
@@ -67,10 +63,22 @@
       color:#333;
       cursor:pointer;
     }
+    .counter-indicator{
+      z-index: 23;
+      position: absolute;
+      text-align: center;
+      background: orangered;
+      color:white;
+      text-align: center;
+      vertical-align: middle;
+      filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5));
+    }
   </style>
 </head>
 <body>
   <div id="progress_diagram"></div>
+  <button id="goto">goto</button>
+  <input id="index" type="number"/>
   <script>
     var progresses=["立案","一审","二审",{name:"正在执行",data:["强制执行","正常执行","无需执行"]},"结案","再审","监督"]; 
     var but=new ProgressesButton({
@@ -78,8 +86,8 @@
                 deadSteps:["无需执行"],
                 showLabel:true,
                 containerId:'#progress_diagram',
-                currentPosition:0,
-                fontSize:15,
+                currentPosition:3,
+                fontSize:14,
                 line_size:2,
                 size:35,
                 width:840,
@@ -92,6 +100,10 @@
                 showCounter:true,
                 //counterData:matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments),
             });
+    $('#goto').on('click',function(e){
+      console.log($('#index').val());
+      but.MoveTo($('#index').val());
+    })
   </script>
 </body>
 </html>

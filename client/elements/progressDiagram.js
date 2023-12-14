@@ -58,7 +58,7 @@ ProgressesButton.prototype.init=function(arg){
     if(this.instance==null){
         this.instance=$('<div class="ProgressesButton-container"></div>');
         this.instance.css({
-            'width':_this.opt.width+'px',
+            'width':_this.opt.width+(_this.opt.hasShadow?+"4":0)+'px',
         });
     }else{
         this.instance.empty();
@@ -108,14 +108,14 @@ ProgressesButton.prototype.init=function(arg){
             points.push({'id':index,'name':stepPointName,'isMain':true});
         }
     }); 
-    var m_line=(tops[tops.length-1]+(_this.opt.size))/2;  
+    var m_line=_this.opt.showSubSteps?(tops[tops.length-1]+(_this.opt.size))/2:_this.opt.size;  
     console.log("tops",tops);
     console.log('lefts',lefts);
     
     console.log('middle line',m_line);
 
 
-    this.instance.css({height:tops[tops.length-1]+(_this.opt.size)})
+    this.instance.css({height:(_this.opt.showSubSteps?tops[tops.length-1]+(_this.opt.size):_this.opt.size*2)+(_this.opt.hasShadow?+"4":0)})
     var NextCombineLines=[];
     _this.pointMap={};
     points.forEach(function(stepPoint,index){
@@ -250,7 +250,10 @@ ProgressesButton.prototype.init=function(arg){
     _this.parent.append(_this.instance);
     _this.parent.trigger('create');
     console.log('map',_this.pointMap);
-    console.log(_this.parent.html());
+    console.log('currentPosition',_this.opt.currentPosition);
+    var positionTo=_this.opt.currentPosition;
+    _this.opt.currentPosition=0;
+    //_this.MoveTo(positionTo);
     //var middle_line=(tops[tops.length-2]+top_offset)/2
 
     function setStepLine(left,top,index,isMain,width,angle){
@@ -288,25 +291,101 @@ ProgressesButton.prototype.init=function(arg){
         var point=$('<div class="stepPoint'+subClass+'" data-index='+index+'></div>');
         var _top="calc(100% + 15px)";
         if(_this.opt.labelPosition=="center") _top="50%";
-        _label.css({width:_this.opt.size*2,top:_top});
+        _label.css({width:_this.opt.size*2-30,top:_top});
         point.append(_label);
         point.css({
             left:left,
             top:top,
             width:_this.opt.size*2-_this.opt.line_size*2,
             height:_this.opt.size*2-_this.opt.line_size*2,
-            border: _this.opt.line_size+"px solid lightgray",
+            'border-width': _this.opt.line_size+"px",
             borderRadius:(_this.opt.size)+"px",
+            fontSize:_this.opt.fontSize,
         });
+        if(_this.opt.hasShadow) point.css({
+            filter: 'drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5))'})
         _this.instance.append(point);
         return point;
     }
     async function clickedEvent(e){
         if($(this).hasClass('stepPoint-selectable') || $(this).hasClass('setpPoint-actived')){
             console.log(this);
-            setPointState(this,$(this).hasClass('setpPoint-actived'));
+            _this.setPointState($(this).data('index'),$(this).hasClass('setpPoint-actived'));
         }
     }
+    function setCounterIndecator(left,top,index,sub){
+        if(_this.opt.showCounter && _this.opt.counterData.length>0){
+            
+            var _counter=_this.opt.counterData.filter(value=>{ 
+                if(sub==undefined)
+                    return formatIndex(value.caseStatus).main==(index);
+                else
+                    return value.caseStatus==index+sub/10
+            });
+            console.log('setCounterIndecator',_counter.length,index,_counter);
+            if(_counter.length>0){
+                if(_this.opt.showCounter){
+                    var size=_this.opt.size*2*0.4;
+                    var counter=getElement("progress-but-counter",{
+                        width:(size)+"px",
+                        height:(size)+"px",
+                        "line-height":size+"px",
+                        "fontSize":_this.opt.fontSize*0.9+'px',
+                        "fontWeight":700,
+                        "borderRadius":(size*0.5)+"px",
+                        'left':(left+_this.opt.size*0.5)+'px',
+                        'top':(top-_this.opt.size*1.2)+'px',
+                    },_counter.length);
+                    $(counter).data('index',(index+(sub==undefined?0:sub)/10));
+                    _this.outter_frame.append(counter)
+                }
+                
+            }
+        }
+    }
+    function bevel(straight,oblique){
+        const sinOfAngleX = straight / oblique;
+        return Math.round((Math.asin(sinOfAngleX)*180)/Math.PI);
+    }
+}
+ProgressesButton.prototype.MoveTo=async function(index){
+    var _this=this;
+    if(index==-1){
+        //var target=_this.getPointByIndex(0);
+        await _this.setPointState(0,true);
+        //_this.setPointState(0,false);
+    }else{
+        console.log(index);
+        //var target=_this.getPointByIndex(index);
+        await _this.setPointState(index,_this.opt.currentPosition>=index);
+    }
+    
+}
+ProgressesButton.prototype.getPointByIndex=function(index){//这里牵扯到分离点，就这个案例只有一个，如果有多个可能需要改进
+    var _this=this;
+    if(index==-1) index=0;
+    console.log(index,_this.pointMap);
+    if(index>=_this.breakpoint+1||index<_this.breakpoint) index=formatIndex(index).main;
+    else{
+        index=formatIndex(index).main+formatIndex(index).sub/10;
+    }
+    console.log(index,_this.pointMap);
+    return _this.pointMap[index].self;
+}
+ProgressesButton.prototype.getPointMapData=function(index){//这里牵扯到分离点，就这个案例只有一个，如果有多个可能需要改进
+    var _this=this;
+    if(index==-1) index=0;
+    //console.log(index,_this.pointMap);
+    if(index>=_this.breakpoint+1) index=formatIndex(index).main;
+    else{
+        index=formatIndex(index).main+formatIndex(index).sub/10;
+    }
+    //console.log(index,_this.pointMap);
+    return _this.pointMap[index];
+}
+ProgressesButton.prototype.setPointState=async function(index,isCurrentActived){
+    var _this=this;
+    var duration=500;
     function activePoint(point,nextPointIndexs){
         $(point).addClass('setpPoint-actived');
         if(nextPointIndexs!=undefined && nextPointIndexs.length>0){
@@ -345,113 +424,328 @@ ProgressesButton.prototype.init=function(arg){
     function isSameMainIndex(index){
         return formatIndex(_this.opt.currentPosition).main==formatIndex(index).main;
     }
-    function getPointByIndex(index){//这里牵扯到分离点，就这个案例只有一个，如果有多个可能需要改进
-        if(index>=_this.breakpoint+1) index=formatIndex(index).main;
-        console.log(index,_this.pointMap);
-        return _this.pointMap[index].self;
-    }
-    async function setPointState(point,isActived){
-        //console.log($(point));
-        //nextPointIndex 下一个的编号 array[int]
-        //prevPointIndex 前一个的编号 array[int]
-        //self 自己元素 object
-        //line 相关联的线 array[object]
-        var clickedIndex=$(point).data('index');
-        var pointData=_this.pointMap[clickedIndex];
-        if(!isActived){//激活节点
-            console.log('激活节点');
-            if(isSameMainIndex(clickedIndex)){
-                var currentPoint=getPointByIndex(_this.opt.currentPosition);
-                await setPointState(currentPoint,true);
-                if(pointData.line.length==1){//如果当前节点不是交汇点
-                    var line=pointData.line[0];
-                    await $(line).animate({
-                        width: $(line).data('width')+"px",
-                          }, 500 ,function(){
-                            activePoint(point,pointData.nextPointIndex);
-                          })
-                }
-            }else if(formatIndex(clickedIndex).main==_this.breakpoint && _this.opt.currentPosition>_this.breakpoint){
-                
-                /*
-                var currentPoint=getPointByIndex(_this.opt.currentPosition);
-                var currentPointData=_this.pointMap[$(currentPoint).data('index')];
-                await setPointState(currentPoint,true);
+    
+    console.log('目标节点',index,'当前节点',_this.opt.currentPosition);
+    //nextPointIndex 下一个的编号 array[int]
+    //prevPointIndex 前一个的编号 array[int]
+    //self 自己元素 object
+    //line 相关联的线 array[object]
+    //var clickedIndex=$(point).data('index');
 
-                if(currentPointData.line.length==1){//如果当前节点不是交汇点
-                    var line=currentPointData.line[0];
-                    await $(line).animate({
-                        width: 0+"px",
-                          }, 500 , function(){
-                            //activePoint(point,pointData.nextPointIndex);
-                          })
-                    */
-                }else if(currentPointData.line.length==2){
-                    var line=$.grep(currentPointData.line,(ln)=>{
-                        //console.log($(ln).data('index'),_this.opt.currentPosition);
-                        return $(ln).data('index')==_this.opt.currentPosition;
-                    });
-                    //console.log(line);
-                    if(line.length>0){
-                        line=line[0];
-                        await $(line).animate({
-                        width: 0+"px",
-                          }, 500 ,function(){
-                            //activePoint(point,pointData.nextPointIndex);
-                          })
-                    }
-                }
-                await delay(500-100);
-            }
-            else if(pointData.line.length==1){//如果当前节点不是交汇点
+
+    var targetPointData=_this.getPointMapData(index);
+    var targetPoint=_this.getPointByIndex(index);
+    var targetPosition=formatIndex(index);
+
+    var currentPointData=_this.getPointMapData(_this.opt.currentPosition);
+    var currentPoint=_this.getPointByIndex(_this.opt.currentPosition);
+    var currentPosition=formatIndex(_this.opt.currentPosition);
+    //递减：以目标sub为准，但目标index小于breakpoint，则先以现目标为准，直到过了breakpoint
+    //还有一个可能是目标index在breakpoint上，但不是同一个子元素路径，则先要回到breakpoint前一个，在增加到目标位置
+    if(targetPosition.main<currentPosition.main){
+        console.log('目标小于当前，递减')
+        var offset=0;
+        if(targetPosition.main==_this.breakpoint){
+            offset=-1;
+        }
+        for(var i=currentPosition.main;i>targetPosition.main+offset;i--){
+            var subIndex=targetPosition.sub;
+            if(targetPosition.main<=_this.breakpoint) subIndex=currentPosition.sub;
+            if(i<_this.breakpoint) subIndex=0;
+            var _index=i+subIndex/10;
+            var point=_this.getPointByIndex(_index);
+            var pointData=_this.getPointMapData(_index);
+
+            deactivePoint(point,pointData.nextPointIndex)
+            //更改当前节点相关路线状态
+            if(pointData.line.length==1){//正常节点只有一条路线
                 var line=pointData.line[0];
                 await $(line).animate({
+                        width: 0+"px",
+                }, duration , function(){});
+            }else if(pointData.line.length==2){//交汇节点有多条，需要按原index的subIndex来判断走哪条路线
+                var line=$.grep(pointData.line,(ln)=>{return $(ln).data('index')==i-1+subIndex/10;});
+                //console.log(line);
+                if(line.length>0){
+                    line=line[0];
+                    await $(line).animate({
+                        width: 0+"px",
+                    }, duration ,function(){})
+                }
+            }
+            await delay(duration-100);
+        }
+        if(targetPosition.main==_this.breakpoint){
+            if(targetPointData.line.length==1){
+                var line=targetPointData.line[0];
+                await $(line).animate({
                     width: $(line).data('width')+"px",
-                      }, 500 ,function(){
-                        activePoint(point,pointData.nextPointIndex);
-                      })
-            }else if(pointData.line.length==2){//如果当前节点是交汇点
-                //获取前一节点的位置来判断选那条线
-                var line=$.grep(pointData.line,(ln)=>$(ln).data('index')==_this.opt.currentPosition);
+                    }, duration ,function(){})
+            }else if(targetPointData.line.length==2){
+                var line=$.grep(targetPointData.line,(ln)=>{return $(ln).data('index')==index;});
                 if(line.length>0){
                     line=line[0];
                     await $(line).animate({
                     width: $(line).data('width')+"px",
-                      }, 500 ,function(){
-                        activePoint(point,pointData.nextPointIndex);
-                      })
+                        }, duration ,function(){})
                 }
-            }else{//当前节点无线连接，比如第一节点
-                activePoint(point,pointData.nextPointIndex);
             }
-        }else{//取消激活节点
-            //$(point).removeClass('setpPoint-actived');
-            console.log('取消激活节点');
-            if(isSameMainIndex(clickedIndex)){
-                deactivePoint(point,pointData.nextPointIndex)
-                if(pointData.line.length==1){
-                    var line=pointData.line[0];
+            await delay(duration-100);
+            activePoint(targetPoint,targetPointData.nextPointIndex);
+        }
+    }else if(targetPosition.main==currentPosition.main){//同级或自己
+        console.log('目标和当前等同',targetPosition)
+        //var currentPoint=_this.getPointByIndex(_this.opt.currentPosition);
+        if(targetPosition.main!=_this.breakpoint){
+            if(currentPosition.main>_this.breakpoint){
+                console.log('目标和当前等同,但大于breakpoint',targetPosition)
+                await _this.setPointState(_this.breakpoint-1+currentPosition.sub/10,true);
+                await _this.setPointState(targetPosition.main+targetPosition.sub/10,true);
+            }else{
+                if($(targetPoint).hasClass('setpPoint-actived')){
+                    deactivePoint(targetPoint,targetPointData.nextPointIndex)
+                    if(targetPointData.line.length==1){
+                        var line=targetPointData.line[0];
+                        await $(line).animate({
+                            width: 0+"px",
+                            }, duration ,function(){
+                            })
+                    }
+                }else{
+                    if(targetPointData.line.length==1){
+                        var line=targetPointData.line[0];
+                        await $(line).animate({
+                            width: $(line).data('width')+"px",
+                            }, duration ,function(){})
+                        await delay(duration-100);
+                        
+                    }
+                    activePoint(targetPoint,targetPointData.nextPointIndex)
+                }
+            }
+        }else{
+            deactivePoint(currentPoint,currentPointData.nextPointIndex)
+            if(currentPointData.line.length==1){//正常节点只有一条路线
+                var line=currentPointData.line[0];
+                await $(line).animate({
+                        width: 0+"px",
+                }, duration , function(){});
+            }else if(currentPointData.line.length==2){//交汇节点有多条，需要按原index的subIndex来判断走哪条路线
+                var line=$.grep(currentPointData.line,(ln)=>{return $(ln).data('index')==currentPointData.main-1+currentPointData.sub/10;});
+                //console.log(line);
+                if(line.length>0){
+                    line=line[0];
                     await $(line).animate({
                         width: 0+"px",
-                        }, 500 ,function(){
+                    }, duration ,function(){})
+                }
+            }
+            await delay(duration-100);
+            if(targetPointData.line.length==1){
+                var line=targetPointData.line[0];
+                await $(line).animate({
+                    width: $(line).data('width')+"px",
+                    }, duration ,function(){})
+            }else if(targetPointData.line.length==2){
+                var line=$.grep(targetPointData.line,(ln)=>{return $(ln).data('index')==index;});
+                if(line.length>0){
+                    line=line[0];
+                    await $(line).animate({
+                    width: $(line).data('width')+"px",
+                        }, duration ,function(){})
+                }
+            }
+            await delay(duration-100);
+            activePoint(targetPoint,targetPointData.nextPointIndex);
+        }
+        
+    }else{//递增
+        console.log('递增',currentPosition,targetPosition)
+        var offset=0;
+        if(targetPosition.main>_this.breakpoint) offset=1;
+        for(var i=currentPosition.main+offset;i<=targetPosition.main;i++){
+            
+            var subIndex=targetPosition.sub;
+            if(i<_this.breakpoint) subIndex=0;
+            var main=i;
+            if(i>=_this.breakpoint && currentPosition.main==_this.breakpoint) {
+                subIndex=currentPosition.sub;
+                
+            }
+            var _index=main+subIndex/10;
+            var point=_this.getPointByIndex(_index);
+            var pointData=_this.getPointMapData(_index);
+            console.log('递增',_index)
+            
+            //更改当前节点相关路线状态
+            if(pointData.line.length==1){//正常节点只有一条路线
+                var line=pointData.line[0];
+                await $(line).animate({
+                        width: $(line).data('width')+"px",
+                }, duration , function(){});
+            }else if(pointData.line.length==2){//交汇节点有多条，需要按原index的subIndex来判断走哪条路线
+                var line=$.grep(pointData.line,(ln)=>{return $(ln).data('index')==main-1+subIndex/10;});
+                //console.log(line);
+                if(line.length>0){
+                    line=line[0];
+                    await $(line).animate({
+                        width: $(line).data('width')+"px",
+                    }, duration ,function(){})
+                }
+            }
+            await delay(duration-100);
+            activePoint(point,pointData.nextPointIndex)
+        }
+    }
+/*
+    var pointData=_this.getPointMapData(index);
+    var point=_this.getPointByIndex(index);
+    if(!isCurrentActived){//激活节点
+        console.log('激活节点');
+        if(isSameMainIndex(index)){
+            
+            var currentPoint=_this.getPointByIndex(_this.opt.currentPosition);
+            await _this.setPointState(_this.opt.currentPosition,true);
+            if(pointData.line.length==1){//如果当前节点不是交汇点
+                var line=pointData.line[0];
+                await $(line).animate({
+                    width: $(line).data('width')+"px",
+                        }, duration ,function(){
+                        activePoint(point,pointData.nextPointIndex);
+                        console.log('在同一主节点，但在不同的子节点',_this.opt.currentPosition)
+                        })
+            }
+        }else if(formatIndex(index).main==_this.breakpoint && _this.opt.currentPosition>_this.breakpoint){
+            
+            
+            console.log('目标在子节点，并且原位置大于目标位置')
+            var currentPoint=_this.getPointByIndex(_this.opt.currentPosition);
+            var currentPointData=_this.pointMap[$(currentPoint).data('index')];
+            await _this.setPointState(_this.opt.currentPosition,true);
+            
+            if(currentPointData.line.length==1){//如果当前节点不是交汇点
+                var line=currentPointData.line[0];
+                await $(line).animate({
+                    width: 0+"px",
+                        }, duration , function(){
+                        //activePoint(point,pointData.nextPointIndex);
+                        })
+                
+            }else if(currentPointData.line.length==2){
+                var line=$.grep(currentPointData.line,(ln)=>{
+                    //console.log($(ln).data('index'),_this.opt.currentPosition);
+                    return $(ln).data('index')==_this.opt.currentPosition;
+                });
+                //console.log(line);
+                if(line.length>0){
+                    line=line[0];
+                    await $(line).animate({
+                    width: 0+"px",
+                        }, duration ,function(){
+                        //activePoint(point,pointData.nextPointIndex);
                         })
                 }
-            }else{
-                var currentPosition=formatIndex(_this.opt.currentPosition);
-                for(var i=currentPosition.main;i>formatIndex(clickedIndex).main;i--){
-                    console.log(currentPosition);
-                    var subIndex=currentPosition.sub/10;
-                    if(i!=_this.breakpoint) subIndex=0;
+            }
+
+            await delay(duration-100);
+            _this.setPointState(index,isCurrentActived);
+        }else{
+            
+            var currentPosition=formatIndex(_this.opt.currentPosition);
+            var targetPostition=formatIndex(index);
+            console.log('多格激活',currentPosition.main,targetPostition.main)
+            for(var i=currentPosition.main;i<=targetPostition.main;i++){
+                console.log(i);
+                var subIndex=targetPostition.sub/10;
+                if(i<_this.breakpoint){
+                    subIndex=0;
+                } else if(i==_this.breakpoint){
+                    
+                    //subIndex=targetPostition.main==_this.breakpoint?targetPostition.sub/10:currentPosition.sub/10;
+                }
+                
+                console.log('多格激活中',subIndex)
+                if(i<0){
+                    var currentTarget=this.getPointByIndex(0);
+                    var pointData=_this.pointMap[0];
+                    console.log('当前为-1，直接激活')
+                    activePoint(currentTarget,pointData.nextPointIndex);
+                }else{
+                    var currentTarget=this.getPointByIndex(i+subIndex);
                     //console.log();
-                    var currentPoint=getPointByIndex(i+subIndex);
-                    var pointData=_this.pointMap[i+subIndex];
-                    console.log(i+subIndex,_this.opt.currentPosition,pointData,currentPoint)
+                    //var currentPoint=_this.getPointByIndex(i+subIndex);
+                    var pointData=_this.getPointMapData(i+subIndex);
+                    console.log(pointData,i+subIndex);
+                    //activePoint(currentTarget,pointData.nextPointIndex)
+                    if(pointData.line.length==1){//如果当前节点不是交汇点
+                        
+                        var line=pointData.line[0];
+                        console.log(i,'如果当前节点不是交汇点',line)
+                        await $(line).animate({
+                            width: $(line).data('width')+"px",
+                                }, duration ,function(){
+                                
+                                })
+                                await delay(duration-100);
+                                activePoint(currentTarget,pointData.nextPointIndex);
+                    }else if(pointData.line.length==2){//如果当前节点是交汇点
+                        //获取前一节点的位置来判断选那条线
+                        console.log(i,'当前节点是交汇点',_this.opt.currentPosition,line)
+                        var line=$.grep(pointData.line,(ln)=>$(ln).data('index')==_this.opt.currentPosition);
+                        if(line.length>0){
+                            line=line[0];
+                            await $(line).animate({
+                            width: $(line).data('width')+"px",
+                                }, duration ,function(){
+                                
+                                })
+                        }
+                        await delay(duration-100);
+                        activePoint(currentTarget,pointData.nextPointIndex);
+                    }else{//当前节点无线连接，比如第一节点
+                        activePoint(currentTarget,pointData.nextPointIndex)
+                    }
+                    
+                }
+                
+            }
+        }
+    }else{//取消激活节点
+        //$(point).removeClass('setpPoint-actived');
+        console.log('取消激活节点',index);
+        if(isSameMainIndex(index)){
+            console.log('取消激活节点-在同一主节点上');
+            deactivePoint(point,pointData.nextPointIndex)
+            if(pointData.line.length==1){
+                var line=pointData.line[0];
+                await $(line).animate({
+                    width: 0+"px",
+                    }, duration ,function(){
+                    })
+            }
+        }else{
+            var currentPosition=formatIndex(_this.opt.currentPosition);
+            var targetPosition=formatIndex(index);
+            if(targetPosition.main==_this.breakpoint && currentPosition.main>targetPosition.main){
+                for(var i=currentPosition.main;i>=targetPosition.main;i--){
+                
+                    var subIndex=currentPosition.sub/10;
+                    if(i<_this.breakpoint) subIndex=0;
+                    else if(i==_this.breakpoint){
+                        //subIndex=currentPosition.sub/10;
+                        subIndex=targetPosition.main==_this.breakpoint?currentPosition.sub/10:targetPosition.sub/10;
+                    }
+                    console.log("多部取消中",i+subIndex,_this.opt.currentPosition,index);
+                    //console.log();
+                    var currentPoint=_this.getPointByIndex(i+subIndex);
+                    var pointData=_this.getPointMapData(i+subIndex);
+                    //console.log(i+subIndex,_this.opt.currentPosition,pointData,currentPoint)
                     deactivePoint(currentPoint,pointData.nextPointIndex)
                     if(pointData.line.length==1){
                         var line=pointData.line[0];
                         await $(line).animate({
                             width: 0+"px",
-                            }, 500 ,function(){
+                            }, duration ,function(){
                             })
                     }else if(pointData.line.length==2){
                         var line=$.grep(pointData.line,(ln)=>{
@@ -463,168 +757,84 @@ ProgressesButton.prototype.init=function(arg){
                             line=line[0];
                             await $(line).animate({
                             width: 0+"px",
-                              }, 500 ,function(){
+                                }, duration ,function(){
                                 //activePoint(point,pointData.nextPointIndex);
-                              })
+                                })
                         }
                     }
-                    await delay(500-100);
+                    await delay(duration-100);
                 }
-            }
-            
-           
+                var targetPoint=_this.getPointByIndex(index);
+                var targetPointData=_this.getPointMapData(index);
                 
-        }
-        /*
-        var nextPoint=$(point).jqmData('nextPoint');
-        if(!isActived){//激活节点
-            console.log('stepoint',$(point).jqmData('stepoint'));
-            if($(point).jqmData('stepoint')!=undefined){
-                var line=$(point).jqmData('stepoint');
-                if(line instanceof Array){
-                    //var formatedIndex=formatIndex(_this.opt.currentPosition);
-                    var _line=$.grep(line,(ln)=>{
-                        console.log($(ln).data('index'),_this.opt.currentPosition,($(ln).data('index')==_this.opt.currentPosition));
-                        return $(ln).data('index')==_this.opt.currentPosition
-                    });
-                    
-                    if(_line.length>0){
-                        console.log($(_line[0]).data('width'),$(_line));
-                        await $(_line[0]).animate({
-                            width: $(_line[0]).data('width')+"px",
-                              }, 500 ,function(){
-                                $(point).addClass('setpPoint-actived');
-                                if(nextPoint!=undefined){
-                                    nextPoint.forEach(idx=>{
-                                        $('.stepPoint[data-index="'+idx+'"]').addClass('stepPoint-selectable');
-                                    })
-                                }
-                                _this.opt.currentPosition=$(point).data('index');
-                              })
-                    }else{
-                        $(point).addClass('setpPoint-actived');
-                        if(nextPoint!=undefined){
-                            nextPoint.forEach(idx=>{
-                                $('.stepPoint[data-index="'+idx+'"]').addClass('stepPoint-selectable');
-                            })
-                        }
-                        _this.opt.currentPosition=$(point).data('index');
-                    }
-                    
-                }else{
-                    await line.animate({
+                if(targetPointData.line.length==1){
+                    var line=targetPointData.line[0];
+                    await $(line).animate({
                         width: $(line).data('width')+"px",
-                          }, 500 ,function(){
-                            $(point).addClass('setpPoint-actived');
-                            if(nextPoint!=undefined){
-                                nextPoint.forEach(idx=>{
-                                    $('.stepPoint[data-index="'+idx+'"]').addClass('stepPoint-selectable');
-                                })
-                            }
-                            _this.opt.currentPosition=$(point).data('index');
-                          })
+                        }, duration ,function(){
+                        })
+                }else if(targetPointData.line.length==2){
+                    var line=$.grep(targetPointData.line,(ln)=>{
+                        //console.log($(ln).data('index'),_this.opt.currentPosition);
+                        return $(ln).data('index')==_this.opt.currentPosition;
+                    });
+                    //console.log(line);
+                    if(line.length>0){
+                        line=line[0];
+                        await $(line).animate({
+                        width: $(line).data('width')+"px",
+                            }, duration ,function(){
+                            //activePoint(point,pointData.nextPointIndex);
+                            })
+                    }
                 }
-                
-                    
-            
+                await delay(duration-100);
+                activePoint(targetPoint,targetPointData.nextPointIndex);
             }else{
-                $(point).addClass('setpPoint-actived');
-                if(nextPoint!=undefined){
-                    nextPoint.forEach(idx=>{
-                        $('.stepPoint[data-index="'+idx+'"]').addClass('stepPoint-selectable');
-                    })
-                }
+                for(var i=currentPosition.main;i>=targetPosition.main;i--){
                 
-                
-            }
-            
-            
-            
-            //console.log($('.stepPoint[data-index="1"]'),$(point).jqmData('index'));
-        }else{//取消激活
-            if($(point).jqmData('stepoint')!=undefined){
-                var line=$(point).jqmData('stepoint');
-                if(nextPoint!=undefined){
-                    nextPoint.forEach(async idx=>{
-                        if($('.stepPoint[data-index="'+idx+'"]').hasClass('setpPoint-actived')){
-                            $('.stepPoint[data-index="'+idx+'"]').removeClass('setpPoint-actived').removeClass('stepPoint-selectable');
-                            var _line=$('.stepPoint[data-index="'+idx+'"]').jqmData('stepoint');
-                            if(_line instanceof Array){
-    
-                            }else{
-                                //$(point).removeClass('setpPoint-actived');
-                                
-                                await _line.animate({
-                                    width: 0+"px",
-                                      }, 500 ,function(){
-                                      })
-                            }
-                        }else{
-                            $(point).removeClass('setpPoint-actived');
-                            if(nextPoint!=undefined){
-                                nextPoint.forEach(idx=>{
-                                    $('.stepPoint[data-index="'+idx+'"]').removeClass('stepPoint-selectable');
+                    var subIndex=currentPosition.sub/10;
+                    if(i<_this.breakpoint) subIndex=0;
+                    else if(i==_this.breakpoint){
+                        //subIndex=currentPosition.sub/10;
+                        subIndex=targetPosition.main==_this.breakpoint?targetPosition.sub/10:currentPosition.sub/10;
+                    }
+                    console.log("多部取消中",i+subIndex,_this.opt.currentPosition,index);
+                    //console.log();
+                    var currentPoint=_this.getPointByIndex(i+subIndex);
+                    var pointData=_this.getPointMapData(i+subIndex);
+                    //console.log(i+subIndex,_this.opt.currentPosition,pointData,currentPoint)
+                    deactivePoint(currentPoint,pointData.nextPointIndex)
+                    if(pointData.line.length==1){
+                        var line=pointData.line[0];
+                        await $(line).animate({
+                            width: 0+"px",
+                            }, duration ,function(){
+                            })
+                    }else if(pointData.line.length==2){
+                        var line=$.grep(pointData.line,(ln)=>{
+                            //console.log($(ln).data('index'),_this.opt.currentPosition);
+                            return $(ln).data('index')==_this.opt.currentPosition;
+                        });
+                        //console.log(line);
+                        if(line.length>0){
+                            line=line[0];
+                            await $(line).animate({
+                            width: 0+"px",
+                                }, duration ,function(){
+                                //activePoint(point,pointData.nextPointIndex);
                                 })
-                            }
-                            if(line instanceof Array){
-    
-                            }else{
-                                //$(point).removeClass('setpPoint-actived');
-                                
-                                await line.animate({
-                                    width: 0+"px",
-                                      }, 500 ,function(){
-                                      })
-                            }
                         }
-                        
-                    })
-                }
-                
-            }else{
-                $(point).removeClass('setpPoint-actived');
-                if(nextPoint!=undefined){
-                    nextPoint.forEach(idx=>{
-                        $('.stepPoint[data-index="'+idx+'"]').removeClass('stepPoint-selectable');
-                    })
+                    }
+                    await delay(duration-100);
                 }
             }
             
-        }
-        */
-    }
-    function setCounterIndecator(left,top,index,sub){
-        if(_this.opt.showCounter && _this.opt.counterData.length>0){
-            
-            var _counter=_this.opt.counterData.filter(value=>{ 
-                if(sub==undefined)
-                    return formatIndex(value.caseStatus).main==(index);
-                else
-                    return value.caseStatus==index+sub/10
-            });
-            console.log('setCounterIndecator',_counter.length,index,_counter);
-            if(_counter.length>0){
-                if(_this.opt.showCounter){
-                    var size=_this.opt.size*2*0.4;
-                    var counter=getElement("progress-but-counter",{
-                        width:(size)+"px",
-                        height:(size)+"px",
-                        "line-height":size+"px",
-                        "fontSize":_this.opt.fontSize*0.9+'px',
-                        "fontWeight":700,
-                        "borderRadius":(size*0.5)+"px",
-                        'left':(left+_this.opt.size*0.5)+'px',
-                        'top':(top-_this.opt.size*1.2)+'px',
-                    },_counter.length);
-                    $(counter).data('index',(index+(sub==undefined?0:sub)/10));
-                    _this.outter_frame.append(counter)
-                }
-                
+            if(formatIndex(index).main==1){
+                //deactivePoint(_this.getPointByIndex(0),true)
             }
+            console.log('取消激活节点-多部取消节点',_this.opt.currentPosition);
         }
     }
-    function bevel(straight,oblique){
-        const sinOfAngleX = straight / oblique;
-        return Math.round((Math.asin(sinOfAngleX)*180)/Math.PI);
-    }
+    */
 }

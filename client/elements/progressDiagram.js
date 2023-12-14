@@ -312,7 +312,7 @@ ProgressesButton.prototype.init=function(arg){
                 $('.stepPoint[data-index="'+idx+'"]').addClass('stepPoint-selectable');
             })
         }
-        _this.opt.currentPosition=$(point).data('index');
+        _this.opt.currentPosition=$(point).data('index')+formatIndex(_this.opt.currentPosition).sub;
       
     }
     
@@ -398,6 +398,20 @@ ProgressesButton.prototype.init=function(arg){
                             width: 0+"px",
                             }, 500 ,function(){
                             })
+                    }else if(pointData.line.length==2){
+                        deactivePoint(currentPoint,pointData.nextPointIndex)
+                        var line=$.grep(pointData.line,(ln)=>{
+                            console.log($(ln).data('index'),_this.opt.currentPosition-1);
+                            $(ln).data('index')==_this.opt.currentPosition-1;
+                        });
+                        if(line.length>0){
+                            line=line[0];
+                            await $(line).animate({
+                            width: $(line).data('width')+"px",
+                              }, 500 ,function(){
+                                //activePoint(point,pointData.nextPointIndex);
+                              })
+                        }
                     }
                     await delay(500-100);
                 }

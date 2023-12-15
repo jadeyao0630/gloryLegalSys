@@ -425,8 +425,29 @@ mform.prototype={
                     if(counter==0){
                         check='checked="checked"';
                     }
-                    radio_container.append($('<input type="radio" name="'+id+'" id="'+id+'-'+counter+'" value="'+d+'" '+check+'>'+
-                                '<label for="'+id+'-'+counter+'">'+d+'</label>'));
+                    if(d instanceof Object){
+                        var text=d;
+                        var valueIndex=counter;
+                        if(item.hasOwnProperty('displayFormat')){
+                            text=item.displayFormat;
+                            $.each(d,(k,v)=>{
+                                text=text.replace("{"+k+"}",v);
+                            })
+                        }
+                        if(item.hasOwnProperty('valueKey')){
+                            $.each(d,(k,v)=>{
+                                if(k==item.valueKey) {
+                                    valueIndex=v;
+                                    return false;
+                                }
+                            })
+                        }
+                        radio_container.append($('<input type="radio" name="'+id+'" id="'+id+'-'+valueIndex+'" data-label="'+text+'" value="'+valueIndex+'" '+check+'>'+
+                        '<label for="'+id+'-'+valueIndex+'">'+text+'</label>'));
+                    }else{
+                        radio_container.append($('<input type="radio" name="'+id+'" id="'+id+'-'+counter+'" data-label="'+d+'" value="'+counter+'" '+check+'>'+
+                        '<label for="'+id+'-'+counter+'">'+d+'</label>'));
+                    }
                 });
             }
             //var item_container=$('<div class="form_item_panel"></div>');
@@ -468,7 +489,7 @@ mform.prototype={
                                 })
                                 label=collector.join(" ");
                             }
-                            var _value=d.hasOwnProperty('value')?d.value:counter;
+                            var _value=d.hasOwnProperty(item.valueKey)?d[item.valueKey]:counter;
                             selectItem.append($('<option value="'+_value+'">'+label+'</option>'));
                         }else
                             selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
@@ -500,7 +521,7 @@ mform.prototype={
                                         })
                                         label=collector.join(" ");
                                     }
-                                    var _value=d.hasOwnProperty('value')?d.value:key+counter;
+                                    var _value=d.hasOwnProperty(item.valueKey)?d[item.valueKey]:key+counter;
                                     grounp.append($('<option value="'+_value+'">'+label+'</option>'));
                                 }else{
 
@@ -553,7 +574,7 @@ mform.prototype={
                                 })
                                 label=collector.join(" ");
                             }
-                            var _value=d.hasOwnProperty('value')?d.value:counter;
+                            var _value=d.hasOwnProperty(item.valueKey)?d[item.valueKey]:counter;
                             selectItem.append($('<option value="'+_value+'">'+label+'</option>'));
                         }else
                             selectItem.append($('<option value="'+counter+'">'+d+'</option>'));
@@ -592,7 +613,7 @@ mform.prototype={
                                             })
                                             label=collector.join(" ");
                                         }
-                                        var _value=d.hasOwnProperty('value')?d.value:key+counter;
+                                        var _value=d.hasOwnProperty(item.valueKey)?d[item.valueKey]:key+counter;
                                         grounp.append($('<option value="'+_value+'">'+label+'</option>'));
                                     }else{
     
@@ -664,7 +685,7 @@ mform.prototype={
                                         })
                                         label=collector.join(" ");
                                     }
-                                    var _value=d.hasOwnProperty('value')?d.value:key+counter;
+                                    var _value=d.hasOwnProperty(item.valueKey)?d[item.valueKey]:key+counter;
                                     grounp.append($('<option value="'+_value+'">'+label+'</option>'));
                                 }else{
 
@@ -690,11 +711,11 @@ mform.prototype={
             subContainer.append(selectItem);
             subContainer.append(tooltip);
             
-            if(item.hasOwnProperty('displayFormat')){
-                subContainer.jqmData('valueformat',item.displayFormat);
+            if(item.hasOwnProperty('optionKey')){
+                subContainer.jqmData('optionKey',item.optionKey);
                 
                 //console.log("value-format1",subContainer);
-                //console.log("value-format1",subContainer.jqmData('valueformat'));
+                //console.log("value-format1",subContainer.jqmData('optionKey'));
             }
             item_container.append(subContainer);
             //console.log(item_container.html());
@@ -719,11 +740,11 @@ mform.prototype={
             subContainer.append(selectItem);
             subContainer.append(tooltip);
             
-            if(item.hasOwnProperty('displayFormat')){
-                subContainer.jqmData('valueformat',item.displayFormat);
+            if(item.hasOwnProperty('optionKey')){
+                subContainer.jqmData('optionKey',item.displayFormat);
                 
                 console.log("value-format1",subContainer);
-                console.log("value-format1",subContainer.jqmData('valueformat'));
+                console.log("value-format1",subContainer.jqmData('optionKey'));
             }
             item_container.append(subContainer);
             //console.log(item_container.html());
@@ -736,7 +757,7 @@ mform.prototype={
         function pageIsSelectmenuDialog( page ) {
             var isDialog = false,
             id = page && page.attr( "id" );
-            $( ".filterable-select" ).each( function() {
+            $( ".filterSelect" ).each( function() {
                 if ( $( this ).attr( "id" ) + "-dialog" === id ) {
                     isDialog = true;
                     return false;
@@ -754,8 +775,8 @@ mform.prototype={
                         
                         $.each($(this),(index,select)=>{
                             //console.log("value-format2",index,"__",$(select).parent().parent());
-                            //console.log("value-format2",index,"__",$(select).parent().parent().jqmData('valueformat'));
-                            $(this).setSuperMultiselect($(select).parent().parent().jqmData('valueformat'));
+                            //console.log("value-format2",index,"__",$(select).parent().parent().jqmData('optionKey'));
+                            $(this).setSuperMultiselect($(select).parent().parent().jqmData('optionKey'));
                         })
                         var id=this.id;
                         $.each($('#'+id+'-button').find('span'),(idx,el)=>{
@@ -787,8 +808,8 @@ mform.prototype={
                         
                         $.each($(this),(index,select)=>{
                             //console.log("value-format2",index,"__",$(select).parent().parent());
-                            //console.log("value-format2",index,"__",$(select).parent().parent().jqmData('valueformat'));
-                            $(this).setSuperMultiselectA($(select).parent().parent().jqmData('valueformat'));
+                            //console.log("value-format2",index,"__",$(select).parent().parent().jqmData('optionKey'));
+                            $(this).setSuperMultiselectA($(select).parent().parent().jqmData('optionKey'));
                         })
                         var id=this.id;
                         $.each($('#'+this.id+'-button').find('span'),(idx,el)=>{
@@ -833,7 +854,7 @@ mform.prototype={
                 if ( !form ) {
                     //$("#filterForm").remove();
                     input = $( "<input data-type='search'></input>" );
-                    form = $( "<form id='searchInput'></form>" ).append( input );
+                    form = $( "<form id='"+selectmenu.attr( "id" ) + "-searchInput'></form>" ).append( input );
                     input.textinput();
                     list
                         .before( form )
@@ -881,13 +902,15 @@ mform.prototype={
                     
                     //return;
                 }
+                var id=$(data.toPage).attr('id').replace('-dialog','');
                 data.toPage.find('a.ui-icon-delete').on('click',function(e){
                     //console.log('pagecontainerhide',$(data.toPage).find('input[data-type="search"]').val());
                     $(data.toPage).find('input[data-type="search"]').val('');
                     $(data.toPage).find('input[data-type="search"]').trigger('keyup');
                 })
-                listview = data.toPage.find( "ul" );
-                console.log('pagecontainerbeforeshow',listview);
+                console.log('data.toPage',id,data.toPage);
+                listview = data.toPage.find( "ul[id^="+id+"]" );
+                //console.log('pagecontainerbeforeshow',listview);
                 //console.log(listview.html());
                 form = listview.jqmData( "filter-form" );
                 // Attach a reference to the listview as a data item to the dialog, because during the
@@ -895,7 +918,8 @@ mform.prototype={
                 // listview to the popup, so we won't be able to find it inside the dialog with a selector.
                 data.toPage.jqmData( "listview", listview );
                 // Place the form before the listview in the dialog.
-                if($(listview).parent().find('#searchInput').length==0)
+                console.log($(listview));
+                if($('#'+id+'-searchInput').length==0)
                     listview.before( form );
                 
                 //listview.addClass('filterable-select-option');
@@ -913,7 +937,7 @@ mform.prototype={
                 //console.log(data);
                 form = listview.jqmData( "filter-form" );
                 // Put the form back in the popup. It goes ahead of the listview.
-                if($(listview).parent().find('#searchInput').length==0)
+                if($(listview).parent().find('#'+$(listview).attr( "id" ).replace("-menu",'')+'-searchInput').length==0)
                     listview.before( form );
             });
             //#endregion
@@ -976,8 +1000,8 @@ mform.prototype={
                     var fvalue=formatSuperMultiSelectOptionValue(($(opt).jqmData('statusValue')!=undefined?$(opt).jqmData('statusValue'):"")+opt.value);
                     var status=fvalue.status;
 
-                    if($(element).parent().parent().jqmData('valueformat')!=undefined){
-                        var displayFormat=$(element).parent().parent().jqmData('valueformat');
+                    if(template.displayFormat!=undefined){
+                        var displayFormat=template.displayFormat;
                         $.each(fvalue,(kk,vv)=>{
                             //console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
                             if(displayFormat.indexOf(kk)>-1){
@@ -1041,7 +1065,7 @@ $.fn.extend({
             if(v.hasOwnProperty('type')){//如果是表格元素
                 if(k.nodeName=="input") val="";
                 if(v.defaultValue!=undefined) val=v.defaultValue;
-                _self.addData(v.type,k,val);
+                _self.addData(v,k,val);
             }else{
                 if(v.hasOwnProperty('data')){//如果是元素父级
                     
@@ -1050,7 +1074,7 @@ $.fn.extend({
                         if(vv.hasOwnProperty('type')){
                             if(kk.nodeName=="input") _val="";
                             if(vv.defaultValue!=undefined) _val=vv.defaultValue;
-                            _self.addData(vv.type,kk,_val);
+                            _self.addData(vv,kk,_val);
                             
                         }
                     })
@@ -1072,7 +1096,7 @@ $.fn.extend({
                 console.log(k.replace('_p',''),val)
                 if(data_keys.includes(k.replace('_p',''))||(v.type=="textrange" && (data_keys.includes(k.replace('_0',''))||data_keys.includes(k.replace('_1',''))))){
                     if(v.defaultValue!=undefined && (val==undefined || val.length==0)) val=v.defaultValue;
-                    _self.addData(v.type,k,val);
+                    _self.addData(v,k,val);
                 }
             }else{
                 if(v.hasOwnProperty('data')){
@@ -1081,7 +1105,7 @@ $.fn.extend({
                             var _val=data[kk];
                             if(data_keys.includes(kk)||(v.type=="textrange" && (data_keys.includes(k.replace('_0',''))||data_keys.includes(k.replace('_1',''))))){
                                 if(vv.defaultValue!=undefined && (_val==undefined || _val.length==0)) _val=vv.defaultValue;
-                                _self.addData(vv.type,kk,_val);
+                                _self.addData(vv,kk,_val);
                             }
                         }
                     })
@@ -1090,17 +1114,28 @@ $.fn.extend({
         });
         //_self.trigger('create');
     },
-    addData:function(type,id,value,element){
+    addData:function(template,id,value,element){
+        var type=template.type;
         if(value==undefined) value="";
         var _self=$(this);
         if(element==undefined) element=_self.find('#'+id);
         if(element.length>0){
             if(type=="radio")  {
                 if(value=="") value=0;
-                var ele=_self.find("#"+id+"-"+parseInt(value)).prop( "checked", true );
-                ele.checkboxradio().checkboxradio( "refresh" ).trigger("change");
-                if(ele.length>0){
-                    _self.find("#_"+id).text(ele.val());
+                var eles=_self.find("input[id^="+id+"]");
+                eles.prop( "checked", false );
+                if(eles.length>0){
+                    $.each(eles,(index,ele)=>{
+                        if($(ele).val()==value){
+                            $(ele).prop( "checked", true );
+                            
+                            console.log("radio",$(ele).data('label'));
+                            _self.find("#_"+id).text($(ele).data('label'));
+                        }else{
+                            $(ele).prop( "checked", false );
+                        }
+                        $(ele).checkboxradio().checkboxradio( "refresh" ).trigger("change");
+                    })
                 }
                     
             }else if(type=="multicombobox"){
@@ -1140,7 +1175,7 @@ $.fn.extend({
                 _self.find("#_"+id).html(_values.join("<br/>"));
                 element.selectmenu().selectmenu("refresh").trigger("change");
             }else if(type=="supermulticombobox"){
-                var _values=[];
+                var _values=[];//只是给只读时候label的值
                 var _valueData=[];
                 $(element).find("option").prop('selected',false);
                 //console.log(id+"--->"+value+"--"+(value!=null));
@@ -1166,14 +1201,14 @@ $.fn.extend({
                     }else{
                         value.split(",").forEach((v)=>{
                             //console.log(id+"--->"+v);
-                            var _v=formatSuperMultiSelectOptionValue(v);
+                            var _v=formatSuperMultiSelectOptionValue(v,template.valueKey,template.optionKey);
                             var ele=$(element).find("option[value="+_v.catelog+_v.valueId+"]");
                             //console.log($(element).html());
                             //console.log(ele);
                             ele.prop('selected',true);
-                            //console.log('value-format',$(element).parent().parent().jqmData('valueformat'));
-                            if($(element).parent().parent().jqmData('valueformat')!=undefined){
-                                var displayFormat=$(element).parent().parent().jqmData('valueformat');
+                            //console.log('value-format',template.displayFormat);
+                            if(template.displayFormat!=undefined){
+                                var displayFormat=template.displayFormat;
                                 $.each(_v,(kk,vv)=>{
                                     //console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
                                     if(displayFormat.indexOf(kk)>-1){
@@ -1207,7 +1242,8 @@ $.fn.extend({
                             })
                         }
                 }
-                setSuperValue("#"+id,_valueData,$(element).parent().parent().jqmData('valueformat'));
+                console.log('setSuperValue',_valueData);
+                setSuperValue("#"+id,_valueData,$(element).parent().parent().jqmData('optionKey'));
                 //console.log('value-format',_values);
                 _self.find("#_"+id).html(_values.join("<br/>"));
                 //element.selectmenu().selectmenu("refresh").trigger("change");
@@ -1286,7 +1322,7 @@ $.fn.extend({
                     if(catelog.data[item_key].type.toLowerCase()=='radio'){
                         //console.log(item_key);
                         //console.log(_Self.find('input[name="'+item_key+'"]:checked'));
-                        var val=parseInt(_Self.find('input[name="'+item_key+'"]:checked').prop('id').replace(item_key+"-",""));
+                        var val=_Self.find('input[name="'+item_key+'"]:checked').val();
                         if(catelog.data[item_key].table!=undefined){
                             if(!vals.hasOwnProperty(catelog.data[item_key].table)){
                                 vals[catelog.data[item_key].table]={};

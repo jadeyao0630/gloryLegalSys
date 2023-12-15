@@ -530,9 +530,15 @@ function getTdElement(columnSettings,value,key,_this){
             }
         }
     }else if(columnSettings.type=="date"){
-        //console.log(value);
+        //console.log('table date value',value);
         val=getDateTime(value);
+
+        //console.log('table date value formated',v);
         if(columnSettings.dateFormat!=null) val=formatDateTime(new Date(value),columnSettings.dateFormat);
+        if(value=='0000-00-00 00:00:00'){
+            val="无";
+        }
+        
         var label=$('<label>'+val+'</label>')
         td.append(label);
     }else if(columnSettings.type=="backgroundColorLabel"){
@@ -541,11 +547,17 @@ function getTdElement(columnSettings,value,key,_this){
             val=columnSettings.data[val];
         }
         var label=$('<label>'+val+'</label>')
+        
+        //console.log('backgroundData',columnSettings.backgroundData,val);
+        if(columnSettings.hasOwnProperty('backgroundData')&&columnSettings.backgroundData.hasOwnProperty(val) ){
+            td.css(columnSettings.backgroundData[val]);
+        }
         td.append(label);
     }else if(columnSettings.type=="supermulticombobox"){
         var vals=value.split(',');
         var multiValues=[];
         vals.forEach(_v=>{
+            //console.log(key,_v);
             var _values=formatSuperMultiSelectOptionValue(_v);
             //console.log('setSumList',_values);
             if(columnSettings.hasOwnProperty('displayFormat')){
@@ -641,6 +653,7 @@ function getTdElement(columnSettings,value,key,_this){
             }
             
         }
+        if(value==null) val="";
         var label=$('<label>'+val+'</label>')
         td.append(label);
     }

@@ -204,7 +204,7 @@ function setSuperValue(element,values,vformat){
         $(s).parent().selectmenu().selectmenu("refresh");
     })
 }
-function formatSuperMultiSelectOptionValue(value){
+function formatSuperMultiSelectOptionValue(value,valueKey,optionKey){
         var splited=value.split('');//'3个人0'----3:statusId, 个人:catelog, 0:valueId
         var statusid=0;
         var catelogid=0;
@@ -214,23 +214,29 @@ function formatSuperMultiSelectOptionValue(value){
         //console.log('formatSuperMultiSelectOptionValue Number',!isNaN(parseInt(splited[0])))
         if(!isNaN(parseInt(splited[0]))){//我方当事人状态
             statusid=Number(splited[0]);
-            for(var i=1;i<splited.length-1;i++){
+            for(var i=1;i<3;i++){
                 catelog.push(splited[i]);
             }
+            valueid=Number(value.replace(statusid+catelog.join(''),''));
+            //console.log(statusid+catelog.join(''),valueid);
         }else{
-            for(var i=0;i<splited.length-1;i++){
+            for(var i=0;i<2;i++){
                 catelog.push(splited[i]);
             }
+            valueid=Number(value.replace(catelog.join(''),''));
+            //console.log(catelog.join(''),valueid);
         }
-        if(!isNaN(parseInt(splited[0]))){//我方当事人id
-            valueid=Number(splited[splited.length-1]);
-        }
+        //if(!isNaN(parseInt(splited[0]))){//我方当事人id
+            //valueid=Number(splited[splited.length-1]);
+        //}
         
         catelogid=Object.keys(casePersonnel).indexOf(catelog.join(''));
         //console.log('formatSuperMultiSelectOptionValue value',value)
         //console.log('formatSuperMultiSelectOptionValue catelog',catelog.join(''))
         //console.log('formatSuperMultiSelectOptionValue casePersonnel',casePersonnel[catelog.join('')])
-        var value=casePersonnel[catelog.join('')][valueid];
+        
+        var value=$.grep(casePersonnel[catelog.join('')],(v)=>v[(valueKey!=undefined?valueKey:'id')]==valueid);
+        if(value.length>0) value=value[0][(optionKey!=undefined?optionKey:'name')];
         //if(value.length>0) value=value[0].name;
         /*
         console.log('formatSuperMultiSelectOptionValue',{

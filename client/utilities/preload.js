@@ -25,6 +25,7 @@ waitTask(logingStatus(),function(){
                 if(k=="projects"){
                     projects=getKeyValues(d,"name");
                     resourceDatas[k]=projects;
+                    resourceDatas[k+"_"]=d;
                     //console.log(projects);
                 }
                 else if(k=="caseLabels"){
@@ -43,10 +44,12 @@ waitTask(logingStatus(),function(){
                 else if(k=="caseReason"){
                     case_reason=getKeyValues(d,"label")
                     resourceDatas[k]=case_reason;
+                    resourceDatas[k+"_"]=d;
                 }
                 else if(k=="caseCauses"){
                     case_causes=getKeyValues(d,"label")
                     resourceDatas[k]=case_causes;
+                    resourceDatas[k+"_"]=d;
                 }
                 else if(k=="caseStatus"){
                     progresses=[];
@@ -79,26 +82,29 @@ waitTask(logingStatus(),function(){
                 else if(k=="propertyStatus"){
                     property_status=getKeyValues(d,"label")
                     resourceDatas[k]=property_status;
+                    resourceDatas[k+"_"]=d;
                 }
                 else if(k=="caseTypes"){
                     case_types=getKeyValues(d,"label")
                     resourceDatas[k]=case_types;
+                    resourceDatas[k+"_"]=d;
                 }
                 else if(k=="caseCatelogs"){
                     case_catelogs=getKeyValues(d,"label")
                     resourceDatas[k]=case_catelogs;
+                    resourceDatas[k+"_"]=d;
                 }
                 else if(k=="corporateCompanies"){
                     corporate_companies=getKeyValues(d,"name")
                     resourceDatas[k]=corporate_companies;
                     
-                    casePersonnel["公司"]=corporate_companies;
+                    casePersonnel["公司"]=d;
                 }
                 else if(k=="corporatePartners"){
                     corporate_partners=getKeyValues(d,"name")
                     resourceDatas[k]=corporate_partners;
                     
-                    casePersonnel["个人"]=corporate_partners;
+                    casePersonnel["个人"]=d;
                 }
                 else if(k=="authLevels"){
                     auth_levels=getKeyValues(d,"descriptions")
@@ -113,14 +119,17 @@ waitTask(logingStatus(),function(){
                 else if(k=="lawFirms"){
                     lawFirms=getKeyValues(d,"name")
                     resourceDatas[k]=lawFirms;
+                    resourceDatas[k+"_"]=d;
                 }
                 else if(k=="legalInstitution"){
                     case_orgnization=getKeyValues(d,"name")
                     resourceDatas[k]=case_orgnization;
+                    resourceDatas[k+"_"]=d;
                 }
                 else if(k=="counselTitles"){
                     counsel_titles=getKeyValues(d,"label")
                     resourceDatas[k]=counsel_titles;
+                    resourceDatas[k+"_"]=d;
                 }
             });
             var _data={};
@@ -156,7 +165,7 @@ waitTask(logingStatus(),function(){
             //setGlobalJson('resourceDatas',resourceDatas);
             result.push(true);
             
-            
+            output('resourceDatas',resourceDatas);
             const intervalId = setInterval(() => {
                 if (resourceDatas.hasOwnProperty('legalAgencies')) {
                     clearInterval(intervalId);

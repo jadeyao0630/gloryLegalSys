@@ -230,10 +230,10 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                         //console.log('setSumList',sub_key,data,val);
                         if(data instanceof Array){
                             //console.log('setSumList',sub_key,val);
-                            if(item.hasOwnProperty('displayFormat') && item.hasOwnProperty('value')){
+                            if(item.hasOwnProperty('displayFormat') && item.hasOwnProperty('valueKey')){
                                 var displayFormat=item.displayFormat;
                                 //console.log('setSumList',$.grep(data,(d)=>d[item.value]==val));
-                                var matched=$.grep(data,(d)=>d[item.value]==val);
+                                var matched=$.grep(data,(d)=>d[item.valueKey]==val);
                                 if(matched.length>0){
                                     $.each(matched[0],(kk,vv)=>{
                                         //console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
@@ -388,6 +388,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             //console.log(val);
                             //console.log(resourceDatas['caseLabelsColors']);
                             li.css(resourceDatas['caseLabelsColors'][val]);
+                            li.css({'text-align':'left'});
                         }else if(sub_key=="caseStatus"){
                             info_ele=$('<div id="'+sub_key+'" style="position: absolute;left:110px;"></div>');
                             

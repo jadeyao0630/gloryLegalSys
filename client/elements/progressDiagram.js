@@ -444,54 +444,60 @@ ProgressesButton.prototype.setPointState=async function(index,isCurrentActived){
     //还有一个可能是目标index在breakpoint上，但不是同一个子元素路径，则先要回到breakpoint前一个，在增加到目标位置
     if(targetPosition.main<currentPosition.main){
         console.log('目标小于当前，递减')
-        var offset=0;
-        if(targetPosition.main==_this.breakpoint){
-            offset=-1;
-        }
-        for(var i=currentPosition.main;i>targetPosition.main+offset;i--){
-            var subIndex=targetPosition.sub;
-            if(targetPosition.main<=_this.breakpoint) subIndex=currentPosition.sub;
-            if(i<_this.breakpoint) subIndex=0;
-            var _index=i+subIndex/10;
-            var point=_this.getPointByIndex(_index);
-            var pointData=_this.getPointMapData(_index);
+        if(targetPosition.main>=_this.breakpoint && currentPosition.main>=_this.breakpoint && targetPosition.sub!=currentPosition.sub){
+            console.log('目标和当前都大于breakpoint，并且子不一样',targetPosition)
+            await _this.setPointState(_this.breakpoint-1+currentPosition.sub/10,true);
+            await _this.setPointState(targetPosition.main+targetPosition.sub/10,true);
+        }else{
+            var offset=0;
+            if(targetPosition.main==_this.breakpoint){
+                offset=-1;
+            }
+            for(var i=currentPosition.main;i>targetPosition.main+offset;i--){
+                var subIndex=targetPosition.sub;
+                if(targetPosition.main<=_this.breakpoint) subIndex=currentPosition.sub;
+                if(i<_this.breakpoint) subIndex=0;
+                var _index=i+subIndex/10;
+                var point=_this.getPointByIndex(_index);
+                var pointData=_this.getPointMapData(_index);
 
-            deactivePoint(point,pointData.nextPointIndex)
-            //更改当前节点相关路线状态
-            if(pointData.line.length==1){//正常节点只有一条路线
-                var line=pointData.line[0];
-                await $(line).animate({
-                        width: 0+"px",
-                }, duration , function(){});
-            }else if(pointData.line.length==2){//交汇节点有多条，需要按原index的subIndex来判断走哪条路线
-                var line=$.grep(pointData.line,(ln)=>{return $(ln).data('index')==i-1+subIndex/10;});
-                //console.log(line);
-                if(line.length>0){
-                    line=line[0];
+                deactivePoint(point,pointData.nextPointIndex)
+                //更改当前节点相关路线状态
+                if(pointData.line.length==1){//正常节点只有一条路线
+                    var line=pointData.line[0];
                     await $(line).animate({
-                        width: 0+"px",
-                    }, duration ,function(){})
-                }
-            }
-            await delay(duration-100);
-        }
-        if(targetPosition.main==_this.breakpoint){
-            if(targetPointData.line.length==1){
-                var line=targetPointData.line[0];
-                await $(line).animate({
-                    width: $(line).data('width')+"px",
-                    }, duration ,function(){})
-            }else if(targetPointData.line.length==2){
-                var line=$.grep(targetPointData.line,(ln)=>{return $(ln).data('index')==index;});
-                if(line.length>0){
-                    line=line[0];
-                    await $(line).animate({
-                    width: $(line).data('width')+"px",
+                            width: 0+"px",
+                    }, duration , function(){});
+                }else if(pointData.line.length==2){//交汇节点有多条，需要按原index的subIndex来判断走哪条路线
+                    var line=$.grep(pointData.line,(ln)=>{return $(ln).data('index')==i-1+subIndex/10;});
+                    //console.log(line);
+                    if(line.length>0){
+                        line=line[0];
+                        await $(line).animate({
+                            width: 0+"px",
                         }, duration ,function(){})
+                    }
                 }
+                await delay(duration-100);
             }
-            await delay(duration-100);
-            activePoint(targetPoint,targetPointData.nextPointIndex);
+            if(targetPosition.main==_this.breakpoint){
+                if(targetPointData.line.length==1){
+                    var line=targetPointData.line[0];
+                    await $(line).animate({
+                        width: $(line).data('width')+"px",
+                        }, duration ,function(){})
+                }else if(targetPointData.line.length==2){
+                    var line=$.grep(targetPointData.line,(ln)=>{return $(ln).data('index')==index;});
+                    if(line.length>0){
+                        line=line[0];
+                        await $(line).animate({
+                        width: $(line).data('width')+"px",
+                            }, duration ,function(){})
+                    }
+                }
+                await delay(duration-100);
+                activePoint(targetPoint,targetPointData.nextPointIndex);
+            }
         }
     }else if(targetPosition.main==currentPosition.main){//同级或自己
         console.log('目标和当前等同',targetPosition)
@@ -561,41 +567,48 @@ ProgressesButton.prototype.setPointState=async function(index,isCurrentActived){
         
     }else{//递增
         console.log('递增',currentPosition,targetPosition)
-        var offset=0;
-        if(targetPosition.main>_this.breakpoint) offset=1;
-        for(var i=currentPosition.main+offset;i<=targetPosition.main;i++){
-            
-            var subIndex=targetPosition.sub;
-            if(i<_this.breakpoint) subIndex=0;
-            var main=i;
-            if(i>=_this.breakpoint && currentPosition.main==_this.breakpoint) {
-                subIndex=currentPosition.sub;
+        if(targetPosition.main>=_this.breakpoint && currentPosition.main>=_this.breakpoint && targetPosition.sub!=currentPosition.sub){
+            console.log('目标和当前都大于breakpoint，并且子不一样',targetPosition)
+            await _this.setPointState(_this.breakpoint-1+currentPosition.sub/10,true);
+            await _this.setPointState(targetPosition.main+targetPosition.sub/10,true);
+        }else{
+            var offset=0;
+            if(targetPosition.main>_this.breakpoint) offset=1;
+            for(var i=currentPosition.main+offset;i<=targetPosition.main;i++){
                 
-            }
-            var _index=main+subIndex/10;
-            var point=_this.getPointByIndex(_index);
-            var pointData=_this.getPointMapData(_index);
-            console.log('递增',_index)
-            
-            //更改当前节点相关路线状态
-            if(pointData.line.length==1){//正常节点只有一条路线
-                var line=pointData.line[0];
-                await $(line).animate({
-                        width: $(line).data('width')+"px",
-                }, duration , function(){});
-            }else if(pointData.line.length==2){//交汇节点有多条，需要按原index的subIndex来判断走哪条路线
-                var line=$.grep(pointData.line,(ln)=>{return $(ln).data('index')==main-1+subIndex/10;});
-                //console.log(line);
-                if(line.length>0){
-                    line=line[0];
-                    await $(line).animate({
-                        width: $(line).data('width')+"px",
-                    }, duration ,function(){})
+                var subIndex=targetPosition.sub;
+                if(i<_this.breakpoint) subIndex=0;
+                var main=i;
+                if(i>=_this.breakpoint && currentPosition.main==_this.breakpoint) {
+                    subIndex=currentPosition.sub;
+                    
                 }
+                var _index=main+subIndex/10;
+                var point=_this.getPointByIndex(_index);
+                var pointData=_this.getPointMapData(_index);
+                console.log('递增',_index)
+                
+                //更改当前节点相关路线状态
+                if(pointData.line.length==1){//正常节点只有一条路线
+                    var line=pointData.line[0];
+                    await $(line).animate({
+                            width: $(line).data('width')+"px",
+                    }, duration , function(){});
+                }else if(pointData.line.length==2){//交汇节点有多条，需要按原index的subIndex来判断走哪条路线
+                    var line=$.grep(pointData.line,(ln)=>{return $(ln).data('index')==main-1+subIndex/10;});
+                    //console.log(line);
+                    if(line.length>0){
+                        line=line[0];
+                        await $(line).animate({
+                            width: $(line).data('width')+"px",
+                        }, duration ,function(){})
+                    }
+                }
+                await delay(duration-100);
+                activePoint(point,pointData.nextPointIndex)
             }
-            await delay(duration-100);
-            activePoint(point,pointData.nextPointIndex)
         }
+        
     }
 /*
     var pointData=_this.getPointMapData(index);

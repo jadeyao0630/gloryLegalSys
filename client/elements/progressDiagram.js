@@ -78,7 +78,7 @@ ProgressesButton.prototype.init=function(arg){
     var countersize=_this.opt.size*2*0.4;
     var counterOffset=countersize/3;
     
-    //["立案","一审","二审",{name:"正在执行",data:["强制执行","正常执行","无需执行"]},"结案","再审","监督"]
+    //["立案","一审","二审",{name:"执行中",data:["强制执行","正常执行","无需执行"]},"结案","再审","监督"]
 
     this.breakpoint=[];//分支点
     this.items=[];
@@ -88,6 +88,7 @@ ProgressesButton.prototype.init=function(arg){
         this.instance=$('<div class="ProgressesButton-container"></div>');
         this.instance.css({
             'width':_this.opt.width+(_this.opt.hasShadow?+"4":0)+'px',
+            position: 'relative',
         });
     }else{
         this.instance.empty();
@@ -316,14 +317,16 @@ ProgressesButton.prototype.init=function(arg){
         return [bkLine,fgLine];
     }
     function setStepPoint(label,left,top,index,isMain){
-        
-        var _label=$('<span>'+label+'</span>');
+        if(_this.opt.labelPosition!="bottom") var _label=$('<span>'+label+'</span>');
+        else _label=$('<span>'+label.substring(0,1)+'</span>');
         var indicatorBackground=$('<div class="counter-indicator" data-index='+index+'></div>');
         var subClass=isMain?"":" subPoint";
         var point=$('<div class="stepPoint'+subClass+'" data-index='+index+'></div>');
-        var _top="calc(100% + 15px)";
+        var _top="calc(100% + 10px)";
         if(_this.opt.labelPosition=="center") _top="50%";
-        _label.css({width:_this.opt.size*2-30,top:_top});
+        if(_this.opt.labelPosition!="bottom") _label.css({width:_this.opt.size*2-30,top:_top});
+        else _label.css({top:_top});
+        if(_this.opt.readOnly) _label.css({color:'#333'});
         point.append(_label);
         point.append(indicatorBackground);
         point.css({
@@ -445,15 +448,16 @@ ProgressesButton.prototype.setPointState=async function(index,isClicked){
     var _this=this;
     var duration=500;
     function activePoint(point,nextPointIndexs){
-        $(point).addClass('setpPoint-actived');
+        if(_this.opt.labelPosition!="bottom")  $(point).addClass('setpPoint-actived-white');
+        else $(point).addClass('setpPoint-actived');
+        
         if(nextPointIndexs!=undefined && nextPointIndexs.length>0){
             nextPointIndexs.forEach(idx=>{
+                
+                
                 $('.stepPoint[data-index="'+idx+'"]').addClass('stepPoint-selectable');
             })
         }
-        
-        $(point).css({
-            color: 'white'})
         var pointPosition=formatIndex($(point).data('index'));
         var currentPosition=formatIndex(_this.opt.currentPosition);
         //console.log('currentPosition active b',_this.opt.currentPosition,currentPosition,pointPosition,$(point).data('index'));
@@ -466,15 +470,14 @@ ProgressesButton.prototype.setPointState=async function(index,isClicked){
     }
     
     function deactivePoint(point,nextPointIndexs){
-        $(point).removeClass('setpPoint-actived');
+        $(point).removeClass('setpPoint-actived').removeClass('setpPoint-actived-white');
         if(nextPointIndexs!=undefined && nextPointIndexs.length>0){
             nextPointIndexs.forEach(idx=>{
                 $('.stepPoint[data-index="'+idx+'"]').removeClass('stepPoint-selectable');
             });
         }
         
-        if(_this.opt.labelPosition.toLocaleLowerCase()!="bottom")$(point).css({
-            color: '#333'})
+        
         var pointPosition=formatIndex($(point).data('index'));
         var currentPosition=formatIndex(_this.opt.currentPosition);
         //console.log('currentPosition deactive b',currentPosition,pointPosition);

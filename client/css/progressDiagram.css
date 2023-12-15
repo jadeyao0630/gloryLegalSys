@@ -24,17 +24,26 @@
     color:gray;
     text-shadow: none;
     position: absolute;
-  z-index: 21;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
+    z-index: 21;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
   }
   .setpPoint-actived{
     background-color: #1362B7;
     border-color: #1362B7;
     cursor:pointer;
   }
-  
+  .setpPoint-actived-white{
+    color: white;
+    background-color: #1362B7;
+    border-color: #1362B7;
+    cursor:pointer;
+  }
+  .setpPoint-actived-white.stepPoint-selectable span{
+    color: white;
+    cursor:pointer;
+  }
   .setpPoint-actived.stepPoint-selectable span{
     cursor:pointer;
   }

@@ -16,7 +16,8 @@
   </style>
 </head>
 <body>
-  <div id="progress_diagram"></div>
+  <div id="progress_diagram" ></div>
+  <div id="progress_diagram1" ></div>
   <button id="goto">goto</button>
   <input id="index" type="number"/>
   <script>
@@ -36,6 +37,25 @@
                 //verticalGap:2,
                 labelPosition:"bottom",
                 showSubSteps:false,
+                readOnly:true,
+                showCounter:false,
+                counterData:[{caseStatus:0},{caseStatus:1},{caseStatus:1},{caseStatus:3},{caseStatus:4.1},{caseStatus:4.1},{caseStatus:6},{caseStatus:2}],
+            });
+            var but=new ProgressesButton({
+                steps:progresses,
+                deadSteps:["无需执行"],
+                showLabel:true,
+                containerId:'#progress_diagram1',
+                currentPosition:3,
+                fontSize:14,
+                line_size:2,
+                size:35,
+                width:840,
+                hasShadow:false,
+                isViewMode:true,
+                //verticalGap:2,
+                //labelPosition:"bottom",
+                showSubSteps:true,
                 readOnly:false,
                 showCounter:false,
                 counterData:[{caseStatus:0},{caseStatus:1},{caseStatus:1},{caseStatus:3},{caseStatus:4.1},{caseStatus:4.1},{caseStatus:6},{caseStatus:2}],

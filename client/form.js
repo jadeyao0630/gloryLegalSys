@@ -448,6 +448,8 @@ mform.prototype={
             if(item.data!=undefined){
                 if(item.data instanceof Array){
                     item.data.forEach((d,counter)=>{
+                        //console.log()
+                        if(d==null) d="";
                         if(d.constructor === Object){//'{name} {contact} {institution}'
                             var label="";
                             if(item.hasOwnProperty('displayFormat')){
@@ -896,7 +898,7 @@ mform.prototype={
                 if($(listview).parent().find('#searchInput').length==0)
                     listview.before( form );
                 
-                listview.addClass('filterable-select-option');
+                //listview.addClass('filterable-select-option');
                 //listview.trigger('create').listview().listview( "refresh" );
                 //listview.parent().trigger('create');
             })

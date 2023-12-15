@@ -389,23 +389,30 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             //console.log(resourceDatas['caseLabelsColors']);
                             li.css(resourceDatas['caseLabelsColors'][val]);
                         }else if(sub_key=="caseStatus"){
-                            info_ele=$('<div id="'+sub_key+'" style="margin-left:90px;margin-top:-7px;"></div>');
+                            info_ele=$('<div id="'+sub_key+'" style="margin-top:27px;display: inline;position: relative;"></div>');
                             
                         }
                         li.append(info_ele);
                         listview.append(li);
                         if(sub_key=="caseStatus"){
-                            
+                            var newProgress=[];
+                            progresses.forEach((prog=>{
+                                if(prog instanceof Array){
+                                    newProgress.push({name:"正在执行",data:prog});
+                                }else{
+                                    newProgress.push(prog);
+                                }
+                            }))
                             //console.log("caseStatus................."+_data[data_key][sub_key]);
                             var but=new ProgressesButton({
-                                steps:progresses,
+                                steps:newProgress,
                                 deadSteps:deads,
                                 selected_color:"#4B9DCB",
                                 showLabel:true,
                                 containerId:'#'+sub_key,
                                 currentPosition:_data[data_key][sub_key],
                                 fontSize:12,
-                                line_size:4,
+                                line_size:2,
                                 size:12,
                                 width:240,
                                 isViewMode:true,

@@ -1,6 +1,6 @@
 var lockeventListener=[];
 var isAddPage=false;
-var excutePoint=2;
+var excutePoint=3;
 $('.popup-add-table').on('click',function(e){
     //createBasicDatabase();
     //createTable('caseUpdates',caseUpdates);
@@ -181,16 +181,24 @@ function functionBtnsEvent(but){
                 progressInfoForm.setEmptyData();
             }
             //console.log('status_val',status_val);
-            
+            //["立案","一审","二审",{name:"正在执行",data:["强制执行","正常执行","无需执行"]},"结案","再审","监督"]
+            var newProgress=[];
+            progresses.forEach((prog=>{
+                if(prog instanceof Array){
+                    newProgress.push({name:"正在执行",data:prog});
+                }else{
+                    newProgress.push(prog);
+                }
+            }))
             var but=new ProgressesButton({
-                steps:progresses,
+                steps:newProgress,
                 deadSteps:deads,
                 showLabel:true,
                 containerId:'#progress_diagram',
                 currentPosition:status_val,
                 fontSize:15,
-                line_size:4,
-                size:30,
+                line_size:2,
+                size:35,
                 width:840,
                 hasShadow:true,
                 isViewMode:true,
@@ -573,11 +581,12 @@ function updateSubmitEvent(e){
     var form=$(this).jqmData('form');
     console.log(form.opt.template);
     form.instance.getValues(0,form.opt.template.template, function(message,values){
-        console.log(values);
+        console.log("获取到的表格值",values);
         if(values.success){
             var editableStatus=checkProgressEdiableStatus();
             var goNext=false;
             var intervalId;
+            console.log("提交方式为",editableStatus);
             if(editableStatus!="new" && editableStatus!="update"){
                 //var list2delete=[];
                 var tables={};
@@ -659,6 +668,8 @@ function updateSubmitEvent(e){
                     values.data.values[data.dateKey]=getDateTime();
                     var newCaseStatus=currentProgress['targetPosition'].main+(currentProgress['originalPosition'].main>excutePoint && currentProgress['targetPosition'].main> currentProgress['originalPosition'].main?currentProgress['originalPosition'].sub:currentProgress['targetPosition'].sub)/10;
                     if(editableStatus=="new" || editableStatus=="shift"){
+
+                        console.log("提交方式为",editableStatus,'状态更新为',newCaseStatus,'目标ID',data.id);
                         update("id="+data.id,'caseStatus','caseStatus="'+newCaseStatus+'"',async function(r){
                             console.log('update result',r);
                             $.each(DataList.combinedData,(index,item)=>{
@@ -667,7 +678,17 @@ function updateSubmitEvent(e){
                                     return false;
                                 }
                             });
-                            await currentProgress['currentDiagramButton'].setStep(currentProgress['target']);
+                            //await currentProgress['currentDiagramButton'].setStep(currentProgress['target']);
+                            var targetPosition=currentProgress['targetPosition'];
+                            if(currentProgress['originalPosition'].main>=currentProgress['currentDiagramButton'].opt.breakpoint){
+                                
+                                if(targetPosition.main==currentProgress['currentDiagramButton'].opt.breakpoint){
+
+                                }else{
+                                    targetPosition.sub=currentProgress['originalPosition'].sub;
+                                }
+                            }
+                            await currentProgress['currentDiagramButton'].MoveTo(targetPosition.main+targetPosition.sub/10);
                         })
                         if(editableStatus=="shift"){
                             $.each(tables,(table,del)=>{
@@ -1206,7 +1227,7 @@ function lockEvent(e){
                     
                 }else if(_this.id=="progress_title"){
                     progressInfoForm.readOnly(datas[0].isReadOnly);
-                    currentProgress['currentDiagramButton'].switchReadyOnly();
+                    //currentProgress['currentDiagramButton'].switchReadyOnly();
                 }
             }
         }else{

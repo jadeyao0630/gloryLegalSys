@@ -5,6 +5,33 @@ function extend(opt1,opt2){
         opt1[attr] = opt2[attr];
     }
 }
+
+function compareStatus(source,target){
+    var _source=formatIndex(source);
+    var _target=formatIndex(target);
+    return _source.main==_target.main && _source.sub==_target.sub;
+}
+function getStatusLabel(status,template){
+    console.log('getStatusLabel',status,template)
+    var status_data=status instanceof Object?status:formatIndex(status);
+    var label=undefined;
+    template.forEach((stageLabel,index)=>{
+        
+        if(index==status_data.main) {
+            if(stageLabel instanceof Array){
+                //console.log('stageLabel',stageLabel);
+                label=stageLabel[Number(status_data.sub)];
+                return false;
+            }else{
+
+                label = stageLabel;
+                return false;
+            }
+        }
+        
+    });
+    return label;
+}
 const delay = ms => new Promise((resolve, reject) => setTimeout(resolve, ms));
 function formatIndex(position){
     var main=Math.floor(position);
@@ -48,8 +75,10 @@ ProgressesButton.prototype.init=function(arg){
     console.log('当前位置',this.opt.currentPosition)
     if (_this.opt.containerId!=undefined) this.parent=$(_this.opt.containerId);
     var steps=_this.opt.steps;//节点数据
-
+    var countersize=_this.opt.size*2*0.4;
+    var counterOffset=countersize/3;
     
+    //["立案","一审","二审",{name:"正在执行",data:["强制执行","正常执行","无需执行"]},"结案","再审","监督"]
 
     this.breakpoint=[];//分支点
     this.items=[];
@@ -94,12 +123,13 @@ ProgressesButton.prototype.init=function(arg){
         if(stepPointName instanceof Object){
             var breakpointData={'id':index,'name':stepPointName.name,'sub':[],'isMain':true};
             _this.breakpoint=index;
+            _this.opt.breakpoint=index;
             if(stepPointName.hasOwnProperty('data')){
                 if(stepPointName.data instanceof Array){
                     stepPointName.data.forEach(function(subStepPointName,subIndex){
                         breakpointData.sub.push({'id':subIndex,'name':subStepPointName,'isMain':false});
                         //var prev_top=tops[tops.length-1];
-                        tops.push(_this.opt.size+v_dist*subIndex);
+                        tops.push(_this.opt.size+v_dist*subIndex+(_this.opt.showCounter?counterOffset:0));
                     });
                 }
             }
@@ -253,7 +283,7 @@ ProgressesButton.prototype.init=function(arg){
     console.log('currentPosition',_this.opt.currentPosition);
     var positionTo=_this.opt.currentPosition;
     _this.opt.currentPosition=0;
-    //_this.MoveTo(positionTo);
+    _this.MoveTo(positionTo);
     //var middle_line=(tops[tops.length-2]+top_offset)/2
 
     function setStepLine(left,top,index,isMain,width,angle){
@@ -286,13 +316,16 @@ ProgressesButton.prototype.init=function(arg){
         return [bkLine,fgLine];
     }
     function setStepPoint(label,left,top,index,isMain){
+        
         var _label=$('<span>'+label+'</span>');
+        var indicatorBackground=$('<div class="counter-indicator" data-index='+index+'></div>');
         var subClass=isMain?"":" subPoint";
         var point=$('<div class="stepPoint'+subClass+'" data-index='+index+'></div>');
         var _top="calc(100% + 15px)";
         if(_this.opt.labelPosition=="center") _top="50%";
         _label.css({width:_this.opt.size*2-30,top:_top});
         point.append(_label);
+        point.append(indicatorBackground);
         point.css({
             left:left,
             top:top,
@@ -302,42 +335,49 @@ ProgressesButton.prototype.init=function(arg){
             borderRadius:(_this.opt.size)+"px",
             fontSize:_this.opt.fontSize,
         });
+        indicatorBackground.css({
+            right:-counterOffset,
+            top:-counterOffset,
+            width:countersize,
+            height:countersize,
+            "line-height":countersize+"px",
+            "fontSize":_this.opt.fontSize*0.9+'px',
+            "fontWeight":700,
+            "borderRadius":(countersize*0.5)+"px",
+
+        });
         if(_this.opt.hasShadow) point.css({
             filter: 'drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5))'})
+        indicatorBackground.hide();
+        setCounterNumber(indicatorBackground,_this.opt.counterData,index);
         _this.instance.append(point);
         return point;
     }
     async function clickedEvent(e){
         if($(this).hasClass('stepPoint-selectable') || $(this).hasClass('setpPoint-actived')){
             console.log(this);
-            _this.setPointState($(this).data('index'),$(this).hasClass('setpPoint-actived'));
+            $(_this.instance).trigger({type:'itemOnClicked', Position:formatIndex($(e.currentTarget).data('index')),
+                            dataId:_this.dataId, target:$(e.currentTarget),event:e});
+            
+            //_this.setPointState($(this).data('index'),true);
         }
     }
-    function setCounterIndecator(left,top,index,sub){
-        if(_this.opt.showCounter && _this.opt.counterData.length>0){
+    function setCounterNumber(counterElement,data,index){
+        //var _index=formatIndex(index);
+        if(data.length>0){
             
-            var _counter=_this.opt.counterData.filter(value=>{ 
-                if(sub==undefined)
-                    return formatIndex(value.caseStatus).main==(index);
-                else
-                    return value.caseStatus==index+sub/10
+            var _counter=data.filter(value=>{ 
+                var sourceIndex=formatIndex(value.caseStatus);
+                //console.log(index,value.caseStatus,sourceIndex.main>_this.breakpoint,(sourceIndex.main>_this.breakpoint?sourceIndex.main:value.caseStatus==index));
+                return (sourceIndex.main>_this.breakpoint?sourceIndex.main:value.caseStatus)==index
             });
             console.log('setCounterIndecator',_counter.length,index,_counter);
             if(_counter.length>0){
+                $(counterElement).text(_counter.length);
                 if(_this.opt.showCounter){
-                    var size=_this.opt.size*2*0.4;
-                    var counter=getElement("progress-but-counter",{
-                        width:(size)+"px",
-                        height:(size)+"px",
-                        "line-height":size+"px",
-                        "fontSize":_this.opt.fontSize*0.9+'px',
-                        "fontWeight":700,
-                        "borderRadius":(size*0.5)+"px",
-                        'left':(left+_this.opt.size*0.5)+'px',
-                        'top':(top-_this.opt.size*1.2)+'px',
-                    },_counter.length);
-                    $(counter).data('index',(index+(sub==undefined?0:sub)/10));
-                    _this.outter_frame.append(counter)
+                    $(counterElement).show();
+                    //$(counterElement).data('index',(index+(sub==undefined?0:sub)/10));
+                    //_this.outter_frame.append(counter)
                 }
                 
             }
@@ -348,16 +388,34 @@ ProgressesButton.prototype.init=function(arg){
         return Math.round((Math.asin(sinOfAngleX)*180)/Math.PI);
     }
 }
+ProgressesButton.prototype.updateCounterIndicator=function(data){
+    
+    //console.log('updateCounterIndicator',this.instance.find('.counter-indicator'));
+    var counter=$.grep(this.instance.find('.counter-indicator'),(cunter)=>{
+        console.log('updateCounterIndicator', $(cunter).data('index'),data.caseStatus,( $(cunter).data('index')==data.caseStatus.toString()));
+        return $(cunter).data('index')==data.caseStatus.toString();
+    });
+    //console.log('updateCounterIndicator',counter);
+    if(counter.length>0){
+        $(counter[0]).text($.grep(this.opt.counterData,(item)=>{
+            return item.id==data.id && compareStatus(item.caseStatus,data.caseStatus)
+        }).length);
+        $(counter[0]).show();
+    }else{
+        $(counter[0]).hide();
+    }
+}
 ProgressesButton.prototype.MoveTo=async function(index){
     var _this=this;
+    console.log('MoveTo',index);
     if(index==-1){
         //var target=_this.getPointByIndex(0);
-        await _this.setPointState(0,true);
+        await _this.setPointState(0,false);
         //_this.setPointState(0,false);
     }else{
-        console.log(index);
+        
         //var target=_this.getPointByIndex(index);
-        await _this.setPointState(index,_this.opt.currentPosition>=index);
+        await _this.setPointState(index,false);
     }
     
 }
@@ -367,7 +425,7 @@ ProgressesButton.prototype.getPointByIndex=function(index){//这里牵扯到分�
     console.log(index,_this.pointMap);
     if(index>=_this.breakpoint+1||index<_this.breakpoint) index=formatIndex(index).main;
     else{
-        index=formatIndex(index).main+formatIndex(index).sub/10;
+        index=formatIndex(index).main+(_this.opt.showSubSteps?formatIndex(index).sub/10:0);
     }
     console.log(index,_this.pointMap);
     return _this.pointMap[index].self;
@@ -378,12 +436,12 @@ ProgressesButton.prototype.getPointMapData=function(index){//这里牵扯到分�
     //console.log(index,_this.pointMap);
     if(index>=_this.breakpoint+1) index=formatIndex(index).main;
     else{
-        index=formatIndex(index).main+formatIndex(index).sub/10;
+        index=formatIndex(index).main+(_this.opt.showSubSteps?formatIndex(index).sub/10:0);
     }
     //console.log(index,_this.pointMap);
     return _this.pointMap[index];
 }
-ProgressesButton.prototype.setPointState=async function(index,isCurrentActived){
+ProgressesButton.prototype.setPointState=async function(index,isClicked){
     var _this=this;
     var duration=500;
     function activePoint(point,nextPointIndexs){
@@ -393,6 +451,9 @@ ProgressesButton.prototype.setPointState=async function(index,isCurrentActived){
                 $('.stepPoint[data-index="'+idx+'"]').addClass('stepPoint-selectable');
             })
         }
+        
+        $(point).css({
+            color: 'white'})
         var pointPosition=formatIndex($(point).data('index'));
         var currentPosition=formatIndex(_this.opt.currentPosition);
         //console.log('currentPosition active b',_this.opt.currentPosition,currentPosition,pointPosition,$(point).data('index'));
@@ -411,6 +472,9 @@ ProgressesButton.prototype.setPointState=async function(index,isCurrentActived){
                 $('.stepPoint[data-index="'+idx+'"]').removeClass('stepPoint-selectable');
             });
         }
+        
+        if(_this.opt.labelPosition.toLocaleLowerCase()!="bottom")$(point).css({
+            color: '#333'})
         var pointPosition=formatIndex($(point).data('index'));
         var currentPosition=formatIndex(_this.opt.currentPosition);
         //console.log('currentPosition deactive b',currentPosition,pointPosition);
@@ -444,7 +508,7 @@ ProgressesButton.prototype.setPointState=async function(index,isCurrentActived){
     //还有一个可能是目标index在breakpoint上，但不是同一个子元素路径，则先要回到breakpoint前一个，在增加到目标位置
     if(targetPosition.main<currentPosition.main){
         console.log('目标小于当前，递减')
-        if(targetPosition.main>=_this.breakpoint && currentPosition.main>=_this.breakpoint && targetPosition.sub!=currentPosition.sub){
+        if(targetPosition.main>=_this.breakpoint && currentPosition.main>=_this.breakpoint && targetPosition.sub!=currentPosition.sub && !isClicked){
             console.log('目标和当前都大于breakpoint，并且子不一样',targetPosition)
             await _this.setPointState(_this.breakpoint-1+currentPosition.sub/10,true);
             await _this.setPointState(targetPosition.main+targetPosition.sub/10,true);
@@ -567,19 +631,24 @@ ProgressesButton.prototype.setPointState=async function(index,isCurrentActived){
         
     }else{//递增
         console.log('递增',currentPosition,targetPosition)
-        if(targetPosition.main>=_this.breakpoint && currentPosition.main>=_this.breakpoint && targetPosition.sub!=currentPosition.sub){
-            console.log('目标和当前都大于breakpoint，并且子不一样',targetPosition)
+        if(targetPosition.main>=_this.breakpoint && currentPosition.main>=_this.breakpoint && targetPosition.sub!=currentPosition.sub && !isClicked){
+            console.log('目标和当前都大于等于breakpoint，并且子不一样',targetPosition)
             await _this.setPointState(_this.breakpoint-1+currentPosition.sub/10,true);
             await _this.setPointState(targetPosition.main+targetPosition.sub/10,true);
         }else{
             var offset=0;
-            if(targetPosition.main>_this.breakpoint) offset=1;
-            for(var i=currentPosition.main+offset;i<=targetPosition.main;i++){
+            if(currentPosition.main==0) {
+                activePoint(currentPoint,currentPointData.nextPointIndex)
+            }
+            //if(targetPosition.main>_this.breakpoint) offset=1;
+            //if( currentPosition.main==_this.breakpoint )
+            for(var i=currentPosition.main+1;i<=targetPosition.main;i++){
                 
                 var subIndex=targetPosition.sub;
                 if(i<_this.breakpoint) subIndex=0;
                 var main=i;
-                if(i>=_this.breakpoint && currentPosition.main==_this.breakpoint) {
+                if(i>=_this.breakpoint && currentPosition.main>=_this.breakpoint) {//如果循环目标和原目标大于等于breakpoint
+                    console.log('循环目标和原目标大于等于breakpoint');
                     subIndex=currentPosition.sub;
                     
                 }

@@ -446,7 +446,7 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 .filterable-select-option {
     background-color: #f6f6f6; /* 设置背景颜色 */
-    border:none;
+
     color:#333
   }
   .filterable-select-option li.ui-first-child{
@@ -459,7 +459,7 @@ ui-collapsible.collapsible-listview .ui-btn{
   }
   .filterable-select-option a{
     color:#333;
-    border:none;
+
   }
   .filterable-select-option a:hover{
     color:white;

@@ -4,75 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
-	<link rel="stylesheet" href="./css/stepButton.css" />
+	<link rel="stylesheet" href="./css/progressDiagram.css" />
   <title>Document</title>
   <script src="./js/jquery.js"></script>
 	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
 	<script type="text/javascript" src="./elements/progressDiagram.js"></script>
   <style>
     .ProgressesButton-container{
-      position: relative;
-    }
-    .stepPoint{
-      position: absolute;
-      z-index: 12;
-      background-color: lightgray;
-      transform:translate(-50%,-50%);
-      text-align: center;
-    font-weight: 700;
-    border-color: lightgray;
-    }
-    .stepLine{
-      position: absolute;
-      z-index: 10;
-      background-color: lightgray;
-      transform:translate(0%,-50%);
     }
     
-    .foregroundStepLine{
-      position: absolute;
-      z-index: 11;
-      background-color: blue;
-      transform:translate(0%,-50%);
-    }
-    .stepPoint span{
-      color:gray;
-      text-shadow: none;
-      position: absolute;
-    z-index: 21;
-    top:50%;
-    left:50%;
-    transform:translate(-50%,-50%);
-    }
-    .setpPoint-actived{
-      background-color: #1362B7;
-      border-color: #1362B7;
-      color:white;
-      cursor:pointer;
-    }
-    
-    .setpPoint-actived.stepPoint-selectable span{
-      color:white;
-      cursor:pointer;
-    }
-    .stepPoint-selectable{
-      
-      cursor:pointer;
-    }
-    .stepPoint-selectable span{
-      color:#333;
-      cursor:pointer;
-    }
-    .counter-indicator{
-      z-index: 23;
-      position: absolute;
-      text-align: center;
-      background: orangered;
-      color:white;
-      text-align: center;
-      vertical-align: middle;
-      filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5));
-    }
   </style>
 </head>
 <body>
@@ -87,18 +27,18 @@
                 showLabel:true,
                 containerId:'#progress_diagram',
                 currentPosition:3,
-                fontSize:14,
+                fontSize:12,
                 line_size:2,
-                size:35,
-                width:840,
-                hasShadow:true,
+                size:12,
+                width:240,
+                hasShadow:false,
                 isViewMode:true,
                 //verticalGap:2,
-                //labelPosition:"bottom",
-                showSubSteps:true,
+                labelPosition:"bottom",
+                showSubSteps:false,
                 readOnly:false,
-                showCounter:true,
-                //counterData:matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments),
+                showCounter:false,
+                counterData:[{caseStatus:0},{caseStatus:1},{caseStatus:1},{caseStatus:3},{caseStatus:4.1},{caseStatus:4.1},{caseStatus:6},{caseStatus:2}],
             });
     $('#goto').on('click',function(e){
       console.log($('#index').val());

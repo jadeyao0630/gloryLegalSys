@@ -126,6 +126,7 @@ function functionBtnsEvent(but){
     var matchedExcutes=DataList.caseExcutes.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     var matchedProperties=DataList.caseProperties.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     var matchedAttachments=DataList.caseAttachments.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var matchedCaseLinked=DataList.caseLinked.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     //console.log(index+"--"+but.currentTarget.name,matchItems);
 
     if(but.currentTarget.name=="fn_btn_details"){//主表里的删除按钮
@@ -191,7 +192,7 @@ function functionBtnsEvent(but){
                 }
             }))
             var but=new ProgressesButton({
-                steps:newProgress,
+                steps:resourceDatas["caseStatus_object"],
                 deadSteps:deads,
                 showLabel:true,
                 containerId:'#progress_diagram',
@@ -208,6 +209,7 @@ function functionBtnsEvent(but){
                 readOnly:enableReadOnlyMode? matchItems[0].isReadOnly:false,
                 showCounter:true,
                 counterData:matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments),
+                //eventsData:,
             });
             //console.log("caseNo",matchItems[0].caseNo);
             currentProgress['currentDiagramButton']=but;
@@ -246,13 +248,14 @@ function functionBtnsEvent(but){
                         $(exeBtn).css({'display':'block'});
                     }
                 }
+                
+                
                 //$('#progress_popupMenu_add').find('ul').trigger('create').listview().listview('refresh');
                // $('#progress_popupMenu_add').find('div').trigger('create');
                 //$('#progress_popupMenu_add').find('div').
                 //console.log('progress_popupMenu_add',$('#progress_popupMenu_add').find('ul'));
                 //console.log('progress_popupMenu_add',$("#progress_popupMenu").find('ul'));
                 $("#progress_popupMenu").trigger('create');
-                
                 $("#progress_popupMenu").popup('open');
                 $("#progress_popupMenu").popup('reposition',{x:e.event.pageX,y:e.event.pageY});
                 $("#progress_popupMenu_add_group").listview().listview('refresh');
@@ -260,6 +263,10 @@ function functionBtnsEvent(but){
             });
             $("#progress_diagram").trigger('create');
             $("#progress_details").trigger('create');
+            setTimeout(() => {
+                
+                but.setEvent(matchedCaseLinked);
+            }, 1000);
         }
         //setTimeout(function() {
             

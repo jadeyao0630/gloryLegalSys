@@ -389,7 +389,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             //console.log(resourceDatas['caseLabelsColors']);
                             li.css(resourceDatas['caseLabelsColors'][val]);
                         }else if(sub_key=="caseStatus"){
-                            info_ele=$('<div id="'+sub_key+'" style="margin-top:27px;display: inline;position: relative;"></div>');
+                            info_ele=$('<div id="'+sub_key+'" style="position: absolute;left:110px;"></div>');
                             
                         }
                         li.append(info_ele);
@@ -405,7 +405,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             }))
                             //console.log("caseStatus................."+_data[data_key][sub_key]);
                             var but=new ProgressesButton({
-                                steps:newProgress,
+                                steps:resourceDatas["caseStatus_object"],
                                 deadSteps:deads,
                                 selected_color:"#4B9DCB",
                                 showLabel:true,

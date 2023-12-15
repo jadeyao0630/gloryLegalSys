@@ -93,6 +93,7 @@ const caseUpdates={//案件每个状态点对应的更新
     dateUpdated:"datetime",//更新提交日期
     caseDisputed:"VARCHAR(255)",//案件争议
     attachments:"VARCHAR(255)",//案件附件
+    isInactived:"INT(1) default '0' NOT NULL"
 }
 
 const caseExcutes={//案件执行数据
@@ -108,6 +109,7 @@ const caseExcutes={//案件执行数据
     sumExecuted:"VARCHAR(1000)",//执行概要
     dateExecuted:"datetime",//执行日期
     attachments:"VARCHAR(255)",//案件附件
+    isInactived:"INT(1) default '0' NOT NULL"
 }
 const properties={//资产状态数据
     id:"INT NOT NULL",//案件唯一序列号
@@ -120,6 +122,7 @@ const properties={//资产状态数据
     dateUpdated:"datetime",//更新提交日期
     dateOccur:"datetime",//案件更新事件发生日期
     attachments:"VARCHAR(255)",//案件附件
+    isInactived:"INT(1) default '0' NOT NULL"
 }
 const attachments={//案件相关文件
     id:"INT NOT NULL",//案件唯一序列号
@@ -133,9 +136,18 @@ const attachments={//案件相关文件
     fileLabel:"VARCHAR(255)",//附件名称
     filePath:"VARCHAR(255)",//附件地址
     dateUploaded:"datetime",//上传日期
+    isInactived:"INT(1) default '0' NOT NULL"
+}
+const _caseLinked={//案件状态
+    id:"INT(11) NOT NULL",//案件状态唯一序列号
+    caseStatus:"VARCHAR(100) default '0'",//案件状态子序列号
+    caseId:"INT(11) NOT NULL",//案件状态名称
+    caseNo:"VARCHAR(255) NOT NULL",//案件编号
+    linkId:"INT(11) NOT NULL,PRIMARY KEY",//案件类型说明
+    isInactived:"INT(1) default '0' NOT NULL"
 }
 const _caseStatus={//案件状态
-    id:"FLOAT NOT NULL,PRIMARY KEY",//案件状态唯一序列号
+    id:"INT NOT NULL,PRIMARY KEY",//案件状态唯一序列号
     isMain:"bool default '1'",//案件状态子序列号
     name:"VARCHAR(255)",//案件状态名称
     descriptions:"VARCHAR(255)",//案件类型说明

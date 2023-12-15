@@ -66,6 +66,14 @@ waitTask(logingStatus(),function(){
                         }
                     });
                     resourceDatas[k]=progresses;
+                    var progresses_object=[];
+                    progresses.forEach((prog=>{
+                        if(prog instanceof Array){
+                            progresses_object.push({name:"执行中",data:prog});
+                        }else{
+                            progresses_object.push(prog);
+                        }
+                    }))
                     resourceDatas[k+"_object"]=progresses_object;
                 }
                 else if(k=="propertyStatus"){
@@ -184,6 +192,7 @@ waitTask(logingStatus(),function(){
             if(!DataList.hasOwnProperty('caseExcutes')) DataList.caseExcutes=[];
             if(!DataList.hasOwnProperty('caseProperties')) DataList.caseProperties=[];
             if(!DataList.hasOwnProperty('caseAttachments')) DataList.caseAttachments=[];
+            if(!DataList.hasOwnProperty('caseLinked')) DataList.caseLinked=[];
             DataList.combinedData=combinedData;
             //DataList.combinedData=d.data.casesDb;
             //setGlobalJson("combinedData",combinedData);

@@ -41,7 +41,7 @@
                 showCounter:false,
                 counterData:[{caseStatus:0},{caseStatus:1},{caseStatus:1},{caseStatus:3},{caseStatus:4.1},{caseStatus:4.1},{caseStatus:6},{caseStatus:2}],
             });
-            var but=new ProgressesButton({
+            var but1=new ProgressesButton({
                 steps:progresses,
                 deadSteps:["无需执行"],
                 showLabel:true,
@@ -51,15 +51,16 @@
                 line_size:2,
                 size:35,
                 width:840,
-                hasShadow:false,
+                hasShadow:true,
                 isViewMode:true,
                 //verticalGap:2,
                 //labelPosition:"bottom",
                 showSubSteps:true,
                 readOnly:false,
-                showCounter:false,
+                showCounter:true,
                 counterData:[{caseStatus:0},{caseStatus:1},{caseStatus:1},{caseStatus:3},{caseStatus:4.1},{caseStatus:4.1},{caseStatus:6},{caseStatus:2}],
             });
+            but1.setEvent([{caseStatus:0},{caseStatus:1}]);
     $('#goto').on('click',function(e){
       console.log($('#index').val());
       but.MoveTo($('#index').val());

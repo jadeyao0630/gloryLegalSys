@@ -702,7 +702,8 @@ var _summary_template;
           isOptional:true,
         },dateUpdated:{
           label:"更新日期",
-          type:"date"
+          type:"date",
+          defaultValue:getDateTime()
         }
       }
       list_proerty={
@@ -717,6 +718,7 @@ var _summary_template;
         },dateOccur:{
           label:"发生日期",
           type:"date",
+          defaultValue:getDateTime()
         },
       }
       list_evidence={
@@ -749,6 +751,7 @@ var _summary_template;
         dateExecuted:{
           label:"执行日期",
           type:"date",
+          defaultValue:getDateTime()
         },targetExecuted:{
           label:"执行标的",
           type:"text",
@@ -958,7 +961,7 @@ var _summary_template;
         width:'550px',
         textareaHeight:90,
         isCollapsibleGrouping:false,
-        displayFormat:"{numCPage}页的 【{fileLabel}】 {numFile}份，有原件{numOriginal}份，复印件{numCopy}份",
+        displayFormat:"上传了 {numCPage}页的 【{fileLabel}】 {numFile}份，有原件{numOriginal}份，复印件{numCopy}份",
         type:'caseAttachments',
         idkey:'evidenceId',
       },

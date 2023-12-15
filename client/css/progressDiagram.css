@@ -65,3 +65,18 @@
     vertical-align: middle;
     filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5));
   }
+  .event-lead-line{
+    position: absolute;
+    border-left:2px dashed #1362B7;
+    border-top:none;
+    border-bottom: none;
+    border-right: none;
+    left:50%;
+    transform:translate(-50%,0%);
+  }
+  .event-box{
+    position: absolute;
+    left:50%;
+    transform:translate(-50%,0%);
+    filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5));
+  }

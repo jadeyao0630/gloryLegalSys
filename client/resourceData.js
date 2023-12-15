@@ -86,6 +86,7 @@ const caseTableList={
     caseExcutes:{tablename:"caseExcutes",template:caseExcutes},
     caseProperties:{tablename:"caseProperties",template:properties},
     caseAttachments:{tablename:"caseAttachments",template:attachments},
+    caseLinked:{tablename:"caseLinked",template:_caseLinked},
 }
 const caseInfoList={
     caseStatus:{tablename:"caseStatus",template:caseStatus},
@@ -96,4 +97,5 @@ const tableNamesMatcher={
     excutesId:"caseExcutes",
     propertyId:"caseProperties",
     evidenceId:"caseAttachments",
+    caseLinked:"caseLinked",
 }

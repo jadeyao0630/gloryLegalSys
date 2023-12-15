@@ -63,6 +63,7 @@ function ProgressesButton(arg){
         hasShadow:false,
         showCounter:false,
         counterData:[],
+        eventsData:[],
     }
     this.init(arg)
 }
@@ -161,6 +162,8 @@ ProgressesButton.prototype.init=function(arg){
             _this.pointMap[index]={
                 self:point,
                 isMain:true,
+                left:lefts[index],
+                top:m_line,
                 line:lines[1]==undefined?[]:[lines[1]],
                 isSelectable:index<=_this.opt.currentPosition+1,
                 isActived:index<=_this.opt.currentPosition,
@@ -229,6 +232,8 @@ ProgressesButton.prototype.init=function(arg){
                     _this.pointMap[index+subIndex/10]={
                         self:subPoint,
                         isMain:false,
+                        left:lefts[index],
+                        top:tops[subIndex],
                         line:[subLines[1]],
                         isSelectable:index<=formatIndex(_this.opt.currentPosition+1).main,
                         isActived:index==formatIndex(_this.opt.currentPosition).main&&subIndex==formatIndex(_this.opt.currentPosition).sub||index<formatIndex(_this.opt.currentPosition).main,
@@ -284,7 +289,10 @@ ProgressesButton.prototype.init=function(arg){
     console.log('currentPosition',_this.opt.currentPosition);
     var positionTo=_this.opt.currentPosition;
     _this.opt.currentPosition=0;
-    _this.MoveTo(positionTo);
+    _this.MoveTo(positionTo,0);
+    if(_this.opt.eventsData.length>0){
+        _this.setEvent(_this.opt.eventsData);
+    }
     //var middle_line=(tops[tops.length-2]+top_offset)/2
 
     function setStepLine(left,top,index,isMain,width,angle){
@@ -408,17 +416,18 @@ ProgressesButton.prototype.updateCounterIndicator=function(data){
         $(counter[0]).hide();
     }
 }
-ProgressesButton.prototype.MoveTo=async function(index){
+ProgressesButton.prototype.MoveTo=async function(index,duration){
     var _this=this;
+    if (duration==undefined) duration=500;
     console.log('MoveTo',index);
     if(index==-1){
         //var target=_this.getPointByIndex(0);
-        await _this.setPointState(0,false);
+        await _this.setPointState(0,false,duration);
         //_this.setPointState(0,false);
     }else{
         
         //var target=_this.getPointByIndex(index);
-        await _this.setPointState(index,false);
+        await _this.setPointState(index,false,duration);
     }
     
 }
@@ -430,8 +439,14 @@ ProgressesButton.prototype.getPointByIndex=function(index){//这里牵扯到分�
     else{
         index=formatIndex(index).main+(_this.opt.showSubSteps?formatIndex(index).sub/10:0);
     }
-    console.log(index,_this.pointMap);
-    return _this.pointMap[index].self;
+    
+    if(_this.pointMap.hasOwnProperty(index))
+        return _this.pointMap[index].self;
+    else{
+        console.log("无法找到对应数据",index,_this.pointMap);
+        return undefined;
+    }
+        
 }
 ProgressesButton.prototype.getPointMapData=function(index){//这里牵扯到分离点，就这个案例只有一个，如果有多个可能需要改进
     var _this=this;
@@ -444,9 +459,97 @@ ProgressesButton.prototype.getPointMapData=function(index){//这里牵扯到分�
     //console.log(index,_this.pointMap);
     return _this.pointMap[index];
 }
-ProgressesButton.prototype.setPointState=async function(index,isClicked){
+ProgressesButton.prototype.setEvent=function(data,positionTemplate){
     var _this=this;
-    var duration=500;
+    var isShift=false;
+    $('.event-lead-line').remove();
+    $('.event-box').remove();
+    if(positionTemplate==undefined) positionTemplate={
+        0:{height:80,position:"bottom"},1:{height:100,isTop:true},2:{height:100}
+    }
+    console.log('setEvent',data);
+    data.forEach(d=>{
+        var pointData=_this.getPointMapData(d.caseStatus);
+        var eventBox=$('.event-box[data-index='+d.caseStatus+']');
+        if(eventBox.length>0) {
+            eventBox=eventBox[0];
+        }
+        else {
+            var left=pointData.left;
+            var line_top=pointData.top-(positionTemplate[d.caseStatus].isTop?positionTemplate[d.caseStatus].height:0);
+            var box_top=pointData.top-(positionTemplate[d.caseStatus].isTop?positionTemplate[d.caseStatus].height:0)+(positionTemplate[d.caseStatus].isTop?0:positionTemplate[d.caseStatus].height-20);
+            var box_transform={transform:'translate(-50%,-100%)'}
+            if(positionTemplate[d.caseStatus].position=="top"){
+                line_top=pointData.top-positionTemplate[d.caseStatus].height;
+                box_transform={transform:'translate(-50%,-100%)'};
+            }else if(positionTemplate[d.caseStatus].position=="bottom"){
+                box_transform={transform:'translate(-50%,0%)'};
+            }else if(positionTemplate[d.caseStatus].position=="left"){
+                box_transform={transform:'translate(0%,-100%)'};
+            }else if(positionTemplate[d.caseStatus].position=="right"){
+                box_transform={transform:'translate(0%,0%)'};
+            }
+            var lead_line=$('<div class="event-lead-line"></div>');
+            lead_line.css({
+                left:pointData.left,
+                top:pointData.top-(positionTemplate[d.caseStatus].isTop?positionTemplate[d.caseStatus].height:0),
+                height:positionTemplate[d.caseStatus].height+'px'
+
+            })
+            eventBox=$('<ul data-role="listview" data-inset="true" data-index='+d.caseStatus+' class="event-box"></div>');
+            if (pointData!=undefined){
+                $(eventBox).css({
+                    left:pointData.left,
+                    top:pointData.top-(positionTemplate[d.caseStatus].isTop?positionTemplate[d.caseStatus].height:0)+(positionTemplate[d.caseStatus].isTop?0:positionTemplate[d.caseStatus].height-20),
+
+                })
+            }
+            
+            _this.instance.append(lead_line);
+            _this.instance.append(eventBox);
+            if(positionTemplate[d.caseStatus].isTop){
+                $(eventBox).css({
+                    
+                    transform:'translate(-50%,-100%)'
+                })
+            }
+        }
+        
+        if (pointData!=undefined){
+            console.log('setEvent',pointData);
+            
+            
+            
+            var eventItem=$('<li><a href="#">'+d.caseNo+'</a></li>')
+            $(eventBox).append(eventItem);
+            
+            /*
+            $(eventBox).on('mouseover',function(e){
+                $(this).addClass('evnet-box-shadow');
+            })
+            $(eventBox).on('mouseout',function(e){
+                $(this).removeClass('evnet-box-shadow');
+            })
+            */
+            
+           // console.log('setEvent',lead_line)
+        }
+        $(eventBox).listview().listview('refresh');
+        $(eventBox).trigger('create');
+        
+        console.log("判断是否超出范围",(pointData.left-$(eventBox).width()/2),_this.instance.position().left);
+        if(pointData.left-$(eventBox).width()/2<_this.instance.position().left) $(eventBox).css({
+            left:$(eventBox).width()/2,
+
+        })
+        console.log('width',$(eventBox).width());
+    })
+    _this.instance.trigger('create');
+    console.log('setEvent',_this.instance.html())
+};
+ProgressesButton.prototype.setPointState=async function(index,isClicked,duration){
+    var _this=this;
+    
     function activePoint(point,nextPointIndexs){
         if(_this.opt.labelPosition!="bottom")  $(point).addClass('setpPoint-actived-white');
         else $(point).addClass('setpPoint-actived');

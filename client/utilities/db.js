@@ -458,7 +458,16 @@ async function getBasic(template,list){
         .then(response => response.json())
         .then(data => {
             resolve(data);
-        }).catch(err => console.log(err));
+        }).catch(err => {
+            $().requestDialog({
+                title:'提示',
+                message:"似乎网络连接有问题...是否去检查连接？",
+            },function(go){
+                
+            });
+            console.log(err);
+            
+        });
         
     });
     return await response;

@@ -236,7 +236,14 @@ function functionBtnsEvent(but){
                     //console.log('setMainForm', $(a).text()=="执行");
                     return $(a).text()=="执行";
                 });
-                //console.log('setMainForm',e.Position.main);
+                console.log('setMainForm',e.Position.main);
+                if(e.Position.main==3){
+                    $(exeBtn).show();
+                    $(exeBtn).css({'display':'block'});
+                }else{
+                    $(exeBtn).hide();
+                }
+                /*
                 if((e.Position.main==3||e.Position.main==excutePoint)&&!matchItems[0].isReadOnly ){
                     $(exeBtn).show();
                     $(exeBtn).css({'display':'block'});
@@ -248,7 +255,7 @@ function functionBtnsEvent(but){
                         $(exeBtn).css({'display':'block'});
                     }
                 }
-                
+                */
                 
                 //$('#progress_popupMenu_add').find('ul').trigger('create').listview().listview('refresh');
                // $('#progress_popupMenu_add').find('div').trigger('create');
@@ -334,11 +341,11 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                         //console.log('JSON.stringify',item_d);
                         var del_btn;
                         if(item.type=='caseAttachments'){
-                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+"["+item.typeName+"] "+item.description+'</h3>');
+                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;"><i class="fa fa-paperclip text-blue" style="margin-right:10px;"></i>'+item.description+'</h3>');
                             
                             item_container=$('<li style="padding:0px;" data-item=\''+JSON.stringify(item)+'\'></li>');
                             var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
-                            var view_btn=$('<a href="#" class="ui-btn ui-icon-eye ui-btn-icon-notext btn-icon-blue view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">查看</a>')
+                            var view_btn=$('<a href="#" class="ui-btn ui-icon-eye ui-btn-icon-notext btn-icon-green view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">查看</a>')
                             del_btn=$('<a href="#" class="ui-btn ui-icon-delete ui-btn-icon-notext btn-icon-red view-list-button" style="padding:10px 5px;border: none;">删除</a>')
                             
                             if(item.isInactived){
@@ -350,7 +357,19 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                             view_btn.jqmData('label',list_item);
                             item_container.append(group);
                         }else{
-                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+"["+item.typeName+"] "+item.description+'</h3>');
+                            var iconNameColor='';
+                            switch(item.typeName){
+                                case '资产':
+                                    iconNameColor='balance-scale text-red';
+                                    break;
+                                case '执行':
+                                    iconNameColor='check-double text-blue';
+                                    break;
+                                case '进展':
+                                    iconNameColor='calendar-check text-green';
+                                    break;
+                            }
+                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;"><i class="fa fa-'+iconNameColor+'" style="margin-right:10px;"></i>'+item.description+'</h3>');
                             
                             item_container=$('<li style="padding:0px;" data-item=\''+JSON.stringify(item)+'\'></li>');
                             var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
@@ -373,7 +392,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                     })
                 })
             
-                $('#progress_details_info_body').find('a.view-list-button').on('click',function(e){
+                $('#progress_details_info_body').find('a.view-list-button').on('click',async function(e){
                     //console.log($(this));
                     var _this=this;
                     var typeName=$(this).text().length==0?$(this).attr('title'):$(this).text();
@@ -522,6 +541,40 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
             console.log("附件");
             
             setProgressPopupForm(add_evidence_template,"添加新的附件证明",{table:'caseAttachments',key:'evidenceId',dateKey:'dateUploaded',id:index,caseStatus:caseStatus,caseNo:caseNo});
+            break;
+        case '关联':
+            console.log("关联");
+            
+            isAddPage=true;
+            $().mloader("show",{message:"读取中...."});
+            await getCaseLatestIndex().then(id=>{
+                
+                sessionStorage.setItem("currentId", id+1);
+                
+                //main_form.readOnly(false);
+                //main_form.instance.setEmptyData(FormTemplate.template);
+                //main_form.readOnly(false).setEmptyData();
+                //main_form.instance.setEmptyData()
+                //
+                
+                //main_form.readOnly(false).setEmptyData();
+                $('.progress_lock.edit-info').addClass('hide');
+                //console.log($('.progress_lock.edit-info'));
+                $("#reg_form_title").html("新增档案");
+                $('.edit-header-btn[name="save_btn"').show();
+                //_setBlurBackgroundVisibility(true);
+                goToPage( $(this).attr( "href" ));
+            // main_form.readOnly(false).setEmptyData();
+                    //$().mloader("hide");
+                setTimeout(function() {
+                    caseForm.readOnly(false).setEmptyData();
+                    
+                    $().mloader("hide");
+                }, 10);
+                //main_form.setData(getGlobalJson("mainData")[0]);
+                //$("#fullscreenPage").trigger('create');
+                //main_form.instance.trigger('create');
+            });
             break;
     }
 })
@@ -948,6 +1001,7 @@ $('.edit-header-btn').on('click',async function(e){
                 console.log('getvalues',values);
                 if(values.success){
                     //console.log(message.message);
+                    //return;
                     if(isAddPage){
                         values.data.caseStatus['penalty']='0.00';
                         values.data.caseStatus['paidAmount']='0.00';

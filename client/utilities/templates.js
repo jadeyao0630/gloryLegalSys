@@ -64,6 +64,7 @@ var _summary_template;
                         isFilterable:true,
                         valueKey:'name',
                         matchKey:'id',
+                        valueFormat:'{key}{id}',
                         displayFormat:'{value} ({status})',//'{name} {contact} {institution}'
                         optionFormat:'{name}'//'{name} {contact} {institution}'
                     },
@@ -825,7 +826,9 @@ var _summary_template;
                       label:"权限:",
                       type:"combobox",
                       isOptional:true,
-                      data:resourceDatas.authLevels,
+                      data:resourceDatas.authLevels_,
+                      valueKey:'id',
+                      displayFormat:'{descriptions}',
                       isAdminOnly:true
                   },
               }
@@ -893,7 +896,9 @@ var _summary_template;
                       label:"权限:",
                       type:"combobox",
                       isOptional:true,
-                      data:resourceDatas.authLevels,
+                      data:resourceDatas.authLevels_,
+                      valueKey:'id',
+                      displayFormat:'{descriptions}',
                       isAdminOnly:true
                   },
                   isInactived_a:{
@@ -965,6 +970,7 @@ var _summary_template;
           data:resourceDatas.casePersonnel,
           isFilterable:true,
           valueKey:'id',
+          valueFormat:'{key}{id}',
           displayFormat:'{name}',
           //defaultValue:"无0"
       },

@@ -2,6 +2,7 @@
 
 var result=[];
 var collectDbList=true;
+
 $('#loadingLogo').attr('src',logoSrc)
 goToPage('#');
 $('#mainFooter').hide();
@@ -109,6 +110,7 @@ waitTask(logingStatus(),function(){
                 else if(k=="authLevels"){
                     auth_levels=getKeyValues(d,"descriptions")
                     resourceDatas[k]=auth_levels;
+                    resourceDatas[k+"_"]=d;
                 }
                 /*
                 else if(k=="legalAgencies"){

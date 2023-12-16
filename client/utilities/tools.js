@@ -215,6 +215,36 @@ $.fn.extend({
         $(this).removeClass('popin').addClass('popout');
         if(overlay!=undefined) $(overlay).addClass('popup-hide');
     },
+    setTooltip:function(){
+        $(this).on('mouseover',(e)=>{
+            if ($(this).get(0).scrollWidth > $(this).get(0).clientWidth) {
+                $(this).tooltip('show',$(this).html());
+            }
+          });
+          
+          $(this).on('mouseleave',(e)=>{
+            $(this).tooltip('hide');
+        });
+    },
+    tooltip:function(visibility,html){
+        if(visibility.toLowerCase()=="show"){
+            var tooltip=$('<span class="ui-tooltip"></span>');
+            tooltip.html(html==undefined?$(this).text():html);
+
+            $('body').append(tooltip);
+            
+            var position=$(this).offsetParent().hasClass('ui-popup')?$(this).position():$(this).offset();
+            var thisWidth=$('.ui-tooltip').width();
+            if(thisWidth+position.left>screen.width) position.left=screen.width-thisWidth-10;
+            $('.ui-tooltip').css({visibility: 'visible',
+                opacity: 1,
+                left:position.left,
+                top:(position.top+$(this).height()+10)+'px'});
+        }else{
+            $('.ui-tooltip').remove();
+        }
+        
+    },
     fullscreenPopup:function(visibility,arg){
         if(visibility.toLowerCase()=="show"){
             var title="";
@@ -275,7 +305,7 @@ $.fn.extend({
         });
     },
     requestDialog:function(arg,response){
-        
+            if($('#main-container').css('display')!='none' && $('.requestDialog').length>0) return;
             var title="";
             var popup_style=' style="padding:10px 15px;text-align:center;min-width:100px;"';
             var content=$('<form></form>');
@@ -293,7 +323,7 @@ $.fn.extend({
                 }
             }
             
-            var popup=$('<div class="popup-message popup-window"'+popup_style+'></div>');
+            var popup=$('<div class="popup-message popup-window requestDialog"'+popup_style+'></div>');
             if(title.length>0) popup.append(title);
             if(message.length>0) popup.append($('<div>'+message+'</div>'));
             popup.append(content);
@@ -307,7 +337,9 @@ $.fn.extend({
             $('body').append(popup);
             
             var index=$('div[data-position="fixed"][data-role="header"]').css('z-index');
-            if(index=="auto") index=1001;
+            //console.log($('#main-container').css('display'));
+            if($('#main-container').css('display')!='none') index=1003;
+            if(index=="auto") index=1002;
             popup_background.css("z-index",index);
             popup.css("z-index",parseInt(popup_background.css('z-index'))+1);
             popup.popIn(popup_background);
@@ -418,6 +450,9 @@ $.fn.extend({
         
     }
 });
+function getNumbers(str){
+    return str.match(/\d+(\.\d+)?/g);
+}
 function isNumber(a){
     return !isNaN(Number(a,10));
 }
@@ -483,7 +518,7 @@ function getFormItemsId(template){
 }
 
 //#endregion 
-
+/*
 $.fn.extend.setFilterableCombobox=function(){
     function pageIsSelectmenuDialog( page ) {
         var isDialog = false,
@@ -598,3 +633,4 @@ $.fn.extend.setFilterableCombobox=function(){
             listview.before( form );
     });
 }
+*/

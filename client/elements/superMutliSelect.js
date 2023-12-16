@@ -2,6 +2,7 @@ var casePersonnelStatus=['无','原告','被告','被执行人','申请执行人
 var value_format="{value} ({status})";
 //#region superMultiSelectWithInput
 function superMultiSelectSetDatas(elementId,datas){//2中国人寿,3中国银行
+    //console.log('superMultiSelectSetDatas',datas);
     var listbox=$('#'+elementId+'-menu');
     //console.log('listbox',listbox);
     listbox.empty();
@@ -10,7 +11,7 @@ function superMultiSelectSetDatas(elementId,datas){//2中国人寿,3中国银行
         listbox.append(superMultiSelectRowItem(listbox,index,'{value} ({status})',fdata,index<datas.length-1));
     })
     _setSuperLabel(elementId,'{value} ({status})');
-    listbox.trigger('create').listview().listview( "refresh" );
+    listbox.trigger('create');
 }
 function _setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
     var collector=[];
@@ -49,8 +50,10 @@ function _setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
     return collector;
 }
 function superMultiSelectRowItem(listbox,idx,format,data,notLast){
-    //console.log("id",idx);
-    var controlgroup=$('<div data-option-index="'+idx+'" data-role="controlgroup" class="row-controlgroup" data-type="horizontal"></div>');
+    console.log("superMultiSelectRowItem",data);
+
+    var li=$('<li data-option-index="'+idx+'" data-icon="false" class="" role="option" aria-selected="true"></li>');
+    var controlgroup=$('<div data-option-index="'+idx+'" data-role="controlgroup" class="row-controlgroup" data-type="horizontal")></div>');
     var select=$('<select class="sub-selectmenu" data-corners="false"></select>');
     $.each(casePersonnelStatus,(index,status)=>{
         var opt=$('<option class="sub-option" value='+index+'>'+status+'</option>');
@@ -71,9 +74,11 @@ function superMultiSelectRowItem(listbox,idx,format,data,notLast){
     controlgroup.append(select);
     controlgroup.append(input);
     controlgroup.append(button);
+    li.append(controlgroup);
     select.change(function () {
         var elementId=listbox.attr('id').replace('-menu','');
         _setSuperLabel(elementId,format);
+        $('#'+elementId).trigger('selectChange');
     });
     button.on('click',function(e){
         var id=$(this).jqmData('option-index');
@@ -93,8 +98,9 @@ function superMultiSelectRowItem(listbox,idx,format,data,notLast){
         }
         _setSuperLabel(elementId,format);
 
+        $('#'+elementId).trigger('selectChange');
     });
-    return controlgroup;
+    return li;
 }
 
 function _getSuperValue(elementid,format){
@@ -204,7 +210,7 @@ function setSuperValue(element,values,vformat){
         $(s).parent().selectmenu().selectmenu("refresh");
     })
 }
-function formatSuperMultiSelectOptionValue(value,valueKey,optionKey){
+function formatSuperMultiSelectOptionValue(value,valueKey,matchKey){
         var splited=value.split('');//'3个人0'----3:statusId, 个人:catelog, 0:valueId
         var statusid=0;
         var catelogid=0;
@@ -234,9 +240,9 @@ function formatSuperMultiSelectOptionValue(value,valueKey,optionKey){
         //console.log('formatSuperMultiSelectOptionValue value',value)
         //console.log('formatSuperMultiSelectOptionValue catelog',catelog.join(''))
         //console.log('formatSuperMultiSelectOptionValue casePersonnel',casePersonnel[catelog.join('')])
-        
-        var value=$.grep(casePersonnel[catelog.join('')],(v)=>v[(valueKey!=undefined?valueKey:'id')]==valueid);
-        if(value.length>0) value=value[0][(optionKey!=undefined?optionKey:'name')];
+        //console.log('formatSuperMultiSelectOptionValue',casePersonnel,catelog.join(''),valueKey,matchKey)
+        var value=$.grep(casePersonnel[catelog.join('')],(v)=>v[(matchKey!=undefined?matchKey:'id')]==valueid);
+        if(value.length>0) value=value[0][(valueKey!=undefined?valueKey:'name')];
         //if(value.length>0) value=value[0].name;
         /*
         console.log('formatSuperMultiSelectOptionValue',{
@@ -342,17 +348,23 @@ function checkIfMainSelectChecked(element,id4check){
     });
     return val;
 }
+
+initalList=[];
 $.fn.extend({
-    setSuperMultiselect:function(vformat){
+    setSuperMultiselect:function(){
         //$(document).on("pagecreate", function () {
-        if(vformat==undefined) vformat=value_format;
         var self=this;
         var id=$(self).attr('id');
         var listbox_popup=$('#'+id+'-listbox')
         //console.log('setSuperMultiselect format',vformat);
         //console.log('setSuperMultiselect before html',$('#'+id+'-menu').html());
-        $(self).parent().parent().find('.sub-selectmenu').remove();
-        setSuperValue('#'+id,undefined,vformat);
+        //$(self).parent().parent().find('.sub-selectmenu').remove();//去除自动生成的多余select元素
+        
+        $(this).parent().parent().find('.sub-selectmenu').remove();
+        var displayformat=$(self).data('displayformat');
+        var optionformat=$(self).data('optionformat');
+        //console.log('select data',displayformat,optionformat,$(self));
+        setSuperValue('#'+id,undefined,optionformat);
         //console.log('setSuperMultiselect',id);
         //console.log('listbox',listbox);
         listbox_popup.popup({
@@ -453,7 +465,7 @@ $.fn.extend({
                         li.attr("aria-selected" , true);
                     }
                     //console.log($('#multiselect').find(':selected').text().join(","));
-                    formatSuperValue('#'+id,vformat);
+                    formatSuperValue('#'+id,displayformat);
                     
                 })
                 select.change(function () {
@@ -462,7 +474,7 @@ $.fn.extend({
                     var optValueSelected = optionSelected.val();
                     //console.log(listbox.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]'));
                     if(listbox.find('li[data-option-index="'+$(this).jqmData('option-index')+'"]').attr('aria-selected')){
-                        formatSuperValue('#'+id,vformat);
+                        formatSuperValue('#'+id,displayformat);
                     }
                     //console.log(optValueSelected);
                 });
@@ -471,7 +483,7 @@ $.fn.extend({
             
         });
         listbox.attr("aria-labelledby" ,id+"-button");
-        formatSuperValue('#'+id,undefined,vformat);
+        formatSuperValue('#'+id,displayformat);
         listbox.trigger('create').listview().listview( "refresh" );
         //console.log(listbox.html());
         
@@ -485,13 +497,18 @@ $.fn.extend({
         var elementId=$(this).attr('id');
         //console.log('listbox',elementId);
         $(this).parent().parent().find('.sub-selectmenu').remove();
+        //$('#'+elementId+'-button').find('.sub-selectmenu').remove();
+        //setSuperValue('#'+elementId,undefined,vformat);
+        //if(initalList.includes(elementId)) return;
+        //initalList.push(elementId);
         var listbox_popup=$('#'+elementId+'-listbox');
         listbox_popup.popup({
             afterclose: function( event, ui ) {
                 _setSuperLabel(elementId,vformat);
+                
+                $('#'+elementId).trigger('selectChange');
             }
         });
-
         var search_form=$(listbox_popup).find("form");
         search_form.find('div > input').attr('id',elementId+"-search");
         //var title=$(listbox).find('.ui-header.ui-bar-inherit');
@@ -502,13 +519,16 @@ $.fn.extend({
         listbox.remove();
         listbox=$('<ul class="ui-selectmenu-list ui-listview ui-super-listview" id="'+elementId+'-menu" role="listbox" aria-labelledby="'+elementId+'-button" data-filter="true" data-input="#'+elementId+'-search"></ul>');
         listbox_popup.append(listbox);
-        var li=$('<li data-option-index="0"  data-icon="false" role="option" ></li>');
+        var li=$('<li data-option-index="0" data-icon="false" role="option" ></li>');
         
         //li.append(controlgroup);
-        listbox.append(superMultiSelectRowItem(listbox,0,vformat));
+        
+        //setTimeout(() => {
+            
+        listbox.append(superMultiSelectRowItem(listbox,0,vformat,_getSuperValue(elementId,vformat)));
         listbox.trigger('create').listview().listview( "refresh" );
+        //}, 500);
         //console.log('listbox',listbox_popup.html());
-
         
         
 

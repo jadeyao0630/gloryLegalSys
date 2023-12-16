@@ -536,7 +536,7 @@ function getTdElement(columnSettings,value,key,_this){
         //console.log('table date value formated',v);
         if(columnSettings.dateFormat!=null) val=formatDateTime(new Date(value),columnSettings.dateFormat);
         if(value=='0000-00-00 00:00:00'){
-            val="无";
+            val="尚未设定";
         }
         
         var label=$('<label>'+val+'</label>')
@@ -576,7 +576,8 @@ function getTdElement(columnSettings,value,key,_this){
                 multiValues.push(collector.join(" "));
             }
         });
-        var label=$('<label>'+multiValues.join("<br/>")+'</label>')
+        var label=$('<label>'+multiValues.join("<br/>")+'</label>');
+        label.setTooltip();
         td.append(label);
     }else if(columnSettings.type=="supermultiinput"){
         var vals=value.split(',');
@@ -600,7 +601,8 @@ function getTdElement(columnSettings,value,key,_this){
                 multiValues.push(collector.join(" "));
             }
         });
-        var label=$('<label>'+multiValues.join("<br/>")+'</label>')
+        var label=$('<label>'+multiValues.join("<br/>")+'</label>');
+        label.setTooltip();
         td.append(label);
     }else if(columnSettings.type=="progresses"){
         var val=value;
@@ -653,7 +655,7 @@ function getTdElement(columnSettings,value,key,_this){
             }
             
         }
-        if(value==null) val="";
+        if(value==null) val="尚未设定";
         var label=$('<label>'+val+'</label>')
         td.append(label);
     }

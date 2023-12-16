@@ -613,7 +613,19 @@ mform.prototype={
                                             })
                                             label=collector.join(" ");
                                         }
-                                        var _value=d.hasOwnProperty(item.valueKey)?d[item.valueKey]:key+counter;
+                                        var _value=key+counter;
+                                        if(item.hasOwnProperty('valueFormat')){
+                                            var _value=item.valueFormat;
+                                            //console.log();
+                                            if(_value.indexOf('key')>-1){
+                                                _value = _value.replace('{key}',key)
+                                            }
+                                            $.each(d,(kk,vv)=>{
+                                                _value = _value.replace('{'+kk+'}',vv)
+                                            });
+                                            
+                                            //d.hasOwnProperty(item.matchKey)?d[item.matchKey]:)
+                                        }
                                         grounp.append($('<option value="'+_value+'">'+label+'</option>'));
                                     }else{
     
@@ -647,8 +659,9 @@ mform.prototype={
         }
         function generateSuperMultiComboBoxItem(item_container,item,id){
             
-            var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="form-original multiSelect supermultiSelect'+
-            (item.isFilterable?" filterSelect":"")+'" multiple="multiple" data-native-menu="false"></select>');
+            var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+
+                setRequired(item.isOptional,"此项必须选择")+' class="form-original multiSelect supermultiSelect'+(item.isFilterable?" filterSelect":"")+'"'+
+            ' data-displayFormat="'+item.displayFormat+'"'+' data-optionFormat="'+item.optionFormat+'"'+' multiple="multiple" data-native-menu="false"></select>');
             if(item.data){
                 if(item.data instanceof Array){
                     item.data.forEach((d,counter)=>{
@@ -665,19 +678,19 @@ mform.prototype={
                             tips.push(key);
                             var grounp=$('<optgroup label="'+key+'"></optgroup>')
                             value.forEach((d,counter)=>{
-                                //console.log(d)
+                                //console.log('generateSuperMultiComboBoxItem',d,item)
                                 //console.log((d.constructor === Object))
                                 if(d.constructor === Object){//'{name} {contact} {institution}'
                                     var label="";
-                                    if(item.hasOwnProperty('displayFormat')){
-                                        var displayFormat=item.displayFormat;
+                                    if(item.hasOwnProperty('optionFormat')){
+                                        var optionFormat=item.optionFormat;
                                         $.each(d,(kk,vv)=>{
-                                            //console.log(kk+"----displayFormat--->"+(item.displayFormat.indexOf(kk)>-1));
-                                            if(item.displayFormat.indexOf(kk)>-1){
-                                                displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                            //console.log(kk+"----optionFormat--->"+(item.optionFormat.indexOf(kk)>-1));
+                                            if(item.optionFormat.indexOf(kk)>-1){
+                                                optionFormat=optionFormat.replace("{"+kk+"}",vv);
                                             }
                                         })
-                                        label=displayFormat;
+                                        label=optionFormat;
                                     }else{
                                         var collector=[];
                                         $.each(d,(kk,vv)=>{
@@ -685,7 +698,21 @@ mform.prototype={
                                         })
                                         label=collector.join(" ");
                                     }
-                                    var _value=d.hasOwnProperty(item.valueKey)?d[item.valueKey]:key+counter;
+                                    
+                                    var _value=key+counter;
+                                    if(item.hasOwnProperty('valueFormat')){
+                                        var _value=item.valueFormat;
+                                        //console.log();
+                                        if(_value.indexOf('key')>-1){
+                                            _value = _value.replace('{key}',key)
+                                        }
+                                        $.each(d,(kk,vv)=>{
+                                            _value = _value.replace('{'+kk+'}',vv)
+                                        });
+                                        
+                                        //d.hasOwnProperty(item.matchKey)?d[item.matchKey]:)
+                                    }
+                                    //console.log("option set",d,item.matchKey,_value);
                                     grounp.append($('<option value="'+_value+'">'+label+'</option>'));
                                 }else{
 
@@ -693,6 +720,7 @@ mform.prototype={
                                 }
                             });
                             selectItem.append(grounp);
+                            
                             
                         }
                         
@@ -708,11 +736,12 @@ mform.prototype={
             //item_container.append(selectItem);
             var tooltip=$('<span id="'+id+'_tooltip" class="tooltip-form">开启搜索</span>')
             var subContainer=$('<div class="form-original"></div>');
+            //selectItem.jqmData('optionFormat',item.optionFormat);
+            //selectItem.jqmData('displayFormat',item.displayFormat);
             subContainer.append(selectItem);
             subContainer.append(tooltip);
-            
-            if(item.hasOwnProperty('optionKey')){
-                subContainer.jqmData('optionKey',item.optionKey);
+            if(item.hasOwnProperty('optionFormat')){
+                subContainer.jqmData('optionFormat',item.optionFormat);
                 
                 //console.log("value-format1",subContainer);
                 //console.log("value-format1",subContainer.jqmData('optionKey'));
@@ -727,8 +756,9 @@ mform.prototype={
         }
         function generateSuperMultiInputItem(item_container,item,id){
             
-            var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+setRequired(item.isOptional,"此项必须选择")+' class="form-original multiSelect supermultiInput'+
-            (item.isFilterable?" filterSelect":"")+'" multiple="multiple" data-native-menu="false"></select>');
+            var selectItem=$('<select name="'+id+'[]" id="'+id+'" '+
+            setRequired(item.isOptional,"此项必须选择")+' class="form-original multiSelect supermultiInput'+(item.isFilterable?" filterSelect":"")+
+            ' data-displayFormat="'+item.displayFormat+'"'+' data-optionFormat="'+item.optionFormat+'"'+'" multiple="multiple" data-native-menu="false"></select>');
 
             var label=$('<label for="'+id+'">'+setOptionMark(item)+item.label+'</label>');
             item_container.append(label);
@@ -739,12 +769,13 @@ mform.prototype={
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
             subContainer.append(tooltip);
+            //$(select).off('selectChange',"**");
             
-            if(item.hasOwnProperty('optionKey')){
-                subContainer.jqmData('optionKey',item.displayFormat);
+            if(item.hasOwnProperty('optionFormat')){
+                subContainer.jqmData('optionFormat',item.optionFormat);
                 
-                console.log("value-format1",subContainer);
-                console.log("value-format1",subContainer.jqmData('optionKey'));
+                //console.log("value-format1",subContainer);
+                //console.log("value-format1",subContainer.jqmData('optionFormat'));
             }
             item_container.append(subContainer);
             //console.log(item_container.html());
@@ -765,6 +796,59 @@ mform.prototype={
             });
             return isDialog;
         }
+        
+        function OnSelectChanged(){
+            
+            
+        }
+        $.mobile.document
+            .on("pagecreate", function () {
+                $(".supermultiInput").selectmenu({
+                    create: function (event, ui) {
+                        
+                        $.each($(this),(index,select)=>{
+                            if(select.nodeName=="SELECT"){
+                                    
+                                //*******修复点击打开其它带索引的下拉菜单导致初始数据丢失*********
+                                $(select).setSuperMultiselectA($(select).parent().parent().jqmData('optionFormat'));
+                                $(select).on('selectChange',function(e){
+                                    var id=$(this).attr('id');
+                                    $(this).closest('form').jqmData('datas')[id]=_getSuperValue($(this).attr('id'),'{statusId}{value}').join(",");
+                                });
+
+                                if($(select).closest('form').jqmData('datas')!=undefined){
+                                    superMultiSelectSetDatas(select.id,$(select).closest('form').jqmData('datas')[select.id].split(','));
+                                    _setSuperLabel(select.id,'{value} ({status})');
+                                }
+                                //*******修复点击打开其它带索引的下拉菜单导致初始数据丢失*********
+                            }
+                                
+                        })
+                        var id=this.id;
+                        $.each($('#'+this.id+'-button').find('span'),(idx,el)=>{
+                            //var isOpened
+                            $(el).on('mouseover',(e)=>{
+                                if (el.scrollWidth > el.clientWidth) {
+                                    //console.log('over',$('#'+id+'_tooltip'));
+                                    $('#'+id+'_tooltip').html($(el).text().split(',').join('<br/>'));
+                                    $('#'+id+'_tooltip').css({'visibility': 'visible','opacity': '1','min-width':$(el).css('width')})
+                                }
+                              });
+                              
+                              $(el).on('mouseleave',(e)=>{
+                                //console.log('leave',$('#'+id+'_tooltip'));
+                                $('#'+id+'_tooltip').css({'visibility': 'hidden','opacity': '0'})
+                                
+                                
+                              
+                            });
+                        })
+                            
+                        
+                    }
+                });
+            });
+            var initalList=[];
         $.mobile.document
             .on("pagecreate", function () {
                 
@@ -774,9 +858,11 @@ mform.prototype={
                         //console.log('supermultiSelect pagecreate',this);
                         
                         $.each($(this),(index,select)=>{
+                            //console.log('nodeName supermultiSelect',select.nodeName,select.id);
                             //console.log("value-format2",index,"__",$(select).parent().parent());
                             //console.log("value-format2",index,"__",$(select).parent().parent().jqmData('optionKey'));
-                            $(this).setSuperMultiselect($(select).parent().parent().jqmData('optionKey'));
+                            if(select.nodeName=="SELECT")
+                                $(select).setSuperMultiselect();
                         })
                         var id=this.id;
                         $.each($('#'+id+'-button').find('span'),(idx,el)=>{
@@ -802,38 +888,7 @@ mform.prototype={
                         
                     }
                 });
-                $(".supermultiInput").selectmenu({
-                    create: function (event, ui) {
-                        //console.log('supermultiSelect pagecreate',this);
-                        
-                        $.each($(this),(index,select)=>{
-                            //console.log("value-format2",index,"__",$(select).parent().parent());
-                            //console.log("value-format2",index,"__",$(select).parent().parent().jqmData('optionKey'));
-                            $(this).setSuperMultiselectA($(select).parent().parent().jqmData('optionKey'));
-                        })
-                        var id=this.id;
-                        $.each($('#'+this.id+'-button').find('span'),(idx,el)=>{
-                            //var isOpened
-                            $(el).on('mouseover',(e)=>{
-                                if (el.scrollWidth > el.clientWidth) {
-                                    //console.log('over',$('#'+id+'_tooltip'));
-                                    $('#'+id+'_tooltip').html($(el).text().split(',').join('<br/>'));
-                                    $('#'+id+'_tooltip').css({'visibility': 'visible','opacity': '1','min-width':$(el).css('width')})
-                                }
-                              });
-                              
-                              $(el).on('mouseleave',(e)=>{
-                                //console.log('leave',$('#'+id+'_tooltip'));
-                                $('#'+id+'_tooltip').css({'visibility': 'hidden','opacity': '0'})
-                                
-                                
-                              
-                            });
-                        })
-                            
-                        
-                    }
-                });
+                
                 //$(".supermultiSelect").selectmenu().selectmenu("refresh").trigger("change");
             })
         $.mobile.document
@@ -841,20 +896,27 @@ mform.prototype={
             // listview it generates starts with the ID of the select menu itself, plus the suffix "-menu".
             // We retrieve the listview and insert a search input before it.
             .on( "selectmenucreate", ".filterSelect", function( event ) {
-                console.log('selectmenucreate');
+                
                 //console.log(" filterSelect--->",$( event.target ).hasClass('supermultiSelect'));
-                //if($( event.target ).hasClass('supermultiSelect')) return;
+                
+                //if($( event.target ).hasClass('supermultiInput')) {
+                    //if(initalList.includes($( event.target ).attr( "id" ))) return;
+                    //initalList.push($( event.target ).attr( "id" ));
+               // }
+                //console.log('selectmenucreate',$( event.target ).attr( "id" ));
                 var input,
                     selectmenu = $( event.target ),
                     list = $( "#" + selectmenu.attr( "id" ) + "-menu" ),
                     form = list.jqmData( "filter-form" );
+
+                
                 // We store the generated form in a variable attached to the popup so we avoid creating a
                 // second form/input field when the listview is destroyed/rebuilt during a refresh.
                 
                 if ( !form ) {
                     //$("#filterForm").remove();
                     input = $( "<input data-type='search'></input>" );
-                    form = $( "<form id='"+selectmenu.attr( "id" ) + "-searchInput'></form>" ).append( input );
+                    form = $( "<form></form>" ).append( input );
                     input.textinput();
                     list
                         .before( form )
@@ -897,6 +959,8 @@ mform.prototype={
             // use it for filtering list items.
             .on( "pagecontainerbeforeshow", function( event, data ) {
                 
+                
+                //console.log('pagecontainerbeforeshow',$( event.target ),$(data.toPage).attr('id').replace('-dialog',''));
                 var listview, form;
                 if ( !pageIsSelectmenuDialog( data.toPage ) ) {
                     
@@ -905,11 +969,15 @@ mform.prototype={
                 var id=$(data.toPage).attr('id').replace('-dialog','');
                 data.toPage.find('a.ui-icon-delete').on('click',function(e){
                     //console.log('pagecontainerhide',$(data.toPage).find('input[data-type="search"]').val());
-                    $(data.toPage).find('input[data-type="search"]').val('');
-                    $(data.toPage).find('input[data-type="search"]').trigger('keyup');
+                    if ( pageIsSelectmenuDialog( data.toPage ) ) {
+                        $(data.toPage).find('input[data-type="search"]').val('');
+                        $(data.toPage).find('input[data-type="search"]').trigger('keyup');
+                    }
+                    
                 })
-                console.log('data.toPage',id,data.toPage);
                 listview = data.toPage.find( "ul[id^="+id+"]" );
+                
+                console.log('data.prevPage',listview);
                 //console.log('pagecontainerbeforeshow',listview);
                 //console.log(listview.html());
                 form = listview.jqmData( "filter-form" );
@@ -918,8 +986,7 @@ mform.prototype={
                 // listview to the popup, so we won't be able to find it inside the dialog with a selector.
                 data.toPage.jqmData( "listview", listview );
                 // Place the form before the listview in the dialog.
-                console.log($(listview));
-                if($('#'+id+'-searchInput').length==0)
+                //if($('#'+id+'-searchInput').length==0)
                     listview.before( form );
                 
                 //listview.addClass('filterable-select-option');
@@ -928,16 +995,20 @@ mform.prototype={
             })
             // After the dialog is closed, the form containing the filter input is returned to the popup.
             .on( "pagecontainerhide", function( event, data ) {
+                
+                //console.log('pagecontainerhide');
                 var listview, form;
                 if ( !pageIsSelectmenuDialog( data.toPage ) ) {
                     //console.log('pagecontainerhide1',$(data.toPage).find('input[data-type="search"]').val());
                     return;
                 }
+                console.log('data.prevPage',data.prevPage);
+                if(listview==undefined) return;
                 listview = data.prevPage.jqmData( "listview" ),
                 //console.log(data);
                 form = listview.jqmData( "filter-form" );
                 // Put the form back in the popup. It goes ahead of the listview.
-                if($(listview).parent().find('#'+$(listview).attr( "id" ).replace("-menu",'')+'-searchInput').length==0)
+                //if($('#'+id+'-searchInput').length==0)
                     listview.before( form );
             });
             //#endregion
@@ -1085,7 +1156,7 @@ $.fn.extend({
     setData:function(data,template){
         
         //console.log("setData....")
-        
+        $(this).jqmData('datas',data);
         var data_keys=Object.keys(data);
         var _self=$(this);
         if(template==undefined) template=_self.template;
@@ -1201,7 +1272,8 @@ $.fn.extend({
                     }else{
                         value.split(",").forEach((v)=>{
                             //console.log(id+"--->"+v);
-                            var _v=formatSuperMultiSelectOptionValue(v,template.valueKey,template.optionKey);
+                            var _v=formatSuperMultiSelectOptionValue(v,template.valueKey,template.matchKey);
+                            console.log('formatSuperMultiSelectOptionValue',_v,template,template.valueKey,template.matchKey);
                             var ele=$(element).find("option[value="+_v.catelog+_v.valueId+"]");
                             //console.log($(element).html());
                             //console.log(ele);
@@ -1566,7 +1638,7 @@ $.fn.extend({
                     //console.log(itemTemplate.label,_subVal);
                     //console.log(itemTemplate.label,_val);
                     //console.log(itemTemplate.label,_greatVal);
-                    if(itemTemplate.hasOwnProperty('valueKey')){
+                    if(itemTemplate.hasOwnProperty('valueKey') && !$(element).hasClass('supermultiInput') && !$(element).hasClass('supermultiSelect')){
                         var _v=[];
                         if(itemTemplate.valueKey=="*"){
                             $.each(_val,(i,v)=>{
@@ -1580,9 +1652,14 @@ $.fn.extend({
                             });
                             val=_v.join(",");
                         }else{
-                            $.each(_val,(v)=>{
-                                _v.push(itemTemplate.data[v][itemTemplate.valueKey]);
+                            
+                            $.each(_val,(i,v)=>{
+                                //console.log("has valueKey",itemTemplate.data,v,_val);
+                                //console.log("has valueKey1",itemTemplate.data.find(d=>d[itemTemplate.valueKey]==v));
+                                //$.grep(itemTemplate.data,(d=>d[itemTemplate.valueKey].toString())==v.toString());
+                                _v.push(itemTemplate.data.find(d=>d[itemTemplate.valueKey]==v)[itemTemplate.valueKey]);
                             });
+                            //console.log("has valueKey2",_v);
                             val=_v.join(",");
                         }
                         

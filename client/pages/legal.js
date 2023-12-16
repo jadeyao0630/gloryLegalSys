@@ -6,6 +6,7 @@ progressInfoForm,
 setting_info_form,
 setting_add_form;
 var currentData;
+var fancyTable;
 //getGlobal("currentId")
 //getGlobal("currentUser")
 
@@ -17,13 +18,28 @@ $('body').on(main_load_completed_event_name,function(){
             clearInterval(intervalId);
             currentData=DataList.combinedData;
             pageOnTable.addTableData(DataList.combinedData);
+            
             setTableFunctionButonClickedEvent();
             //$('#pageOneTable').trigger('create');
             
             setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
             
-            resizeTables();
+            //resizeTables();
             resizeColumnFilter();
+            setTimeout(() => {
+                fancyTable=$("#pageOneTable").fancyTable({
+                    /* Column number for initial sorting*/
+                     sortColumn:0,
+                     /* Setting pagination or enabling */
+                     pagination: true,
+                     /* Rows per page kept for display */
+                     perPage:10,
+                     globalSearch:true
+                     });
+                     console.log('fancyTable',$("#pageOneTable").jqmData('fancyTable'));
+            resizeTables();
+            
+            }, 1000);
             //$('#header-filter-container').trigger('create')
             $().mloader("hide");
             $('#mainFooter').show();
@@ -172,10 +188,32 @@ $('body').on(preload_completed_event_name,function(){
                                         return $(ele).val().includes(item[id]+"");
                                     }else{
                                         //console.log('数组');
-                                        return item[id].split(',').some(itm => $.grep($(ele).val(),(it)=>{
-                                            console.log(itm,it);
-                                            return itm.indexOf(it)>-1;
-                                        }));
+                                        if(id=="casePersonnel"){
+                                            //console.log(item[id]);
+                                            return $.grep(item[id].split(','),itm=>{
+                                                return $.grep($(ele).val(),(it)=>{
+                                                
+                                                    var numbers=getNumbers(itm);
+                                                    var catelog=itm;
+                                                    var val2Match=itm;
+                                                    if(numbers.length==2){
+                                                        numbers.forEach(num=>{
+                                                            catelog=catelog.replace(num,'');
+                                                        })
+                                                        val2Match=catelog+numbers[1];
+                                                    }
+                                                    if(it==val2Match)
+                                                        console.log(itm,it,val2Match);
+                                                    return it==val2Match;
+                                                }).length>0
+                                            }).length>0
+                                        }else{
+                                            return item[id].split(',').some(itm => $.grep($(ele).val(),(it)=>{
+                                                console.log(itm,it,itm.indexOf(it));
+                                                return itm.indexOf(it)>-1;
+                                            }));
+                                        }
+                                        
                                     }
                                     //$(ele).val().includes(item[id]+"")
                                     //$.each($(ele).val(),(i,val)=>{
@@ -221,6 +259,7 @@ $('body').on(preload_completed_event_name,function(){
                     $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height')});
                     $('#header-filter-container').trigger('create');
                     //resizeTables();
+                    fancyTable.instance.tableUpdate($("#pageOneTable").jqmData('fancyTable'));
                     //console.log('togglebuttonicon',);
                     $(window).trigger('hidepopup');
                 }, 10);
@@ -260,16 +299,14 @@ function setToolTip(element){
     //console.log($(element));
     $(element).on('mouseover',function(e){
         //$('body').append(tooltip);
-        $('.ui-tooltip').text($(this).data('tooltip')!=undefined?$(this).data('tooltip'):$(this).text());
-        var position=$(this).offsetParent().hasClass('ui-popup')?$(this).position():$(this).offset();
-        $('.ui-tooltip').css({visibility: 'visible',
-        opacity: 1,
-        left:position.left,
-        top:(position.top+$(this).height()+10)+'px'});
+        $(this).tooltip('show',$(this).data('tooltip')!=undefined?$(this).data('tooltip'):$(this).text());
+
+
     })
     $(element).on('mouseout',function(e){
-        $('.ui-tooltip').css({visibility: 'hidden',
-        opacity: 0});
+        $(this).tooltip('hide');
+        //$('.ui-tooltip').css({visibility: 'hidden',
+        //opacity: 0});
     })
 }
 function syncHeaderCloneWidth(){//同步表格头和身的宽度

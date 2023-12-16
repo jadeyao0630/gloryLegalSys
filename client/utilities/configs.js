@@ -1,5 +1,5 @@
 var isRunLocal=true;
-var IPS=['localhost','192.168.10.69','cn.luyao.site']
+var IPS=['192.168.10.141','192.168.10.69','cn.luyao.site']
 var showDebug=false;
 let ip=isRunLocal?IPS[0]:IPS[2];
 let port=5555;

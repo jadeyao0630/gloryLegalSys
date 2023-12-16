@@ -287,9 +287,23 @@ function getFormatString(template,item){
     var text="";
     if(settings.hasOwnProperty('displayFormat')){
         var format=settings.displayFormat;
+        console.log('getFormatString',item);
         $.each(item,(k,v)=>{
             if(_template.hasOwnProperty(k) && _template[k].hasOwnProperty('data')){
-                format=format.replace("{"+k+"}",_template[k].data[isNumber(v)?Number(v):v]);
+                _template[k].data.forEach((data,index)=>{
+                    
+                    
+                    if (data instanceof Object){
+                        console.log('getFormatString',data);
+                        if(data.id==v){
+                            format=format.replace("{"+k+"}",data.label);
+                        }
+                    }else{
+                        if(index==v)
+                            format=format.replace("{"+k+"}",data);
+                    }
+                })
+                
             }else
                 format=format.replace("{"+k+"}",v);
         })

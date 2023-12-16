@@ -377,11 +377,11 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                         //console.log(listview.html());
                     }else{
                         //console.log(val);
-                        
-                        var li=$('<li class="ui-field-contain"></li>');
+                        if(val==null) val="尚未设定"
+                        var li=$('<li class="ui-field-contain" style="word-wrap: break-word;white-space : normal"></li>');
                         
                         var label_ele=$('<label>'+label+'</label>');
-                        var info_ele=$('<label>'+val+'</label>');
+                        var info_ele=$('<label style="width:310px;">'+val+'</label>');
                         
                         li.append(label_ele);
                         if(sub_key=="caseLabel"){

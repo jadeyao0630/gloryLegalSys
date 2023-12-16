@@ -51,7 +51,7 @@
 			testing: false
 		}, options);
 		var instance = this;
-
+		this.instance=this;
 		this.settings = settings;
 		this.tableUpdate = function (elm) {
 			settings.beforeUpdate.call(this,elm);
@@ -203,6 +203,7 @@
 				sortAs:['numeric',undefined,undefined,undefined,undefined,undefined,'datetime','datetime'], // undefined, numeric, datetime, case-insensitive, or custom
 				paginationElement : settings.paginationElement
 			};
+			$(elm).jqmData('fancyTable',elm);
 			elm.fancyTable.rowSortOrder = new Array(elm.fancyTable.nRows);
 			if($(elm).find("tbody").length==0){
 				var content = $(elm).html();

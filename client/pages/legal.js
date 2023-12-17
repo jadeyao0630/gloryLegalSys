@@ -24,22 +24,9 @@ $('body').on(main_load_completed_event_name,function(){
             
             setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
             
+            resizeTables();
             //resizeTables();
             resizeColumnFilter();
-            setTimeout(() => {
-                fancyTable=$("#pageOneTable").fancyTable({
-                    /* Column number for initial sorting*/
-                     sortColumn:0,
-                     /* Setting pagination or enabling */
-                     pagination: true,
-                     /* Rows per page kept for display */
-                     perPage:10,
-                     globalSearch:true
-                     });
-                     console.log('fancyTable',$("#pageOneTable").jqmData('fancyTable'));
-            resizeTables();
-            
-            }, 1000);
             //$('#header-filter-container').trigger('create')
             $().mloader("hide");
             $('#mainFooter').show();

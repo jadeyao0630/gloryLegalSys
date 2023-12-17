@@ -172,6 +172,7 @@ waitTask(logingStatus(),function(){
                 if (resourceDatas.hasOwnProperty('legalAgencies')) {
                     clearInterval(intervalId);
                     $('body').trigger(preload_completed_event_name);
+                    console.log('trigger '+preload_completed_event_name);
                     if(collectDbList) $().mloader("show",{message:"加载表格数据....",overlay:true});
                     $('#main-container').addClass('hide');
                 }

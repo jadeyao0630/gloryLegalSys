@@ -12,7 +12,7 @@ var list_evidence;
 var list_executed;
 var _summary_template;
   $('body').on(preload_completed_event_name,function(data){
-    //console.log(case_orgnizationPersonnel);
+    console.log(preload_completed_event_name);
     FormTemplate3={
         settings:{
             templateColumn:"33.3% 33.3% 33.3%",
@@ -228,14 +228,16 @@ var _summary_template;
             data:case_labels,
             backgroundData:resourceDatas.caseLabelsColors,
             //style:{'font-weight':'700','font-size':'18px'},
-            isFilterable:true
+            isFilterable:true,
         },
         caseNo:{
             label:"案件编号",
-            type:"label"
+            type:"label",
+            defaultValue:'尚未设定'
         },
         caseName:{label:"案件名称",
-          type:"label", isFilterable:true,isHidden:true},
+          type:"label", isFilterable:true,isHidden:true,
+          defaultValue:'尚未设定'},
         caseCause:{label:"案由",
           type:"label",data:resourceDatas.caseCauses_,
           valueKey:'label',
@@ -275,6 +277,7 @@ var _summary_template;
         penalty:{
           label:"判决金额(万)",
           type:"label", isFilterable:true,
+          displayFormat:'{}万',
           sortable:{
             type:'number',
             isASC:true,
@@ -313,12 +316,14 @@ var _summary_template;
           type:"label", isFilterable:true,isHidden:true},
         caseDate:{label:"立案日期",
           type:"date", dateFormat:'yyyy年MM月dd日', isFilterable:true,
+          defaultValue:'尚未设定',
           sortable:{
             type:'date',
             isASC:true,
             id:'caseDate',
           }},
         rowButtons:{
+          width:150,
             label:"操作",
             type:"buttons"
         }

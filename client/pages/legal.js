@@ -75,7 +75,7 @@ $('body').on(preload_completed_event_name,function(){
         }
     }
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
-
+    setVisibleColumnToTemplate();
     pageOnTable=new pageTable({
 		containerId:"pageOneTable",
 		template:_firstPageTableColumns,
@@ -103,8 +103,13 @@ $('body').on(preload_completed_event_name,function(){
         //$().mloader("hide");
     })
     //设置主表格头固定顶部位置，需要克隆主表格的原有头
-    var t1Header=$('#pageOneTable').find('thead').clone();
-    $('#pageOneTable-fixed').append(t1Header);
+    //var t1Header=$('#pageOneTable').find('thead').clone();
+    //$('#pageOneTable-fixed').append(t1Header);
+    setFixedHead($('#pageOneTable'),$('#pageOneTable-fixed'));
+    setTimeout(() => {
+        tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
+        //setColumnToggleButton();
+    }, 500);
     pageOnTable.setSort($('#pageOneTable-fixed').find('th'));
     
     $('#header-filter-container').css({top:$('#main-header').css('height')});
@@ -275,7 +280,7 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
     $('#pageOneTable').filterable({
         filter: function( event, ui ) {
             console.log('create');
-            syncHeaderCloneWidth();
+            //syncHeaderCloneWidth();
         }
     });
 });
@@ -295,6 +300,33 @@ function setToolTip(element){
         //$('.ui-tooltip').css({visibility: 'hidden',
         //opacity: 0});
     })
+}
+function setVisibleColumnToTemplate(){
+    if(getGlobalJson('currentUser').columns!=undefined && getGlobalJson('currentUser').columns!=null){
+        var user_cols=getGlobalJson('currentUser').columns.split(',');
+        $.each(_firstPageTableColumns,(k,v)=>{
+            if(v.isFilterable){
+                if(user_cols.includes(k)){
+                    v.isHidden=false;
+                }else{
+                    v.isHidden=true;
+                }
+            }else{
+                v.isHidden=false;
+            }
+
+        });
+        //$('#pageOneTable').trigger('create');
+        //$('#pageOneTable-fixed').trigger('create'); 
+    }
+}
+function setColumnToggleButton(){
+    if($('#pageOneTable-columnFilter').length==0){
+        
+        //console.log('tableColumnToggle',$('.table-column-toggle'));
+        tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
+        
+    }
 }
 function syncHeaderCloneWidth(){//同步表格头和身的宽度
     var columnToggler=$('<i class="fa fa-gear"></i>');
@@ -374,7 +406,7 @@ function resizeTables(isNormal){//按照窗口尺寸调整表格字体尺寸
     $('#pageOneTable').trigger('create');
     //$('#pageOneTable-fixed').trigger('create');
     
-    syncHeaderCloneWidth();
+    //syncHeaderCloneWidth();
     $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height')});
     $('#header-filter-container').trigger('create');
 }

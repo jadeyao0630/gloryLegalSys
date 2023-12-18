@@ -1,3 +1,47 @@
+const resizeObserver = new ResizeObserver(entries => {
+		
+    //setFontSize();
+    for (let entry of entries) {
+        
+        var clone=$(entry.target).jqmData('clone');
+        if($(clone).width()!=$(entry.target).width())
+        //console.log('Element width changed to: ' + $(entry.target).width(),$(clone).width(),entry.target);
+            $(clone).css('width',$(entry.target).width());
+        
+    }
+    
+});
+
+
+const setFixedHead = function(target,fixed) {
+    //console.log('thead',table.find('thead'));
+    var _Header=$(target).find('thead').clone();
+    //var _table_fixed=$('<table data-role="table" class="ui-responsive table-stroke fixed-header" style="margin: 0px 0px;text-shadow: none;width: 100%;position: fixed;z-index:100;"></table>');
+    _Header.css({'background': '#262626',color:'white'})
+    fixed.append(_Header);
+    //that.prepend(_table_fixed);
+    fixed.trigger('create');
+    //_table_fixed.hide();
+    //that.trigger('create');
+    var _ths=fixed.find('thead').find('th');
+    $.each($(target).find('thead').find('th'),(index,th)=>{
+        $(th).jqmData('clone',_ths[index]);
+        if(index==_ths.length-1) {
+            var columnToggler=$('<i class="fa fa-gear"></i>');
+            $(_ths[index]).empty();
+            $(_ths[index]).removeClass('table-column-toggle');
+            $(_ths[index]).append(columnToggler);
+            $(_ths[index]).addClass('table-column-toggle');
+            //console.log('isNormal',($(ref_ths[index]).outerWidth()/window.innerWidth>0.1),$(ref_ths[index]).outerWidth(),window.innerWidth);
+            //resizeTables($(ref_ths[index]).outerWidth()/window.innerWidth>0.1,true);
+        }
+        resizeObserver.observe(th);
+    });
+
+    
+    //headResizeObserver.observe(_Header.get( 0 ));
+}
+
 function tableColumnToggle(columnTemplate,container,target){
     var ids=Object.keys(columnTemplate);
     var filterables={};
@@ -44,9 +88,6 @@ var duration=500;
                 //console.log( $('td[name="'+input.prop('name')+'"]'));
                 setAvailableColumn(target,input,duration);
                 saveChangedToUser(target);
-                setTimeout(() => {
-                    filterPopup.trigger('columnChanged');
-                }, duration+100);
                 
             });
             if(columnData.isHidden){
@@ -75,6 +116,7 @@ function saveChangedToUser(target){
     var userData=getCurrentUserSaved();
     userData.columns=checkedCols.join();
     userData.createDate=formatDateTimeStr2Mysql(userData.createDate);
+    userData.lastLogin=formatDateTimeStr2Mysql(userData.lastLogin);
     saveCurrentUser(userData);
 }
 function setAvailableColumns(target,duration){
@@ -83,15 +125,11 @@ function setAvailableColumns(target,duration){
     $.each(checkboxs,(index,checkbox)=>{
         setAvailableColumn(target,checkbox,duration);
     })
-    setTimeout(() => {
-        $('#'+target+'-columnFilter').trigger('columnChanged');
-    }, duration+100);
 }
 function setAvailableColumn(target,checkbox,duration){
     target=target.replace('#','');
     if(!$(checkbox).prop('checked')){
         $("#"+target).find('th[name="'+$(checkbox).prop('name')+'"]').hide(duration);
-        
         $("#"+target+"-fixed").find('th[name="'+$(checkbox).prop('name')+'"]').hide(duration);
         $("#"+target).find('td[name="'+$(checkbox).prop('name')+'"]').hide(duration);
     }else{
@@ -659,7 +697,7 @@ function getTdElement(columnSettings,value,key,_this){
         var label=$('<label>'+val+'</label>')
         td.append(label);
     }
-    //if(columnSettings.isHidden) td.hide();
+    if(columnSettings.isHidden) td.hide();
     if(columnSettings.style!=undefined) td.children().css(columnSettings.style);
     return td;
 }

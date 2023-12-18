@@ -474,6 +474,10 @@ function getGlobalJson(key){
     if(sessionStorage.getItem(key)=='[object Object]' || sessionStorage.getItem(key)=='undefined') return undefined;
     return JSON.parse(sessionStorage.getItem(key))
 }
+function encodPass(pass){
+    return b64_md5(pass+prefix);
+}
+
 function showLoading(message){
     $.mobile.loading( "show", {
         text: message,

@@ -48,6 +48,8 @@ function login(data){
     //console.log(data.data[0].name);
     if(data.success){
         message.innerHTML=formatString(Message.LOGIN_WELCOME_F,JSON.parse(data.data).name);
+        //console.log(data);
+        //data.data['_pass']=data.pass;
         sessionStorage.setItem("currentUser", data.data);
         //console.log(JSON.parse(sessionStorage.getItem("currentUser")).name+"--"+data.data);
         window.location.href = mainPage;

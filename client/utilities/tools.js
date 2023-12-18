@@ -279,7 +279,7 @@ $.fn.extend({
             message:messages,
             content:$('<input type="password" data-theme="a" value="" placeholder="请输入密码">')
         },function(go,form){
-            if($(form).find('input').val()==getGlobalJson("currentUser").pass){
+            if(encrypt($(form).find('input').val())==getGlobalJson("currentUser").pass){
                 console.log("登陆成功。。")
                 response({success:true});
             }else{
@@ -474,8 +474,33 @@ function getGlobalJson(key){
     if(sessionStorage.getItem(key)=='[object Object]' || sessionStorage.getItem(key)=='undefined') return undefined;
     return JSON.parse(sessionStorage.getItem(key))
 }
-function encodPass(pass){
-    //return b64_md5(pass+prefix);
+
+function encrypt(data, keyS, ivS) {
+    let key = keyS || keyStr
+    let iv = ivS || ivStr
+    key = CryptoJS.enc.Utf8.parse(key)
+    iv = CryptoJS.enc.Utf8.parse(iv)
+    const src = CryptoJS.enc.Utf8.parse(data)
+    const cipher = CryptoJS.AES.encrypt(src, key, {
+        iv: iv, // 初始向量
+        mode: CryptoJS.mode.CBC, // 加密模式
+        padding: CryptoJS.pad.Pkcs7, // 填充方式
+    })
+    const encrypted = cipher.toString()
+    return encrypted
+}
+function decrypt(data, keyS, ivS) {
+    let key = keyS || keyStr
+    let iv = ivS || ivStr
+    key = CryptoJS.enc.Utf8.parse(key)
+    iv = CryptoJS.enc.Utf8.parse(iv)
+    const cipher = CryptoJS.AES.decrypt(data, key, {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+    })
+    const decrypted = cipher.toString(CryptoJS.enc.Utf8) // 返回的是加密之前的原始数据->字符串类型
+    return decrypted
 }
 
 function showLoading(message){

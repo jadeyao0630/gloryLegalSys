@@ -9,7 +9,7 @@ $('#mainFooter').hide();
 //getBasicDatabaseData();
 $('#mainLoadingMessage').text('读取中...');
 waitTask(logingStatus(),function(){
-    //updateLastLogin(getGlobalJson("currentUser").id).then((r)=>console.log);
+    updateLastLogin(getGlobalJson("currentUser").id).then((r)=>console.log);
     getLegalAgencies().then(d=>{
         console.log('getLegalAgencies',d)
         var agencies=d.data.filter(dd=>dd.position>0 && dd.isInactived==0);

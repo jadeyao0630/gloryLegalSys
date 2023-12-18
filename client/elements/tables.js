@@ -331,7 +331,7 @@ pageTable.prototype.removeTableItem=function(auth,callback){
         }
     }, 100);
 }
-pageTable.prototype.insertTableData=function(data){
+pageTable.prototype.insertTableData=function(data,isLastPosition){
     var _this=this;
     var tbody=$("#"+_this.opt.containerId).find('tbody');
     var columnTemplate=_this.opt.template;
@@ -356,7 +356,10 @@ pageTable.prototype.insertTableData=function(data){
         //}
     })
     //console.log('scrollTop height',$("#"+_this.opt.containerId).height());
-    tbody.append(tr);
+    if(isLastPosition)
+        tbody.append(tr);
+    else
+        tbody.prepend(tr);
     $(tr).addClass('newItem');
     $(tr).on('click',disableGlowing)
     _this.pageTable('refresh');

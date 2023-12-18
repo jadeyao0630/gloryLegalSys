@@ -614,6 +614,9 @@ mform.prototype={
                                             label=collector.join(" ");
                                         }
                                         var _value=key+counter;
+                                        if(item.hasOwnProperty('valueKey')){
+                                            _value=key+d[item.valueKey];
+                                        }
                                         if(item.hasOwnProperty('valueFormat')){
                                             var _value=item.valueFormat;
                                             //console.log();
@@ -1129,6 +1132,7 @@ mform.prototype={
 $.fn.extend({
     setEmptyData:function(template){
         var _self=this;
+        $(_self).jqmData('datas',{});
         if(template==undefined) template=_self.template;
         console.log('setEmptyData template',template);
         $.each(template,(k,v)=>{
@@ -1137,6 +1141,7 @@ $.fn.extend({
                 if(k.nodeName=="input") val="";
                 if(v.defaultValue!=undefined) val=v.defaultValue;
                 _self.addData(v,k,val);
+                $(_self).jqmData('datas')[k]=val;
             }else{
                 if(v.hasOwnProperty('data')){//如果是元素父级
                     
@@ -1146,6 +1151,7 @@ $.fn.extend({
                             if(kk.nodeName=="input") _val="";
                             if(vv.defaultValue!=undefined) _val=vv.defaultValue;
                             _self.addData(vv,kk,_val);
+                            $(_self).jqmData('datas')[kk]=_val;
                             
                         }
                     })
@@ -1652,15 +1658,20 @@ $.fn.extend({
                             });
                             val=_v.join(",");
                         }else{
+                            //console.log(_val);
+                            if(_val instanceof Array){
+                                val=_val.join(",");
+                            }else{
+                                $.each(_val,(i,v)=>{
+                                    //console.log("has valueKey",itemTemplate.data,v,_val);
+                                    //console.log("has valueKey1",itemTemplate.data.find(d=>d[itemTemplate.valueKey]==v));
+                                    //$.grep(itemTemplate.data,(d=>d[itemTemplate.valueKey].toString())==v.toString());
+                                    _v.push(itemTemplate.data.find(d=>d[itemTemplate.valueKey]==v)[itemTemplate.valueKey]);
+                                });
+                                //console.log("has valueKey2",_v);
+                                val=_v.join(",");
+                            }
                             
-                            $.each(_val,(i,v)=>{
-                                //console.log("has valueKey",itemTemplate.data,v,_val);
-                                //console.log("has valueKey1",itemTemplate.data.find(d=>d[itemTemplate.valueKey]==v));
-                                //$.grep(itemTemplate.data,(d=>d[itemTemplate.valueKey].toString())==v.toString());
-                                _v.push(itemTemplate.data.find(d=>d[itemTemplate.valueKey]==v)[itemTemplate.valueKey]);
-                            });
-                            //console.log("has valueKey2",_v);
-                            val=_v.join(",");
                         }
                         
                     }else{

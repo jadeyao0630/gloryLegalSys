@@ -251,7 +251,7 @@ $('body').on(preload_completed_event_name,function(){
                     $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height')});
                     $('#header-filter-container').trigger('create');
                     //resizeTables();
-                    fancyTable.instance.tableUpdate($("#pageOneTable").jqmData('fancyTable'));
+                    //fancyTable.instance.tableUpdate($("#pageOneTable").jqmData('fancyTable'));
                     //console.log('togglebuttonicon',);
                     $(window).trigger('hidepopup');
                 }, 10);

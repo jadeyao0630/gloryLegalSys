@@ -467,7 +467,7 @@ ProgressesButton.prototype.setEvent=function(data,positionTemplate){
     if(positionTemplate==undefined) positionTemplate={
         0:{height:80,position:"bottom"},1:{height:100,isTop:true},2:{height:100}
     }
-    console.log('setEvent',data);
+    //console.log('setEvent',data);
     data.forEach(d=>{
         var pointData=_this.getPointMapData(d.caseStatus);
         var eventBox=$('.event-box[data-index='+d.caseStatus+']');
@@ -545,7 +545,7 @@ ProgressesButton.prototype.setEvent=function(data,positionTemplate){
         console.log('width',$(eventBox).width());
     })
     _this.instance.trigger('create');
-    console.log('setEvent',_this.instance.html())
+    //console.log('setEvent',_this.instance.html())
 };
 ProgressesButton.prototype.setPointState=async function(index,isClicked,duration){
     var _this=this;

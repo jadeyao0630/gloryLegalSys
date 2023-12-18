@@ -162,6 +162,7 @@ var _summary_template;
                         data:resourceDatas.legalCounsels,
                         isFilterable:true,
                         table:'caseStatus',
+                        valueKey:'id',
                         displayFormat:'{name} {contact}',//'{name} {contact} {institution}'
                     },
                     requestAmount:{

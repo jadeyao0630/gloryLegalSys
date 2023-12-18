@@ -147,13 +147,16 @@ waitTask(logingStatus(),function(){
             resourceDatas['attorneys']=_data;
     
             _data={};
-            resourceDatas['counselTitles'].forEach((title,index)=>{
+            $.each(resourceDatas['counselTitles_'],(index,title)=>{
                 var _d=[];
-                d.data['legalCounsels'].filter((counsels) => counsels.title==index).forEach((counsel)=>{
-                    counsel['value']=title+counsel.id;
+                console.log('counselTitles_',title,d.data['legalCounsels'].filter((counsels) => counsels.title==title.id))
+                
+                d.data['legalCounsels'].filter((counsels) => counsels.title==title.id).forEach((counsel)=>{
+                    //counsel['value']=title.label+counsel.id;
                     _d.push(counsel);
                 });
-                _data[title]=_d;//data.value['legalCounsels'].filter((counsels) => counsels.title==index);
+                _data[title.label]=_d;//data.value['legalCounsels'].filter((counsels) => counsels.title==index);
+                
             });
             
             case_orgnizationPersonnel=_data;

@@ -475,7 +475,7 @@ function getGlobalJson(key){
     return JSON.parse(sessionStorage.getItem(key))
 }
 function encodPass(pass){
-    return b64_md5(pass+prefix);
+    //return b64_md5(pass+prefix);
 }
 
 function showLoading(message){

@@ -183,7 +183,7 @@ waitTask(logingStatus(),function(){
     });
     
     if(collectDbList){
-        
+        console.log('获取案件数据。。')
         //console.log('caseTableList',caseTableList)
         getBasic(caseTableList,[]).then(d=>{
             output('caseTableList completed: ',d.data);

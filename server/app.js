@@ -12,6 +12,8 @@ const multer = require('multer');
 const ftp = require("basic-ftp");
 const fs = require("fs");
 
+const _ftp = require('ftp');
+
 var iconv = require('iconv-lite');
 
 const path = require('path');
@@ -23,6 +25,39 @@ dotenv.config({
       ),
 });
 
+const CryptoJS = require('crypto-js')
+
+const keyStr = 'it@glory.com'
+const ivStr = 'it@glory.com'
+
+function encrypt(data, keyS, ivS) {
+  let key = keyS || keyStr
+  let iv = ivS || ivStr
+  key = CryptoJS.enc.Utf8.parse(key)
+  iv = CryptoJS.enc.Utf8.parse(iv)
+  const src = CryptoJS.enc.Utf8.parse(data)
+  const cipher = CryptoJS.AES.encrypt(src, key, {
+    iv: iv, // 初始向量
+    mode: CryptoJS.mode.CBC, // 加密模式
+    padding: CryptoJS.pad.Pkcs7, // 填充方式
+  })
+  const encrypted = cipher.toString()
+  return encrypted
+}
+
+function decrypt(data, keyS, ivS) {
+  let key = keyS || keyStr
+  let iv = ivS || ivStr
+  key = CryptoJS.enc.Utf8.parse(key)
+  iv = CryptoJS.enc.Utf8.parse(iv)
+  const cipher = CryptoJS.AES.decrypt(data, key, {
+    iv: iv,
+    mode: CryptoJS.mode.CBC,
+    padding: CryptoJS.pad.Pkcs7,
+  })
+  const decrypted = cipher.toString(CryptoJS.enc.Utf8) // 返回的是加密之前的原始数据->字符串类型
+  return decrypted
+}
 
 const DbService = require('./dbService');
 
@@ -46,104 +81,113 @@ app.use(fileUpload({
 //app.use(express.urlencoded({extended:false}));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
-
-async function uploadFileToFTP(from, to) {
-    const client = new ftp.Client();
-  
-    try {
-      // Connect to the FTP server
-      await client.access({
-        host: "192.168.10.241",
-        user: "luke",
-        password: "Qijiashe6",
-        secure: false // Set to true if using FTPS
+app.get('/downloadLocal', (req, res) => {
+  const fileName = decodeURIComponent(req.query.fileName);
+  const folder = req.query.folder;
+  //const filePath = 'uploads/国瑞信息软件表.xlsx';
+  res.download(path.join(env.UPLOADS_PATH,folder,fileName), fileName, (err) => {
+    if (err) {
+      res.json({
+        status:500,
+        message:'Error downloading file '+fileName,
+        error:err
       });
-  
-  
-      // Read the local file
-      const fileData = await fs.promises.readFile(from);
-  
-      // Upload the file to the FTP server
-      await client.uploadFrom(fileData, to);
-  
-      console.log("File uploaded successfully to FTP server");
-    } catch (err) {
-      console.error("Error uploading file to FTP server:", err);
-    } finally {
-      // Close the FTP client connection
-      client.close();
     }
-  }
-  app.get('/getFileWithCustomName', (req, res) => {
-    const filePath = req.query.filePath; // 从查询参数中获取文件路径
-    const customFileName = req.query.customFileName; // 从查询参数中获取指定的文件名
-  
-    const fileStream = fs.createReadStream(filePath);
-    res.setHeader('Content-Disposition', `attachment; filename="${customFileName}"`);
-    res.setHeader('Content-Type', 'application/octet-stream');
-  
-    fileStream.pipe(res);
   });
+});
   app.get('/download', async (req, res) => {
-    const client = new ftp.Client();
-    try {
-      // Connect to the FTP server
-      await client.access({
-        host: "192.168.10.241",
-        user: "luke",
-        password: "Qijiashe6",
-        secure: false 
-      });
-  
-      // Download the file from the FTP server
-      await client.downloadTo(res, '/path/to/file');
-  
-      // Send the file to the client
-      res.download('/path/to/file', 'filename.ext');
-    } catch (err) {
-      console.log(err);
-      res.status(500).send('Error downloading file from FTP server');
-    }
-    client.close();
+    const client = new _ftp();
+    const remoteFilePath = '/Downloads/1.xlsx';
+    const localFilePath = './uploads/1.xlsx';
+
+    await client.connect({
+      host: "192.168.10.69",
+      user: "FWdb\\administrator",
+      password: "Glorypty@123",
   });
-  app.post('/upload', async (req, res) => {
-    const client = new ftp.Client();
+
+    client.on('ready', () => {
+      client.get(remoteFilePath, (err, stream) => {
+        if (err) {
+          res.status(500).send('Error downloading file');
+        } else {
+          stream.pipe(fs.createWriteStream(localFilePath));
+          stream.on('end', () => {
+            res.download(localFilePath, '1.xlsx', (err) => {
+              if (err) {
+                res.status(500).send('Error downloading file');
+              }
+              client.end();
+            });
+          });
+        }
+      });
+    });
+
+    client.on('error', (err) => {
+      res.status(500).send('Error connecting to FTP server');
+    });
+  });
+  app.post('/uploadLocal', async (req, res) => {
     try {
       if (!req.files || Object.keys(req.files).length === 0) {
-        return res.status(400).send('No files were uploaded.');
+        //return res.status(400).send('No files were uploaded.');
+        res.json({
+          status:400,
+          message:'No files were uploaded.',
+        });
       }
   
       const file = req.files.file;
-      const remoteFilePath = '/Downloads/'+file.name; // Replace 'filename.jpg' with the desired file name
-  
-      await client.access({
-        host: "192.168.10.241",
-        user: "luke",
-        password: "Qijiashe6",
-        secure: false 
-      });
-  
-      const localFilePath = path.join(__dirname, 'uploads', file.name); // Save the uploaded file to the 'uploads' directory
-      file.mv(localFilePath, async function(err) {
-        if (err) {
-          console.error('Error saving file:', err);
-          return res.status(500).send('Error saving file');
-        }
-  
-        try {
-          await client.uploadFrom(localFilePath, remoteFilePath);
-          console.log('File uploaded successfully to FTP server');
-          res.status(200).send(file.name+' File uploaded successfully'+file.name);
-        } catch (err) {
-          console.error('Error uploading file to FTP server:', err);
-          res.status(500).send('Error uploading file to FTP server');
-        } finally {
-          client.close();
-        }
-      });
+      const folder=req.body.folder;
+      const  db= DbService.getDbServiceInstance();
+      const result = db.uploadFileL(env.UPLOADS_PATH,folder,file);
+      result
+      .then(data => {
+        console.log(folder);
+        res.json(data);
+      } )
+      .catch(err => console.log(err));
+      
     } catch (err) {
       console.error('Error handling file upload:', err);
-      res.status(500).send('Error handling file upload');
+      //res.status(500).send('Error handling file upload');
+      res.json({
+        status:500,
+        message:'Error handling file upload',
+        error:err
+      });
+    }
+  });
+  app.post('/upload', async (req, res) => {
+    try {
+      if (!req.files || Object.keys(req.files).length === 0) {
+        //return res.status(400).send('No files were uploaded.');
+        res.json({
+          status:400,
+          message:'No files were uploaded.',
+        });
+      }
+  
+      const file = req.files.file;
+      const filePath=req.body.filePath;
+      const  db= DbService.getDbServiceInstance();
+      const result = db.uploadFile(filePath,file);
+      result
+      .then(data => {
+        console.log(filePath);
+        res.json(data);
+      } )
+      .catch(err => console.log(err));
+      
+    } catch (err) {
+      console.error('Error handling file upload:', err);
+      //res.status(500).send('Error handling file upload');
+      res.json({
+        status:500,
+        message:'Error handling file upload',
+        error:err
+      });
     }
   });
 // create
@@ -164,6 +208,16 @@ app.post('/insert',(request,response) => {
     const {table} = request.body;
     const  db= DbService.getDbServiceInstance();
     const result = db.insertRow(table,data);
+    result
+    .then(data => response.json({data:data}) )
+    .catch(err => console.log(err));
+});
+app.post('/pureinsert',(request,response) => {
+    //console.log("request.body "+request.header('Content-Type'));
+    const {data} = request.body;
+    const {table} = request.body;
+    const  db= DbService.getDbServiceInstance();
+    const result = db.insert(table,data);
     result
     .then(data => response.json({data:data}) )
     .catch(err => console.log(err));
@@ -259,6 +313,26 @@ app.post('/insertCase',(request,response) => {
     });
 
 });
+app.post('/updateUser',(request,response) => {
+  //console.log("request.body "+request.header('Content-Type'));
+  const {data} = request.body;
+  const {where} = request.body;
+  const  db= DbService.getDbServiceInstance();
+  var vals=[];
+  if (data instanceof Object){
+      var keys=Object.keys(data);
+      if(keys.includes('_pass')&&data.hasOwnProperty('pass')) delete data.pass;
+      keys.forEach((key)=>{
+          vals.push(key+"=\""+data[key]+"\"");
+          if(key=='_pass') vals.push("pass=\""+encrypt(data[key])+"\"");
+      })
+      data=vals.join();
+  }
+  const result = db.updateUser(where,data);
+  result
+  .then(data => response.json({data:data}) )
+  .catch(err => console.log(err));
+});
 app.post('/update',(request,response) => {
     //console.log("request.body "+request.header('Content-Type'));
     const {data} = request.body;
@@ -334,8 +408,9 @@ app.post('/login',(request,response) => {
     //console.log("request.body "+request.header('Content-Type'));
     const {name} = request.body;
     const {pass} = request.body;
+    
     const  db= DbService.getDbServiceInstance();
-    const result = db.login(name,pass);
+    const result = db.login(name,encrypt(pass));
     result
     .then(data => response.json({data:data}) )
     .catch(err => console.log(err));

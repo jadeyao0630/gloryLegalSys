@@ -1,5 +1,6 @@
 const mysql = require('mysql');
 const dotenv = require('dotenv');
+const ftp = require("basic-ftp");
 const path = require("path");
 let instance = null;
 const { env } = process;
@@ -31,12 +32,113 @@ class DbService{
     static getDbServiceInstance(){
         return instance ? instance : new DbService();
     }
+    async downloadFile(filePath,file,res){
+        try{
+            const client = new ftp.Client();
+            const remoteFilePath = path.join(filePath, fileName); 
+            const localFilePath = path.join(__dirname, 'uploads', fileName);
+            await client.access({
+                host: "192.168.10.69",
+                user: "FWdb\\administrator",
+                password: "Glorypty@123",
+                secure: false 
+            });
+            await client.downloadTo(remoteFilePath, localFilePath);
+      
+            // Send the file to the client
+            res.download('uploads', file);
+        }catch (error){
+            console.log(error);
+        }
+        
+    }
+    async uploadFileL(rootPath,folder,file){
+        try{
+            const response = await new Promise(async(resolve,reject)=>{
+                var fileName=file.name;
+                //const remoteFilePath = path.join(filePath, fileName); // Replace 'filename.jpg' with the desired file name
+                
+                const localFilePath = path.join(rootPath,folder, fileName); // Save the uploaded file to the 'uploads' directory
+                file.mv(localFilePath, async function(err) {
+                    if (err) {
+                        console.error('Error saving file:', err);
+                        reject(new Error(err.message));
+                        resolve({
+                            status:500,
+                            message:'Error saving file '+fileName,
+                            error:err
+                        });
+                    }
+                    resolve({
+                        status:200,
+                        message:'File uploaded successfully '+fileName
+                    });
+                    
+                });
+            });
+            return response;
+        }catch (error){
+            console.log(error);
+        }
+        
+    }
+    async uploadFile(filePath,file){
+        try{
+            const response = await new Promise(async(resolve,reject)=>{
+                var fileName=file.name;
+                const remoteFilePath = path.join(filePath, fileName); // Replace 'filename.jpg' with the desired file name
+                const client = new ftp.Client();
+                await client.access({
+                    host: "192.168.10.69",
+                    user: "FWdb\\administrator",
+                    password: "Glorypty@123",
+                    secure: false 
+                });
+            
+                const localFilePath = path.join(__dirname, 'uploads', fileName); // Save the uploaded file to the 'uploads' directory
+                file.mv(localFilePath, async function(err) {
+                    if (err) {
+                        console.error('Error saving file:', err);
+                        reject(new Error(err.message));
+                        resolve({
+                            status:500,
+                            message:'Error saving file '+fileName,
+                            error:err
+                        });
+                    }
+            
+                    try {
+                        await client.uploadFrom(localFilePath, remoteFilePath);
+                        console.log('File uploaded successfully to FTP server '+fileName);
+                        resolve({
+                            status:200,
+                            message:__dirname+' File uploaded successfully '+fileName
+                        });
+                    } catch (err) {
+                        console.error('Error uploading file to FTP server:', err);
+                        reject(new Error(err.message));
+                        resolve({
+                            status:500,
+                            message:'Error uploading file to FTP server '+fileName,
+                            error:err
+                        });
+                    } finally {
+                        client.close();
+                    }
+                });
+            });
+            return response;
+        }catch (error){
+            console.log(error);
+        }
+        
+    }
     //#region 选择
     async getBasic(columnData){
         try{
             const response = await new Promise((resolve,reject)=>{
                 const query = "SELECT * FROM "+columnData.tablename+
-                    (columnData.conditions!=undefined?columnData.conditions:"");
+                    (columnData.conditions!=undefined?+" "+columnData.conditions:"")+(columnData.orderBy!=undefined?" "+columnData.orderBy:"");
                 connection.query(query, (err,results)=>{
                     if (err) reject(new Error(err.message));
                     resolve(results);
@@ -258,6 +360,42 @@ class DbService{
             console.log(error);
         }
     }
+    async insert(table,data){
+        try{
+            //console.log(name);
+            const dateAdded = new Date();
+            var keys=Object.keys(data);
+                const _values=[];
+                keys.forEach((key)=>{
+                    //console.log((data[key].constructor === String));
+                    var val=(data[key].constructor === String)?'"'+data[key]+'"':data[key];
+                    _values.push(val);
+                });
+            
+            var query="INSERT INTO `"+table+"` ("+keys.join()+") VALUES "+"("+_values.join()+")";
+            const insertId = await new Promise((resolve,reject)=>{
+                //console.log(query);
+                connection.query(query, (err,result)=>{
+                    if (err) reject(new Error(err.message));
+                    //console.log(result.insertId);
+                    resolve(result);
+                });
+            });
+            
+            //console.log(insertId);
+            return {
+                success: true,
+                id: insertId,
+                createDate: dateAdded,
+            };
+        }catch(error){
+            console.log(error);
+            return {
+                success: false,
+                error: error.message
+            };
+        }
+    }
     //#endregion 插入
     
     //#region 删除
@@ -345,11 +483,12 @@ class DbService{
         }
     }
     //#endregion 删除
-
-    async update(where,table,value){
+    async updateUser(where,value){
         try{
+            var query;
             const response = await new Promise((resolve,reject)=>{
-                const query = `UPDATE `+table+` SET `+value+` WHERE `+where;
+                
+                query = `UPDATE names SET `+value+` WHERE `+where;
                 connection.query(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
@@ -359,8 +498,37 @@ class DbService{
             
             //console.log("typeof: "+(typeof response));
             return {
-                success: true,
                 data: response,
+                query:query
+            };
+        }catch(error){
+            console.log(error);
+        }
+    }
+    async update(where,table,value){
+        try{
+            var query;
+            const response = await new Promise((resolve,reject)=>{
+                var vals=[];
+                if (value instanceof Object){
+                    var keys=Object.keys(value);
+                    keys.forEach((key)=>{
+                        vals.push(key+"=\""+value[key]+"\"");
+                    })
+                    value=vals.join();
+                }
+                query = `UPDATE `+table+` SET `+value+` WHERE `+where;
+                connection.query(query, (err,result)=>{
+                    if (err) reject(new Error(err.message));
+                    //console.log(result);
+                    resolve(result);
+                });
+            });
+            
+            //console.log("typeof: "+(typeof response));
+            return {
+                data: response,
+                query:query
             };
         }catch(error){
             console.log(error);

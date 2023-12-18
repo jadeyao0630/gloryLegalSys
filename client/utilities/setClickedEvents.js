@@ -48,7 +48,7 @@ $('#popupMenu').find('a').on('click',function(e){
             break;
         case '修改用户':
             var _this=this;
-            var select=$('<select id="user_edit_select" data-native-menu="false" class="filterSelect"></select>');
+            var select=$('<select id="user_edit_select" data-native-menu="true" class="filterSelect"></select>');
             $.each(resourceDatas['users'],(index,user)=>{
                 console.log(user);
                 var option=$('<option value="'+(index+1)+'">'+user.name+'</option>');

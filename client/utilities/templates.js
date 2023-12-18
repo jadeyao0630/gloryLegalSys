@@ -31,13 +31,13 @@ var _summary_template;
                         placeholder:"案件编号",
                         label:"案件编号:",
                         type:"text",
-                        isOptional:true,
+                        isOptional:false,
                     },
                     caseName:{
                         placeholder:"案件名称",
                         label:"案件名称:",
                         type:"text",
-                        isOptional:true,
+                        isOptional:false,
                     },
                     caseLabel:{
                         placeholder:"案件标签",
@@ -51,7 +51,7 @@ var _summary_template;
                         label:"所属项目:",
                         type:"combobox",
                         isOptional:false,
-                        data:resourceDatas.projects_,
+                        data:$.grep(resourceDatas.projects_,(d)=>d.isInactived==0),
                         valueKey:'id',
                         displayFormat:'{name}'
                     },
@@ -105,6 +105,7 @@ var _summary_template;
                       type:"combobox",
                       data:resourceDatas.legalAgencies,
                       valueKey:'id',
+                      matchKey:"name",
                       displayFormat:'{name}',
                       isFilterable:false,
                     },
@@ -151,6 +152,7 @@ var _summary_template;
                         isOptional:false,
                         data:resourceDatas.legalInstitution_,
                         valueKey:'id',
+                        matchKey:"name",
                         displayFormat:'{name}',
                         table:'caseStatus'
                     },
@@ -163,6 +165,7 @@ var _summary_template;
                         isFilterable:true,
                         table:'caseStatus',
                         valueKey:'id',
+                        matchKey:"name",
                         displayFormat:'{name} {contact}',//'{name} {contact} {institution}'
                     },
                     requestAmount:{
@@ -372,6 +375,8 @@ var _summary_template;
                 data:resourceDatas.attorneys,
                 label:"代理律师：",
                 isOptional:true,
+                valueKey:'id',
+                matchKey:"name",
                 //table:'caseStatus',
                 displayFormat:'{name} {contact}'
             },
@@ -565,7 +570,10 @@ var _summary_template;
                 },
                 legalCounsel:{
                     label:"受理相关人:",
-                    data:resourceDatas.legalCounsels
+                    type:"multicombobox",
+                    data:resourceDatas.legalCounsels,
+                    valueKey:'id',
+                    displayFormat:'{name} {contact}',
                 },
                 lawFirm:{
                     label:"代理律所:",
@@ -575,7 +583,10 @@ var _summary_template;
                 },
                 attorney:{
                     label:"代理律师:",
-                    data:resourceDatas.attorneys
+                    type:"multicombobox",
+                    data:resourceDatas.attorneys,
+                    valueKey:'id',
+                    displayFormat:'{name} {contact}',
                 }
             }
             
@@ -625,8 +636,10 @@ var _summary_template;
           label:"附件信息",
           data:{
             type:"listview",
-            attachments:[]
-          }
+            attachments:[],
+            displayFormat:"上传了 {numCPage}页的 【{fileLabel}】 {numFile}份，有原件{numOriginal}份，复印件{numCopy}份",
+          },
+          
         },
         
     } 
@@ -757,7 +770,7 @@ var _summary_template;
                     type:"combobox",
                     isOptional:false,
                     data:addEmptyValueToArray(Object.keys(Object.assign(basicTableList,caseTableList))),
-                    isValueCanNotBeNone:true,
+                    isValueCanBeNone:false,
                     valueKey:"*"
                 },
                 insertQuery:{

@@ -1626,21 +1626,40 @@ $.fn.extend({
                         });
                         
                     }
-                    
-                    if(_val.length==0 && !itemTemplate.isOptional) {
+                    if((_val.length==0 || _val=="无") && !itemTemplate.isOptional) {
+                        //console.log("form valiation 值为空或无");
                         console.log(itemTemplate.label+"-- has empty value"+_val.join(","));
                         hasError=true;
                     }else{
+
                         //console.log("combobox check...",_val,(itemTemplate.data!=undefined),(itemTemplate.isValueCanNotBeNone));
-                        if(itemTemplate.data!=undefined && itemTemplate.isValueCanNotBeNone && !itemTemplate.isOptional){
+                        if(itemTemplate.data!=undefined && !itemTemplate.isValueCanBeNone && !itemTemplate.isOptional){
                             //console.log("combobox check...",_val,$.grep(_val,(v)=>itemTemplate.data[v]=="无").length)
-                            if($.grep(_val,(v)=>itemTemplate.data[v]=="无").length>0){
-                                console.log(itemTemplate.label+"-- has empty value"+_val.join(","));
-                                hasError=true;
+                            if(_val instanceof Array){
+                                //console.log("form valiation 值是 array",{template:itemTemplate});
+                                if(itemTemplate.matchKey!=undefined && itemTemplate.valueKey!=undefined){
+
+                                    var matched=$.grep(itemTemplate.data,(d=>_val.includes(d[itemTemplate.valueKey].toString())));
+                                    //console.log("form valiation",matched);
+                                    //console.log("form valiation 有matchkey和valuekey",matched);
+                                    
+                                    if(matched.length>0 && matched[0][itemTemplate.matchKey]=="无"){
+                                        console.log(itemTemplate.label+"-- has empty value"+_val.join(","));
+                                        hasError=true;
+                                    }
+                                    
+                                }else{
+                                    if($.grep(_val,(v)=>itemTemplate.data[v]=="无").length>0){
+                                        console.log(itemTemplate.label+"-- has empty value"+_val.join(","));
+                                        hasError=true;
+                                    }
+                                }
+                                
                             }
+                            
                         }
                     }
-                    res(hasError);
+                    
                     //console.log(itemTemplate.label,_subVal);
                     //console.log(itemTemplate.label,_val);
                     //console.log(itemTemplate.label,_greatVal);
@@ -1677,7 +1696,7 @@ $.fn.extend({
                     }else{
                         val=_greatVal.join(",");
                     }
-                    
+                    res(hasError);
                     break;
                 case "TEXTAREA":
                     if(val.length===0 && !itemTemplate.isOptional){

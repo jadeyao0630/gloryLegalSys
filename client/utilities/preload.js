@@ -135,13 +135,14 @@ waitTask(logingStatus(),function(){
                 }
             });
             var _data={};
-            resourceDatas['lawFirms'].forEach((lawFirms,index)=>{
+            $.each(resourceDatas['lawFirms_'],(index,lawFirm)=>{
                 var _d=[];
-                d.data['attorneys'].filter((attorney) => attorney.lawFirm==index).forEach((attorney)=>{
-                    attorney['value']=lawFirms+attorney.id;
+                console.log('lawFirms',lawFirm,d.data['attorneys']);
+                d.data['attorneys'].filter((attorney) => attorney.lawFirm==lawFirm.id).forEach((attorney)=>{
+                    //attorney['value']=lawFirms+attorney.id;
                     _d.push(attorney);
                 });
-                _data[lawFirms]=_d;
+                _data[lawFirm.name]=_d;
             });
             Attorneys=_data;
             resourceDatas['attorneys']=_data;
@@ -149,7 +150,7 @@ waitTask(logingStatus(),function(){
             _data={};
             $.each(resourceDatas['counselTitles_'],(index,title)=>{
                 var _d=[];
-                console.log('counselTitles_',title,d.data['legalCounsels'].filter((counsels) => counsels.title==title.id))
+                //console.log('counselTitles_',title,d.data['legalCounsels'].filter((counsels) => counsels.title==title.id))
                 
                 d.data['legalCounsels'].filter((counsels) => counsels.title==title.id).forEach((counsel)=>{
                     //counsel['value']=title.label+counsel.id;
@@ -241,6 +242,7 @@ function logingStatus(){
 
         //condtions.push('legalAgencies='+getGlobalJson('currentUser').id);
         $.each(caseTableList,(key,settings)=>{
+            settings['orderBy']="ORDER BY id DESC";
             if(key=='caseStatus'){
                 if(getGlobalJson('currentUser').level==1){
                     settings['conditions']=' WHERE isInactived=0 AND legalAgencies='+getGlobalJson('currentUser').id;

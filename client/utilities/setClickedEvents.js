@@ -103,6 +103,26 @@ $('#popupMenu').find('a').on('click',function(e){
     }
     
 })
+var isFirstTimeBack=true;
+$(window).on('popstate', function(event) {
+    if(event.originalEvent.state!=null){
+        //console.log("pop",'back',sessionStorage.getItem('scrollPosition'));
+        //sessionStorage.setItem('scrollPosition', );
+        if(isFirstTimeBack){
+            $("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, 800);
+            isFirstTimeBack=false;
+        }else{
+
+            $("html, body").scrollTop(sessionStorage.getItem('scrollPosition'));
+        }
+        //$("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, 100);
+    }else{
+        
+        sessionStorage.setItem('scrollPosition', $("html, body").scrollTop());
+        //console.log("pop",sessionStorage.getItem('scrollPosition'));
+    }
+    
+});
 var currentProgress={};
 var tableFuntionButListenerList=[];
 function setTableFunctionButonClickedEvent(){
@@ -133,7 +153,7 @@ function functionBtnsEvent(but){
     //console.log(index+"--"+but.currentTarget.name,matchItems);
 
     if(but.currentTarget.name=="fn_btn_details"){//主表里的删除按钮
-        showProgressDetails(matchItems,matchedUpdates,matchedExcutes,matchedProperties,matchedAttachments);
+        showProgressDetails(matchItems,matchedUpdates,matchedExcutes,matchedProperties,matchedAttachments,matchedCaseLinked);
     }
     else if(but.currentTarget.name=="fn_btn_edit"){//主表里的编辑按钮
         isAddPage=false;
@@ -363,17 +383,24 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                             var iconNameColor='';
                             switch(item.typeName){
                                 case '资产':
-                                    iconNameColor='balance-scale text-red';
+                                    iconNameColor='sack-dollar text-red';
                                     break;
                                 case '执行':
-                                    iconNameColor='check-double text-blue';
+                                    iconNameColor='check-double text-green';
                                     break;
                                 case '进展':
-                                    iconNameColor='calendar-check text-green';
+                                    iconNameColor='thumbtack text-blue';
                                     break;
                             }
-                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;"><i class="fa fa-'+iconNameColor+'" style="margin-right:10px;"></i>'+item.description+'</h3>');
-                            
+                            var icon=$('<i class="fa fa-'+iconNameColor+'" style="margin-right:10px;"></i>');
+                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+item.description+'</h3>');
+                            list_item.prepend(icon);
+                            icon.on('mouseover',(e)=>{
+                                icon.tooltip('show',item.typeName);
+                            })
+                            icon.on('mouseout',(e)=>{
+                                icon.tooltip('hide');
+                            })
                             item_container=$('<li style="padding:0px;" data-item=\''+JSON.stringify(item)+'\'></li>');
                             var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
                             var view_btn=$('<a href="#" class="ui-btn ui-icon-edit ui-btn-icon-notext btn-icon-blue view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">编辑</a>')
@@ -958,7 +985,7 @@ $('.case_reg_but').on('click',async function(e){
     }
 })
 //#region 查看信息页面的按钮事件
-function showProgressDetails(datas,updates,excutes,properties,attachments){
+function showProgressDetails(datas,updates,excutes,properties,attachments,caseLinked){
     $().mloader('show',{message:"读取中..."});
     if(datas.length>0){
         //window.location="./test/timeline.html"
@@ -970,7 +997,7 @@ function showProgressDetails(datas,updates,excutes,properties,attachments){
             excutes:excutes,
             properties:properties,
             attachments:attachments,
-            
+            caseLinked:caseLinked
         }
         
     //console.log('showProgressDetails',data);
@@ -999,6 +1026,8 @@ $('.edit-header-btn').on('click',async function(e){
     if($(this).text()=="保存"){
         //console.log("保存");
         //console.log($(pageOnTable).html())
+
+        //案件页面
         if(sessionStorage.getItem('currentPage')=="#casePage"){
             caseForm.instance.getValues(getGlobal("currentId"),FormTemplate3.template,function(message,values){
                 console.log('getvalues',values);
@@ -1032,6 +1061,7 @@ $('.edit-header-btn').on('click',async function(e){
                             pageOnTable.insertTableData(values.data.values);
                             setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
                         }
+                        //enableRealDelete=false;
                         //pageOnTable.addTableData([values.data.values],true);
                         //console.log('保存',values.data.values.id,$("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
                         //setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+values.data.values.id+"]"));

@@ -214,7 +214,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
         $(containerId).append(collapsibleset);
         Object.keys(_summary_template[key].data).forEach(sub_key=>{
             $.each(Object.keys(_data),function(index,data_key){
-                    //console.log(data_key+"--"+sub_key);
+                    //console.log(data_key+"--"+sub_key,_data);
                 if (data_key!="template" && Object.keys(_data[data_key]).includes(sub_key)){
                     var item=_summary_template[key].data[sub_key];
                     var data=item.data;
@@ -227,7 +227,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                     var isMultiValue=false;
                     var multiValues=[];
                     if(data!=undefined){
-                        //console.log('setSumList',sub_key,data,val);
+                        console.log('setSumList',sub_key,data,val);
                         if(data instanceof Array){
                             //console.log('setSumList',sub_key,val);
                             if(item.hasOwnProperty('displayFormat') && item.hasOwnProperty('valueKey')){
@@ -301,6 +301,40 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                                     }
                                 });
 
+                            }else if(type=='multicombobox'){
+                                var keys=Object.keys(data)
+                                values.forEach(_v=>{
+                                    var matchedKey=$.grep(keys,key=>_v.indexOf(key)>-1);
+                                    console.log(matchedKey);
+                                    if(matchedKey.length>0){
+                                        if(item.valueKey!=undefined){
+                                            //console.log(data[matchedKey[0]],item.valueKey);
+                                            $.each(data[matchedKey[0]],(_i,_d)=>{
+                                                console.log(_d,_v.replace(matchedKey[0],''));
+                                                if(_d[item.valueKey].toString()==_v.replace(matchedKey[0],'')){
+                                                    if(item.hasOwnProperty('displayFormat')){
+                                                        var displayFormat=item.displayFormat;
+                                                        $.each(_d,(kk,vv)=>{
+                                                            if(displayFormat.indexOf(kk)>-1){
+                                                                displayFormat=displayFormat.replace("{"+kk+"}",vv);
+                                                            }
+                                                        })
+                                                        multiValues.push(displayFormat);
+                                                    }else{
+                                                        var collector=[];
+                                                        $.each(_d,(kk,vv)=>{
+                                                            collector.push(vv);
+                                                        })
+                                                        multiValues.push(collector.join(" "));
+                                                    }
+                                                }
+                                            })
+                                            
+                                            //var matchedData=$.grep(data[matchedKey[0]],(d=>d[item.valueKey].toString()==_v.replace(matchedKey[0],'')));
+                                            //console.log('matchedData',matchedData);
+                                        }
+                                    }
+                                });
                             }else{
                                 //var _values=formatSuperMultiSelectOptionValue(v);
                                 //console.log('setSumList',_values);
@@ -429,6 +463,27 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                     
                     //if (sub_key=="caseNo") console.log(data_key);
                     return false;
+                }else if(data_key==sub_key && data_key=='attachments'){
+                    $.each(_data[data_key],(index,attachment)=>{
+                        //console.log(getStatusLabel(attachment.caseStatus,resourceDatas["caseStatus_object"]));
+                        attachment.caseStatus=getStatusLabel(attachment.caseStatus,resourceDatas["caseStatus_object"]);
+                        //console.log(_summary_template[key].data);
+                        if(_summary_template[key].data.displayFormat!=undefined){
+                            var displayFormat=_summary_template[key].data.displayFormat;
+                            $.each(attachment,(k,v)=>{
+                                displayFormat=displayFormat.replace('{'+k+'}',v);
+                            })
+                            //console.log(displayFormat);
+                            var li=$('<li class="ui-field-contain" style="word-wrap: break-word;white-space : normal"></li>');
+                        
+                            var label_ele=$('<label>'+attachment.caseStatus+'</label>');
+                            li.append(label_ele);
+                            var item=$('<label style="width:310px;">'+displayFormat+'</label>');
+                            
+                            li.append(item);
+                            listview.append(li);
+                        }
+                    })
                 }
                 
             });

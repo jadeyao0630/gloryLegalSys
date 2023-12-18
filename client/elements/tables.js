@@ -371,8 +371,10 @@ pageTable.prototype.insertTableData=function(data,isLastPosition){
         //var pageHeight = $(window).height();
         //var scrollAmount = tableHeight - pageHeight;
         //console.log('scrollTop',scrollAmount);
-        $("html, body").animate({ scrollTop: $(tr).offset().top+$(tr).height()}, 1000);
-
+        if(isLastPosition)
+            $("html, body").animate({ scrollTop: $(tr).offset().top+$(tr).height()}, 1000);
+        else
+            $("html, body").animate({ scrollTop: 0}, 1000);
     }, 500);
 }
 pageTable.prototype.addTableData=function(data,isAdd){

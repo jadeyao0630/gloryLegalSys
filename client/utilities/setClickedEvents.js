@@ -1149,8 +1149,9 @@ $('.edit-header-btn').on('click',async function(e){
                 if(values.success){
                     console.log(values);
                     values.data.values.createDate=getDateTime();
-                    values.data.values[isInactived]=values.data.values.isInactived_a;
+                    values.data.values['isInactived']=values.data.values.isInactived_a;
                     delete values.data.values.isInactived_a;
+                    values.data.values.pass=encrypt(values.data.values.pass)
                     saveCurrentUser(values.data.values,true).then((r)=>{
                         if(r.success){
                             console.log("添加成功。");

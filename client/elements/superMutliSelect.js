@@ -50,7 +50,7 @@ function _setSuperLabel(elementid,format){//"[{catelog}] {value} ({status})"
     return collector;
 }
 function superMultiSelectRowItem(listbox,idx,format,data,notLast){
-    console.log("superMultiSelectRowItem",data);
+    //console.log("superMultiSelectRowItem",data);
 
     var li=$('<li data-option-index="'+idx+'" data-icon="false" class="" role="option" aria-selected="true"></li>');
     var controlgroup=$('<div data-option-index="'+idx+'" data-role="controlgroup" class="row-controlgroup" data-type="horizontal")></div>');

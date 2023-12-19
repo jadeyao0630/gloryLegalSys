@@ -83,7 +83,9 @@ $('#popupMenu').find('a').on('click',function(e){
                             $($(_this).attr( "href" )).find('.edit-header-btn.ui-icon-check').text('修改');
                             $($(_this).attr( "href" )).find('.edit-header-btn.ui-icon-check').data('item',JSON.stringify(userD));
                             goToPage( $(_this).attr( "href" ));
-                            $().mloader('hide');
+                            setTimeout(() => {
+                                $().mloader('hide');
+                            }, 500);
                         }
                         
                     });
@@ -109,7 +111,7 @@ $(window).on('popstate', function(event) {
         //console.log("pop",'back',sessionStorage.getItem('scrollPosition'));
         //sessionStorage.setItem('scrollPosition', );
         if(isFirstTimeBack){
-            $("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, 800);
+            $("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, 1000);
             isFirstTimeBack=false;
         }else{
 

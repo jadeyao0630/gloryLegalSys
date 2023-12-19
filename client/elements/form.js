@@ -980,7 +980,7 @@ mform.prototype={
                 })
                 listview = data.toPage.find( "ul[id^="+id+"]" );
                 
-                console.log('data.prevPage',listview);
+                //console.log('data.prevPage',listview);
                 //console.log('pagecontainerbeforeshow',listview);
                 //console.log(listview.html());
                 form = listview.jqmData( "filter-form" );

@@ -1,6 +1,6 @@
 
 $.fn.extend({
-    togglebuttonicon:function(target,callback,args){
+    togglebuttonicon:function(target,callback,args){//上过滤栏下拉按钮
         this.opt={
             distance:100,
             duration:500,

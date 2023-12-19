@@ -184,7 +184,7 @@ timelinePage.prototype.setTimeline=function(data,canvas){
             
         })
         circle.addListener('mouseover',function(e){
-            console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
+            //console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
             var datas=_this.flowList.filter((item)=>item.id==this.sourceData.index);
             if(datas.length>0 && datas[0].data!= undefined && datas[0].data.length>0){
                 $(canvas).css({cursor:"pointer"});
@@ -195,7 +195,7 @@ timelinePage.prototype.setTimeline=function(data,canvas){
             e.ctx.globalCompositeOperation = "source-over";
         })
         circle.addListener('mouseout',function(e){
-            console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
+            //console.log(this.sourceData.label+" ["+this.sourceData.index+"]--"+e.type);
             $(canvas).css({cursor:"default"});
         })
     });
@@ -227,7 +227,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                     var isMultiValue=false;
                     var multiValues=[];
                     if(data!=undefined){
-                        console.log('setSumList',sub_key,data,val);
+                        //console.log('setSumList',sub_key,data,val);
                         if(data instanceof Array){
                             //console.log('setSumList',sub_key,val);
                             if(item.hasOwnProperty('displayFormat') && item.hasOwnProperty('valueKey')){
@@ -305,12 +305,12 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                                 var keys=Object.keys(data)
                                 values.forEach(_v=>{
                                     var matchedKey=$.grep(keys,key=>_v.indexOf(key)>-1);
-                                    console.log(matchedKey);
+                                    //console.log(matchedKey);
                                     if(matchedKey.length>0){
                                         if(item.valueKey!=undefined){
                                             //console.log(data[matchedKey[0]],item.valueKey);
                                             $.each(data[matchedKey[0]],(_i,_d)=>{
-                                                console.log(_d,_v.replace(matchedKey[0],''));
+                                                //console.log(_d,_v.replace(matchedKey[0],''));
                                                 if(_d[item.valueKey].toString()==_v.replace(matchedKey[0],'')){
                                                     if(item.hasOwnProperty('displayFormat')){
                                                         var displayFormat=item.displayFormat;

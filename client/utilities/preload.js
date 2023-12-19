@@ -250,12 +250,16 @@ function logingStatus(){
                     settings['conditions']=' WHERE isInactived=0';
                 }
             }else if(key=='casesDb'){
+                
+                settings['orderBy']="ORDER BY caseStatus.id DESC";
                 if(getGlobalJson('currentUser').level==1){
-                    settings['conditions']=' JOIN caseStatus ON '+
+                    settings['conditions']='JOIN caseStatus ON '+
                     settings.tablename+'.id=caseStatus.id AND caseStatus.isInactived=0 AND caseStatus.legalAgencies='+getGlobalJson('currentUser').id;
                 }else if (getGlobalJson('currentUser').level<adminLevel){
-                    settings['conditions']=' JOIN caseStatus ON '+
+                    settings['conditions']='JOIN caseStatus ON '+
                     settings.tablename+'.id=caseStatus.id AND caseStatus.isInactived=0';
+                }else{
+                    settings['orderBy']="ORDER BY id DESC";
                 }
             }else{
                 if(getGlobalJson('currentUser').level==1){

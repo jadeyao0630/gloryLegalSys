@@ -140,7 +140,7 @@ class DbService{
                 const query = "SELECT * FROM "+columnData.tablename+
                     (columnData.conditions!=undefined?+" "+columnData.conditions:"")+(columnData.orderBy!=undefined?" "+columnData.orderBy:"");
                 connection.query(query, (err,results)=>{
-                    if (err) reject(new Error(err.message));
+                    if (err) reject(new Error(err.message+"--"+query));
                     resolve(results);
                 });
             });

@@ -28,6 +28,8 @@ $('body').on(main_load_completed_event_name,function(){
             //resizeTables();
             resizeColumnFilter();
             //$('#header-filter-container').trigger('create')
+            var info=$('<label>信息</label>');
+            $('#footer_info_bar').append(info);
             $().mloader("hide");
             $('#mainFooter').show();
         }
@@ -91,15 +93,15 @@ $('body').on(preload_completed_event_name,function(){
     $("#pageOneTable").on('sort',function(columnData){
         //console.log(columnData.value);
         $(window).trigger('waiting');
-        pageOnTable.sortColumn(currentData,columnData.value);
-        //setTimeout(() => {
-            
+        
+        setTimeout(() => {
+            pageOnTable.sortColumn(currentData,columnData.value);
         setAvailableColumns('pageOneTable',1);
         setTableFunctionButonClickedEvent();
         
         $(window).trigger('hidepopup');
             //syncHeaderCloneWidth();
-        //}, 100);
+        }, 100);
         //$().mloader("hide");
     })
     //设置主表格头固定顶部位置，需要克隆主表格的原有头
@@ -284,6 +286,11 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
         }
     });
 });
+function getPersonCaseSum(data){
+    data.forEach(d=>{
+
+    });
+}
 function setToolTip(element){
     
     //console.log($(element).position(),$(element).offset(),$(element).offsetParent().hasClass('ui-popup'));

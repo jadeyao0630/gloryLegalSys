@@ -287,6 +287,9 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
     });
 });
 function getPersonCaseSum(data){
+    var sum={
+        caseNum:data.length
+    }
     data.forEach(d=>{
 
     });

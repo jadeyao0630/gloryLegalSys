@@ -286,7 +286,17 @@ var _summary_template;
             type:'number',
             isASC:true,
             id:'penalty',
-          }
+          },
+      },
+      requestAmount:{
+          label:"本诉金额(万)",
+          type:"label", isFilterable:true,
+          displayFormat:'{}万',
+          sortable:{
+            type:'number',
+            isASC:true,
+            id:'requestAmount',
+          },
       },
         /*
         caseStatus:{

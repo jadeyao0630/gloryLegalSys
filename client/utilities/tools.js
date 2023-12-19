@@ -116,6 +116,11 @@ function formatIndex(position){
     var sub=Math.round((position-main)*10);
     return {main:main,sub:sub};
 }
+$.fn.extend({
+    getValue:function (matchKey,vakyeKey){
+        
+    }
+});
 
 function getKeyValues(object,key){
     var collector=[];

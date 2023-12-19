@@ -17,6 +17,7 @@ $('body').on(main_load_completed_event_name,function(){
         if (pageOnTable!=undefined) {
             clearInterval(intervalId);
             currentData=DataList.combinedData;
+            setPersonCaseSum(DataList.combinedData);
             pageOnTable.addTableData(DataList.combinedData);
             
             setTableFunctionButonClickedEvent();
@@ -28,8 +29,7 @@ $('body').on(main_load_completed_event_name,function(){
             //resizeTables();
             resizeColumnFilter();
             //$('#header-filter-container').trigger('create')
-            var info=$('<label>信息</label>');
-            $('#footer_info_bar').append(info);
+            
             $().mloader("hide");
             $('#mainFooter').show();
         }
@@ -264,6 +264,59 @@ $('body').on(preload_completed_event_name,function(){
     });
     
 })
+$('body').on('caseexcutesChanged',function(e){
+    console.log('caseexcutesChanged',e);
+    if(e.action=="add"){
+
+    }
+    //保存修改数据到数据库
+
+    //更新缓存内数据
+
+    //更新页面ui数据显示
+    var paidA=0;
+    DataList.caseExcutes.forEach(exe => {
+        if(exe.id==e.value.id){
+            paidA+=parseFloat(exe.exexuteAmount);
+        }
+    })
+    $('#progress').find('#paidAmount').val(paidA);
+    DataList.caseStatus.forEach((d,i)=>{
+        if(d.id==e.value.id){
+            DataList.caseStatus[i].paidAmount=paidA;
+        }
+    });
+    DataList.combinedData.forEach((d,i)=>{
+        if(d.id==e.value.id){
+            DataList.combinedData[i].paidAmount=paidA;
+        }
+    });
+    setPersonCaseSum(DataList.combinedData);
+    update("id="+e.value.id,
+    'casestatus',
+    {paidAmount:paidA},async function(r){console.log(r)})
+    console.log(getGlobal('currentPage'),DataList.caseExcutes,$.grep(DataList.caseExcutes,(exe)=>exe.id==e.value.id));
+})
+//影响的缓存内数据：DataList.caseStatus,DataList.combinedData
+//影响的UI数据：footer_sum,main_table
+$('body').on('caseStatusChanged',function(e){
+    //保存修改数据到数据库
+    
+    //更新缓存内数据
+
+    //更新页面ui数据显示
+    pageOnTable.updateTableData(e.value,$('#pageOneTable').find('tr[data-item='+e.value.id+']'));
+    setPersonCaseSum(DataList.combinedData);
+})
+$('body').on('caseChanged',function(e){
+    //保存修改数据到数据库
+    
+    //更新缓存内数据
+
+    //更新页面ui数据显示
+    setPersonCaseSum(DataList.combinedData);
+    console.log('caseChanged1',e,DataList.combinedData)
+})
 $(window).on('waiting',function(e){
     $().mloader('show',{message:"请稍等..."});
 })
@@ -286,13 +339,51 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
         }
     });
 });
+function setPersonCaseSum(data){
+    var personCaseSum=getPersonCaseSum(data);
+    console.log(personCaseSum);
+    $('#footer_info_bar').empty();
+    var info=$(`<label>共计<b>${personCaseSum.caseNum}</b>个案件`+
+        `，（ 群诉<b id="footer_sum_label_group" style="color:blue;">${personCaseSum.caseLabels[3].length}</b>件`+
+        `，1000万以上<b id="footer_sum_label_thousand" style="color:#E25C62;">${personCaseSum.caseLabels[2].length}</b>件`+
+        `，300万以上<b id="footer_sum_label_hundred" style="color:orange;">${personCaseSum.caseLabels[1].length}</b>件`+
+        `，普通案件<b id="footer_sum_label_normal" style="color:green;">${personCaseSum.caseLabels[0].length}</b>件`+
+        ` ），本诉金额为 <b id="footer_sum_request">${personCaseSum.rquestAmount.formatMoney(0, "￥")}</b> 万`+
+        `，判决金额为 <b id="footer_sum_penalty">${personCaseSum.penaltyAmount.formatMoney(0, "￥")}</b> 万`+
+        `，已执行金额为 <b id="footer_sum_paid">${personCaseSum.paidAmount.formatMoney(0, "￥")}</b> 万`+
+    `</label>`);
+    $('#footer_info_bar').append(info);
+    $('#footer_info_bar').trigger('create');
+}
 function getPersonCaseSum(data){
     var sum={
-        caseNum:data.length
+        caseNum:data.length,
+        caseLabels:{
+            0:[],
+            1:[],
+            2:[],
+            3:[]
+        },
+        rquestAmount:0,
+        penaltyAmount:0,
+        paidAmount:0
     }
     data.forEach(d=>{
-
+        //findValue
+        /*
+        var label=resourceDatas.caseLabels_.findValue(d.caseLabel,'id','label');
+        if(label!=undefined){
+            if(!sum.caseLabels.hasOwnProperty(label)) sum.caseLabels[label]=[];
+            sum.caseLabels[label].push(d.id);
+        }
+        */
+        sum.caseLabels[d.caseLabel].push(d.id);
+        sum.rquestAmount+=parseFloat(d.requestAmount);
+        sum.penaltyAmount+=parseFloat(d.penalty);
+        sum.paidAmount+=parseFloat(d.paidAmount);
     });
+    console.log(sum);
+    return sum;
 }
 function setToolTip(element){
     

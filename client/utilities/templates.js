@@ -44,7 +44,9 @@ var _summary_template;
                         label:"案件标签:",
                         type:"combobox",
                         isOptional:false,
-                        data:resourceDatas.caseLabels
+                        data:resourceDatas.caseLabels_,
+                        valueKey:'id',
+                        displayFormat:'{label}'
                     },
                     caseProject:{
                         placeholder:"所属项目",
@@ -400,7 +402,8 @@ var _summary_template;
                 type:"text",
                 label:"执行金额(万)：",
                 isOptional:true,
-                defaultValue:0.0
+                defaultValue:0.0,
+                isDisabled:true
             },
             FirstInstance:{
                 type:"date",
@@ -516,7 +519,9 @@ var _summary_template;
                     label:"案件标签:",
                     type:"combobox",
                     isOptional:false,
-                    data:resourceDatas.caseLabels
+                    data:resourceDatas.caseLabels_,
+                    valueKey:'id',
+                    displayFormat:'{label}'
                 },
                 caseProject:{
                     label:"所属项目:",
@@ -960,7 +965,9 @@ var _summary_template;
           type:"multicombobox",
           isOptional:true,
           //data:addEmptyValueToArray(resourceDatas.caseLabels,'无'),
-          data:resourceDatas.caseLabels,
+          data:resourceDatas.caseLabels_,
+          valueKey:'id',
+          displayFormat:'{label}'
       },
       caseProject_f:{
           label:"所属项目:",

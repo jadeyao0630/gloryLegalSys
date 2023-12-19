@@ -360,3 +360,10 @@ function getTextSize(text, ctx) {
     let actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
     return { width: metrics.width, height: actualHeight };
 }
+function fireDataChnaged(type,value,action){
+    
+    var event=jQuery.Event(type);
+    event.value=value;
+    event.action=action;
+    $('body').trigger(event)
+}

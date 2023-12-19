@@ -116,12 +116,36 @@ function formatIndex(position){
     var sub=Math.round((position-main)*10);
     return {main:main,sub:sub};
 }
-$.fn.extend({
-    getValue:function (matchKey,vakyeKey){
-        
+Number.prototype.formatMoney = function (places, symbol, thousand, decimal) {
+    places = !isNaN(places = Math.abs(places)) ? places : 2;
+    symbol = symbol !== undefined ? symbol : "$";
+    thousand = thousand || ",";
+    decimal = decimal || ".";
+    var number = this,
+        negative = number < 0 ? "-" : "",
+        i = parseInt(number = Math.abs(+number || 0).toFixed(places), 10) + "",
+        j = (j = i.length) > 3 ? j % 3 : 0;
+    return symbol + negative + (j ? i.substr(0, j) + thousand : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + thousand) + (places ? decimal + Math.abs(number - i).toFixed(places).slice(2) : "");
+};
+Array.prototype.findValue=function(matchValue,matchKey,valueKey){
+    var val=undefined;
+    //console.log('Array.prototype.findValue',this);
+    this.every(data=>{
+        val=findValue(data,matchValue,matchKey,valueKey);
+        console.log({returnVal:val,source:data,matchVal:matchValue,matchK:matchKey,valueK:valueKey})
+        if(val!=undefined) return false;
+        else return true;
+    })
+    return val;
+}
+function findValue(object,matchValue,matchKey,valueKey){
+    if(object instanceof Object){
+        if(object.hasOwnProperty(matchKey) && object[matchKey]==matchValue && object.hasOwnProperty(valueKey)){
+            return object[valueKey];
+        }
     }
-});
-
+    return undefined;
+}
 function getKeyValues(object,key){
     var collector=[];
     if(object instanceof Array){

@@ -350,14 +350,14 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                 });
                 //console.log('查看...',sessionStorage.getItem("currentId"));
                 //_setTitleBar("progress_details_info_title",'caseNo');
-                console.log('查看...',index,caseStatus,DataList.caseUpdates);
+                //console.log('查看...',index,caseStatus,DataList.caseUpdates);
                 
-                console.log('查看...',greatMatched);
+                //console.log('查看...',greatMatched);
                 $('#progress_details_info_body').empty();
                 $('#progress_details_info_title').text(title);
                 sortedItems.forEach(date=>{
                     var items=dateSortItems[date];
-                    console.log('items',items);
+                    //console.log('items',items);
                 //$.each(dateSortItems,(date,items)=>{
                     var date_bar=$('<li data-role="list-divider">'+date+'<span class="ui-li-count">'+items.length+'</span></li>');
                     $('#progress_details_info_body').append(date_bar);
@@ -628,8 +628,9 @@ function checkProgressEdiableStatus(){
     //currentProgress['targetPosition']=e.Position;
     //currentProgress['originalPosition']=formatIndex(but.opt.currentPosition);
 }
+//节点添加保存
 $('.progress_popup_add_form_submit').on('click', updateSubmitEvent)
-
+//节点修改保存
 $('.progress_popup_edit_form_submit').on('click', function (e){
     $(window).trigger('saving');
     console.log($(this).data('item'));
@@ -657,6 +658,14 @@ $('.progress_popup_edit_form_submit').on('click', function (e){
                 form.instance.jqmData('label').text("["+formatData.typeName+"] "+formatData.description);
                 //console.log('DataList['+data.table+'] before',DataList[data.table]);
                 DataList[data.table]=updateOriginalData(DataList[data.table],newData,data.idkey);
+                if(data.table=='caseExcutes'){
+                    
+                    newData.id=data.data.id;
+                    var event=jQuery.Event("caseexcutesChanged");
+                    event.value=newData;
+                    event.action="update";
+                    $('body').trigger(event)
+                }
                 history.back();
                 $(window).trigger('hidepopup');
                 //console.log('DataList['+data.table+'] after',DataList[data.table]);
@@ -666,6 +675,7 @@ $('.progress_popup_edit_form_submit').on('click', function (e){
         }
     });
 })
+//节点添加保存
 function updateSubmitEvent(e){
     console.log($(this).data('item'));
     var data=JSON.parse($(this).data('item'));
@@ -808,12 +818,16 @@ function updateSubmitEvent(e){
                     console.log("final values",data.table,values.data.values);
                     insert(data.table,values.data.values,(r)=>{
                         console.log('insert result',data.table,r,currentProgress['target']);
-                        
                         DataList[data.table].push(values.data.values);
-                        
+
                         currentProgress['currentDiagramButton'].opt.counterData.push(values.data.values);
                         currentProgress['currentDiagramButton'].updateCounterIndicator(data);
-                        
+                        if(data.table=='caseExcutes'){
+                            var event=jQuery.Event("caseexcutesChanged");
+                            event.value=values.data.values;
+                            event.action="add";
+                            $('body').trigger(event)
+                        }
                         $().mloader("hide");
                     
                     });
@@ -987,6 +1001,7 @@ $('.case_reg_but').on('click',async function(e){
     }
 })
 //#region 查看信息页面的按钮事件
+
 function showProgressDetails(datas,updates,excutes,properties,attachments,caseLinked){
     $().mloader('show',{message:"读取中..."});
     if(datas.length>0){
@@ -1029,7 +1044,7 @@ $('.edit-header-btn').on('click',async function(e){
         //console.log("保存");
         //console.log($(pageOnTable).html())
 
-        //案件页面
+        //保存案件页面
         if(sessionStorage.getItem('currentPage')=="#casePage"){
             caseForm.instance.getValues(getGlobal("currentId"),FormTemplate3.template,function(message,values){
                 console.log('getvalues',values);
@@ -1058,7 +1073,6 @@ $('.edit-header-btn').on('click',async function(e){
                         values.data.values["caseApplicant"]=getGlobalJson("currentUser").id;
                         if(enableReadOnlyMode) values.data.values["isReadOnly"]=_isReadOnlyCurrentForm();
                         values.data.values["id"]=Number(values.data.values["id"]);
-                        history.back();
                         if(isAddPage){
                             pageOnTable.insertTableData(values.data.values);
                             setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
@@ -1067,39 +1081,34 @@ $('.edit-header-btn').on('click',async function(e){
                         //pageOnTable.addTableData([values.data.values],true);
                         //console.log('保存',values.data.values.id,$("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
                         //setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
-                        if(enableRealDelete){
-                            $().mloader('show',{message:"保存中..."});
-                            //console.log(values.data);
-                            insertCase(values.data.values,caseInfoList,function(r){
-                                //console.log(r);
-                                if(r.success){
-                                    console.log("修改添加成功。");
-                                    $().minfo('show',{title:"提示",message:"保存完成。"},function(){
-                                        goToPage('#');
-                                    });
-                                    console.log('pageOneTable id',$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
-                                    pageOnTable.updateTableData(values.data.values,$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
-                                    
-                                    DataList.combinedData=updateOriginalData(DataList.combinedData,values.data.values,'id');//tools.js
-                                    DataList.caseStatus=updateOriginalData(DataList.caseStatus,values.data.values,'id');//tools.js
-                                }else{
-                                    console.log(r);
-                                    $().minfo('show',{title:"错误",message:r.error});
+                        $().mloader('show',{message:"保存中..."});
+                        //console.log(values.data);
+                        insertCase(values.data.values,caseInfoList,function(r){
+                            //console.log(r);
+                            if(r.success){
+                                console.log("修改添加成功。");
+                                $().minfo('show',{title:"提示",message:"保存完成。"},function(){
+                                    //history.back();
+                                });
+                                console.log('pageOneTable id',$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
+                                pageOnTable.updateTableData(values.data.values,$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
+                                
+                                DataList.combinedData=updateOriginalData(DataList.combinedData,values.data.values,'id');//tools.js
+                                DataList.caseStatus=updateOriginalData(DataList.caseStatus,values.data.values,'id');//tools.js
+                                if(isAddPage){
+                                    currentData.push(values.data.values);
+                                    DataList.combinedData.push(values.data.values);
+                                    DataList.caseStatus.push(values.data.values);
                                 }
-                                $().mloader('hide');
-                            });
-                        }else{
-                            
-                            pageOnTable.updateTableData(values.data.values,$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
-                            DataList.combinedData=updateOriginalData(DataList.combinedData,values.data.values,'id');
-                            DataList.caseStatus=updateOriginalData(DataList.caseStatus,values.data.values,'id');//tools.js
-                            currentData=updateOriginalData(currentData,values.data.values,'id');//tools.js
-                        }
-                        if(isAddPage){
-                            currentData.push(values.data.values);
-                            DataList.combinedData.push(values.data.values);
-                            DataList.caseStatus.push(values.data.values);
-                        }
+                                
+                                fireDataChnaged("caseChanged",values.data.values,isAddPage?"add":"update");
+                            }else{
+                                console.log(r);
+                                $().minfo('show',{title:"错误",message:r.error});
+                            }
+                            $().mloader('hide');
+                        });
+                        
                         setTimeout(() => {
                             //syncHeaderCloneWidth();
                         }, 100);
@@ -1111,7 +1120,9 @@ $('.edit-header-btn').on('click',async function(e){
                 }
             });
         
-        }else if(sessionStorage.getItem('currentPage')=="#progress"){
+        }
+        //保存进展页面
+        else if(sessionStorage.getItem('currentPage')=="#progress"){
             progressInfoForm.instance.getValues(getGlobal("currentId"),progress_form_template.template,function(message,values){
                 //console.log(values)
                 if(values.success){
@@ -1131,11 +1142,14 @@ $('.edit-header-btn').on('click',async function(e){
                         DataList.combinedData=updateOriginalData(DataList.combinedData,newValue,'id');
                         currentData=updateOriginalData(currentData,newValue,'id');//tools.js
                         console.log(DataList.caseStatus);
+                        fireDataChnaged("caseStatusChanged",newValue,"update");
                         $(window).trigger('hidepopup');
                     });
                 }
             });
-        }else if(sessionStorage.getItem('currentPage')=="#infoPage"){
+        }
+        //保存个人信息页面
+        else if(sessionStorage.getItem('currentPage')=="#infoPage"){
            
             setting_info_form.instance.getValues(getGlobalJson("currentUser").id,settingPage_form.template,function(message,values){
                 //console.log(values)
@@ -1175,6 +1189,7 @@ $('.edit-header-btn').on('click',async function(e){
             });
         }
     }else if($(this).text()=="添加"){
+        //添加个人信息页面
         if(sessionStorage.getItem('currentPage')=="#infoPage"){
             setting_add_form.instance.getValues((await getRecordLatestIndex(userDbTableName,'id'))+1,settingPage_add_form.template,function(message,values){
                 //console.log(values)
@@ -1203,6 +1218,7 @@ $('.edit-header-btn').on('click',async function(e){
         }
     }else if($(this).text()=="修改"){
         var _this=this;
+        //修改个人信息页面
         if(sessionStorage.getItem('currentPage')=="#infoPage"){
             
             var userD=JSON.parse($(_this).data('item'));

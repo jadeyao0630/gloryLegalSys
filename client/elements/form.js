@@ -197,6 +197,7 @@ mform.prototype={
                         if(item.isAdminOnly){
                             item_container.addClass('admin-ui');
                         }
+                        
                         var replacement=replacementOfInput(item_key);
                         item_container.append(replacement);
                         replacement.hide();
@@ -1582,11 +1583,11 @@ $.fn.extend({
                                 hasError=true;
                             }else{
                                 if(element.type.toLowerCase()=="datetime")
-                                    val='0000-00-00 00:00:00';
+                                    val=formatDateTimeStr2Mysql('0000-00-00 00:00:00');
                                 else if(element.type.toLowerCase()=="date")
-                                    val='0000-00-00';
+                                    val=formatDateTimeStr2Mysql('0000-00-00');
                                 else if(element.type.toLowerCase()=="time")
-                                    val='00:00:00';
+                                    val=formatDateTimeStr2Mysql('00:00:00');
                             }
                         }
                         //console.log('Date mform getvalue',val);

@@ -38,6 +38,7 @@ waitTask(logingStatus(),function(){
                     case_labels_colors=_data;
                     
                     resourceDatas[k]=case_labels;
+                    resourceDatas[k+"_"]=d;
                     resourceDatas['caseLabelsColors']=_data;
                     //console.log(`Data from caseLabelsColors:`, _data);
                     //FormTemplate3.template.baseInfo.data.caseLabel.data=getKeyValues(d,"label");

@@ -4,6 +4,7 @@ var result=[];
 var collectDbList=true;
 
 $('#loadingLogo').attr('src',logoSrc)
+$('#headerLogo').attr('src',logoSrc)
 goToPage('#');
 $('#mainFooter').hide();
 //getBasicDatabaseData();

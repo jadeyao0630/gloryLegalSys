@@ -192,9 +192,14 @@
                     });
                     convertedData.push(item);
                 });
+                var testData=[0,1,2,3,4,5,6,7];
+                $.each(testData,(index,data)=>{
+                    console.log(data)
+                    if(index==5) return false;
+                })
                 console.log('convertedData',convertedData);
                 var fn_btns='<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
-                                '<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onclick=\'fnBtnClickEvent({0})\'>查看</a>'+
+                                '<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onclick=\'fnBtnClickEvent(this,{0})\'>查看</a>'+
                                 '<a href="#casePage" name="fn_btn_edit" class="ui-btn btn-icon-blue btn-tooltip ui-btn-icon-notext ui-icon-edit" data-tooltip="案件编辑修改" data-transition="slidefade" onclick=\'fnBtnClickEvent({0})\'>修改</a>'+
                                 '<a href="#" name="fn_btn_update" class="ui-btn btn-icon-red btn-tooltip ui-btn-icon-notext ui-icon-calendar" data-tooltip="更新案件进展" data-transition="slidefade" onclick=\'fnBtnClickEvent({0})\'>更新</a>'+
                             '</div>';

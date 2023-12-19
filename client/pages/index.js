@@ -11,13 +11,16 @@ const addBut = document.getElementById("addBut");
 
 const nameInput = document.getElementById("user");
 const passInput = document.getElementById("password");
+$('#loadingLogo').attr('src',logoSrc)
+//console.log(sessionStorage.getItem("currentUser"),sessionStorage.getItem("currentUser").name!=undefined);
+try{
+    if(JSON.parse(sessionStorage.getItem("currentUser")).name!=undefined){
+        window.location.href = mainPage;
+    }
+}catch(e){
+    console.log('需要重新登录')
+}
 
-nameInput.addEventListener("change", (event) => {
-    message.innerHTML="";
-});
-passInput.oninput = (event) => {
-    message.innerHTML="";
-};
 const loginBut = document.getElementById("loginBut");
 loginBut.onclick = async function (){
     const name = nameInput.value;
@@ -36,7 +39,7 @@ loginBut.onclick = async function (){
         .then(response => response.json())
         .then(data => login(data['data']));
     }else{
-        message.innerHTML=Message.LOGIN_IS_EMPTY;
+       // message.innerHTML=Message.LOGIN_IS_EMPTY;
     }
     
 }
@@ -47,29 +50,18 @@ function insertRowIntoTable(data){
 function login(data){
     //console.log(data.data[0].name);
     if(data.success){
-        message.innerHTML=formatString(Message.LOGIN_WELCOME_F,JSON.parse(data.data).name);
+        //message.innerHTML=formatString(Message.LOGIN_WELCOME_F,JSON.parse(data.data).name);
         //console.log(data);
         //data.data['_pass']=data.pass;
         sessionStorage.setItem("currentUser", data.data);
         //console.log(JSON.parse(sessionStorage.getItem("currentUser")).name+"--"+data.data);
-        window.location.href = mainPage;
+        $('.loginPanel').animate({opacity:0,height:0},1000,function(){
+
+            window.location.href = mainPage;
+        })
     }else{
         message.innerHTML=Message.LOGIN_ISNOT_MATCH;
     }
-}
-
-function loadHTML(data){
-    
-    console.log(data);
-    if(data.length === 0){
-        message.innerHTML = "<div>没有数据</div>";
-        return;
-    }
-    let tableHtml = "";
-    data.forEach(function ({user,pass,position,level,createDate}){
-        //tableHtml += user + ", "+pass + ", "+position + ", "+level + ", "+new Date(createDate).toLocaleDateString();
-    });
-    log.innerHTML=tableHtml;
 }
 
 function IsLoginVaild(){
@@ -78,7 +70,11 @@ function IsLoginVaild(){
     return user != "" && pass != "";
 }
 
-
+$(document).keyup(function(event){  
+    if(event.key === 'Enter'){  
+        $(loginBut).trigger('click');
+    }  
+  });   
 
 //console.log(JSON.stringify(columns));
 /*

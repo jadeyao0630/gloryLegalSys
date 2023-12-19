@@ -16,7 +16,8 @@ const connection = mysql.createConnection({
     user:'glory',
     password:env.PASSWORD,
     database:env.DATABASE,
-    por:env.DB_PORT,
+    port:env.DB_PORT,
+    connectTimeout:0,
     //ssl: true,
 });
 
@@ -532,6 +533,9 @@ class DbService{
             };
         }catch(error){
             console.log(error);
+            return{
+                data:error
+            }
         }
     }
 

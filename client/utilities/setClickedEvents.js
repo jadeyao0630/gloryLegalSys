@@ -1,6 +1,7 @@
 var lockeventListener=[];
 var isAddPage=false;
 var excutePoint=3;
+var titleBarDisplayFormat="{caseNo} [{id}]";
 $('.popup-add-table').on('click',function(e){
     //createBasicDatabase();
     //createTable('caseUpdates',caseUpdates);
@@ -106,46 +107,45 @@ $('#popupMenu').find('a').on('click',function(e){
     
 })
 var isFirstTimeBack=true;
+var scrollSpeed=1000;
 $(window).on('popstate', function(event) {
     if(event.originalEvent.state!=null){
         //console.log("pop",'back',sessionStorage.getItem('scrollPosition'));
         //sessionStorage.setItem('scrollPosition', );
         if(isFirstTimeBack){
-            $("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, 1000);
+            $("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, scrollSpeed);
             isFirstTimeBack=false;
+            scrollSpeed=0;
         }else{
 
             $("html, body").scrollTop(sessionStorage.getItem('scrollPosition'));
         }
         //$("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, 100);
     }else{
-        
-        sessionStorage.setItem('scrollPosition', $("html, body").scrollTop());
+        if(getGlobal('currentPage')!="#timeline")
+            sessionStorage.setItem('scrollPosition', $("html, body").scrollTop());
+        else{
+
+            isFirstTimeBack=true;
+            scrollSpeed=0;
+        }
         //console.log("pop",sessionStorage.getItem('scrollPosition'));
     }
     
 });
 var currentProgress={};
-var tableFuntionButListenerList=[];
-function setTableFunctionButonClickedEvent(){
-    tableFuntionButListenerList.forEach(but=>{
-        $(but).off('click', functionBtnsEvent);
-    })
-    tableFuntionButListenerList=[];
-    $.each($("[name^='fn_btn']"),(index,btn)=>{
-        setToolTip($(btn));
-    })
-    
-    $("[name^='fn_btn']").on('click', functionBtnsEvent);
+
+function showTooltip(self){
+    $(self).tooltip('show',$(self).data('tooltip')!=undefined?$(self).data('tooltip'):$(self).text());
 }
-function setTableRowFunctionButonClickedEvent(buttons){
-    
-    $(buttons).on('click', functionBtnsEvent);
+function hideTooltip(self){
+    $(self).tooltip('hide');
 }
 //#region 主表里的功能按钮
-function functionBtnsEvent(but){
-    tableFuntionButListenerList.push(but.currentTarget);
-    var index=but.currentTarget.dataset.item;
+function functionBtnsEvent(but,index){
+    //tableFuntionButListenerList.push(but.currentTarget);
+    //console.log('functionBtnsEvent',index,this,e);
+    //var index=data.id;
     var matchItems=DataList.combinedData.filter((item) =>item.id == index);
     var matchedUpdates=DataList.caseUpdates.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     var matchedExcutes=DataList.caseExcutes.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
@@ -154,19 +154,18 @@ function functionBtnsEvent(but){
     var matchedCaseLinked=DataList.caseLinked.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     //console.log(index+"--"+but.currentTarget.name,matchItems);
 
-    if(but.currentTarget.name=="fn_btn_details"){//主表里的删除按钮
+    if(but.name=="fn_btn_details"){//主表里的删除按钮
         showProgressDetails(matchItems,matchedUpdates,matchedExcutes,matchedProperties,matchedAttachments,matchedCaseLinked);
     }
-    else if(but.currentTarget.name=="fn_btn_edit"){//主表里的编辑按钮
+    else if(but.name=="fn_btn_edit"){//主表里的编辑按钮
         isAddPage=false;
         if(matchItems.length>0){
             $().mloader("show",{message:"读取中...."});
             //_showEditForm(matchItems[0]);//naviation.js
-            var _this=this;
             //$("#reg_form_title").html('<i class="fa fa-unlock text-green edit-lock"></i>'+"修改档案");
             setGlobal("currentId", matchItems[0].id);
             //_setBlurBackgroundVisibility(true);
-            goToPage( $(_this).attr( "href" ));
+            goToPage( $(but).attr( "href" ));
             setTimeout(function() {
                 //console.log(matchItems[0]);
                 //main_form.setData(matchItems[0]);
@@ -184,7 +183,7 @@ function functionBtnsEvent(but){
             
         }
     }
-    else if(but.currentTarget.name=="fn_btn_update"){//主表里的信息按钮
+    else if(but.name=="fn_btn_update"){//主表里的信息按钮
         $().mloader("show",{message:"读取中...."});
         $("#progress_details").empty();
         $("#progress_diagram").empty();
@@ -194,7 +193,7 @@ function functionBtnsEvent(but){
         goToPage( '#progress');
         if(matchItems.length>0){
             
-            _setTitleBar("progress_title",'caseNo');
+            _setTitleBar("progress_title",titleBarDisplayFormat);
             var status_val=-1;
             if(matchItems.length>0){
                 //console.log("matchItems",matchItems[0]);
@@ -309,6 +308,31 @@ function functionBtnsEvent(but){
         },10);
     }
 }
+function getIconFromTypeName(typeName){
+    var iconNameColor='';
+    switch(typeName){
+        case '资产':
+            iconNameColor='sack-dollar text-red';
+            break;
+        case '执行':
+            iconNameColor='check-double text-green';
+            break;
+        case '进展':
+            iconNameColor='thumbtack text-blue';
+            break;
+        case '附件':
+            iconNameColor='paperclip text-blue';
+            break;
+    }
+    var icon=$('<i class="fa fa-'+iconNameColor+'" style="margin-right:10px;"></i>');
+    icon.on('mouseover',(e)=>{
+        icon.tooltip('show',typeName);
+    })
+    icon.on('mouseout',(e)=>{
+        icon.tooltip('hide');
+    })
+    return icon;
+}
 //#endregion /主表里的功能按钮
 //流程图节点点击弹出菜单
 $('#progress_popupMenu').find('a').on('click',async function(e){
@@ -366,7 +390,9 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                         //console.log('JSON.stringify',item_d);
                         var del_btn;
                         if(item.type=='caseAttachments'){
-                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;"><i class="fa fa-paperclip text-blue" style="margin-right:10px;"></i>'+item.description+'</h3>');
+                            var icon=getIconFromTypeName(item.typeName);
+                            var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+item.description+'</h3>');
+                            list_item.prepend(icon);
                             
                             item_container=$('<li style="padding:0px;" data-item=\''+JSON.stringify(item)+'\'></li>');
                             var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
@@ -382,27 +408,9 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                             view_btn.jqmData('label',list_item);
                             item_container.append(group);
                         }else{
-                            var iconNameColor='';
-                            switch(item.typeName){
-                                case '资产':
-                                    iconNameColor='sack-dollar text-red';
-                                    break;
-                                case '执行':
-                                    iconNameColor='check-double text-green';
-                                    break;
-                                case '进展':
-                                    iconNameColor='thumbtack text-blue';
-                                    break;
-                            }
-                            var icon=$('<i class="fa fa-'+iconNameColor+'" style="margin-right:10px;"></i>');
+                            var icon=getIconFromTypeName(item.typeName);
                             var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+item.description+'</h3>');
                             list_item.prepend(icon);
-                            icon.on('mouseover',(e)=>{
-                                icon.tooltip('show',item.typeName);
-                            })
-                            icon.on('mouseout',(e)=>{
-                                icon.tooltip('hide');
-                            })
                             item_container=$('<li style="padding:0px;" data-item=\''+JSON.stringify(item)+'\'></li>');
                             var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
                             var view_btn=$('<a href="#" class="ui-btn ui-icon-edit ui-btn-icon-notext btn-icon-blue view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">编辑</a>')
@@ -655,16 +663,15 @@ $('.progress_popup_edit_form_submit').on('click', function (e){
                 vals.join(),async function(r){
                 //console.log('update result',r);
                 var formatData=getEventsDetails(newData);
-                form.instance.jqmData('label').text("["+formatData.typeName+"] "+formatData.description);
+                
+                form.instance.jqmData('label').text(formatData.description);
+                form.instance.jqmData('label').prepend(getIconFromTypeName(formatData.typeName))
                 //console.log('DataList['+data.table+'] before',DataList[data.table]);
                 DataList[data.table]=updateOriginalData(DataList[data.table],newData,data.idkey);
                 if(data.table=='caseExcutes'){
                     
                     newData.id=data.data.id;
-                    var event=jQuery.Event("caseexcutesChanged");
-                    event.value=newData;
-                    event.action="update";
-                    $('body').trigger(event)
+                    fireDataChnaged("caseexcutesChanged",newData,"update");
                 }
                 history.back();
                 $(window).trigger('hidepopup');
@@ -823,10 +830,7 @@ function updateSubmitEvent(e){
                         currentProgress['currentDiagramButton'].opt.counterData.push(values.data.values);
                         currentProgress['currentDiagramButton'].updateCounterIndicator(data);
                         if(data.table=='caseExcutes'){
-                            var event=jQuery.Event("caseexcutesChanged");
-                            event.value=values.data.values;
-                            event.action="add";
-                            $('body').trigger(event)
+                            fireDataChnaged("caseexcutesChanged",values.data.values,"add");
                         }
                         $().mloader("hide");
                     
@@ -1021,8 +1025,7 @@ function showProgressDetails(datas,updates,excutes,properties,attachments,caseLi
         //if(datas[0].id>30){
             //dataList=[];
         //}
-
-        $('#timelineTitle').text(datas[0].caseNo);
+        $('#timelineTitle').text(getFormatText(titleBarDisplayFormat,datas[0]));
         var canvas=document.getElementById('myCanvas');
         //eventManager.setCanvas(canvas);
 
@@ -1073,45 +1076,7 @@ $('.edit-header-btn').on('click',async function(e){
                         values.data.values["caseApplicant"]=getGlobalJson("currentUser").id;
                         if(enableReadOnlyMode) values.data.values["isReadOnly"]=_isReadOnlyCurrentForm();
                         values.data.values["id"]=Number(values.data.values["id"]);
-                        if(isAddPage){
-                            pageOnTable.insertTableData(values.data.values);
-                            setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
-                        }
-                        //enableRealDelete=false;
-                        //pageOnTable.addTableData([values.data.values],true);
-                        //console.log('保存',values.data.values.id,$("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
-                        //setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+values.data.values.id+"]"));
-                        $().mloader('show',{message:"保存中..."});
-                        //console.log(values.data);
-                        insertCase(values.data.values,caseInfoList,function(r){
-                            //console.log(r);
-                            if(r.success){
-                                console.log("修改添加成功。");
-                                $().minfo('show',{title:"提示",message:"保存完成。"},function(){
-                                    //history.back();
-                                });
-                                console.log('pageOneTable id',$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
-                                pageOnTable.updateTableData(values.data.values,$('#pageOneTable').find('tr[data-item='+values.data.values.id+']'));
-                                
-                                DataList.combinedData=updateOriginalData(DataList.combinedData,values.data.values,'id');//tools.js
-                                DataList.caseStatus=updateOriginalData(DataList.caseStatus,values.data.values,'id');//tools.js
-                                if(isAddPage){
-                                    currentData.push(values.data.values);
-                                    DataList.combinedData.push(values.data.values);
-                                    DataList.caseStatus.push(values.data.values);
-                                }
-                                
-                                fireDataChnaged("caseChanged",values.data.values,isAddPage?"add":"update");
-                            }else{
-                                console.log(r);
-                                $().minfo('show',{title:"错误",message:r.error});
-                            }
-                            $().mloader('hide');
-                        });
-                        
-                        setTimeout(() => {
-                            //syncHeaderCloneWidth();
-                        }, 100);
+                        fireDataChnaged("caseChanged",values.data.values,isAddPage?"add":"update");
                     }
                     
                     
@@ -1126,25 +1091,8 @@ $('.edit-header-btn').on('click',async function(e){
             progressInfoForm.instance.getValues(getGlobal("currentId"),progress_form_template.template,function(message,values){
                 //console.log(values)
                 if(values.success){
-                    $(window).trigger('saving');
-                    var data=[];
-                    var newValue={};
-                    $.each(values.data.values,(key,val)=>{
-                        if(key!='id'){
-                            data.push(key.replace("_p","")+"=\""+val+"\"");
-                        }
-                        newValue[key.replace("_p","")]=val;
-                    })
-                    //console.log(data.join());
-                    update('id='+newValue.id,'caseStatus',data.join(),function(r){
-                        pageOnTable.updateTableData(newValue,$('#pageOneTable').find('tr[data-item='+newValue.id+']'));
-                        DataList.caseStatus=updateOriginalData(DataList.caseStatus,newValue,'id');
-                        DataList.combinedData=updateOriginalData(DataList.combinedData,newValue,'id');
-                        currentData=updateOriginalData(currentData,newValue,'id');//tools.js
-                        console.log(DataList.caseStatus);
-                        fireDataChnaged("caseStatusChanged",newValue,"update");
-                        $(window).trigger('hidepopup');
-                    });
+                    fireDataChnaged("caseStatusChanged",values.data.values,"update");
+                    
                 }
             });
         }
@@ -1260,7 +1208,13 @@ $('.edit-header-btn').on('click',async function(e){
     }
         
 })
-
+function getFormatText(format,dataObject){
+    var text=format;
+    $.each(dataObject,(k,v)=>{
+        text=text.replace("{"+k+"}",v==null||v.length==0?"尚未设定":v);
+    })
+    return text;
+}
 function resetPassChangeState(form){
     var change_btn=form.find('#pass_controlgroup').find('a.btn-edit');
     var showHide_btn=form.find('#pass_controlgroup').find('a.btn-eye');
@@ -1277,14 +1231,18 @@ function resetPassChangeState(form){
 }
 //#endregion
 function _setTitleBar(titlebarId,displayKey){
-    var lockedTitle="查看案件";
-    var unlockedTitle="修改案件";
     titlebarId=titlebarId.replace("#","");
     var matched=DataList.combinedData.filter((d)=>{return d.id==sessionStorage.getItem("currentId")});
+    
+    var lockedTitle="查看案件";
+    var unlockedTitle="修改案件";
     if(matched.length>0){
+        lockedTitle+=" ["+matched[0].id+"]";
+        unlockedTitle+=" ["+matched[0].id+"]";
         if(displayKey!=undefined){
-            lockedTitle=matched[0][displayKey];
-            unlockedTitle=matched[0][displayKey];
+            var title=getFormatText(displayKey,matched[0]);
+            lockedTitle=title;
+            unlockedTitle=title;
         }
         if(enableReadOnlyMode) {
             if(matched[0].isReadOnly) {
@@ -1557,22 +1515,24 @@ function getDataById(source,idKey,matchValue){
     
 }
 function updateOriginalData(source,newData,matchKey){
-    var matchedIndex=-1;
+    var found=false;
     if(source instanceof Array){
         $.each(source,(index,item)=>{
             //console.log(matchKey,item[matchKey],"=="+newData[matchKey]);
             if(item[matchKey]==newData[matchKey]){
                 matchedIndex=index;
                 source[index]=Object.assign(source[index],newData);
-                
+                found=true;
                 return false;
             }
         })
+        if(!found) source.push(newData);
     }else{
         var keys=Object.keys(newData);
         $.each(source,(key,item)=>{
             //console.log(matchKey,item[matchKey],"=="+newData[matchKey]);
             if(keys.includes(key)){
+                found=true;
                 source[key]=newData[key];
             }
         })

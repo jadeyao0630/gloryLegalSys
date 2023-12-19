@@ -260,6 +260,22 @@ $('body').on(preload_completed_event_name,function(){
     });
     
 })
+$('body').on('userDataChanged',function(e){
+    console.log('userDataChanged b',getGlobalJson("currentUser"),e);
+    setGlobalJson("currentUser",updateOriginalData(getGlobalJson("currentUser"),e.value,'id'));
+    console.log('userDataChanged a',getGlobalJson("currentUser"),e);
+    $('#username').text(getGlobalJson("currentUser").name);
+    resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,e.value,'id');
+    resourceDatas['users']=updateOriginalData(resourceDatas['users'],e.value,'id');
+    //console.log(getGlobalJson("currentUser"),resourceDatas.legalAgencies,r);
+    $('#legalAgencies_f').trigger('create').selectmenu().selectmenu( "refresh" );
+    $('#legalAgencies_p').trigger('create').selectmenu().selectmenu( "refresh" );
+    $('#legalAgencies').trigger('create').selectmenu().selectmenu( "refresh" );
+    setTimeout(() => {
+        
+        $('#username').trigger('create');
+    }, 1000);
+});
 $('body').on('caseexcutesChanged',function(e){
     console.log('caseexcutesChanged',e);
     if(e.action=="add"){

@@ -1103,27 +1103,21 @@ $('.edit-header-btn').on('click',async function(e){
                 //console.log(values)
                 if(values.success){
                     console.log(values);
-                    var data=[];
+                    var newData={};
                     $.each(values.data.values,(key,val)=>{
-                        if(key!='id'){
-                            //data.push(key.replace("_p","")+"=\""+val+"\"");
-                            if(key.replace("_p","")=='pass') data.push(key.replace("_p","")+"=\""+encrypt(val)+"\"");
-                            else data.push(key.replace("_p","")+"=\""+val+"\"");
+                        if(key.replace("_p","")=='pass'){
+                                newData[key.replace("_p","")]=encrypt(val);
+                        }else{
+                            newData[key.replace("_p","")]=val;
                         }
                     })
-                    update('id='+getGlobalJson("currentUser").id,userDbTableName,data.join(),function(r){
+                    update('id='+getGlobalJson("currentUser").id,userDbTableName,newData,function(r){
                         
                         if(r.data.data.affectedRows>0){
                             console.log("修改成功。");
                             resetPassChangeState(setting_info_form.instance);
-                            setGlobalJson("currentUser",updateOriginalData(getGlobalJson("currentUser"),data));
-                            $('#username').text(getGlobalJson("currentUser").name);
-                            resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,data,'id');
-                            resourceDatas['users']=updateOriginalData(resourceDatas['users'],data,'id');
-                            console.log(getGlobalJson("currentUser"),resourceDatas.legalAgencies,r);
-                            $('#legalAgencies_f').trigger('create').selectmenu().selectmenu( "refresh" );
-                            $('#legalAgencies_p').trigger('create').selectmenu().selectmenu( "refresh" );
-                            $('#legalAgencies').trigger('create').selectmenu().selectmenu( "refresh" );
+                            fireDataChnaged('userDataChanged',newData,"update");
+                            
                             $().minfo('show',{title:"提示",message:"修改成功。"},function(){
                                 
                             });

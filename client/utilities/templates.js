@@ -257,14 +257,14 @@ var _summary_template;
         },
         
         caseCatelog:{
-          label:"案件类别",
+          label:"类别",
           type:"label",
           isFilterable:true,
           data:resourceDatas.caseCatelogs_,
           valueKey:'label',
           matchKey:'id'
       },
-        caseType:{label:"案件类型",
+        caseType:{label:"类型",
           type:"label",
           data:resourceDatas.caseTypes_, 
           matchKey:'id',
@@ -280,6 +280,16 @@ var _summary_template;
           data:resourceDatas.caseStatus,
           type:"progresses", isFilterable:true
         },
+        requestAmount:{
+            label:"本诉金额(万)",
+            type:"label", isFilterable:true,
+            displayFormat:'{}万',
+            sortable:{
+              type:'number',
+              isASC:true,
+              id:'requestAmount',
+            },
+        },
         penalty:{
           label:"判决金额(万)",
           type:"label", isFilterable:true,
@@ -288,16 +298,6 @@ var _summary_template;
             type:'number',
             isASC:true,
             id:'penalty',
-          },
-      },
-      requestAmount:{
-          label:"本诉金额(万)",
-          type:"label", isFilterable:true,
-          displayFormat:'{}万',
-          sortable:{
-            type:'number',
-            isASC:true,
-            id:'requestAmount',
           },
       },
         /*

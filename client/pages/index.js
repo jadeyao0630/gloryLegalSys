@@ -60,14 +60,27 @@ function login(data){
             window.location.href = mainPage;
         })
     }else{
-        message.innerHTML=Message.LOGIN_ISNOT_MATCH;
+        //message.innerHTML=Message.LOGIN_ISNOT_MATCH;
+        $().minfo('show',{title:"错误",message:"请检查您的密码或用户名！"},function(){
+        });
     }
 }
-
+$(nameInput).on("change keyup", (event) => {
+    $(nameInput).tooltip('hide');
+});
+$(passInput).on("change keyup",(event) => {
+    $(passInput).tooltip('hide');
+});
 function IsLoginVaild(){
     const name = nameInput.value;
     const pass = passInput.value;
-    return user != "" && pass != "";
+    if(name == ""){
+        
+        $(nameInput).tooltip('show',"用户名不能为空")
+    }else if(pass == ""){
+        $(passInput).tooltip('show',"密码不能为空")
+    }
+    return name != "" && pass != "";
 }
 
 $(document).keyup(function(event){  

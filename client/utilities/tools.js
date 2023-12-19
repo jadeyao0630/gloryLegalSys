@@ -257,7 +257,7 @@ $.fn.extend({
     },
     tooltip:function(visibility,html){
         if(visibility.toLowerCase()=="show"){
-            var tooltip=$('<span class="ui-tooltip"></span>');
+            var tooltip=$('<span class="ui-tooltip" style=""></span>');
             tooltip.html(html==undefined?$(this).text():html);
 
             $('body').append(tooltip);

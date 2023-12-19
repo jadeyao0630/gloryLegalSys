@@ -16,7 +16,7 @@ const connection = mysql.createConnection({
     user:'glory',
     password:env.PASSWORD,
     database:env.DATABASE,
-    port:env.DB_PORT,
+    por:env.DB_PORT,
     connectTimeout:0,
     //ssl: true,
 });
@@ -139,7 +139,7 @@ class DbService{
         try{
             const response = await new Promise((resolve,reject)=>{
                 const query = "SELECT * FROM "+columnData.tablename+
-                    (columnData.conditions!=undefined?+" "+columnData.conditions:"")+(columnData.orderBy!=undefined?" "+columnData.orderBy:"");
+                    (columnData.conditions!=undefined?" "+columnData.conditions:"")+(columnData.orderBy!=undefined?" "+columnData.orderBy:"");
                 connection.query(query, (err,results)=>{
                     if (err) reject(new Error(err.message+"--"+query));
                     resolve(results);
@@ -507,6 +507,7 @@ class DbService{
         }
     }
     async update(where,table,value){
+        var error_mesg;
         try{
             var query;
             const response = await new Promise((resolve,reject)=>{
@@ -520,21 +521,27 @@ class DbService{
                 }
                 query = `UPDATE `+table+` SET `+value+` WHERE `+where;
                 connection.query(query, (err,result)=>{
-                    if (err) reject(new Error(err.message));
+                    if (err) {
+                        reject(new Error(err.message));
+                        error_mesg=err;
+                    }
+
+                        resolve(result);
+                    
                     //console.log(result);
-                    resolve(result);
                 });
             });
             
             //console.log("typeof: "+(typeof response));
             return {
                 data: response,
-                query:query
+                query:query,
+                success:true
             };
         }catch(error){
             console.log(error);
             return{
-                data:error
+                data:error_mesg,success:false,state:'error'
             }
         }
     }

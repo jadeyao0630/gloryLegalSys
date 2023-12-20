@@ -1351,7 +1351,7 @@ $.fn.extend({
                 _self.find('#'+id+"_1").val('');
                 _self.find("#_"+id).text(value);
             }else if(type=="date"||type=="datetime"||type=="time")  {
-                
+                console.log('Date mform',value);
                 if(value!='0000-00-00 00:00:00' && value!='0000-00-00' && value!='00:00:00'){
                     if(value=="") value=new Date();
                     //console.log("form date",formatDateTime(new Date(value),"yyyy-MM-dd"),getDateTime(value));

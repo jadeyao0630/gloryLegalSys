@@ -12,9 +12,9 @@ const addBut = document.getElementById("addBut");
 const nameInput = document.getElementById("user");
 const passInput = document.getElementById("password");
 $('#loadingLogo').attr('src',logoSrc)
-//console.log(sessionStorage.getItem("currentUser"),sessionStorage.getItem("currentUser").name!=undefined);
+//console.log(getGlobalJson("currentUser"),getGlobalJson("currentUser").name!=undefined);
 try{
-    if(JSON.parse(sessionStorage.getItem("currentUser")).name!=undefined){
+    if(getGlobalJson("currentUser")!=undefined && getGlobalJson("currentUser").name!=undefined){
         window.location.href = mainPage;
     }
 }catch(e){

@@ -66,6 +66,9 @@ mform.prototype={
         //_self.instance.find('select').parent().css("overflow", "auto");
         //_self.instance.trigger('create');
         _self.instance.find('select').parent().addClass('select-overflow');
+        if(template.settings.hasOwnProperty('isMini')){
+            _self.instance.addClass('smlFontForm')
+        }
         $.mobile.document
             .on("pagecreate", function () {
                 /*
@@ -185,6 +188,8 @@ mform.prototype={
                         }
                         if(template.settings.hasOwnProperty('isMini')){
                             if(_self.elements[item_key]!=undefined) _self.elements[item_key].jqmData('mini',template.settings.isMini);
+                            _self.elements[item_key].addClass('smlele');
+
                         }
                         
                         if(item.hasOwnProperty('span')){
@@ -197,7 +202,6 @@ mform.prototype={
                         if(item.isAdminOnly){
                             item_container.addClass('admin-ui');
                         }
-                        
                         var replacement=replacementOfInput(item_key);
                         item_container.append(replacement);
                         replacement.hide();
@@ -546,6 +550,7 @@ mform.prototype={
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(selectItem);
             item_container.append(subContainer);
+            selectItem.addClass('smlele')
             //selectItem.selectmenu().selectmenu('refresh');
             return selectItem;
             //return item_container;
@@ -807,6 +812,7 @@ mform.prototype={
         }
         $.mobile.document
             .on("pagecreate", function () {
+                $(".smlFontForm .ui-select.ui-mini").selectmenu().selectmenu("widget").addClass("ui-mini");
                 $(".supermultiInput").selectmenu({
                     create: function (event, ui) {
                         

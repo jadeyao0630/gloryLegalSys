@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+﻿const mysql = require('mysql');
 const dotenv = require('dotenv');
 const ftp = require("basic-ftp");
 const path = require("path");
@@ -13,7 +13,7 @@ dotenv.config({
 
 const connection = mysql.createConnection({
     host: env.HOST,
-    user:'glory',
+    user:'root',
     password:env.PASSWORD,
     database:env.DATABASE,
     por:env.DB_PORT,

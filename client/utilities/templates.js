@@ -957,7 +957,8 @@ var _summary_template;
       isCollapsibleGrouping:false,
       gridStyle:{'row-gap':"5px"},
       labelStyle:{'text-align': 'right','padding-right':"15px",'min-width':'100px'},
-      isMini:true
+      isMini:true,
+      itemHeight:15,
     },
     template:{
       caseLabel_f:{

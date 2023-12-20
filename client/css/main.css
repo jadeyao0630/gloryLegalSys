@@ -172,13 +172,48 @@ ui-collapsible.collapsible-listview .ui-btn{
     margin-right: 10px;
     cursor: pointer;
 }
+.smlFontForm{
+    font-size: 10px;
+}
+.smlFontForm label{
+    font-size: 10px;
+}
+.smlFontForm .ui-input-text{
+    font-size: 10px;
+    height:26px;
+}
+.smlFontForm .ui-input-text input{
+    line-height: 18px;
+}
 
+.smlFontForm .ui-select.ui-mini{
+    font-size: 10px;
+  }
+.smlFontForm .ui-controlgroup{
+    font-size: 10px;
+  }
+  .smlFontForm a::after{
+    height:14px;
+    width:14px;
+    background-size: 10px;
+    margin-top:-6px;
+  }
+  .smlFontForm button::after{
+    height:14px;
+    width:14px;
+    background-size: 10px;
+    margin-top:-6px;
+  }
+  .ui-selectmenu.ui-mini a{
+    font-size: 10px; /* Change the font size to your desired value */
+  }
 #main-header{
     overflow:hidden;
     background: white;
     color:#333;
     text-shadow: none;
     border:none;
+    border-bottom: 2px solid orangered;
 }
 #main-header .header-search-container{
     margin-right:10px;
@@ -323,6 +358,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     padding:5px 0px;
     background: white;
     color:#333;
+    border-right:1px solid lightgray
 }
 #mainFooter{
     height:50px;

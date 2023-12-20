@@ -308,13 +308,16 @@ $.fn.extend({
             message:messages,
             content:$('<input type="password" data-theme="a" value="" placeholder="请输入密码">')
         },function(go,form){
-            if(encrypt($(form).find('input').val())==getGlobalJson("currentUser").pass){
-                console.log("登陆成功。。")
-                response({success:true});
-            }else{
-
-                response({success:false});
+            if(go){
+                if(encrypt($(form).find('input').val())==getGlobalJson("currentUser").pass){
+                    console.log("登陆成功。。")
+                    response({success:true});
+                }else{
+    
+                    response({success:false});
+                }
             }
+            
         });
     },
     requestPassword:function(response,messages){

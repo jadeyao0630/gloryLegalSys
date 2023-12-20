@@ -100,7 +100,7 @@ $('#popupMenu').find('a').on('click',function(e){
             break;
         case '退出':
             //goToPage( $(this).attr( "href" ));
-            setGlobal("currentUser",undefined);
+            setGlobalJson("currentUser",{});
             window.location.href = 'index.html';
             break;
     }

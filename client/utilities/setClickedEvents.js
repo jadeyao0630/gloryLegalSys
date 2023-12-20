@@ -442,7 +442,19 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                         case '查看':
                             var itemData=getDataById(DataList[data.type],data.key,data.id);
                             console.log('查看',data,itemData);
-                            downloadFile(itemData.id,itemData.filePath);
+                            //downloadFile(itemData.id,itemData.filePath);
+                            //"http://"+ip+":"+port+"/downloadLocal?fileName="+data,itemData+"&folder="+itemData.id;
+                            var container=$('<div style="width:100%;height:100%;"></div>');
+                            //$('#preview_container').append(container);
+                            $('#preview_container').empty();
+                              var url="http://"+ip+":"+port+"/preview?fileName="+itemData.filePath+"&folder="+itemData.id;
+                              const embedTag = `<embed src="${url}" type="application/pdf" width="100%" height="600px" />`;
+                              var frame=$("<iframe src='"+url+"' style='width:100%;height:100%;'></iframe>")
+
+                              $('#preview_container').append(frame);
+                            goToPage('#progress_file_preview');
+                            //var media=$('<embed  class="media" src="'+"http://"+ip+":"+port+"/preview?fileName="+itemData.filePath+"&folder="+itemData.id+'"></a>');
+
                             break;
                         case '编辑':
                             //console.log(data.id,data.type,data.key,typeName)

@@ -380,7 +380,7 @@ mform.prototype={
             var input=$('<input type="'+type+'" class="form-original" name="'+id+'_1" id="'+id+'_0"'+placeholders[0]+'" value="" '+setRequired(item.isOptional,"此项必须填写")+'>');
             var subContainer=$('<div class="form-original" style="display:grid;grid-template-columns: 1fr auto 1fr;grid-gap:0px;"></div>');
             subContainer.append(input);
-            var dash=$('<label style="text-align: center;min-width:50px;"> 到 </label>');
+            var dash=$('<label style="text-align: center;min-width:40px;"> 到 </label>');
             subContainer.append(dash);
             input=$('<input type="'+type+'" class="form-original" name="'+id+'_1" id="'+id+'_1"'+placeholders[1]+'" value="" '+setRequired(item.isOptional,"此项必须填写")+'>');
             subContainer.append(input);
@@ -812,7 +812,7 @@ mform.prototype={
         }
         $.mobile.document
             .on("pagecreate", function () {
-                $(".smlFontForm .ui-select.ui-mini").selectmenu().selectmenu("widget").addClass("ui-mini");
+                //$(".smlFontForm .ui-select.ui-mini").selectmenu().selectmenu("widget").addClass("ui-mini");
                 $(".supermultiInput").selectmenu({
                     create: function (event, ui) {
                         
@@ -1589,11 +1589,11 @@ $.fn.extend({
                                 hasError=true;
                             }else{
                                 if(element.type.toLowerCase()=="datetime")
-                                    val=formatDateTimeStr2Mysql('0000-00-00 00:00:00');
+                                    val='0000-00-00 00:00:00';
                                 else if(element.type.toLowerCase()=="date")
-                                    val=formatDateTimeStr2Mysql('0000-00-00');
+                                    val='0000-00-00';
                                 else if(element.type.toLowerCase()=="time")
-                                    val=formatDateTimeStr2Mysql('00:00:00');
+                                    val='00:00:00';
                             }
                         }
                         //console.log('Date mform getvalue',val);

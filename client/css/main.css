@@ -1,3 +1,119 @@
+:root{
+    --mfont:10px;
+    --iconSize:14px;
+    --iconMargin:-7px;
+    --inputHeight:26px;
+    --inputLineHeight:18px;
+    --HeaderFooterHeight:34px;
+}
+.ui-page, .ui-header, .ui-content, .ui-footer, .ui-btn, .ui-title, .ui-select, .ui-controlgroup, .ui-controlgroup-controls, .ui-li-divider .ui-li-count{
+    font-size: var(--mfont); /* Set the desired font size */
+  }
+  .ui-listview > .ui-li-divider{
+    font-size: var(--mfont);
+  }
+  .ui-header-fixed, .ui-footer-fixed{
+    height:var(--HeaderFooterHeight);
+    line-height: calc( var(--HeaderFooterHeight) / 2 );
+  }
+  .ui-header .ui-btn, .ui-header .ui-btn-left, .ui-footer .ui-btn, .ui-mini .ui-btn{
+    font-size: var(--mfont);
+  }
+  .ui-btn-icon-notext{
+    font-size: var(--mfont);
+    width:var(--iconSize);
+    height:var(--iconSize);
+  }
+  .ui-btn-icon-notext::after{
+    left:50%;
+    top:50%;
+    margin-left: var(--iconMargin);
+    margin-top: var(--iconMargin);
+  }
+  a::after, button::after{
+    background-size: var(--mfont) !important;
+    width:var(--iconSize);
+    height:var(--iconSize);
+    margin-top: var(--iconMargin);
+  }
+  a, button{
+    font-size: var(--mfont);
+  }
+  .ui-btn-icon-notext::after, .ui-btn-icon-left::after, .ui-btn-icon-right::after, .ui-btn.ui-checkbox-off::after, .ui-btn.ui-checkbox-on::after {
+    top: 50%;
+    margin-top: var(--iconMargin);
+    background-size: var(--mfont) !important;
+    width:var(--iconSize);
+    height:var(--iconSize);
+  }
+
+.ui-mobile label{
+    font-size: var(--mfont);
+}
+.ui-input-text{
+    font-size: var(--mfont);
+    height: var(--inputHeight);
+}
+.ui-input-text input, .ui-input-search input{
+    line-height: var(--inputLineHeight);
+}
+.ui-checkbox input{
+    width:var(--iconSize);
+    height:var(--iconSize);
+    margin-top:  var(--iconMargin);
+}
+.tooltip-serarch {
+    visibility: hidden;
+    font-size: var(--mfont);
+    min-width: 120px;
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+
+    top: 50%;
+    left: -45%;
+    margin-left: 60px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+  }
+.ui-tooltip{
+    visibility: hidden;
+    font-size: var(--mfont);
+    background-color: #000;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    position: absolute;
+    margin-top: 10px;
+    top: 50%;
+    left: -45%;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1000;
+    text-shadow: none;
+}
+#username{
+    text-align: right;
+    margin-right: 0px;
+    font-size: var(--mfont);
+}
+#mainFooter .ui-controlgroup {
+    margin-top:0px;
+}
+#main-header{
+    overflow:hidden;
+    background: white;
+    color:#333;
+    text-shadow: none;
+    border:none;
+    border-bottom: 2px solid orangered;
+    height:80px;
+}
 #main_nav ul li button{
     vertical-align: middle;
     text-align: center;
@@ -48,15 +164,7 @@
 .hide{
     display: none;
 }
-#username{
-    text-align: right;
-    margin-right: 20px;
-    margin-top: 8px;
-    line-height: 15px;
-    height: 15px;
-    min-width: 40px;
-    font-size: 16px;
-}
+
 #main-container{
     position: fixed;
     top:0;
@@ -172,41 +280,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     margin-right: 10px;
     cursor: pointer;
 }
-.smlFontForm{
-    font-size: 10px;
-}
-.smlFontForm label{
-    font-size: 10px;
-}
-.smlFontForm .ui-input-text{
-    font-size: 10px;
-    height:26px;
-}
-.smlFontForm .ui-input-text input{
-    line-height: 18px;
-}
 
-.smlFontForm .ui-select.ui-mini{
-    font-size: 10px;
-  }
-.smlFontForm .ui-controlgroup{
-    font-size: 10px;
-  }
-  .smlFontForm a::after{
-    height:14px;
-    width:14px;
-    background-size: 10px;
-    margin-top:-6px;
-  }
-  .smlFontForm button::after{
-    height:14px;
-    width:14px;
-    background-size: 10px;
-    margin-top:-6px;
-  }
-  .ui-selectmenu.ui-mini a{
-    font-size: 10px; /* Change the font size to your desired value */
-  }
 #main-header{
     overflow:hidden;
     background: white;
@@ -228,54 +302,13 @@ ui-collapsible.collapsible-listview .ui-btn{
     position: absolute;
     top: 15px; 
 }
-.header-btn-search{
-    color:gray;
-    font-size: 25px;
-}
-.header-btn-search:hover{
-    cursor: pointer;
-    color:#333;
-}
 
 .header-search-container {
     position: relative;
     display: inline-block;
   }
 
-.tooltip-serarch {
-    visibility: hidden;
-    min-width: 120px;
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 0;
-    position: absolute;
 
-    top: 50%;
-    left: -45%;
-    margin-left: 60px;
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 1000;
-  }
-.ui-tooltip{
-    visibility: hidden;
-    
-    background-color: #000;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 10px;
-    position: absolute;
-    margin-top: 10px;
-    top: 50%;
-    left: -45%;
-    opacity: 0;
-    transition: opacity 0.3s;
-    z-index: 1000;
-    text-shadow: none;
-}
 .btn-tooltip{
 
 }
@@ -327,7 +360,7 @@ ui-collapsible.collapsible-listview .ui-btn{
 #pageOneTable tbody tr td{
     text-align: center;
     vertical-align: middle;
-    max-width: 150px;
+    max-width: 160px;
     min-width: 25px;
     border-right: 1px solid rgba(0,0,0,.05);
     padding:5px 7px 0px 0px;
@@ -347,6 +380,9 @@ ui-collapsible.collapsible-listview .ui-btn{
     color:#333;
     text-shadow: none;
     width: 100%;
+    border-top: 2px solid orangered;
+    padding:5px 0px;
+    min-width: 25px;
 }
 #pageOneTable-fixed th{
 
@@ -359,9 +395,6 @@ ui-collapsible.collapsible-listview .ui-btn{
     background: white;
     color:#333;
     border-right:1px solid lightgray
-}
-#mainFooter{
-    height:50px;
 }
 .table-regularFont{
     font-size: 12px;
@@ -463,13 +496,6 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 .table-smallFont label.ui-checkbox-off.ui-btn-icon-left{
     padding-left: 3em;
-}
-#header-search-input{
-    padding-left: 5px;
-}
-.ui-input-search::after{
-    width:0px;
-    background-image: url("data:image/svg+xml;charset=US-ASCII,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22iso-8859-1%22%3F%3E%3C!DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%3Csvg%20version%3D%221.1%22%20id%3D%22Layer_1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%20x%3D%220px%22%20y%3D%220px%22%20%20width%3D%2214px%22%20height%3D%2214px%22%20viewBox%3D%220%200%2014%2014%22%20style%3D%22enable-background%3Anew%200%200%2014%2014%3B%22%20xml%3Aspace%3D%22preserve%22%3E%3Cpath%20style%3D%22fill%3A%23FFFFFF%3B%22%20d%3D%22M7%2C2C3%2C2%2C0%2C7%2C0%2C7s3%2C5%2C7%2C5s7-5%2C7-5S11%2C2%2C7%2C2z%20M7%2C10c-1.657%2C0-3-1.344-3-3c0-1.657%2C1.343-3%2C3-3%20s3%2C1.343%2C3%2C3C10%2C8.656%2C8.657%2C10%2C7%2C10z%20M7%2C6C6.448%2C6%2C6%2C6.447%2C6%2C7c0%2C0.553%2C0.448%2C1%2C1%2C1s1-0.447%2C1-1C8%2C6.447%2C7.552%2C6%2C7%2C6z%22%2F%3E%3C%2Fsvg%3E");
 }
 .item-inActived{
     color:white;

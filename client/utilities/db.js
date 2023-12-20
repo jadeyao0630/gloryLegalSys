@@ -3,6 +3,7 @@ var headers={
 };
 async function downloadFile(folder,fileName){
     window.location = "http://"+ip+":"+port+"/downloadLocal?fileName="+fileName+"&folder="+folder;
+    //console.log("http://"+ip+":"+port+"/downloadLocal?fileName="+fileName+"&folder="+folder);
 }
 async function uploadFiles(folder,files){
     var results=[];

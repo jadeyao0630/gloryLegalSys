@@ -953,10 +953,10 @@ var _summary_template;
       hasLabel:true,
       hasPlaceHolder:true,
       labelPosition:"left",
-      templateColumn:"25% 25% 25% 25%",
+      templateColumn:"20% 20% 20% 20% 20%",
       isCollapsibleGrouping:false,
-      gridStyle:{'row-gap':"5px"},
-      labelStyle:{'text-align': 'right','padding-right':"15px",'min-width':'100px'},
+      gridStyle:{'row-gap':"3px"},
+      labelStyle:{'text-align': 'right','padding-right':"15px",'min-width':'60px'},
       isMini:true,
       itemHeight:15,
     },
@@ -1036,20 +1036,29 @@ var _summary_template;
           type:"multicombobox", 
           isOptional:true,
         },
-        penalty_f:{
-          label:"判决金额(万):",
-          type:"textrange", 
-          isOptional:true,
-      },
-      caseDate_f:{
-          label:"立案日期:",
-          type:"textrange",
-          subType:"date",
-          isOptional:true,
-      },
       isInactived_f:{
-
+        label:"文档状态:",
+        type:"multicombobox",
+        data:['正常','删除'],
+        isOptional:true,
+        isAdminOnly:true,
       },
+      
+      penalty_f:{
+        label:"判决金额(万):",
+        type:"textrange", 
+        isOptional:true,
+        
+        span:'1/2'
+    },
+    caseDate_f:{
+        label:"立案日期:",
+        type:"textrange",
+        subType:"date",
+        isOptional:true,
+        
+        span:'2/3'
+    },
       cutom:{
         type:"custom",
         data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
@@ -1057,7 +1066,7 @@ var _summary_template;
         '<button class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left header-filter-btn">复位</button>'+
         '</div>',
         
-        span:'4/4'
+        span:'5/5'
     },
     }
   }

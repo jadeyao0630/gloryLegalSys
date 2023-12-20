@@ -95,6 +95,12 @@ app.get('/downloadLocal', (req, res) => {
     }
   });
 });
+app.get('/preview', async (req, res) => {
+  const fileName = decodeURIComponent(req.query.fileName);
+  const folder = req.query.folder;
+  //const filePath = 'uploads/国瑞信息软件表.xlsx';
+  res.sendFile(path.join(env.UPLOADS_PATH,folder,fileName));
+});
   app.get('/download', async (req, res) => {
     const client = new _ftp();
     const remoteFilePath = '/Downloads/1.xlsx';

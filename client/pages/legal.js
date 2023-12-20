@@ -7,11 +7,30 @@ setting_info_form,
 setting_add_form;
 var currentData;
 var fancyTable;
+var slidedownOffset=0;
+var tableFunBtns='<div data-role="controlgroup" style="max-width:120px;" data-type="horizontal" data-mini="true">'+
+'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>查看</a>'+
+'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue btn-tooltip" data-icon="edit" data-iconpos="notext" data-tooltip="案件编辑修改" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>修改</button>'+
+'<button name="fn_btn_update" class="btn-icon-red btn-tooltip" data-icon="calendar" data-iconpos="notext" data-tooltip="更新案件进展" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>更新</button>'+
+'</div>';
 //getGlobal("currentId")
 //getGlobal("currentUser")
 
 //document.body.style.fontSize = "16px";
-
+function setFontSize(){
+    document.documentElement.style.setProperty('--mfont', 14 + "px");
+    document.documentElement.style.setProperty('--iconSize', 20 + "px");
+    document.documentElement.style.setProperty('--iconMargin', -10 + "px");
+    document.documentElement.style.setProperty('--inputHeight', 36 + "px");
+    document.documentElement.style.setProperty('--inputLineHeight', 26 + "px");
+    document.documentElement.style.setProperty('--HeaderFooterHeight', 44 + "px");
+    slidedownOffset=40;
+    tableFunBtns='<div data-role="controlgroup" style="min-width:160px;" data-type="horizontal" data-mini="true">'+
+    '<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>查看</a>'+
+    '<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue btn-tooltip" data-icon="edit" data-iconpos="notext" data-tooltip="案件编辑修改" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>修改</button>'+
+    '<button name="fn_btn_update" class="btn-icon-red btn-tooltip" data-icon="calendar" data-iconpos="notext" data-tooltip="更新案件进展" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>更新</button>'+
+    '</div>';
+}
 $('body').on(main_load_completed_event_name,function(){
     const intervalId = setInterval(() => {
         if (pageOnTable!=undefined) {
@@ -23,29 +42,34 @@ $('body').on(main_load_completed_event_name,function(){
             
             setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
             
-            resizeTables();
             //resizeTables();
-            resizeColumnFilter();
+            //resizeTables();
+            //resizeColumnFilter();
             //$('#header-filter-container').trigger('create')
             
             $().mloader("hide");
             $('#mainFooter').show();
+            
+            
+            
+            
         }
     }, 100);
 });
 $('body').on(preload_completed_event_name,function(){
 
     
+    //setFontSize();
     
 
     databaseBatchForm();
     //console.log('resourceDatas',getGlobalJson('resourceDatas'));
-    var tb=$('.header-search-container').togglebuttonicon(form,function(e,isbefore){
+    var tb=$('.header-btn-search').togglebuttonicon(form,function(e,isbefore){
         if(e){
             if(isbefore){
                 form.slideDown();
                 //form.animate({'height':"200px"});
-                $('#pageOneTable').animate({'margin-top':"198px"})
+                $('#pageOneTable').animate({'margin-top':139+slidedownOffset+"px"})
             }
         }else{
             //$('#header-filter-container').empty();
@@ -66,13 +90,6 @@ $('body').on(preload_completed_event_name,function(){
     }else if(getGlobalJson('currentUser').level==adminLevel){
         //$('#case_reg_but_restore').show();
         $('.admin-ui').show();
-        header_filter_template.template['isInactived_f']={
-            label:"文档状态:",
-            type:"multicombobox",
-            data:['正常','删除'],
-            isOptional:true,
-            span:'3/3'
-        }
     }
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
     setVisibleColumnToTemplate();
@@ -81,11 +98,7 @@ $('body').on(preload_completed_event_name,function(){
 		template:_firstPageTableColumns,
 		//data:DataList.combinedData,
 		//filterParent:"mainFooter",
-		rowButtons:'<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
-			'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>查看</a>'+
-			'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue btn-tooltip" data-icon="edit" data-iconpos="notext" data-tooltip="案件编辑修改" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>修改</button>'+
-			'<button name="fn_btn_update" class="btn-icon-red btn-tooltip" data-icon="calendar" data-iconpos="notext" data-tooltip="更新案件进展" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>更新</button>'+
-		'</div>'
+		rowButtons:tableFunBtns
 	});
 
     $("#pageOneTable").on('sort',function(columnData){
@@ -390,8 +403,8 @@ $(window).on('hidepopup',function(e){
 })
 $(window).resize(function(e){
     //console.log('高度',window.innerHeight,'宽度',window.innerWidth)
-    resizeTables();
-    resizeColumnFilter();
+    //resizeTables();
+    //resizeColumnFilter();
 });
 $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
     $('#pageOneTable').filterable({

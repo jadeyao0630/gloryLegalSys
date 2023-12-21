@@ -30,6 +30,10 @@ const CryptoJS = require('crypto-js')
 const keyStr = 'it@glory.com'
 const ivStr = 'it@glory.com'
 
+function encryptMD5(data) {
+  return CryptoJS.MD5(data).toString();
+}
+
 function encrypt(data, keyS, ivS) {
   let key = keyS || keyStr
   let iv = ivS || ivStr
@@ -146,7 +150,7 @@ app.get('/preview', async (req, res) => {
       const file = req.files.file;
       const extension=file.name.split('.').pop();
       const filename=file.name.replace('.'+extension,'');
-      const encryptedFileName=encrypt(new Date().getTime()+filename)+"."+extension;
+      const encryptedFileName=encryptMD5(new Date().getTime()+filename)+"."+extension;
       const folder=req.body.folder;
       const  db= DbService.getDbServiceInstance();
       const result = db.uploadFileL(env.UPLOADS_PATH,folder,file,encryptedFileName);

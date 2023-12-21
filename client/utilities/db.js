@@ -257,6 +257,22 @@ async function insertCase(data,template,res){
         if(res!=undefined)res(data.data);
     });
 }
+async function pureinsert(table,data,res){
+    await fetch("http://"+ip+":"+port+"/pureinsert",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ table: table, data:data})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.data.success){
+            console.log(data.data.id);
+        }else{
+            console.log(data.data.error);
+        }
+        if(res!=undefined)res(data.data);
+    });
+}
 async function insert(table,data,res){
     await fetch("http://"+ip+":"+port+"/insert",{
         headers:headers,

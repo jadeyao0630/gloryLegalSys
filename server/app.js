@@ -7,21 +7,21 @@ const $ = require("jquery");
 
 const bodyParser = require('body-parser');
 const formidable = require('formidable');
-const busboy = require('busboy');
-const multer = require('multer');
+//const busboy = require('busboy');
+//const multer = require('multer');
 const ftp = require("basic-ftp");
 const fs = require("fs");
 
 const _ftp = require('ftp');
 
-var iconv = require('iconv-lite');
+//var iconv = require('iconv-lite');
 
 const path = require('path');
 const { env } = process;
 dotenv.config({
     path: path.resolve(
         __dirname,
-        `./env.${env.NODE_ENV ? env.NODE_ENV : "local"}`
+        `./env.${env.NODE_ENV ? env.NODE_ENV : "home"}`
       ),
 });
 
@@ -29,6 +29,7 @@ const CryptoJS = require('crypto-js')
 
 const keyStr = 'it@glory.com'
 const ivStr = 'it@glory.com'
+const oaKey="it@glory.com"
 
 function encryptMD5(data) {
   return CryptoJS.MD5(data).toString();
@@ -85,6 +86,23 @@ app.use(fileUpload({
 //app.use(express.urlencoded({extended:false}));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+
+
+app.get('/fetch-docx', (req, res) => {
+  const fileName = decodeURIComponent(req.query.fileName);
+  const folder = req.query.folder;
+  const file = path.join(env.UPLOADS_PATH,folder,fileName); // Replace with the actual path to your .docx file
+  const stat = fs.statSync(file);
+
+  res.writeHead(200, {
+    'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'Content-Length': stat.size
+  });
+
+  const readStream = fs.createReadStream(file);
+  readStream.pipe(res);
+});
+
 app.get('/downloadLocal', (req, res) => {
   const fileName = decodeURIComponent(req.query.fileName);
   const folder = req.query.folder;
@@ -426,6 +444,22 @@ app.post('/login',(request,response) => {
     result
     .then(data => response.json({data:data}) )
     .catch(err => console.log(err));
+});
+app.get('/oalogin',(request,response) => {
+  //console.log("request.body "+request.header('Content-Type'));
+  const user = request.query.user;
+  const token = request.query.token;
+  console.log(encrypt(oaKey));
+  if(encrypt(oaKey)!=token) {
+    response.json({data:{success:false,message:'not auth'}});
+    
+    return;
+  }
+  const  db= DbService.getDbServiceInstance();
+  const result = db.oalogin(user);
+  result
+  .then(data => response.json({data:data}) )
+  .catch(err => console.log(err));
 });
 
 // update

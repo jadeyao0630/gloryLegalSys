@@ -439,7 +439,7 @@ ProgressesButton.prototype.MoveTo=async function(index,duration){
 ProgressesButton.prototype.getPointByIndex=function(index){//这里牵扯到分离点，就这个案例只有一个，如果有多个可能需要改进
     var _this=this;
     if(index==-1) index=0;
-    console.log(index,_this.pointMap);
+    //console.log(index,_this.pointMap);
     if(index>=_this.breakpoint+1||index<_this.breakpoint) index=formatIndex(index).main;
     else{
         index=formatIndex(index).main+(_this.opt.showSubSteps?formatIndex(index).sub/10:0);

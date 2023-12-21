@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    
+	<script src="./utilities/db.js"></script>
+</head>
+<body>
+    <script>
+        const searchParams = new URLSearchParams(window.location.search);
+        if(searchParams.has('user') && searchParams.has('token')){
+            var ip='localhost'
+            var port=5555;
+            //console.log(searchParams.get('user'),searchParams.get('token')); // true
+            fetch("http://"+ip+":"+port+"/oalogin?user="+searchParams.get('user')+"&token="+searchParams.get('token'),{
+                headers:headers,
+                method: 'GET',
+            })
+            .then(response => response.json())
+            .then(data => {
+                
+                console.log(data.data.data);
+                if(data.data.data.name!=undefined){
+                    sessionStorage.setItem("currentUser", JSON.stringify(data.data.data));
+                    window.location.href = 'legal.html';
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -600,7 +600,7 @@ function getFormatString(template,item){
     var text="";
     if(settings.hasOwnProperty('displayFormat')){
         var format=settings.displayFormat;
-        console.log('getFormatString',item);
+        //console.log('getFormatString',item);
         $.each(item,(k,v)=>{
             if(_template.hasOwnProperty(k) && _template[k].hasOwnProperty('data')){
                 _template[k].data.forEach((data,index)=>{

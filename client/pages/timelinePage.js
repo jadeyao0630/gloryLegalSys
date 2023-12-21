@@ -477,7 +477,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             })
                             //console.log(displayFormat);
                             var li=$('<li class="ui-field-contain" style="word-wrap: break-word;white-space : normal"></li>');
-                            console.log(attachment.caseStatus,attchmentEventData,icon);
+                            //console.log(attachment.caseStatus,attchmentEventData,icon);
 
                             var label_ele=$('<label>'+attachment.caseStatus+'</label>');
                             

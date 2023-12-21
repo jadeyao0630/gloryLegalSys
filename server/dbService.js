@@ -1,51 +1,9 @@
-﻿const mysql = require('mysql');
-const dotenv = require('dotenv');
-const ftp = require("basic-ftp");
+﻿const ftp = require("basic-ftp");
 const path = require("path");
 let instance = null;
-const { env } = process;
-dotenv.config({
-    path: path.resolve(
-        __dirname,
-        `./env.${env.NODE_ENV ? env.NODE_ENV : "local"}`
-      ),
-});
 
-//const connection = disconnect_handler();
-function disconnect_handler() {
-    let conn = mysql.createConnection({
-        host: env.HOST,
-        user:env.USER,
-        password:env.PASSWORD,
-        database:env.DATABASE,
-        por:env.DB_PORT,
-        connectTimeout:0,
-        //ssl: true,
-    });
-     conn.connect(err => {
-        console.log(err);
-         (err) && setTimeout(disconnect_handler, 2000);
-     });
- 
-     conn.on('error', err => {
-         if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-             // db error 重新連線
-             disconnect_handler();
-         } else {
-             throw err;
-         }
-     });
-     return conn;
- }
- /*
-connection.connect((err)=>{
+const mquery = require('./mysqlQuery.js');
 
-    if(err){
-        console.log(err.message);
-    }
-    console.log('db '+ connection.state);
-});
-*/
 class DbService{
     static getDbServiceInstance(){
         return instance ? instance : new DbService();
@@ -155,12 +113,11 @@ class DbService{
     }
     //#region 选择
     async getBasic(columnData){
-        var conn=disconnect_handler();
         try{
             const response = await new Promise((resolve,reject)=>{
                 const query = "SELECT * FROM "+columnData.tablename+
                     (columnData.conditions!=undefined?" "+columnData.conditions:"")+(columnData.orderBy!=undefined?" "+columnData.orderBy:"");
-                    conn.query(query, (err,results)=>{
+                    mquery(query, (err,results)=>{
                     if (err) reject(new Error(err.message+"--"+query));
                     resolve(results);
                 });
@@ -171,13 +128,12 @@ class DbService{
         }catch (error){
             console.log(error);
         }
-        conn.release();
     }
     async getAllData(){
         try{
             const response = await new Promise((resolve,reject)=>{
                 const query = "SELECT * FROM names";
-                disconnect_handler().query(query, (err,results)=>{
+                mquery(query, (err,results)=>{
                     if (err) reject(new Error(err.message));
                     resolve(results);
                 });
@@ -190,9 +146,10 @@ class DbService{
         }
     }
     async select(query){
+        
         try{
             const response = await new Promise((resolve,reject)=>{
-                disconnect_handler().query(query, (err,results)=>{
+                mquery(query, (err,results)=>{
                     if (err) reject(new Error(err.message));
                     resolve(results);
                 });
@@ -238,7 +195,7 @@ class DbService{
             //console.log(values);
             const response = await new Promise((resolve,reject)=>{
                 const query = "CREATE TABLE "+table+" ("+values.join()+");";
-                disconnect_handler().query(query, (err,result)=>{
+                mquery(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result.insertId);
                     resolve(result);
@@ -264,7 +221,7 @@ class DbService{
             
             const insertId = await new Promise((resolve,reject)=>{
 
-                disconnect_handler().query(query, (err,result)=>{
+                mquery(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     resolve(result);
                 });
@@ -298,7 +255,7 @@ class DbService{
             const insertId = await new Promise((resolve,reject)=>{
                 const query = "REPLACE INTO "+table+" ("+keys.join()+") VALUES ("+_values.join()+");";
                 //console.log(query);
-                disconnect_handler().query(query,values, (err,result)=>{
+                mquery(query,values, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result.insertId);
                     resolve(result);
@@ -338,7 +295,7 @@ class DbService{
             var query="REPLACE INTO `"+table+"` ("+keys.join()+") VALUES "+queries.join();
             const insertId = await new Promise((resolve,reject)=>{
                 //console.log(query);
-                disconnect_handler().query(query, (err,result)=>{
+                mquery(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result.insertId);
                     resolve(result);
@@ -365,7 +322,7 @@ class DbService{
             const dateAdded = new Date();
             const insertId = await new Promise((resolve,reject)=>{
                 const query = "REPLACE INTO names (user,pass,position,level,createDate) VALUES (?, ?, ?, ?, ?);";
-                disconnect_handler().query(query,[user,pass,"1",4,dateAdded], (err,result)=>{
+                mquery(query,[user,pass,"1",4,dateAdded], (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result.insertId);
                     resolve(result);
@@ -397,7 +354,7 @@ class DbService{
             var query="INSERT INTO `"+table+"` ("+keys.join()+") VALUES "+"("+_values.join()+")";
             const insertId = await new Promise((resolve,reject)=>{
                 //console.log(query);
-                disconnect_handler().query(query, (err,result)=>{
+                mquery(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result.insertId);
                     resolve(result);
@@ -426,7 +383,7 @@ class DbService{
             const response = await new Promise((resolve,reject)=>{
                 //console.log(table);
                 const query = `DELETE FROM `+table+` WHERE \`id\` = ?;`;
-                disconnect_handler().query(query,id, (err,result)=>{
+                mquery(query,id, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -447,7 +404,7 @@ class DbService{
             const response = await new Promise((resolve,reject)=>{
                 //console.log(table);
                 const query = `DELETE FROM `+table+` WHERE \`id\` IN (`+ids.join()+`);`;
-                disconnect_handler().query(query, (err,result)=>{
+                mquery(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -468,7 +425,7 @@ class DbService{
             const response = await new Promise((resolve,reject)=>{
                 //console.log(table);
                 const query = `UPDATE caseStatus SET isInactived=`+isInactived+` WHERE \`id\` IN (`+ids.join()+`);`;
-                disconnect_handler().query(query, (err,result)=>{
+                mquery(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -488,7 +445,7 @@ class DbService{
         try{
             const response = await new Promise((resolve,reject)=>{
                 const query = `UPDATE `+table+` SET isInactived=`+isInactived+` WHERE `+where;
-                disconnect_handler().query(query, (err,result)=>{
+                mquery(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -511,7 +468,7 @@ class DbService{
             const response = await new Promise((resolve,reject)=>{
                 
                 query = `UPDATE names SET `+value+` WHERE `+where;
-                disconnect_handler().query(query, (err,result)=>{
+                mquery(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -541,7 +498,7 @@ class DbService{
                     value=vals.join();
                 }
                 query = `UPDATE `+table+` SET `+value+` WHERE `+where;
-                disconnect_handler().query(query, (err,result)=>{
+                mquery(query, (err,result)=>{
                     if (err) {
                         reject(new Error(err.message));
                         error_mesg=err;
@@ -572,7 +529,7 @@ class DbService{
         try{
             const response = await new Promise((resolve,reject)=>{
                 const query = `SELECT * FROM names WHERE user=? AND pass=?;`;
-                disconnect_handler().query(query,[name,pass], (err,result)=>{
+                mquery(query,[name,pass], (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -583,6 +540,26 @@ class DbService{
             return {
                 success : response.length>0,
                 data: JSON.stringify(response[0])
+            };
+        }catch(error){
+            console.log(error);
+        }
+    }
+    async oalogin(name){
+        try{
+            const response = await new Promise((resolve,reject)=>{
+                const query = `SELECT * FROM names WHERE user=?;`;
+                mquery(query,[name], (err,result)=>{
+                    if (err) reject(new Error(err.message));
+                    //console.log(result);
+                    resolve(result);
+                });
+            });
+            
+            //console.log("typeof: "+(typeof response));
+            return {
+                success : response.length>0,
+                data: response[0]
             };
         }catch(error){
             console.log(error);

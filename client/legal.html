@@ -23,6 +23,13 @@
     <script src="./js/crypto/enc-base64.js"></script>
     <script src="./js/crypto/cipher-core.js"></script>
     <script src="./js/crypto/aes.js"></script>
+	
+    <!--dependencies-->
+    <script crossorigin src="./js/jszip.min.js"></script>
+    <!--library-->
+    <script src="./js/docx-preview.js"></script>
+    <script src="./js/FileSaver.js"></script>
+    <script src="./utilities/excel-gen.js"></script>
     <script src="./js/fancyTable.js"></script>
 	<script src="./utilities/configs.js"></script>
     <script type="text/javascript" src="./utilities/tools.js"></script>
@@ -76,6 +83,7 @@
 				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
 					<a href="#casePage" id="case_reg_but_add" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn">新增</a>
 					<a href="#" id="case_reg_but_remove" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but">删除</a>
+					<button id="export_excel" class="btn-icon-blue btn-tooltip" data-icon="action" data-tooltip="案件编辑修改" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick="exportExcel()">导出</button>
 					<a href="#" id="case_reg_but_restore" class="ui-btn ui-btn-icon-left ui-icon-recycle btn-icon-blue case_reg_but admin-ui">还原</a>
 				</div>
 				<h1 id="footer_info_bar" class="footer-info-bar"></h1>

@@ -1,24 +1,62 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <title>Document Preview</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://unpkg.com/viewerjs@1.3.3/dist/viewer.min.js"></script>
-  <link href="https://unpkg.com/viewerjs@1.3.3/dist/viewer.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <script src="./js/jquery.js"></script>
+    <!--dependencies-->
+    <script crossorigin src="https://unpkg.com/jszip/dist/jszip.min.js"></script>
+    <!--library-->
+    <script src="./js/docx-preview.js"></script>
 </head>
-<body>
 
-  <div id="document-preview"></div>
+<body class="vh-100 d-flex flex-column">
 
-  <script>
-    var viewer = new Viewer(document.getElementById('document-preview'), {
-      inline: false,
-      viewed() {
-        viewer.view('http://192.168.10.68:5555/preview?fileName=52e7d2357f7a6dd77579236f771ad4fb.xlsx&folder=283');
-      },
-    });
-  </script>
+  <input id="files" type="file" class="form-control" style="width: 50ch;" accept=".docx,.pdf" />
+        <div id="document-container" class="overflow-auto flex-grow-1 h-100"></div>
+  
 
+    <script>
+      
+      const docxOptions = Object.assign(docx.defaultOptions, {
+            debug: true,
+            experimental: true
+        });
+        const fileInput = document.querySelector("#files");
+        const container = document.querySelector("#document-container");
+        function renderDocx(file) {
+            currentDocument = file; 
+            currentDocument = 'http://localhost:5555/fetch-docx?fileName=a9450c9527df6b51b0ea09c5f375f3e1.docx&folder=280'
+            if (!currentDocument) 
+                return;
+
+            docx.renderAsync(currentDocument, container, null, docxOptions)
+                .then((x) => {
+                    
+                    console.log(x);
+                });
+        }
+        fileInput.addEventListener("change", ev => {
+            renderDocx(fileInput.files[0]);
+        });
+
+
+        fetch('http://localhost:5555/fetch-docx?fileName=a9450c9527df6b51b0ea09c5f375f3e1.docx&folder=280') // Replace with the actual server URL
+  .then(response => response.blob())
+  .then(blob => {
+    // Handle the received Blob
+    console.log(blob);
+    // You can now use the 'blob' object as needed
+    docx.renderAsync(blob, container, null, docxOptions)
+                .then((x) => {
+                    
+                    console.log(x);
+                });
+  })
+  .catch(error => {
+    console.error('Error fetching the file:', error);
+  });
+    </script>
 </body>
+
 </html>

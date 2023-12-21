@@ -5,6 +5,22 @@ async function downloadFile(folder,fileName){
     window.location = "http://"+ip+":"+port+"/downloadLocal?fileName="+fileName+"&folder="+folder;
     //console.log("http://"+ip+":"+port+"/downloadLocal?fileName="+fileName+"&folder="+folder);
 }
+async function getDocxFile(folder,fileName){
+    const response = new Promise(async(resolve,reject)=>{
+        await fetch("http://"+ip+":"+port+"/fetch-docx?fileName="+fileName+"&folder="+folder) // Replace with the actual server URL
+        .then(res => res.blob())
+        .then(blob => {
+            // Handle the received Blob
+            console.log(blob);
+            resolve(blob);
+        })
+        .catch(error => {
+        console.error('Error fetching the file:', error);
+        });
+    });
+    return await response;
+}
+
 async function uploadFiles(folder,files){
     var results=[];
     $.each(files,(index,file)=>{

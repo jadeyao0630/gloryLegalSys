@@ -31,6 +31,19 @@ function setFontSize(){
     '<button name="fn_btn_update" class="btn-icon-red btn-tooltip" data-icon="calendar" data-iconpos="notext" data-tooltip="更新案件进展" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>更新</button>'+
     '</div>';
 }
+
+function exportExcel (tableId) {
+    $().mloader('show',{message:"导出中..."});
+    setTimeout(() => {
+        if(tableId==undefined) tableId='pageOneTable';
+        var excel = new ExcelGen({
+            "src_id": tableId,
+            "show_header": true
+        });
+        excel.generate();
+        $().mloader('hide');
+    },200);
+};
 $('body').on(main_load_completed_event_name,function(){
     const intervalId = setInterval(() => {
         if (pageOnTable!=undefined) {

@@ -376,6 +376,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                             item_container=$('<li style="padding:0px;" data-item=\''+JSON.stringify(item)+'\'></li>');
                             var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
                             var view_btn=$('<a href="#" class="ui-btn ui-icon-eye ui-btn-icon-notext btn-icon-green view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">查看</a>')
+                            console.log('preview',"http://"+ip+':'+port+'/downloadLocal?fileName='+itemData.filePath+'&folder='+itemData.id);
                             if(!attachmentData.previewable)
                                 view_btn=$('<a href="http://'+ip+':'+port+'/downloadLocal?fileName='+itemData.filePath+'&folder='+itemData.id+'" class="ui-btn ui-icon-action ui-btn-icon-notext btn-icon-blue view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">下载</a>')
                             del_btn=$('<a href="#" class="ui-btn ui-icon-delete ui-btn-icon-notext btn-icon-red view-list-button" style="padding:10px 5px;border: none;">删除</a>')
@@ -430,25 +431,50 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                                 var container=$('<div style="width:100%;height:100%;"></div>');
                                 //$('#preview_container').append(container);
                                 $('#preview_container').empty();
-                                var url="http://"+ip+":"+port+"/preview?fileName="+itemData.filePath+"&folder="+itemData.id;
+                               
                                 const embedTag = `<embed src="${url}" type="application/pdf" width="100%" height="600px" />`;
                                 var headerHeight=$('#progress_file_preview').find('div[data-role="header"]').outerHeight();
-                                var office='https://view.officeapps.live.com/op/view.aspx?src=';
+                                //var office='https://view.officeapps.live.com/op/view.aspx?src=';
                                 var extension=itemData.filePath.split('.').pop().toLowerCase();
-                                var frame=$("<iframe src='"+url+"' style='position: absolute;top: "+40+"px;left: 0;width: 100%;height: 100%;border: none;'>"+
-                                'This browser does not support docxs and xlsxs. Please download the file to view it: <a :href="'+url+'">Download file</a>'
-                                +"</iframe>");
+                                
 
                                 if(extension=='docx'||extension=='xlsx'){
-                                    url="http://"+ip+":"+port+"/downloadLocal?fileName="+itemData.filePath+"&folder="+itemData.id;
-                                    frame=$("<iframe style='position: absolute;top: "+40+"px;left: 0;width: 100%;height: 100%;border: none;'>"+
-                                        'This browser does not support docxs and xlsxs. Please download the file to view it: <a href="'+url+'">Download file</a>'
-                                        +"</iframe>");
+                                    const docxOptions = Object.assign(docx.defaultOptions, {
+                                        debug: true,
+                                        experimental: true,
+                                        breakPages:true,
+                                        inWrapper:true
+                                    });
+                                    getDocxFile(itemData.id,itemData.filePath).then(blob=>{
+                                            docx.renderAsync(blob, $('#preview_container').get(0), null, docxOptions)
+                                            .then((x) => {
+                                                
+                                                console.log(x);
+                                            }).catch(error => {
+                                                $().requestDialog({
+                                                    title:'提示',
+                                                    message:'文件预览出了问题，可能文件损坏或者加密了，你是否需要下载？',
+                                                },function(go){
+                                                    if(go){
+                                                        downloadFile(itemData.id,itemData.filePath);
+                                                    }
+                                                    setTimeout(() => {
+                                                        history.back();
+                                                    }, 200);
+                                                });
+                                                });;
+                                        
+                                    });
+                                    
+                                }else{
+                                    var url="http://"+ip+":"+port+"/preview?fileName="+itemData.filePath+"&folder="+itemData.id;
+                                    var frame=$("<iframe src='"+url+"' style='position: absolute;top: "+40+"px;left: 0;width: 100%;height: 100%;border: none;'>"+
+                                                +"</iframe>");
+                                    $('#preview_container').append(frame);
                                 }
-                                console.log('preview',office,url);
                                 console.log('height',$('#progress_file_preview').find('div[data-role="header"]'),headerHeight);
                                 
-                                $('#preview_container').append(frame);
+                                
                                 goToPage('#progress_file_preview');
                                 setTimeout(() => {
                                     $().mloader('hide');
@@ -600,7 +626,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
             break;
         case '关联':
             console.log("关联");
-            
+            /*
             isAddPage=true;
             $().mloader("show",{message:"读取中...."});
             await getCaseLatestIndex().then(id=>{
@@ -631,6 +657,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                 //$("#fullscreenPage").trigger('create');
                 //main_form.instance.trigger('create');
             });
+            */
             break;
     }
 })

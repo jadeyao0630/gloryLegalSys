@@ -507,6 +507,11 @@ var _summary_template;
         filePath:{
           label:"上传文件",
           type:"file",
+          accept:".docx,.doc,.xlsx,.xls,.pdf,.png,.jpg,.jpeg,.txt,.zip,.rar"
+        },
+        __formLabel:{
+          label:"支持扩展名：rar. zip. xlsx. docx. pdf. jpg. jpeg. png. txt… 单个文件不超过50MB",
+          type:"label",
         }
       }
       list_executed={

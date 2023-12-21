@@ -1,5 +1,5 @@
 var isRunLocal=true;
-var IPS=['localhost','192.168.10.68','cn.luyao.site']
+var IPS=['localhost','192.168.10.141','cn.luyao.site']
 var showDebug=false;
 let ip=isRunLocal?IPS[1]:IPS[2];
 let port=5555;
@@ -60,7 +60,7 @@ const fileTypes={
         tooltip:'WORD文件'
     },
     'docx':{
-        previewable:false,
+        previewable:true,
         icon:'file-word text-blue',
         tooltip:'WORD文件'
     },

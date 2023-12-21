@@ -121,6 +121,11 @@ mform.prototype={
                         }
                         _self.typeIndexs[item_key]=item.type.toLowerCase();
                         switch(item.type.toLowerCase()){
+                            case "label":
+                                item_container=$('<div class="form_item_panel" style="margin-top:-30px;"></div>');
+                                var label=$('<label>'+item.label+'</label>')
+                                item_container.append(label);
+                                break;
                             case "text":
                                 _self.elements[item_key]=generateInputTypeBase(item_container,item,item_key,template.settings.hasPlaceHolder);
                                 break;
@@ -413,8 +418,10 @@ mform.prototype={
             item_container.append(label);
             
             labelStyle(label,template);
-            var multiple=item.isMultiple?' multiple="multiple"':'';
-            var input=$('<input class="form-original" type="file" name="'+id+'" id="'+id+'" value=""'+multiple+' '+setRequired(item.isOptional,"此项必须填写")+'>');
+            
+            var accept=item.accept?' accept="'+item.accept+'"':'';
+            
+            var input=$('<input class="form-original" type="file" name="'+id+'" id="'+id+'" value=""'+accept+' '+setRequired(item.isOptional,"此项必须填写")+'>');
             //item_container.append(input);
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(input);
@@ -1544,7 +1551,7 @@ $.fn.extend({
                             if(!vals.hasOwnProperty(catelog.table)){
                                 vals[catelog.table]={};
                             }
-                            vals[catelog.table][catelog_key]=val;
+                            vals[catelog.table][catelog_key]=val==null?"":val;
                         }else{
                             values[catelog_key]=val;
                         }

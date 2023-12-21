@@ -143,11 +143,13 @@ app.get('/preview', async (req, res) => {
           message:'No files were uploaded.',
         });
       }
-  
       const file = req.files.file;
+      const extension=file.name.split('.').pop();
+      const filename=file.name.replace('.'+extension,'');
+      const encryptedFileName=encrypt(new Date().getTime()+filename)+"."+extension;
       const folder=req.body.folder;
       const  db= DbService.getDbServiceInstance();
-      const result = db.uploadFileL(env.UPLOADS_PATH,folder,file);
+      const result = db.uploadFileL(env.UPLOADS_PATH,folder,file,encryptedFileName);
       result
       .then(data => {
         console.log(folder);

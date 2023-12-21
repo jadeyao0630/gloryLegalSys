@@ -180,7 +180,7 @@
         const intervalId = setInterval(() => {
             if (_firstPageTableColumns!=undefined) {
                 clearInterval(intervalId);
-                console.log('decrypted',encrypt('1234'),decrypt(encrypt('1234')));
+                console.log('decrypted',new Date().getTime(),encrypt(new Date().getTime()),decrypt(encrypt(new Date().getTime())));
                 var convertedData=[];
                 $.each(DataList.casesDb,(index,value)=>{
                     var item={};

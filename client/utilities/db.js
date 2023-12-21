@@ -20,11 +20,11 @@ async function uploadFiles(folder,files){
           contentType: false,
           success: function(response) {
             console.log(response);
-            results.push({success:true,fileName:file});
+            results.push({success:true,fileName:response.newFileName});
           },
           error: function(xhr, status, error) {
             console.error('Error uploading file:', error);
-            results.push({success:false,fileName:file,error:error});
+            results.push({success:false,fileName:response.newFileName,error:error});
           }
         });
     })

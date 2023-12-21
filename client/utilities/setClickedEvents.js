@@ -449,7 +449,11 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                             $('#preview_container').empty();
                               var url="http://"+ip+":"+port+"/preview?fileName="+itemData.filePath+"&folder="+itemData.id;
                               const embedTag = `<embed src="${url}" type="application/pdf" width="100%" height="600px" />`;
-                              var frame=$("<iframe src='"+url+"' style='width:100%;height:100%;'></iframe>")
+                              
+                              var headerHeight=$('#progress_file_preview').find('div[data-role="header"]').outerHeight();
+                              var office='https://view.officeapps.live.com/op/view.aspx?src=';
+                              console.log('height',$('#progress_file_preview').find('div[data-role="header"]'),headerHeight);
+                              var frame=$("<iframe src='"+url+"' style='position: absolute;top: "+40+"px;left: 0;width: 100%;height: 100%;border: none;'></iframe>")
 
                               $('#preview_container').append(frame);
                             goToPage('#progress_file_preview');
@@ -757,97 +761,114 @@ function updateSubmitEvent(e){
                     $().mloader("show",{message:"提交中...."});
                     //var files=[];
                     //var cango=true;
+                    var fileOk=true;
                     var idx=await getRecordLatestIndex(data.table,data.key);
                     if(data.table!='caseAttachments'){
                         var subidx=await getRecordLatestIndex(data.table,'subId','caseStatus='+data.caseStatus);
                         values.data.values.subId=subidx+1;
                     }else{
+                        fileOk=false;
                         //files=values.data.caseAttachments;
                         if(values.data.values.filePath.length>0){
+                            var filePaths= [];
+                            
                             uploadFiles(data.id,values.data.values.filePath).then(r=>{
                                 //console.log(r);
                                 $.each(r,(index,uploadResult)=>{
                                     if(!uploadResult.success){
-                                        console.log(uploadResult.fileName.name+" 上传失败！");
+                                        console.log(uploadResult.fileName+" 上传失败！");
                                         //cango=false;
                                         //$().mloader("hide");
+                                    }else{
+                                        console.log(uploadResult.fileName+" 上传成功！");
+                                        filePaths.push(uploadResult.fileName);
                                     }
                                 });
+                                values.data.values.filePath=filePaths.join(',');
+                                fileOk=true;
                             });
-                            values.data.values.filePath=values.data.values.filePath[0].name;
+                            
                             
                         }
                         
                         //values.data.caseAttachments
                     }
 
-                    values.data.values[data.key]=idx+1;
-                    values.data.values.caseNo=data.caseNo;
-                    values.data.values.id=data.id;
-                    values.data.values.isInactived=0;
-                    values.data.values.caseStatus=data.caseStatus;
-                    values.data.values[data.dateKey]=getDateTime();
-                    var newCaseStatus=currentProgress['targetPosition'].main+(currentProgress['originalPosition'].main>excutePoint && currentProgress['targetPosition'].main> currentProgress['originalPosition'].main?currentProgress['originalPosition'].sub:currentProgress['targetPosition'].sub)/10;
-                    if(editableStatus=="new" || editableStatus=="shift"){
-
-                        console.log("提交方式为",editableStatus,'状态更新为',newCaseStatus,'目标ID',data.id);
-                        update("id="+data.id,'caseStatus','caseStatus="'+newCaseStatus+'"',async function(r){
-                            console.log('update result',r);
-                            $.each(DataList.combinedData,(index,item)=>{
-                                if(item.id == data.id) {
-                                    DataList.combinedData[index].caseStatus=newCaseStatus;
-                                    return false;
-                                }
-                            });
-                            //await currentProgress['currentDiagramButton'].setStep(currentProgress['target']);
-                            var targetPosition=currentProgress['targetPosition'];
-                            if(currentProgress['originalPosition'].main>=currentProgress['currentDiagramButton'].opt.breakpoint){
-                                
-                                if(targetPosition.main==currentProgress['currentDiagramButton'].opt.breakpoint){
-
-                                }else{
-                                    targetPosition.sub=currentProgress['originalPosition'].sub;
+                    var _intervalId = setInterval(async() => {
+                        if (fileOk) {
+                            clearInterval(_intervalId);
+                            values.data.values[data.key]=idx+1;
+                            values.data.values.caseNo=data.caseNo;
+                            values.data.values.id=data.id;
+                            values.data.values.isInactived=0;
+                            values.data.values.caseStatus=data.caseStatus;
+                            values.data.values[data.dateKey]=getDateTime();
+                            var newCaseStatus=currentProgress['targetPosition'].main+(currentProgress['originalPosition'].main>excutePoint && currentProgress['targetPosition'].main> currentProgress['originalPosition'].main?currentProgress['originalPosition'].sub:currentProgress['targetPosition'].sub)/10;
+                            if(editableStatus=="new" || editableStatus=="shift"){
+        
+                                console.log("提交方式为",editableStatus,'状态更新为',newCaseStatus,'目标ID',data.id);
+        
+                                //因为是添加，需要更新节点在表格caseStatus的位置
+                                update("id="+data.id,'caseStatus','caseStatus="'+newCaseStatus+'"',async function(r){
+                                    console.log('update result',r);
+                                    $.each(DataList.combinedData,(index,item)=>{
+                                        if(item.id == data.id) {
+                                            DataList.combinedData[index].caseStatus=newCaseStatus;
+                                            return false;
+                                        }
+                                    });
+                                    //await currentProgress['currentDiagramButton'].setStep(currentProgress['target']);
+                                    var targetPosition=currentProgress['targetPosition'];
+                                    if(currentProgress['originalPosition'].main>=currentProgress['currentDiagramButton'].opt.breakpoint){
+                                        
+                                        if(targetPosition.main==currentProgress['currentDiagramButton'].opt.breakpoint){
+        
+                                        }else{
+                                            targetPosition.sub=currentProgress['originalPosition'].sub;
+                                        }
+                                    }
+                                    await currentProgress['currentDiagramButton'].MoveTo(targetPosition.main+targetPosition.sub/10);
+                                })
+                                if(editableStatus=="shift"){
+                                    $.each(tables,(table,del)=>{
+                            
+                                        del.forEach((dl)=>{
+                                            //console.log(table,del.length,dl.caseStatus,dl.id);
+                                            inactiveItem("caseStatus="+dl.caseStatus+" AND id="+dl.id,table);
+                                            var index=currentProgress['currentDiagramButton'].opt.counterData.indexOf(dl);
+                                            console.log("indexOf",index)
+                                            if(index>-1){
+                                                //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
+                                                currentProgress['currentDiagramButton'].opt.counterData.splice(index, 1);
+                                            }
+                                            index=DataList[table].indexOf(dl);
+                                            if(index>-1){
+                                                //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
+                                                DataList[table][index].isInactived=1;
+                                            }
+                                        })
+                                    })
+                                    console.log('DataList',DataList);
                                 }
                             }
-                            await currentProgress['currentDiagramButton'].MoveTo(targetPosition.main+targetPosition.sub/10);
-                        })
-                        if(editableStatus=="shift"){
-                            $.each(tables,(table,del)=>{
-                    
-                                del.forEach((dl)=>{
-                                    //console.log(table,del.length,dl.caseStatus,dl.id);
-                                    inactiveItem("caseStatus="+dl.caseStatus+" AND id="+dl.id,table);
-                                    var index=currentProgress['currentDiagramButton'].opt.counterData.indexOf(dl);
-                                    console.log("indexOf",index)
-                                    if(index>-1){
-                                        //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
-                                        currentProgress['currentDiagramButton'].opt.counterData.splice(index, 1);
-                                    }
-                                    index=DataList[table].indexOf(dl);
-                                    if(index>-1){
-                                        //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
-                                        DataList[table][index].isInactived=1;
-                                    }
-                                })
-                            })
-                            console.log('DataList',DataList);
+                            //更新节点数据
+                            console.log("final values",data.table,values.data.values);
+                            pureinsert(data.table,values.data.values,(r)=>{
+                                console.log('insert result',data.table,r,currentProgress['target']);
+                                DataList[data.table].push(values.data.values);
+        
+                                currentProgress['currentDiagramButton'].opt.counterData.push(values.data.values);
+                                currentProgress['currentDiagramButton'].updateCounterIndicator(data);
+                                if(data.table=='caseExcutes'){
+                                    fireDataChnaged("caseexcutesChanged",values.data.values,"add");
+                                }
+                                $().mloader("hide");
+                            
+                            });
+                            history.back();
                         }
-                    }
-                    
-                    console.log("final values",data.table,values.data.values);
-                    insert(data.table,values.data.values,(r)=>{
-                        console.log('insert result',data.table,r,currentProgress['target']);
-                        DataList[data.table].push(values.data.values);
-
-                        currentProgress['currentDiagramButton'].opt.counterData.push(values.data.values);
-                        currentProgress['currentDiagramButton'].updateCounterIndicator(data);
-                        if(data.table=='caseExcutes'){
-                            fireDataChnaged("caseexcutesChanged",values.data.values,"add");
-                        }
-                        $().mloader("hide");
-                    
                     });
-                    history.back();
+                    
                 }
             }, 100);
         }

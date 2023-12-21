@@ -455,7 +455,7 @@ var _summary_template;
       }
       list_evidence={
         fileLabel:{
-          label:"证据名",
+          label:"附件名",
           type:"text",
         },numFile:{
           label:"份数",

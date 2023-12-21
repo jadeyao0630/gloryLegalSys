@@ -53,13 +53,13 @@ class DbService{
         }
         
     }
-    async uploadFileL(rootPath,folder,file){
+    async uploadFileL(rootPath,folder,file,newFileName){
         try{
             const response = await new Promise(async(resolve,reject)=>{
                 var fileName=file.name;
                 //const remoteFilePath = path.join(filePath, fileName); // Replace 'filename.jpg' with the desired file name
                 
-                const localFilePath = path.join(rootPath,folder, fileName); // Save the uploaded file to the 'uploads' directory
+                const localFilePath = path.join(rootPath,folder, newFileName); // Save the uploaded file to the 'uploads' directory
                 file.mv(localFilePath, async function(err) {
                     if (err) {
                         console.error('Error saving file:', err);
@@ -67,12 +67,14 @@ class DbService{
                         resolve({
                             status:500,
                             message:'Error saving file '+fileName,
+                            newFileName:newFileName,
                             error:err
                         });
                     }
                     resolve({
                         status:200,
-                        message:'File uploaded successfully '+fileName
+                        message:'File uploaded successfully '+fileName,
+                        newFileName:newFileName,
                     });
                     
                 });

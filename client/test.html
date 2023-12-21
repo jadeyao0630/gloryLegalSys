@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Document</title>
     <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.3.4/viewer.min.css">
     <link rel="stylesheet" href="./css/color.css">
     <style>
         body{
@@ -43,9 +44,15 @@
             .newTableItem{
                 animation: glowing-border 2s infinite;
             }
+            #document-preview {
+      width: 100%;
+      height: 600px;
+    }
         </style>
     <script src="./js/jquery.js"></script>
     <script src="./js/jquery.mobile-1.4.5.min.js"></script>
+    
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.3.4/viewer.min.js"></script>
     <script src="./js/crypto/core.js"></script>
     <script src="./js/crypto/lib-typedarrays.js"></script>
     <script src="./js/crypto/x64-core.js"></script>
@@ -173,8 +180,51 @@
     
     </script>
     
-    
+    <div id="document-preview"></div>
+
+  <script>
+    $(document).ready(function() {
+      var viewer = new Viewer(document.getElementById('document-preview'), {
+        inline: false,
+        viewed: function() {
+          viewer.zoomTo(1);
+        }
+      });
+      viewer.show('http://192.168.10.68:5555/preview?fileName=52e7d2357f7a6dd77579236f771ad4fb.xlsx&folder=283');
+    });
+  </script>
 <script>
+    $(document).ready(function() {
+        
+  // 获取预览容器
+  var previewContainer = $("#preview");
+  console.log('preview');
+  // 发送 AJAX 请求加载 Word 文档
+  $.ajax({
+    url: "http://192.168.10.68:5555/preview?fileName=52e7d2357f7a6dd77579236f771ad4fb.xlsx&folder=283",
+    type: "GET",
+    dataType: "binary",
+    responseType: "arraybuffer",
+    success: function(data) {
+        console.log(data);
+      // 将二进制数据转换为 Blob 对象
+      var blob = new Blob([data], {type: "application/octet-stream"});
+      
+      // 创建 URL 对象
+      var url = URL.createObjectURL(blob);
+      
+      // 创建 iframe 元素并设置 src 属性为 Word 文档的 URL
+      var iframe = $("<iframe>").attr("src", url);
+      
+      // 添加 iframe 到预览容器
+      previewContainer.append(iframe);
+    },
+    error:function(jqXHR, textStatus, ErrorThrown){
+        console.log(jqXHR, textStatus, ErrorThrown);
+    }
+  });
+});
+/*
     $('body').on(main_load_completed_event_name,function(){
         //console.log(DataList);
         const intervalId = setInterval(() => {
@@ -280,11 +330,11 @@
         }, 100);
 
     });
-    
+    */
 </script>
 <script src="./utilities/templates.js"></script>
 <script src="./utilities/preload.js"></script>
-
+<div id="preview"></div>
 <input id="filterTable-input" type="text">
 <a href="#" id="columntToggle">test</a>
 <div class="tableWrapper" >

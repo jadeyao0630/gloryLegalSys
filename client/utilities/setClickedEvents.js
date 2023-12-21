@@ -308,31 +308,7 @@ function functionBtnsEvent(but,index){
         },10);
     }
 }
-function getIconFromTypeName(typeName){
-    var iconNameColor='';
-    switch(typeName){
-        case '资产':
-            iconNameColor='sack-dollar text-red';
-            break;
-        case '执行':
-            iconNameColor='check-double text-green';
-            break;
-        case '进展':
-            iconNameColor='thumbtack text-blue';
-            break;
-        case '附件':
-            iconNameColor='paperclip text-blue';
-            break;
-    }
-    var icon=$('<i class="fa fa-'+iconNameColor+'" style="margin-right:10px;"></i>');
-    icon.on('mouseover',(e)=>{
-        icon.tooltip('show',typeName);
-    })
-    icon.on('mouseout',(e)=>{
-        icon.tooltip('hide');
-    })
-    return icon;
-}
+
 //#endregion /主表里的功能按钮
 //流程图节点点击弹出菜单
 $('#progress_popupMenu').find('a').on('click',async function(e){
@@ -390,13 +366,18 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                         //console.log('JSON.stringify',item_d);
                         var del_btn;
                         if(item.type=='caseAttachments'){
-                            var icon=getIconFromTypeName(item.typeName);
+                            var itemData=getDataById(DataList[item.type],item.key,item.id);
+                            var icon=getIconFromTypeName(item.typeName,itemData.filePath);
+                            
+                            var attachmentData=getAttachmentData(itemData.filePath);
                             var list_item=$('<h3 style="padding-left:15px;margin:auto 0px;">'+item.description+'</h3>');
                             list_item.prepend(icon);
                             
                             item_container=$('<li style="padding:0px;" data-item=\''+JSON.stringify(item)+'\'></li>');
                             var group=$('<div style="display: grid;grid-template-columns: 1fr auto auto;grid-gap: 0px;margin:-8px 0px;"></div>');
                             var view_btn=$('<a href="#" class="ui-btn ui-icon-eye ui-btn-icon-notext btn-icon-green view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">查看</a>')
+                            if(!attachmentData.previewable)
+                                view_btn=$('<a href="http://'+ip+':'+port+'/downloadLocal?fileName='+itemData.filePath+'&folder='+itemData.id+'" class="ui-btn ui-icon-action ui-btn-icon-notext btn-icon-blue view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">下载</a>')
                             del_btn=$('<a href="#" class="ui-btn ui-icon-delete ui-btn-icon-notext btn-icon-red view-list-button" style="padding:10px 5px;border: none;">删除</a>')
                             
                             if(item.isInactived){
@@ -440,23 +421,40 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                     //console.log($(this).closest('li'),data.id,data.type,data.key,typeName);
                     switch(typeName){
                         case '查看':
-                            var itemData=getDataById(DataList[data.type],data.key,data.id);
-                            console.log('查看',data,itemData);
-                            //downloadFile(itemData.id,itemData.filePath);
-                            //"http://"+ip+":"+port+"/downloadLocal?fileName="+data,itemData+"&folder="+itemData.id;
-                            var container=$('<div style="width:100%;height:100%;"></div>');
-                            //$('#preview_container').append(container);
-                            $('#preview_container').empty();
-                              var url="http://"+ip+":"+port+"/preview?fileName="+itemData.filePath+"&folder="+itemData.id;
-                              const embedTag = `<embed src="${url}" type="application/pdf" width="100%" height="600px" />`;
-                              
-                              var headerHeight=$('#progress_file_preview').find('div[data-role="header"]').outerHeight();
-                              var office='https://view.officeapps.live.com/op/view.aspx?src=';
-                              console.log('height',$('#progress_file_preview').find('div[data-role="header"]'),headerHeight);
-                              var frame=$("<iframe src='"+url+"' style='position: absolute;top: "+40+"px;left: 0;width: 100%;height: 100%;border: none;'></iframe>")
+                            $().mloader('show',{message:"读取中..."});
+                            setTimeout(() => {
+                                var itemData=getDataById(DataList[data.type],data.key,data.id);
+                                console.log('查看',data,itemData);
+                                //downloadFile(itemData.id,itemData.filePath);
+                                //"http://"+ip+":"+port+"/downloadLocal?fileName="+data,itemData+"&folder="+itemData.id;
+                                var container=$('<div style="width:100%;height:100%;"></div>');
+                                //$('#preview_container').append(container);
+                                $('#preview_container').empty();
+                                var url="http://"+ip+":"+port+"/preview?fileName="+itemData.filePath+"&folder="+itemData.id;
+                                const embedTag = `<embed src="${url}" type="application/pdf" width="100%" height="600px" />`;
+                                var headerHeight=$('#progress_file_preview').find('div[data-role="header"]').outerHeight();
+                                var office='https://view.officeapps.live.com/op/view.aspx?src=';
+                                var extension=itemData.filePath.split('.').pop().toLowerCase();
+                                var frame=$("<iframe src='"+url+"' style='position: absolute;top: "+40+"px;left: 0;width: 100%;height: 100%;border: none;'>"+
+                                'This browser does not support docxs and xlsxs. Please download the file to view it: <a :href="'+url+'">Download file</a>'
+                                +"</iframe>");
 
-                              $('#preview_container').append(frame);
-                            goToPage('#progress_file_preview');
+                                if(extension=='docx'||extension=='xlsx'){
+                                    url="http://"+ip+":"+port+"/downloadLocal?fileName="+itemData.filePath+"&folder="+itemData.id;
+                                    frame=$("<iframe style='position: absolute;top: "+40+"px;left: 0;width: 100%;height: 100%;border: none;'>"+
+                                        'This browser does not support docxs and xlsxs. Please download the file to view it: <a href="'+url+'">Download file</a>'
+                                        +"</iframe>");
+                                }
+                                console.log('preview',office,url);
+                                console.log('height',$('#progress_file_preview').find('div[data-role="header"]'),headerHeight);
+                                
+                                $('#preview_container').append(frame);
+                                goToPage('#progress_file_preview');
+                                setTimeout(() => {
+                                    $().mloader('hide');
+                                },200);
+                            },200);
+                            
                             //var media=$('<embed  class="media" src="'+"http://"+ip+":"+port+"/preview?fileName="+itemData.filePath+"&folder="+itemData.id+'"></a>');
 
                             break;
@@ -576,7 +574,9 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                 //$('#progress_details_info_body').trigger('create');
                 $('#progress_details_info_body').listview().listview('refresh');
                 goToPage( "#progress_details_info");
-                $().mloader('hide');
+                setTimeout(() => {
+                    $().mloader('hide');
+                },200);
             }, 200);
             //goToPage( "#progress_details_info");
             break;
@@ -1122,7 +1122,7 @@ $('.edit-header-btn').on('click',async function(e){
         //保存进展页面
         else if(sessionStorage.getItem('currentPage')=="#progress"){
             progressInfoForm.instance.getValues(getGlobal("currentId"),progress_form_template.template,function(message,values){
-                //console.log(values)
+                console.log('保存进展页面',values)
                 if(values.success){
                     fireDataChnaged("caseStatusChanged",values.data.values,"update");
                     

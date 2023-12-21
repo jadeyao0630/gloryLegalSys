@@ -139,7 +139,7 @@ waitTask(logingStatus(),function(){
             var _data={};
             $.each(resourceDatas['lawFirms_'],(index,lawFirm)=>{
                 var _d=[];
-                console.log('lawFirms',lawFirm,d.data['attorneys']);
+                //console.log('lawFirms',lawFirm,d.data['attorneys']);
                 d.data['attorneys'].filter((attorney) => attorney.lawFirm==lawFirm.id).forEach((attorney)=>{
                     //attorney['value']=lawFirms+attorney.id;
                     _d.push(attorney);

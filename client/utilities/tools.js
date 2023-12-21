@@ -506,7 +506,130 @@ function getGlobalJson(key){
     if(sessionStorage.getItem(key)=='[object Object]' || sessionStorage.getItem(key)=='undefined') return undefined;
     return JSON.parse(sessionStorage.getItem(key))
 }
-
+function getAttachmentData(filename){
+    var fileType='';
+    var attachmentData={icon:'paperclip text-blue'};
+    if(filename!=undefined){
+        fileType=filename.split('.').pop().toLowerCase();
+        attachmentData['tooltip']=fileType.toUpperCase()+'文件';
+        attachmentData['previewable']=false;
+        if(fileTypes.hasOwnProperty(fileType))
+            attachmentData=fileTypes[fileType];
+    }
+    return attachmentData;
+}
+function getIconFromTypeName(typeName,filename){
+    var iconNameColor='';
+    var fileType='';
+    var attachmentData={icon:'paperclip text-blue'};
+    if(filename!=undefined){
+        fileType=filename.split('.').pop().toLowerCase();
+        attachmentData['tooltip']=fileType.toUpperCase()+'文件';
+    }
+    switch(typeName){
+        case '资产':
+            iconNameColor='sack-dollar text-red';
+            break;
+        case '执行':
+            iconNameColor='check-double text-green';
+            break;
+        case '进展':
+            iconNameColor='thumbtack text-blue';
+            break;
+        case '附件':
+            if(fileTypes.hasOwnProperty(fileType))
+                {attachmentData=fileTypes[fileType];
+                    iconNameColor=attachmentData.icon;
+                }
+            break;
+    }
+    var icon=$('<i class="fa fa-'+iconNameColor+'" style="margin-right:10px;"></i>');
+    icon.on('mouseover',(e)=>{
+        icon.tooltip('show',typeName=='附件'?attachmentData.tooltip:typeName);
+    })
+    icon.on('mouseout',(e)=>{
+        icon.tooltip('hide');
+    })
+    return icon;
+}
+function getEventsDetails(item){
+    var date;
+    var originalDate;
+    var text;
+    var id;
+    var type;
+    var key;
+    if(item.hasOwnProperty('updatesId')){//updates
+        originalDate=new Date(item.dateUpdated);
+        date=formatDateTime(new Date(item.dateUpdated),"MM月dd日 ");
+        text=getFormatString(add_update_template,item);
+        id=item[add_update_template.settings.idkey];
+        type=add_update_template.settings.type;
+        key=add_update_template.settings.idkey;
+        typeName="进展";
+    }else if(item.hasOwnProperty('evidenceId')){//evidence
+        originalDate=new Date(item.dateUploaded);
+        date=formatDateTime(new Date(item.dateUploaded),"MM月dd日 ");
+        text=getFormatString(add_evidence_template,item);
+        id=item[add_evidence_template.settings.idkey];
+        type=add_evidence_template.settings.type;
+        key=add_evidence_template.settings.idkey;
+        typeName="附件";
+    }else if(item.hasOwnProperty('propertyId')){//property
+        originalDate=new Date(item.dateOccur);
+        date=formatDateTime(new Date(item.dateOccur),"MM月dd日 ");
+        text=getFormatString(add_property_template,item);
+        id=item[add_property_template.settings.idkey];
+        type=add_property_template.settings.type;
+        key=add_property_template.settings.idkey;
+        typeName="资产";
+    }else if(item.hasOwnProperty('excutesId')){//excutes
+        originalDate=new Date(item.dateExecuted);
+        date=formatDateTime(new Date(item.dateExecuted),"MM月dd日 ");
+        text=getFormatString(add_execute_template,item);
+        id=item[add_execute_template.settings.idkey];
+        type=add_execute_template.settings.type;
+        key=add_execute_template.settings.idkey;
+        typeName="执行";
+    }
+    return {date:date,description:text,id:id,type:type,key:key,isInactived:item.isInactived,originalDate:originalDate,typeName:typeName};
+}
+function getFormatString(template,item){
+    var settings=template.settings;
+    var _template=template.template;
+    var text="";
+    if(settings.hasOwnProperty('displayFormat')){
+        var format=settings.displayFormat;
+        console.log('getFormatString',item);
+        $.each(item,(k,v)=>{
+            if(_template.hasOwnProperty(k) && _template[k].hasOwnProperty('data')){
+                _template[k].data.forEach((data,index)=>{
+                    
+                    
+                    if (data instanceof Object){
+                        console.log('getFormatString',data);
+                        if(data.id==v){
+                            format=format.replace("{"+k+"}",data.label);
+                        }
+                    }else{
+                        if(index==v)
+                            format=format.replace("{"+k+"}",data);
+                    }
+                })
+                
+            }else
+                format=format.replace("{"+k+"}",v);
+        })
+        text=format;
+    }else{
+        var vals=[];
+        $.each(item,(k,v)=>{
+            vals.push(v);
+        })
+        text=vals.join(' ');
+    }
+    return text;
+}
 function encrypt(data, keyS, ivS) {
     let key = keyS || keyStr
     let iv = ivS || ivStr

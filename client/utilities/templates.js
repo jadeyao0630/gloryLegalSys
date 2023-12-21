@@ -101,16 +101,6 @@ var _summary_template;
                         type:"date",
                         isOptional:false,
                     },
-                    legalAgencies:{
-                      placeholder:"代理法务",
-                      label:"代理法务:",
-                      type:"combobox",
-                      data:resourceDatas.legalAgencies,
-                      valueKey:'id',
-                      matchKey:"name",
-                      displayFormat:'{name}',
-                      isFilterable:false,
-                    },
                     /*
                     caseAttachments:{
                         placeholder:"上传文件",
@@ -158,9 +148,10 @@ var _summary_template;
                         displayFormat:'{name}',
                         table:'caseStatus'
                     },
+                    /*
                     legalCounsel:{
-                        placeholder:"受理相关人",
-                        label:"受理相关人:",
+                        placeholder:"法官",
+                        label:"法官:",
                         type:"multicombobox",
                         isOptional:true,
                         data:resourceDatas.legalCounsels,
@@ -170,6 +161,7 @@ var _summary_template;
                         matchKey:"name",
                         displayFormat:'{name} {contact}',//'{name} {contact} {institution}'
                     },
+                    */
                     requestAmount:{
                         placeholder:"本诉金额",
                         label:"本诉金额(万元):",
@@ -177,7 +169,7 @@ var _summary_template;
                         isOptional:true,
                         numberOnly:true,
                         defaultValue:0.0,
-                        table:'caseStatus'
+                        table:'caseStatus',
                     },
                     appealAmount:{
                         placeholder:"反诉金额",
@@ -188,26 +180,42 @@ var _summary_template;
                         defaultValue:0.0,
                         table:'caseStatus'
                     },
+                   
+                    legalAgencies:{
+                      placeholder:"代理法务",
+                      label:"代理法务:",
+                      type:"combobox",
+                      data:resourceDatas.legalAgencies,
+                      valueKey:'id',
+                      matchKey:"name",
+                      displayFormat:'{name}',
+                      isFilterable:false,
+                    },
                     caseLawsuitRequest:{
                         placeholder:"本诉请求",
                         label:"本诉请求:",
                         type:"textarea",
                         isOptional:true,
-                        table:'caseStatus'
+                        table:'caseStatus',
+                        span: '1/2'
                     },
                     caseCounterclaimRequest:{
                         placeholder:"反诉请求",
                         label:"反诉请求:",
                         type:"textarea",
                         isOptional:true,
-                        table:'caseStatus'
+                        table:'caseStatus',
+                        
+                        span: '2/3'
                     },
                     caseSum:{
                         placeholder:"案件摘要",
                         label:"案件摘要:",
                         type:"textarea",
                         isOptional:true,
-                        table:'caseStatus'
+                        table:'caseStatus',
+                        
+                        span: '3/4'
                     },
                 }
             }
@@ -411,11 +419,33 @@ var _summary_template;
                 isOptional:true,
                 //defaultValue:0.0
             },
+            legalCounsel:{
+                placeholder:"一审法官",
+                label:"一审法官:",
+                type:"multicombobox",
+                isOptional:true,
+                data:resourceDatas.legalCounsels,
+                isFilterable:true,
+                valueKey:'id',
+                matchKey:"name",
+                displayFormat:'{name} {contact}',//'{name} {contact} {institution}'
+            },
             SecondInstance:{
                 type:"date",
                 label:"二审日期：",
                 isOptional:true,
                 //defaultValue:0.0
+            },
+            legalCounselSecond:{
+                placeholder:"二审法官",
+                label:"二审法官:",
+                type:"multicombobox",
+                isOptional:true,
+                data:resourceDatas.legalCounsels,
+                isFilterable:true,
+                valueKey:'id',
+                matchKey:"name",
+                displayFormat:'{name} {contact}',//'{name} {contact} {institution}'
             },
         }
       }
@@ -584,7 +614,14 @@ var _summary_template;
                     displayFormat:'{name}',
                 },
                 legalCounsel:{
-                    label:"受理相关人:",
+                    label:"一审法官:",
+                    type:"multicombobox",
+                    data:resourceDatas.legalCounsels,
+                    valueKey:'id',
+                    displayFormat:'{name} {contact}',
+                },
+                legalCounselSecond:{
+                    label:"二审法官:",
                     type:"multicombobox",
                     data:resourceDatas.legalCounsels,
                     valueKey:'id',

@@ -11,16 +11,33 @@ dotenv.config({
       ),
 });
 
-const connection = mysql.createConnection({
-    host: env.HOST,
-    user:env.USER,
-    password:env.PASSWORD,
-    database:env.DATABASE,
-    por:env.DB_PORT,
-    connectTimeout:0,
-    //ssl: true,
-});
-
+//const connection = disconnect_handler();
+function disconnect_handler() {
+    let conn = mysql.createConnection({
+        host: env.HOST,
+        user:env.USER,
+        password:env.PASSWORD,
+        database:env.DATABASE,
+        por:env.DB_PORT,
+        connectTimeout:0,
+        //ssl: true,
+    });
+     conn.connect(err => {
+        console.log(err);
+         (err) && setTimeout(disconnect_handler, 2000);
+     });
+ 
+     conn.on('error', err => {
+         if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+             // db error 重新連線
+             disconnect_handler();
+         } else {
+             throw err;
+         }
+     });
+     return conn;
+ }
+ /*
 connection.connect((err)=>{
 
     if(err){
@@ -28,7 +45,7 @@ connection.connect((err)=>{
     }
     console.log('db '+ connection.state);
 });
-
+*/
 class DbService{
     static getDbServiceInstance(){
         return instance ? instance : new DbService();
@@ -138,11 +155,12 @@ class DbService{
     }
     //#region 选择
     async getBasic(columnData){
+        var conn=disconnect_handler();
         try{
             const response = await new Promise((resolve,reject)=>{
                 const query = "SELECT * FROM "+columnData.tablename+
                     (columnData.conditions!=undefined?" "+columnData.conditions:"")+(columnData.orderBy!=undefined?" "+columnData.orderBy:"");
-                connection.query(query, (err,results)=>{
+                    conn.query(query, (err,results)=>{
                     if (err) reject(new Error(err.message+"--"+query));
                     resolve(results);
                 });
@@ -153,12 +171,13 @@ class DbService{
         }catch (error){
             console.log(error);
         }
+        conn.release();
     }
     async getAllData(){
         try{
             const response = await new Promise((resolve,reject)=>{
                 const query = "SELECT * FROM names";
-                connection.query(query, (err,results)=>{
+                disconnect_handler().query(query, (err,results)=>{
                     if (err) reject(new Error(err.message));
                     resolve(results);
                 });
@@ -173,7 +192,7 @@ class DbService{
     async select(query){
         try{
             const response = await new Promise((resolve,reject)=>{
-                connection.query(query, (err,results)=>{
+                disconnect_handler().query(query, (err,results)=>{
                     if (err) reject(new Error(err.message));
                     resolve(results);
                 });
@@ -219,7 +238,7 @@ class DbService{
             //console.log(values);
             const response = await new Promise((resolve,reject)=>{
                 const query = "CREATE TABLE "+table+" ("+values.join()+");";
-                connection.query(query, (err,result)=>{
+                disconnect_handler().query(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result.insertId);
                     resolve(result);
@@ -245,7 +264,7 @@ class DbService{
             
             const insertId = await new Promise((resolve,reject)=>{
 
-                connection.query(query, (err,result)=>{
+                disconnect_handler().query(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     resolve(result);
                 });
@@ -279,7 +298,7 @@ class DbService{
             const insertId = await new Promise((resolve,reject)=>{
                 const query = "REPLACE INTO "+table+" ("+keys.join()+") VALUES ("+_values.join()+");";
                 //console.log(query);
-                connection.query(query,values, (err,result)=>{
+                disconnect_handler().query(query,values, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result.insertId);
                     resolve(result);
@@ -319,7 +338,7 @@ class DbService{
             var query="REPLACE INTO `"+table+"` ("+keys.join()+") VALUES "+queries.join();
             const insertId = await new Promise((resolve,reject)=>{
                 //console.log(query);
-                connection.query(query, (err,result)=>{
+                disconnect_handler().query(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result.insertId);
                     resolve(result);
@@ -346,7 +365,7 @@ class DbService{
             const dateAdded = new Date();
             const insertId = await new Promise((resolve,reject)=>{
                 const query = "REPLACE INTO names (user,pass,position,level,createDate) VALUES (?, ?, ?, ?, ?);";
-                connection.query(query,[user,pass,"1",4,dateAdded], (err,result)=>{
+                disconnect_handler().query(query,[user,pass,"1",4,dateAdded], (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result.insertId);
                     resolve(result);
@@ -378,7 +397,7 @@ class DbService{
             var query="INSERT INTO `"+table+"` ("+keys.join()+") VALUES "+"("+_values.join()+")";
             const insertId = await new Promise((resolve,reject)=>{
                 //console.log(query);
-                connection.query(query, (err,result)=>{
+                disconnect_handler().query(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result.insertId);
                     resolve(result);
@@ -407,7 +426,7 @@ class DbService{
             const response = await new Promise((resolve,reject)=>{
                 //console.log(table);
                 const query = `DELETE FROM `+table+` WHERE \`id\` = ?;`;
-                connection.query(query,id, (err,result)=>{
+                disconnect_handler().query(query,id, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -428,7 +447,7 @@ class DbService{
             const response = await new Promise((resolve,reject)=>{
                 //console.log(table);
                 const query = `DELETE FROM `+table+` WHERE \`id\` IN (`+ids.join()+`);`;
-                connection.query(query, (err,result)=>{
+                disconnect_handler().query(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -449,7 +468,7 @@ class DbService{
             const response = await new Promise((resolve,reject)=>{
                 //console.log(table);
                 const query = `UPDATE caseStatus SET isInactived=`+isInactived+` WHERE \`id\` IN (`+ids.join()+`);`;
-                connection.query(query, (err,result)=>{
+                disconnect_handler().query(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -469,7 +488,7 @@ class DbService{
         try{
             const response = await new Promise((resolve,reject)=>{
                 const query = `UPDATE `+table+` SET isInactived=`+isInactived+` WHERE `+where;
-                connection.query(query, (err,result)=>{
+                disconnect_handler().query(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -492,7 +511,7 @@ class DbService{
             const response = await new Promise((resolve,reject)=>{
                 
                 query = `UPDATE names SET `+value+` WHERE `+where;
-                connection.query(query, (err,result)=>{
+                disconnect_handler().query(query, (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);
@@ -522,7 +541,7 @@ class DbService{
                     value=vals.join();
                 }
                 query = `UPDATE `+table+` SET `+value+` WHERE `+where;
-                connection.query(query, (err,result)=>{
+                disconnect_handler().query(query, (err,result)=>{
                     if (err) {
                         reject(new Error(err.message));
                         error_mesg=err;
@@ -553,7 +572,7 @@ class DbService{
         try{
             const response = await new Promise((resolve,reject)=>{
                 const query = `SELECT * FROM names WHERE user=? AND pass=?;`;
-                connection.query(query,[name,pass], (err,result)=>{
+                disconnect_handler().query(query,[name,pass], (err,result)=>{
                     if (err) reject(new Error(err.message));
                     //console.log(result);
                     resolve(result);

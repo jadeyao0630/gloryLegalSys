@@ -419,11 +419,11 @@ function setPersonCaseSum(data){
     console.log(personCaseSum);
     $('#footer_info_bar').empty();
     var info=$(`<label>共计<b>${personCaseSum.caseNum}</b>个案件`+
-        `，（ 群诉<b id="footer_sum_label_group" style="color:blue;">${personCaseSum.caseLabels[3].length}</b>件`+
-        `，1000万以上<b id="footer_sum_label_thousand" style="color:#E25C62;">${personCaseSum.caseLabels[2].length}</b>件`+
-        `，300万以上<b id="footer_sum_label_hundred" style="color:orange;">${personCaseSum.caseLabels[1].length}</b>件`+
+        `，群诉<b id="footer_sum_label_group" style="color:blue;">${personCaseSum.caseLabels[3].length}</b>件`+
+        `，300万以上<b id="footer_sum_label_hundred" style="color:orange;">${personCaseSum.caseLabels[1].length+personCaseSum.caseLabels[2].length}</b>件`+
+        ` 包含（1000万以上<b id="footer_sum_label_thousand" style="color:#E25C62;">${personCaseSum.caseLabels[2].length}</b>件）`+
         `，普通案件<b id="footer_sum_label_normal" style="color:green;">${personCaseSum.caseLabels[0].length}</b>件`+
-        ` ），本诉金额为 <b id="footer_sum_request">${personCaseSum.rquestAmount.formatMoney(0, "￥")}</b> 万`+
+        `，本诉金额为 <b id="footer_sum_request">${personCaseSum.rquestAmount.formatMoney(0, "￥")}</b> 万`+
         `，判决金额为 <b id="footer_sum_penalty">${personCaseSum.penaltyAmount.formatMoney(0, "￥")}</b> 万`+
         `，已执行金额为 <b id="footer_sum_paid">${personCaseSum.paidAmount.formatMoney(0, "￥")}</b> 万`+
     `</label>`);

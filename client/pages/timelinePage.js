@@ -424,7 +424,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             li.css(resourceDatas['caseLabelsColors'][val]);
                             li.css({'text-align':'left'});
                         }else if(sub_key=="caseStatus"){
-                            info_ele=$('<div id="'+sub_key+'" style="position: absolute;left:110px;"></div>');
+                            info_ele=$('<div id="'+sub_key+'" style="position: absolute;left:110px;top:2px;"></div>');
                             
                         }
                         li.append(info_ele);
@@ -446,12 +446,12 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                                 showLabel:true,
                                 containerId:'#'+sub_key,
                                 currentPosition:_data[data_key][sub_key],
-                                fontSize:12,
-                                line_size:2,
-                                size:12,
+                                fontSize:7,
+                                line_size:1,
+                                size:8,
                                 width:240,
                                 isViewMode:true,
-                                verticalGap:2,
+                                //verticalGap:1,
                                 labelPosition:"bottom",
                                 showSubSteps:false,
                                 readOnly:true,
@@ -468,6 +468,8 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                         //console.log(getStatusLabel(attachment.caseStatus,resourceDatas["caseStatus_object"]));
                         attachment.caseStatus=getStatusLabel(attachment.caseStatus,resourceDatas["caseStatus_object"]);
                         //console.log(_summary_template[key].data);
+                        var attchmentEventData=getEventsDetails(attachment);
+                        var icon=getIconFromTypeName('附件',attachment.filePath);
                         if(_summary_template[key].data.displayFormat!=undefined){
                             var displayFormat=_summary_template[key].data.displayFormat;
                             $.each(attachment,(k,v)=>{
@@ -475,11 +477,13 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             })
                             //console.log(displayFormat);
                             var li=$('<li class="ui-field-contain" style="word-wrap: break-word;white-space : normal"></li>');
-                        
+                            console.log(attachment.caseStatus,attchmentEventData,icon);
+
                             var label_ele=$('<label>'+attachment.caseStatus+'</label>');
+                            
                             li.append(label_ele);
                             var item=$('<label style="width:310px;">'+displayFormat+'</label>');
-                            
+                            item.prepend(icon);
                             li.append(item);
                             listview.append(li);
                         }

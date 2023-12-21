@@ -23,6 +23,63 @@ class Message{
     static LOGIN_WELCOME_F='<p style="color:red;">欢迎{0}回来</p>';
     static PROGRESS_DELETE_WARNING_F='确定删除此流程点[{0}]后已存在其它流程点吗？';
 }
+const fileTypes={
+    'jpeg':{
+        previewable:true,
+        icon:'file-image text-blue',
+        tooltip:'JPEG文件'
+    },
+    'jpg':{
+        previewable:true,
+        icon:'file-image text-blue',
+        tooltip:'JPG文件'
+    },
+    'png':{
+        previewable:true,
+        icon:'file-image text-blue',
+        tooltip:'PNG文件'
+    },
+    'txt':{
+        previewable:true,
+        icon:'file-edit text-blue',
+        tooltip:'文本文件'
+    },
+    'zip':{
+        previewable:false,
+        icon:'file-archive text-red',
+        tooltip:'ZIP文件'
+    },
+    'rar':{
+        previewable:false,
+        icon:'file-archive text-red',
+        tooltip:'RAR文件'
+    },
+    'doc':{
+        previewable:false,
+        icon:'file-word text-blue',
+        tooltip:'WORD文件'
+    },
+    'docx':{
+        previewable:false,
+        icon:'file-word text-blue',
+        tooltip:'WORD文件'
+    },
+    'xls':{
+        previewable:false,
+        icon:'file-excel text-green',
+        tooltip:'EXCEL文件'
+    },
+    'xlsx':{
+        previewable:false,
+        icon:'file-excel text-green',
+        tooltip:'EXCEL文件'
+    },
+    'pdf':{
+        previewable:true,
+        icon:'file-pdf text-red',
+        tooltip:'PDF文件'
+    },
+}
 var position=['无','法务人员','法务管理']
 var deads=["无需执行"]; 
 const TextColor="rgb(51, 51, 51)";

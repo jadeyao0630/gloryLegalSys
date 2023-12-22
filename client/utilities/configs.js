@@ -1,5 +1,5 @@
 var isRunLocal=true;
-var IPS=['localhost','192.168.10.141','cn.luyao.site']
+var IPS=['localhost','192.168.10.68','cn.luyao.site']
 var showDebug=false;
 let ip=isRunLocal?IPS[1]:IPS[2];
 let port=5555;
@@ -7,6 +7,7 @@ var auth_code='1234';
 var adminLevel=3;
 const keyStr = 'it@glory.com'
 const ivStr = 'it@glory.com'
+const APP_TITLE='国瑞法务管理系统';
 var enableConsoleLog=true;
 var enableRealDelete=true;
 var enableReadOnlyMode=false;

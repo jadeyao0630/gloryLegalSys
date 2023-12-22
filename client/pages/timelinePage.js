@@ -424,7 +424,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             li.css(resourceDatas['caseLabelsColors'][val]);
                             li.css({'text-align':'left'});
                         }else if(sub_key=="caseStatus"){
-                            info_ele=$('<div id="'+sub_key+'" style="position: absolute;left:110px;top:2px;"></div>');
+                            info_ele=$('<div id="'+sub_key+'" style="position: absolute;left:110px;top:5px;"></div>');
                             
                         }
                         li.append(info_ele);
@@ -446,9 +446,9 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                                 showLabel:true,
                                 containerId:'#'+sub_key,
                                 currentPosition:_data[data_key][sub_key],
-                                fontSize:7,
-                                line_size:1,
-                                size:8,
+                                fontSize:10,
+                                line_size:2,
+                                size:12,
                                 width:240,
                                 isViewMode:true,
                                 //verticalGap:1,

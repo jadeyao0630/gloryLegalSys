@@ -69,6 +69,7 @@ function ProgressesButton(arg){
         showCounter:false,
         counterData:[],
         eventsData:[],
+        labelMarginTop:10,
     }
     this.init(arg)
 }
@@ -335,7 +336,7 @@ ProgressesButton.prototype.init=function(arg){
         var indicatorBackground=$('<div class="counter-indicator" data-index='+index+'></div>');
         var subClass=isMain?"":" subPoint";
         var point=$('<div class="stepPoint'+subClass+'" data-index='+index+'></div>');
-        var _top="calc(100% + 5px)";
+        var _top="calc(100% + "+_this.opt.labelMarginTop+"px)";
         if(_this.opt.labelPosition=="center") _top="50%";
         if(_this.opt.labelPosition!="bottom") _label.css({width:_this.opt.size*2-30,top:_top});
         else _label.css({top:_top});

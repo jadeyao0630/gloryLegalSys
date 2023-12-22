@@ -3,16 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    
+    <title>国瑞法务管理系统</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+	<link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
+	
+	<script src="./js/jquery.js"></script>
+    <script src="./js/jquery.mobile-1.4.5.min.js"></script>
+    <style>
+        
+		.main{
+            text-align: center; /*让div内部文字居中*/
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+        }
+    </style>
+	<script src="./utilities/configs.js"></script>
 	<script src="./utilities/db.js"></script>
 </head>
 <body>
+    <div class="main" >
+        <div id="loginForm">
+			<img id="loadingLogo" class="logo-image" src="javascript:logoSrc;"  width="200px" height="200px"></img>
+            <h1>国瑞法务管理系统</h1>
+            
+        </div> 
+		
+    </div>
     <script>
+        
+        $('#loadingLogo').attr('src',logoSrc)
         const searchParams = new URLSearchParams(window.location.search);
         if(searchParams.has('user') && searchParams.has('token')){
-            var ip='localhost'
-            var port=5555;
             //console.log(searchParams.get('user'),searchParams.get('token')); // true
             fetch("http://"+ip+":"+port+"/oalogin?user="+searchParams.get('user')+"&token="+searchParams.get('token'),{
                 headers:headers,
@@ -21,8 +44,8 @@
             .then(response => response.json())
             .then(data => {
                 
-                console.log(data.data.data);
-                if(data.data.data.name!=undefined){
+                //console.log('oalogin',ip,port,data.data.data);
+                if(data.data.success && data.data.data.name!=undefined){
                     sessionStorage.setItem("currentUser", JSON.stringify(data.data.data));
                     window.location.href = 'legal.html';
                 }

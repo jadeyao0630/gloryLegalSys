@@ -21,7 +21,7 @@ const { env } = process;
 dotenv.config({
     path: path.resolve(
         __dirname,
-        `./env.${env.NODE_ENV ? env.NODE_ENV : "home"}`
+        `./env.${env.NODE_ENV ? env.NODE_ENV : "local"}`
       ),
 });
 
@@ -455,7 +455,7 @@ app.get('/oalogin',(request,response) => {
     
     return;
   }
-  const  db= DbService.getDbServiceInstance();
+  const db= DbService.getDbServiceInstance();
   const result = db.oalogin(user);
   result
   .then(data => response.json({data:data}) )
@@ -525,4 +525,4 @@ app.post('/restoreItem',(request,response) => {
     .catch(err => console.log(err));
 });
 
-app.listen(process.env.PORT, () => console.log('app is runing at port: '+process.env.PORT))
+app.listen(process.env.PORT, () => console.log('app is runing at port: '+process.env.PORT,'mysql host: '+process.env.HOST))

@@ -72,7 +72,7 @@ $('body').on(main_load_completed_event_name,function(){
 $('body').on(preload_completed_event_name,function(){
 
     
-    //setFontSize();
+    setFontSize();
     
 
     databaseBatchForm();
@@ -95,8 +95,8 @@ $('body').on(preload_completed_event_name,function(){
     //$('#case_reg_but_restore').hide();
     $('.admin-ui').hide();
     if(getGlobalJson('currentUser').level==1){
-        FormTemplate3.template.baseInfo.data.legalAgencies.isDisabled=true;
-        FormTemplate3.template.baseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
+        FormTemplate3.template.caseInfo.data.legalAgencies.isDisabled=true;
+        FormTemplate3.template.caseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
         progress_form_template.template.legalAgencies_p.isDisabled=true;
         header_filter_template.template.legalAgencies_f.isDisabled=true;
         header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;

@@ -453,7 +453,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                                             }).catch(error => {
                                                 $().requestDialog({
                                                     title:'提示',
-                                                    message:'文件预览出了问题，可能文件损坏或者加密了，你是否需要下载？',
+                                                    message:'文件预览出了问题，可能文件损坏，不存在，或者加密了，你是否需要下载？',
                                                 },function(go){
                                                     if(go){
                                                         downloadFile(itemData.id,itemData.filePath);

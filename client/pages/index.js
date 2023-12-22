@@ -11,7 +11,8 @@ const addBut = document.getElementById("addBut");
 
 const nameInput = document.getElementById("user");
 const passInput = document.getElementById("password");
-$('#loadingLogo').attr('src',logoSrc)
+$('#loadingLogo').attr('src',logoSrc);
+$('#loginForm').find('h1').text(APP_TITLE);
 //console.log(getGlobalJson("currentUser"),getGlobalJson("currentUser").name!=undefined);
 try{
     if(getGlobalJson("currentUser")!=undefined && getGlobalJson("currentUser").name!=undefined){

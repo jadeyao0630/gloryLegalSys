@@ -9,7 +9,7 @@
 	if("1".equals(type)){ 
 	}
 
-	String url = "http://192.168.10.241:80/oalogin?user="+loginName+"&token="+key;
+	String url = "http://192.168.10.68:80/oalogin.html?user="+loginName+"&token="+key;
 		request.setAttribute("url", url);
 	
 %>

@@ -430,41 +430,50 @@ $.fn.extend({
         }
         
     },
-    minfo:function(visibility,arg){
+    minfo:async function(visibility,arg){
+        
         if(visibility.toLowerCase()=="show"){
-            var title="";
-            var popup_style=' style="padding-top:40px;"';
-            var message="";
-            var icon='<i class="fa fa-info-circle text-green"></i>';
-            if (arg!=undefined){
-                if(arg.hasOwnProperty('type')){
-                    if(arg.type=="alert") icon='<i class="fas fa-exclamation-triangle text-red" />';
-                }
-                if(arg.hasOwnProperty('title')){
-                    title='<h4>'+icon+' '+arg.title+'</h4>';
-                    popup_style='';
-                }
-                if(arg.hasOwnProperty('message')){
-                    message=arg.message;
-                }
-            }
-            var popup=$('<div class="popup-message popup-window"'+popup_style+'>'+title+message+'</div>');
-            var popup_background=$('<div class="popup-background popup-c"></div>');
-            var popup_but=$('<button class="ui-btn ui-btn-a ui-corner-all ui-icon-check" style="margin-top:30px;">确认</button>');
-            $('body').append(popup_background);
-            $('body').append(popup);
-            popup.append(popup_but);
-            popup.trigger('create');
-
-            popup_but.on("click",function(e){
-                $().hideMessage(popup,popup_background);
-            });
             
-            popup_background.css("z-index",parseInt($('div[data-position="fixed"][data-role="header"]').css('z-index'))+1);
-            popup.css("z-index",parseInt(popup_background.css('z-index'))+1);
-            popup.popIn(popup_background);
             //console.log($('div[data-position="fixed"][data-role="header"]').css('z-index'));
-            return [popup,popup_background];
+            const response = new Promise(async(resolve,reject)=>{
+                var title="";
+                var popup_style=' style="padding-top:40px;"';
+                var message="";
+                var icon='<i class="fa fa-info-circle text-green"></i>';
+                if (arg!=undefined){
+                    if(arg.hasOwnProperty('type')){
+                        if(arg.type=="alert") icon='<i class="fas fa-exclamation-triangle text-red" />';
+                    }
+                    if(arg.hasOwnProperty('title')){
+                        title='<h4>'+icon+' '+arg.title+'</h4>';
+                        popup_style='';
+                    }
+                    if(arg.hasOwnProperty('message')){
+                        message=arg.message;
+                    }
+                }
+                var popup=$('<div class="popup-message popup-window"'+popup_style+'>'+title+message+'</div>');
+                var popup_background=$('<div class="popup-background popup-c"></div>');
+                var popup_but=$('<button class="ui-btn ui-btn-a ui-corner-all ui-icon-check" style="margin-top:30px;">确认</button>');
+                var index=$('div[data-position="fixed"][data-role="header"]').css('z-index');
+                if($('#main-container').css('display')!='none') index=1003;
+                popup_background.css("z-index",index);
+                popup.css("z-index",parseInt(popup_background.css('z-index'))+1);
+                $('body').append(popup_background);
+                $('body').append(popup);
+                popup.append(popup_but);
+                popup.trigger('create');
+    
+                popup_but.on("click",function(e){
+                    resolve();
+                    $().hideMessage(popup,popup_background);
+                });
+                
+                popup_background.css("z-index",parseInt($('div[data-position="fixed"][data-role="header"]').css('z-index'))+1);
+                popup.css("z-index",parseInt(popup_background.css('z-index'))+1);
+                popup.popIn(popup_background);
+            });
+            return await response;
         }else{
             $().hideMessage();
         }

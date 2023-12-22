@@ -30,7 +30,7 @@ mform.prototype={
             loadCssCode('textarea.ui-input-text {min-height: '+template.settings.textareaHeight+'px;}')
         }
         var form_width="";
-        if(template.settings.textareaHeight != undefined && template.settings.textareaHeight!=Number.NaN){
+        if(template.settings.width != undefined && template.settings.width!=Number.NaN){
             form_width=' style="width:'+template.settings.width+';"'
         }
         

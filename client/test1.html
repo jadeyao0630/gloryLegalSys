@@ -3,60 +3,79 @@
 
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
+    <link rel="stylesheet" href="./css/form.css" />
+    <link rel="stylesheet" href="./css/popup.css" />
     <script src="./js/jquery.js"></script>
-    <!--dependencies-->
-    <script crossorigin src="https://unpkg.com/jszip/dist/jszip.min.js"></script>
-    <!--library-->
-    <script src="./js/docx-preview.js"></script>
+	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
+    
+	<script src="./elements/mform.js"></script>
+    
+    <script src="./utilities/tools.js"></script>
+    <script src="./utilities/db.js"></script>
+    <script src="./utilities/configs.js"></script>
+    <script src="./utilities/resourceData.js"></script>
 </head>
 
-<body class="vh-100 d-flex flex-column">
+<body>
 
-  <input id="files" type="file" class="form-control" style="width: 50ch;" accept=".docx,.pdf" />
-        <div id="document-container" class="overflow-auto flex-grow-1 h-100"></div>
+  <div id="form_container">读取中</div>
   
 
     <script>
-      
-      const docxOptions = Object.assign(docx.defaultOptions, {
-            debug: true,
-            experimental: true
+    
+    var preloadDone=false;
+    $('body').on(preload_completed_event_name,function(){  
+        console.log('preload_completed_event_name',preload_completed_event_name);
+        preloadDone=true;
+    });
+    $('body').on(main_load_completed_event_name,function(){  
+        
+        console.log('main_load_completed_event_name',main_load_completed_event_name);
+        const intervalId = setInterval(() => {
+                
+                console.log('setInterval',FormTemplate3);
+                if (FormTemplate3) {
+                    clearInterval(intervalId);
+                    FormTemplate3.template['caseInfo'].data['pass']={
+                        placeholder:"密码",
+                        label:"密码:",
+                        type:"password",
+                        isOptional:true,
+                        isChangeable:true,
+                    },
+                    FormTemplate3.template['caseInfo'].data['matchRange']={
+                        placeholders:["索引起始","索引结束"],
+                        label:"索引范围:",
+                        type:"textrange",
+                        isOptional:false,
+                    };
+                    $('#form_container').empty();
+                    $('#form_container').append(new mform({template:FormTemplate3}).instance);
+                    $('#form_container').trigger('create')
+                    $().mloader('hide');
+                }
+            }, 100);
+        
+    });
+    
+    async function waitfor(condition){//无效，condition值在循环中不变
+        const response = new Promise(async(resolve,reject)=>{
+            const intervalId = setInterval(() => {
+                
+                console.log(condition);
+                if (condition) {
+                    clearInterval(intervalId);
+                    resolve();
+                }
+            }, 100);
         });
-        const fileInput = document.querySelector("#files");
-        const container = document.querySelector("#document-container");
-        function renderDocx(file) {
-            currentDocument = file; 
-            currentDocument = 'http://localhost:5555/fetch-docx?fileName=a9450c9527df6b51b0ea09c5f375f3e1.docx&folder=280'
-            if (!currentDocument) 
-                return;
-
-            docx.renderAsync(currentDocument, container, null, docxOptions)
-                .then((x) => {
-                    
-                    console.log(x);
-                });
-        }
-        fileInput.addEventListener("change", ev => {
-            renderDocx(fileInput.files[0]);
-        });
-
-
-        fetch('http://localhost:5555/fetch-docx?fileName=a9450c9527df6b51b0ea09c5f375f3e1.docx&folder=280') // Replace with the actual server URL
-  .then(response => response.blob())
-  .then(blob => {
-    // Handle the received Blob
-    console.log(blob);
-    // You can now use the 'blob' object as needed
-    docx.renderAsync(blob, container, null, docxOptions)
-                .then((x) => {
-                    
-                    console.log(x);
-                });
-  })
-  .catch(error => {
-    console.error('Error fetching the file:', error);
-  });
+        return await response;
+    }
     </script>
+    
+    <script src="./utilities/templates.js"></script>
+    <script src="./utilities/preload.js"></script>
 </body>
 
 </html>

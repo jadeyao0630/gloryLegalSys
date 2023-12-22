@@ -109,3 +109,7 @@ padding:5px 10px;
   background:orangered;
   text-shadow: none;
 }
+.controlgroup-textinput{
+  padding-top:.22em;
+  padding-bottom:.22em;
+}

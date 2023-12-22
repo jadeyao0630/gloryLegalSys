@@ -347,5 +347,15 @@ mform.prototype={
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(radio_container);
             return subContainer;
+    },
+    generateFileInput:function(itemId,itemTemplate){
+        var accept=itemTemplate.accept?' accept="'+itemTemplate.accept+'"':'';
+            
+        var input=$('<input class="form-original" type="file" name="'+itemId+'" id="'+itemId+'" value=""'+accept+' '+setRequired(itemTemplate.isOptional,"此项必须填写")+'>');
+        //item_container.append(input);
+        var subContainer=$('<div class="form-original"></div>');
+        subContainer.append(input);
+        item_container.append(subContainer);
+        return input;
     }
 }

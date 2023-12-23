@@ -37,6 +37,112 @@ mform.prototype={
             //console.log('setMainForm',template);
             _self.instance.append(_self.setForm(template.template));
         }
+        //#region 
+        function pageIsSelectmenuDialog( page ) {
+            var isDialog = false,
+            id = page && page.attr( "id" );
+            $( ".filterSelect" ).each( function() {
+                if ( $( this ).attr( "id" ) + "-dialog" === id ) {
+                    isDialog = true;
+                    return false;
+                }
+            });
+            return isDialog;
+        }
+        $.mobile.document
+            // Upon creation of the select menu, we want to make use of the fact that the ID of the
+            // listview it generates starts with the ID of the select menu itself, plus the suffix "-menu".
+            // We retrieve the listview and insert a search input before it.
+            .on( "selectmenucreate", ".filterSelect", function( event ) {
+                var input,
+                    selectmenu = $( event.target ),
+                    list = $( "#" + selectmenu.attr( "id" ) + "-menu" ),
+                    form = list.jqmData( "filter-form" );
+
+                
+                // We store the generated form in a variable attached to the popup so we avoid creating a
+                // second form/input field when the listview is destroyed/rebuilt during a refresh.
+                
+                if ( !form ) {
+                    //$("#filterForm").remove();
+                    input = $( "<input data-type='search'></input>" );
+                    form = $( "<form></form>" ).append( input );
+                    input.textinput();
+                    list
+                        .before( form )
+                        .jqmData( "filter-form", form ) ;
+                    form.jqmData( "listview", list );
+                    list.jqmData('theme','a');
+                    
+                    //list.listview( "refresh" );
+                }
+                selectmenu.jqmData('theme','a');
+                var listbox=$( "#" + selectmenu.attr( "id" ) + "-listbox" );
+                listbox.addClass('filterable-select-listbox');
+                list.addClass('filterable-select-option');
+                
+                var isOptgroup=$(selectmenu).find('optgroup').length>0;
+                selectmenu
+                    .filterable({
+                        input: input,
+                        children: "> "+(isOptgroup?"optgroup":"")+" option[value]"
+                    })
+                    // Rebuild the custom select menu's list items to reflect the results of the filtering
+                    // done on the select menu.
+                    .on( "filterablefilter", function() {
+                        selectmenu.selectmenu().selectmenu( "refresh" );
+                    });
+            })
+            // The custom select list may show up as either a popup or a dialog, depending on how much
+            // vertical room there is on the screen. If it shows up as a dialog, then the form containing
+            // the filter input field must be transferred to the dialog so that the user can continue to
+            // use it for filtering list items.
+            .on( "pagecontainerbeforeshow", function( event, data ) {
+                
+                
+                //console.log('pagecontainerbeforeshow',$( event.target ),$(data.toPage).attr('id').replace('-dialog',''));
+                var listview, form;
+                if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                    
+                    return;
+                }
+                var id=$(data.toPage).attr('id').replace('-dialog','');
+                data.toPage.find('a.ui-icon-delete').on('click',function(e){
+                    //console.log('pagecontainerhide',$(data.toPage).find('input[data-type="search"]').val());
+                    if ( pageIsSelectmenuDialog( data.toPage ) ) {
+                        $(data.toPage).find('input[data-type="search"]').val('');
+                        $(data.toPage).find('input[data-type="search"]').trigger('keyup');
+                    }
+                    
+                })
+                listview = data.toPage.find( "ul[id^="+id+"]" );
+                
+                form = listview.jqmData( "filter-form" );
+                data.toPage.jqmData( "listview", listview );
+                // Place the form before the listview in the dialog.
+                //if($('#'+id+'-searchInput').length==0)
+                    listview.before( form );
+            })
+            // After the dialog is closed, the form containing the filter input is returned to the popup.
+            .on( "pagecontainerhide", function( event, data ) {
+                
+                var listview, form;
+                if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                    return;
+                }
+                console.log('data.prevPage',data.prevPage);
+                if(listview==undefined) return;
+                listview = data.prevPage.jqmData( "listview" ),
+                form = listview.jqmData( "filter-form" );
+                // Put the form back in the popup. It goes ahead of the listview.
+                //if($('#'+id+'-searchInput').length==0)
+                    listview.before( form );
+            })
+            .on("pagecreate", function () {
+                //$(".smlFontForm .ui-select.ui-mini").selectmenu().selectmenu("widget").addClass("ui-mini");
+                
+            })
+            //#endregion
     },
     setForm:function(data){
         var _this=this;
@@ -118,6 +224,19 @@ mform.prototype={
                 case "radio":
                     item_container.append(_this.generateRadioItem(key,form_item_template));
                     break;
+                case "file":
+                    item_container.append(_this.generateFileInput(key,form_item_template));
+                    break;
+                case "combobox":
+                    item_container.append(_this.generateComboBoxItem(key,form_item_template));
+                    break;
+                case "multicombobox":
+                    form_item_template.isMultiple=true;
+                    item_container.append(_this.generateComboBoxItem(key,form_item_template));
+                    break;
+                case "supermultiinput":
+                    item_container.append(_this.generateSuperMultiInputItem(key,form_item_template));
+                    break;
             }
         }
         return item_container;
@@ -162,6 +281,15 @@ mform.prototype={
         }
         return placeholders;
     },
+    setFiltableSelect:function(itemTemplate){
+        var clss=["form-original"];
+        if(itemTemplate.isFilterable) clss.push('filterSelect');
+        if(itemTemplate.isMultiple) clss.push('multiSelect');
+        if(itemTemplate.type.toLowerCase()=="supermultiinput") clss.push('supermultiInput');
+        return 'class="'+clss.join(' ')+'"'+
+                (itemTemplate.isFilterable||itemTemplate.isMultiple||itemTemplate.type.toLowerCase()=="supermultiinput"?' data-native-menu="false"':' data-native-menu="true"')+
+                (itemTemplate.isMultiple?' multiple="multiple"':'');
+    },
     generateLabel:function(itemId,itemTemplate){
         var _this=this;
         //console.log(itemTemplate,itemId);
@@ -173,7 +301,7 @@ mform.prototype={
         var _this=this;
         var value=itemTemplate.defaultValue || '';
         
-        var input=$('<input type="'+itemTemplate.type.toLowerCase()+'" class="form-original" name="'+itemId+'"'+//' id="'+itemId+'"'+
+        var input=$('<input type="'+itemTemplate.type.toLowerCase()+'" class="form-original" name="'+itemId+'"'+' id="'+itemId+'"'+
                     _this.setPlaceholder(itemTemplate)+
                     ' value="'+value+'" '+_this.setRequired(itemTemplate.isOptional,"此项必须正确填写")+'>');
         var subContainer=$('<div class="form-original"></div>');
@@ -183,7 +311,7 @@ mform.prototype={
     generatePasswordInput:function(itemId,itemTemplate){
         var _this=this;
         var value=itemTemplate.defaultValue || '';
-        var input=$('<input type="password" class="form-original" name="'+itemId+'"'+//' id="'+itemId+'"'+
+        var input=$('<input type="password" class="form-original" name="'+itemId+'"'+' id="'+itemId+'"'+
                     _this.setPlaceholder(itemTemplate)+
                     'data-wrapper-class="controlgroup-textinput ui-btn"'+
                     ' value="'+value+'" '+_this.setRequired(itemTemplate.isOptional,"此项必须正确填写")+'>');
@@ -284,7 +412,7 @@ mform.prototype={
         if(itemTemplate['subType']) type=itemTemplate.subType;
         for(var i=0;i<2;i++){
             console.log(placeholders[i]);
-            var input=$('<input type="'+type+'" class="form-original" name="'+itemId+'_'+i+'"'+//' id="'+itemId+'_'+i+'"'+
+            var input=$('<input type="'+type+'" class="form-original" name="'+itemId+'_'+i+'"'+' id="'+itemId+'_'+i+'"'+
                         placeholders[i]+'" value="" '+_this.setRequired(itemTemplate.isOptional,"此项必须填写")+'>');
             if(i==0) {
                 subContainer.prepend(input);
@@ -298,7 +426,7 @@ mform.prototype={
     generateTextAreaItem:function(itemId,itemTemplate){
         var _this=this;
         var value=itemTemplate.defaultValue || '';
-        var textarea=$('<textarea class="form-original" cols="40" rows="1" name="'+itemId+'"'+//' id="'+itemId+'"'+
+        var textarea=$('<textarea class="form-original" cols="40" rows="1" name="'+itemId+'"'+' id="'+itemId+'"'+
                     _this.setPlaceholder(itemTemplate)+'" '+_this.setRequired(itemTemplate.isOptional,"此项必须填写")+'>'+value+'</textarea>');
         var subContainer=$('<div class="form-original"></div>');
         
@@ -306,8 +434,9 @@ mform.prototype={
         return subContainer;
     },
     generateRadioItem:function(itemId,itemTemplate){
+        var _this=this;
         var value=itemTemplate.defaultValue || 0;
-        var radio_container=$('<fieldset class="form-original" id="'+itemId+'" data-role="controlgroup" data-type="horizontal" data-mini="true"></fieldset>');
+        var radio_container=$('<fieldset class="form-original" name="'+itemId+'" id="'+itemId+'" data-role="controlgroup" data-type="horizontal" data-mini="true"></fieldset>');
             if(itemTemplate.data){
                 itemTemplate.data.forEach((d,counter)=>{
                     var check="";
@@ -315,29 +444,16 @@ mform.prototype={
                         check='checked="checked"';
                     }
                     if(d instanceof Object){
-                        var text=d;
-                        var valueIndex=counter;
-                        if(itemTemplate.hasOwnProperty('displayFormat')){
-                            text=itemTemplate.displayFormat;
-                            $.each(d,(k,v)=>{
-                                text=text.replace("{"+k+"}",v);
-                            })
-                        }
-                        if(itemTemplate.hasOwnProperty('valueKey')){
-                            $.each(d,(k,v)=>{
-                                if(k==itemTemplate.valueKey) {
-                                    valueIndex=v;
-                                    return false;
-                                }
-                            })
-                        }
-                        if(valueIndex==value){
+                        var textAndValue=_this.getDisplayTextAndValue(d,itemTemplate);
+                        if(textAndValue.value==value){
                             check='checked="checked"';
                         }else{
                             check='';
                         }
-                        radio_container.append($('<input type="radio" name="'+itemId+'" id="'+itemId+'-'+valueIndex+'" data-label="'+text+'" value="'+valueIndex+'" '+check+'>'+
-                        '<label for="'+itemId+'-'+valueIndex+'">'+text+'</label>'));
+                        textAndValue.value=(textAndValue.value==undefined?counter:textAndValue.value);
+                        radio_container.append($('<input type="radio" name="'+itemId+'" id="'+itemId+'-'+textAndValue.value+
+                                                    '" data-label="'+textAndValue.text+'" value="'+textAndValue.value+'" '+check+'>'+
+                        '<label for="'+itemId+'-'+textAndValue.value+'">'+textAndValue.text+'</label>'));
                     }else{
                         radio_container.append($('<input type="radio" name="'+itemId+'" id="'+itemId+'-'+counter+'" data-label="'+d+'" value="'+counter+'" '+check+'>'+
                         '<label for="'+itemId+'-'+counter+'">'+d+'</label>'));
@@ -351,11 +467,103 @@ mform.prototype={
     generateFileInput:function(itemId,itemTemplate){
         var accept=itemTemplate.accept?' accept="'+itemTemplate.accept+'"':'';
             
-        var input=$('<input class="form-original" type="file" name="'+itemId+'" id="'+itemId+'" value=""'+accept+' '+setRequired(itemTemplate.isOptional,"此项必须填写")+'>');
+        var input=$('<input class="form-original" type="file" name="'+itemId+'" id="'+itemId+'" value=""'+accept+' '+this.setRequired(itemTemplate.isOptional,"此项必须填写")+'>');
         //item_container.append(input);
         var subContainer=$('<div class="form-original"></div>');
         subContainer.append(input);
-        item_container.append(subContainer);
-        return input;
-    }
+        return subContainer;
+    },
+    getDisplayTextAndValue:function(data,itemTemplate,key){
+        var text='';
+        var value;
+        if(itemTemplate.hasOwnProperty('displayFormat')){
+            text=itemTemplate.displayFormat;
+            $.each(data,(k,v)=>{
+                text=text.replace("{"+k+"}",v);
+            })
+        }else{
+            var collector=[];
+            $.each(data,(k,v)=>{
+                collector.push(v);
+            })
+            text=collector.join(" ");
+        }
+        if(itemTemplate['valueKey']!=undefined && data[itemTemplate.valueKey]!=undefined){
+            value=data[itemTemplate.valueKey]
+        }
+        if(itemTemplate['valueFormat']&&key.length>0){
+            value=itemTemplate.valueFormat;
+            //console.log();
+            if(_value.indexOf('key')>-1){
+                value = value.replace('{key}',key)
+            }
+            $.each(data,(k,v)=>{
+                value = value.replace('{'+k+'}',v)
+            });
+            
+            //d.hasOwnProperty(item.matchKey)?d[item.matchKey]:)
+        }
+        return {text:text,value:value};
+    },
+    generateComboBoxItem:function(itemId,itemTemplate){
+        var _this=this;
+        var value=itemTemplate.defaultValue || 0;
+        var selectItem=$('<select name="'+itemId+'" id="'+itemId+'"'+
+                            this.setFiltableSelect(itemTemplate)+'" '+this.setRequired(itemTemplate.isOptional,"此项必须选择")+'></select>');
+        if(itemTemplate.data){
+            if(itemTemplate.data instanceof Array){
+                itemTemplate.data.forEach((d,counter)=>{
+                    //console.log()
+                    if(d==null) d="";
+                    selectItem.append(setOptionItem(counter,d,itemTemplate));
+                });
+            }else{
+                $.each(item.data,function(key,value){
+                    if(key=="无"){
+                        selectItem.append($('<option value="'+key+0+'">'+key+'</option>'));
+                    }else{
+                        var grounp=$('<optgroup label="'+key+'"></optgroup>')
+                        value.forEach((d,counter)=>{
+                            grounp.append(setOptionItem(counter,d,itemTemplate,key));
+                        });
+                        selectItem.append(grounp);
+                    }
+                })
+            }
+        }
+        var subContainer=$('<div class="form-original"></div>');
+        subContainer.append(selectItem);
+        $(selectItem).on('change',function(){
+            console.log('change',$(this).find('option.emptyOption'));
+            if($(this).children('option:selected').text()!='无'){
+                $($.grep($(this).find('option'),option=>$(option).text()==="无")).prop('selected',false);;
+            }
+        });
+        return subContainer;
+        function setOptionItem(index,data,itemTemplate,key){
+            key=key||'';
+            var selected='';
+            if(data.constructor === Object){//'{name} {contact} {institution}'
+                var textAndValue=_this.getDisplayTextAndValue(data,itemTemplate);
+                textAndValue.value=(textAndValue.value==undefined?index:textAndValue.value);
+                if(textAndValue.value==value) selected=' selected';
+                return $('<option value="'+key+textAndValue.value+'"'+selected+'>'+textAndValue.text+'</option>');
+            }else{
+                if(index==value) selected=' selected';
+                return $('<option value="'+key+index+'"'+selected+'>'+d+'</option>');
+            }
+        }
+        
+    },
+    generateSuperMultiInputItem:function(itemId,itemTemplate){
+        var _this=this;
+        var value=itemTemplate.defaultValue || 0;
+        var subContainer=$('<div class="form-original"></div>');
+        var select=$('<div id="'+itemId+'" class="ui-select" data-placeholder="'+itemTemplate.placeholder+'"></div>')
+
+        select.superMultiInput();
+        subContainer.append(select);
+        return subContainer;
+        
+    },
 }

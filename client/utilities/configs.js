@@ -1,4 +1,4 @@
-var isRunLocal=true;
+var isRunLocal=false;
 var IPS=['localhost','192.168.10.68','cn.luyao.site']
 var showDebug=false;
 let ip=isRunLocal?IPS[1]:IPS[2];

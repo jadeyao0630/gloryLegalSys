@@ -1,27 +1,28 @@
 function databaseBatchForm(data){
     var combineDB=Object.assign(basicTableList,caseTableList)
     var form= new mform({template:databasePage_form});
-    if(data==undefined) form.setEmptyData();
+    if(data==undefined) form.setEmptyValues();
     else form.setData(data);
     $('#database_container').empty();
     $('#database_container').append(form.instance);
     $('#database_container').trigger('create');
     $('#database_container').find('.database-submit').on('click',function(e){
-        form.instance.getValues(0,databasePage_form.template.databseBatch.data,function(message,values){
-            console.log('databaseBatchForm',values)
-            if(values.success){
+        form.getFormValues(function(e){
+            console.log('databaseBatchForm',e)
+            if(e.success){
                 $().mloader("show",{message:"提交中...."});
-                var tableName=combineDB[values.data.values.dbName].tablename;
+                e.values.id=0;
+                var tableName=combineDB[e.values.dbName].tablename;
 
-                var range0=values.data.values["matchRange"].split(',')[0];
-                var range1=values.data.values["matchRange"].split(',')[1];
+                var range0=e.values["matchRange"].split(',')[0];
+                var range1=e.values["matchRange"].split(',')[1];
                 var rangeStr=range0==range1?"="+range0:(" BETWEEN \""+range0+"\" AND \""+range1+"\"");
                 console.log(range0,range0);
-                console.log("update "+tableName+ " set "+values.data.values.targetId+"=\""+values.data.values.targetValue+"\""+" where "+values.data.values.matchId+rangeStr);
+                console.log("update "+tableName+ " set "+e.values.targetId+"=\""+e.values.targetValue+"\""+" where "+e.values.matchId+rangeStr);
                 
-                update(values.data.values.matchId+rangeStr,
+                update(e.values.matchId+rangeStr,
                     tableName,
-                    values.data.values.targetId+"=\""+values.data.values.targetValue+"\"",(e)=>{
+                    e.values.targetId+"=\""+e.values.targetValue+"\"",(e)=>{
                         console.log(e.data.message);
                         $().mloader("hide");
                         $().minfo('show',{title:"提示",message:"保存完成。"+e.data.data.message},function(){
@@ -34,11 +35,12 @@ function databaseBatchForm(data){
         });
     });
     $('#database_container').find('.database-insert-submit').on('click',function(e){
-        form.instance.getValues(0,databasePage_form.template.databseInsert.data,function(message,values){
-            console.log('databaseInsertForm',values)
-            if(values.success){
+        form.getFormValues(function(e){
+            console.log('databaseInsertForm',e)
+            if(e.success){
+                e.values.id=0;
                 try{
-                    var query=JSON.parse(values.data.values.insertQuery);
+                    var query=JSON.parse(e.values.insertQuery);
                     console.log(Object.keys(query));
                 }catch(e){
                     $().minfo('show',{title:"提示",message:e},function(){
@@ -52,10 +54,10 @@ function databaseBatchForm(data){
         });
     });
     $('#database_container').find('.database-reset').on('click',function(e){
-        form.setEmptyData(databasePage_form.template.databseBatch.data);
+        form.setEmptyValues();
     });
     $('#database_container').find('.database-insert-reset').on('click',function(e){
-        form.setEmptyData(databasePage_form.template.databseInsert.data);
+        form.setEmptyValues();
     });
     $('#database_container').find('#dbName').on('change',function(e){
         var combineDB=Object.assign(basicTableList,caseTableList)
@@ -87,7 +89,7 @@ function databaseBatchForm(data){
         }
 
         /*
-        form.instance.getValues(0,databasePage_form.template,function(message,values){
+        form.getFormValues(0,databasePage_form.template,function(message,values){
             //console.log("changed",values);
             if(values.data.dbName!="无" && values.key=="dbName"){
                 console.log('databaseBatchForm',basicTableList[values.data.dbName])

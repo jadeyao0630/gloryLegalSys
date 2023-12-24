@@ -261,7 +261,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             var values=val.split(",");
                             if(type=="supermulticombobox"){
                                 values.forEach(_v=>{
-                                    var _values=formatSuperMultiSelectOptionValue(_v);
+                                    var _values=_v.convertToSuperMultiSelectValue(item.data,item.valueKey,item.matchKey);
                                     //console.log('setSumList',_values);
                                     if(_summary_template[key].data[sub_key].hasOwnProperty('displayFormat')){
                                         var displayFormat=_summary_template[key].data[sub_key].displayFormat;
@@ -282,7 +282,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
 
                             }else if(type=="supermultiinput"){
                                 values.forEach(_v=>{
-                                    var _values=formatSuperMultiSelectData(_v);
+                                    var _values=_v.convertToSuperMultiInputValue();
                                     //console.log('setSumList',_values);
                                     if(_summary_template[key].data[sub_key].hasOwnProperty('displayFormat')){
                                         var displayFormat=_summary_template[key].data[sub_key].displayFormat;

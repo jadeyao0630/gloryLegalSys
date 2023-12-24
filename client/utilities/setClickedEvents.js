@@ -29,7 +29,7 @@ $('#popupMenu').find('a').on('click',function(e){
             setting_info_form= new mform({template:settingPage_form});
             var userInfo=getGlobalJson("currentUser");
             userInfo.pass=decrypt(userInfo.pass);
-            setting_info_form.setData(userInfo);
+            setting_info_form.setValues(userInfo);
             $('#info_container').empty();
             $('#info_container').append(setting_info_form.instance);
                             
@@ -40,7 +40,7 @@ $('#popupMenu').find('a').on('click',function(e){
             break;
         case '添加用户':
             setting_add_form= new mform({template:settingPage_add_form});
-            setting_add_form.setEmptyData();
+            setting_add_form.setEmptyValues();
             $('#info_container').empty();
             $('#info_container').append(setting_add_form.instance);
                             
@@ -75,7 +75,7 @@ $('#popupMenu').find('a').on('click',function(e){
                             userD.pass=decrypt(userD.pass);
                             console.log(userD.name);
                             setting_add_form= new mform({template:settingPage_add_form});
-                            setting_add_form.setData(userD);
+                            setting_add_form.setValues(userD);
                             $('#info_container').empty();
                             $('#info_container').append(setting_add_form.instance);
                             
@@ -168,11 +168,11 @@ function functionBtnsEvent(but,index){
             goToPage( $(but).attr( "href" ));
             setTimeout(function() {
                 //console.log(matchItems[0]);
-                //main_form.setData(matchItems[0]);
+                //main_form.setValues(matchItems[0]);
                 //main_form.readOnly(false);
                 //
                 //console.log("data-role------"+$('.edit-header-btn[name="save_btn"').jqmData('role'));
-                caseForm.setData(matchItems[0]);
+                caseForm.setValues(matchItems[0]);
                 if(enableReadOnlyMode) caseForm.readOnly(matchItems[0].isReadOnly);
                 _setTitleBar("reg_form_title");
                 $().mloader("hide");
@@ -183,7 +183,7 @@ function functionBtnsEvent(but,index){
             
         }
     }
-    else if(but.name=="fn_btn_update"){//主表里的信息按钮
+    else if(but.name=="fn_btn_update"){//主表里的案件更新按钮
         $().mloader("show",{message:"读取中...."});
         $("#progress_details").empty();
         $("#progress_diagram").empty();
@@ -197,13 +197,14 @@ function functionBtnsEvent(but,index){
             var status_val=-1;
             if(matchItems.length>0){
                 //console.log("matchItems",matchItems[0]);
-                progressInfoForm.setData(matchItems[0])
-                if(enableReadOnlyMode) progressInfoForm.readOnly(matchItems[0].isReadOnly);
+                console.log('案件更新',matchItems);
+                progressInfoForm.setValues(matchItems[0],'_p')
+                //if(enableReadOnlyMode) progressInfoForm.readOnly(matchItems[0].isReadOnly);
                 //$("#progress_diagram").empty();
                 status_val=Number(matchItems[0].caseStatus);
                 
             }else{
-                progressInfoForm.setEmptyData();
+                progressInfoForm.setEmptyValues();
             }
             //console.log('status_val',status_val);
             //["立案","一审","二审",{name:"正在执行",data:["强制执行","正常执行","无需执行"]},"结案","再审","监督"]
@@ -494,8 +495,8 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                                     var form= new mform({template:add_update_template});
                                     var data={table:data.type,idkey:'updatesId',dateKey:'dateUpdated',data:itemData};
                                     
-                                    itemData['dateUpdated']=getDateTime();
-                                    form.setData(itemData);
+                                    //itemData['dateUpdated']=getDateTime();
+                                    form.setValues(itemData);
                                     $('#progress_popup_edit_title').text("修改进展");
                                     $('#progress_popup_edit_form').empty();
                                     $('#progress_popup_edit_form').append(form.instance);
@@ -513,8 +514,8 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                                     var form= new mform({template:add_execute_template});
                                     var data={table:data.type,idkey:'excutesId',dateKey:'dateExecuted',data:itemData};
                                     
-                                    itemData['dateExecuted']=getDateTime();
-                                    form.setData(itemData);
+                                    //itemData['dateExecuted']=getDateTime();
+                                    form.setValues(itemData);
                                     $('#progress_popup_edit_title').text("修改执行");
                                     $('#progress_popup_edit_form').empty();
                                     $('#progress_popup_edit_form').append(form.instance);
@@ -531,8 +532,8 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                                     var form= new mform({template:add_property_template});
                                     var data={table:data.type,idkey:'propertyId',dateKey:'dateUpdated',data:itemData};
                                     
-                                    itemData['dateUpdated']=getDateTime();
-                                    form.setData(itemData);
+                                    //itemData['dateUpdated']=getDateTime();
+                                    form.setValues(itemData);
                                     $('#progress_popup_edit_title').text("修改资产变更");
                                     $('#progress_popup_edit_form').empty();
                                     $('#progress_popup_edit_form').append(form.instance);
@@ -550,8 +551,8 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                                     var form= new mform({template:add_evidence_template});
                                     var data={table:data.type,idkey:'evidenceId',dateKey:'dateUploaded',data:itemData};
                                     
-                                    itemData['dateUploaded']=getDateTime();
-                                    form.setData(itemData);
+                                    //itemData['dateUploaded']=getDateTime();
+                                    form.setValues(itemData);
                                     $('#progress_popup_edit_title').text("修改附件证明");
                                     $('#progress_popup_edit_form').empty();
                                     $('#progress_popup_edit_form').append(form.instance);
@@ -634,26 +635,26 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                 sessionStorage.setItem("currentId", id+1);
                 
                 //main_form.readOnly(false);
-                //main_form.instance.setEmptyData(FormTemplate.template);
-                //main_form.readOnly(false).setEmptyData();
-                //main_form.instance.setEmptyData()
+                //main_form.instance.setEmptyValues(FormTemplate.template);
+                //main_form.readOnly(false).setEmptyValues();
+                //main_form.instance.setEmptyValues()
                 //
                 
-                //main_form.readOnly(false).setEmptyData();
+                //main_form.readOnly(false).setEmptyValues();
                 $('.progress_lock.edit-info').addClass('hide');
                 //console.log($('.progress_lock.edit-info'));
                 $("#reg_form_title").html("新增档案");
                 $('.edit-header-btn[name="save_btn"').show();
                 //_setBlurBackgroundVisibility(true);
                 goToPage( $(this).attr( "href" ));
-            // main_form.readOnly(false).setEmptyData();
+            // main_form.readOnly(false).setEmptyValues();
                     //$().mloader("hide");
                 setTimeout(function() {
-                    caseForm.readOnly(false).setEmptyData();
+                    caseForm.readOnly(false).setEmptyValues();
                     
                     $().mloader("hide");
                 }, 10);
-                //main_form.setData(getGlobalJson("mainData")[0]);
+                //main_form.setValues(getGlobalJson("mainData")[0]);
                 //$("#fullscreenPage").trigger('create');
                 //main_form.instance.trigger('create');
             });
@@ -688,12 +689,12 @@ $('.progress_popup_edit_form_submit').on('click', function (e){
     var data=JSON.parse($(this).data('item'));
     
     var form=$(this).jqmData('form');
-    form.instance.getValues(0,form.opt.template.template, function(message,values){
-        console.log(values);
-        if(values.success){
+    form.getFormValues(function(e){
+        console.log(e);
+        if(e.success){
             var vals=[];
             var newData={};
-            $.each(values.data.values,(key,val)=>{
+            $.each(e.values,(key,val)=>{
                 if(key!='id'){
                     vals.push(key+'="'+val+'"');
                     newData[key]=val;
@@ -732,8 +733,8 @@ function updateSubmitEvent(e){
     
     var form=$(this).jqmData('form');
     console.log(form.opt.template);
-    form.instance.getValues(0,form.opt.template.template, function(message,values){
-        console.log("获取到的表格值",values);
+    form.getFormValues(function(e){
+        console.log("获取到的表格值",e);
         if(values.success){
             var editableStatus=checkProgressEdiableStatus();
             var goNext=false;
@@ -792,14 +793,14 @@ function updateSubmitEvent(e){
                     var idx=await getRecordLatestIndex(data.table,data.key);
                     if(data.table!='caseAttachments'){
                         var subidx=await getRecordLatestIndex(data.table,'subId','caseStatus='+data.caseStatus);
-                        values.data.values.subId=subidx+1;
+                        e.values.subId=subidx+1;
                     }else{
                         fileOk=false;
                         //files=values.data.caseAttachments;
-                        if(values.data.values.filePath.length>0){
+                        if(e.values.filePath.length>0){
                             var filePaths= [];
                             
-                            uploadFiles(data.id,values.data.values.filePath).then(r=>{
+                            uploadFiles(data.id,e.values.filePath).then(r=>{
                                 //console.log(r);
                                 $.each(r,(index,uploadResult)=>{
                                     if(!uploadResult.success){
@@ -811,7 +812,7 @@ function updateSubmitEvent(e){
                                         filePaths.push(uploadResult.fileName);
                                     }
                                 });
-                                values.data.values.filePath=filePaths.join(',');
+                                e.values.filePath=filePaths.join(',');
                                 fileOk=true;
                             });
                             
@@ -824,12 +825,12 @@ function updateSubmitEvent(e){
                     var _intervalId = setInterval(async() => {
                         if (fileOk) {
                             clearInterval(_intervalId);
-                            values.data.values[data.key]=idx+1;
-                            values.data.values.caseNo=data.caseNo;
-                            values.data.values.id=data.id;
-                            values.data.values.isInactived=0;
-                            values.data.values.caseStatus=data.caseStatus;
-                            values.data.values[data.dateKey]=getDateTime();
+                            e.values[data.key]=idx+1;
+                            e.values.caseNo=data.caseNo;
+                            e.values.id=data.id;
+                            e.values.isInactived=0;
+                            e.values.caseStatus=data.caseStatus;
+                            e.values[data.dateKey]=getDateTime();
                             var newCaseStatus=currentProgress['targetPosition'].main+(currentProgress['originalPosition'].main>excutePoint && currentProgress['targetPosition'].main> currentProgress['originalPosition'].main?currentProgress['originalPosition'].sub:currentProgress['targetPosition'].sub)/10;
                             if(editableStatus=="new" || editableStatus=="shift"){
         
@@ -879,15 +880,15 @@ function updateSubmitEvent(e){
                                 }
                             }
                             //更新节点数据
-                            console.log("final values",data.table,values.data.values);
-                            pureinsert(data.table,values.data.values,(r)=>{
+                            console.log("final values",data.table,e.values);
+                            pureinsert(data.table,e.values,(r)=>{
                                 console.log('insert result',data.table,r,currentProgress['target']);
-                                DataList[data.table].push(values.data.values);
+                                DataList[data.table].push(e.values);
         
-                                currentProgress['currentDiagramButton'].opt.counterData.push(values.data.values);
+                                currentProgress['currentDiagramButton'].opt.counterData.push(e.values);
                                 currentProgress['currentDiagramButton'].updateCounterIndicator(data);
                                 if(data.table=='caseExcutes'){
-                                    fireDataChnaged("caseexcutesChanged",values.data.values,"add");
+                                    fireDataChnaged("caseexcutesChanged",e.values,"add");
                                 }
                                 $().mloader("hide");
                             
@@ -954,26 +955,26 @@ $('.case_reg_but').on('click',async function(e){
             sessionStorage.setItem("currentId", id+1);
             
             //main_form.readOnly(false);
-            //main_form.instance.setEmptyData(FormTemplate.template);
-            //main_form.readOnly(false).setEmptyData();
-            //main_form.instance.setEmptyData()
+            //main_form.instance.setEmptyValues(FormTemplate.template);
+            //main_form.readOnly(false).setEmptyValues();
+            //main_form.instance.setEmptyValues()
             //
             
-            //main_form.readOnly(false).setEmptyData();
+            //main_form.readOnly(false).setEmptyValues();
             $('.progress_lock.edit-info').addClass('hide');
             //console.log($('.progress_lock.edit-info'));
             $("#reg_form_title").html("新增档案");
             $('.edit-header-btn[name="save_btn"').show();
             //_setBlurBackgroundVisibility(true);
             goToPage( $(this).attr( "href" ));
-           // main_form.readOnly(false).setEmptyData();
+           // main_form.readOnly(false).setEmptyValues();
                 //$().mloader("hide");
             setTimeout(function() {
-                caseForm.readOnly(false).setEmptyData();
+                caseForm.setEmptyValues();
                 
                 $().mloader("hide");
             }, 10);
-            //main_form.setData(getGlobalJson("mainData")[0]);
+            //main_form.setValues(getGlobalJson("mainData")[0]);
             //$("#fullscreenPage").trigger('create');
             //main_form.instance.trigger('create');
         });
@@ -1062,10 +1063,129 @@ $('.case_reg_but').on('click',async function(e){
                 });
             });
         }
+    }else if(this.id=="chart_sum"){
+        var caseCause={};
+        
+        var caseCause1={};
+        DataList.casesDb.forEach(item=>{
+            var match=$.grep(resourceDatas.caseCauses_,(d=>d.id==item.caseCause));
+            if(match.length>0){
+                var catelog=match[0].label;
+                if(!caseCause.hasOwnProperty(catelog)) caseCause[catelog]=[];
+                if(!caseCause1.hasOwnProperty(catelog)) caseCause1[catelog]=0.0;
+                caseCause[catelog].push(item);
+                caseCause1[catelog]+=item.requestAmount;
+            }
+
+            //console.log('chart_sum',match.label,match)
+            //caseCause.push({})
+        });
+        console.log('chart_sum',caseCause1);
+        var chartData=[];
+        var chartData1=[];
+        $.each(caseCause,(key,items)=>{
+            chartData.push({'label':key,'value':items.length})
+        });
+        $.each(caseCause1,(key,value)=>{
+            chartData1.push({'label':key,'value':value,"style": { "color": "#ffffff" } })
+        });
+        FusionCharts.ready(function () {  
+            var caseCauseNumChart = new FusionCharts({  
+                type: 'pie3d',  
+                renderAt: 'chart_container',  
+                width: '100%',  
+                height: '100%',  
+                dataFormat: 'json',  
+                dataSource: {  
+                    "chart": {  
+                        "caption": "案件纠纷数量比例",  
+                        "captionFontColor": "#333",
+                        "subCaption": "",  
+                        "paletteColors": "#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",  
+                        "bgColor": "#ffffff",  
+                        "showBorder": "0",  
+                        "use3DLighting": "0",  
+                        "showShadow": "0",  
+                        "enableSmartLabels": "0",  
+                        "startingAngle": "0",  
+                        "showPercentValues": "1",  
+                        "showPercentInTooltip": "0",  
+                        "decimals": "2",  
+                        "captionFontSize": "18",  
+                        "subcaptionFontSize": "18",  
+                        "subcaptionFontBold": "0",  
+                        //"toolTipColor": "#ffffff",  
+                        //"toolTipBorderThickness": "0",  
+                        //"toolTipBgColor": "#000000",  
+                        //"toolTipBgAlpha": "80",  
+                        //"toolTipBorderRadius": "2",  
+                        //"toolTipPadding": "5",  
+                        "showHoverEffect":"1",  
+                        "showLegend": "1",  
+                        "legendBgColor": "#ffffff",  
+                        "legendBorderAlpha": '0',  
+                        "legendShadow": '0',  
+                        "legendItemFontSize": '14',  
+                        "legendItemFontColor": '#666666'  ,
+                        "labelFontSize": "14",
+                        "baseFontSize": "16",
+                    },  
+                    "data": chartData
+                }  
+            });
+            caseCauseNumChart.render('chart_container'); 
+            
+            var caseCauseAmountChart = new FusionCharts({  
+                type: 'bar2d',  
+                renderAt: 'chart_amount_container',  
+                width: '100%',  
+                height: '100%',  
+                dataFormat: 'json',  
+                dataSource: {  
+                    "chart": {  
+                        "caption": "案件纠纷金额",  
+                        "bgColor": "#ffffff",  
+                        "showBorder": "0",  
+                        "captionFontSize": "18",  
+                        "captionFontColor": "#333",
+                        "subcaptionFontSize": "18",  
+                        "formatNumberScale": "1",
+                        "numberScaleUnit": "万,亿",  // Setting the scale units in Chinese
+                        "numberScaleValue": "1,10000",  // Setting the scale values
+                        "palettecolors": "#5d62b5,#29c3be,#f2726f,#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",
+                        "plotBorderAlpha": "0", // Setting the plotBorderAlpha to 0 to remove the column borders
+                        "usePlotGradientColor": "0",
+                        "baseFontSize": "14",
+                        "legendShadow": '0',  
+                    },  
+                    "data": chartData1
+                }  
+            });
+            caseCauseAmountChart.render('chart_amount_container');  
+        });
+        goToPage( $(this).attr( "href" ));
     }
 })
 //#region 查看信息页面的按钮事件
 
+function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+    ['Task', 'Hours per Day'],
+    ['Work',     11],
+    ['Eat',      2],
+    ['Commute',  2],
+    ['Watch TV', 2],
+    ['Sleep',    7]
+    ]);
+
+    var options = {
+    title: 'My Daily Activities',
+    is3D: true,
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('chart_container'));
+    chart.draw(data, options);
+}
 function showProgressDetails(datas,updates,excutes,properties,attachments,caseLinked){
     $().mloader('show',{message:"读取中..."});
     if(datas.length>0){
@@ -1109,23 +1229,24 @@ $('.edit-header-btn').on('click',async function(e){
 
         //保存案件页面
         if(sessionStorage.getItem('currentPage')=="#casePage"){
-            caseForm.instance.getValues(getGlobal("currentId"),FormTemplate3.template,function(message,values){
-                console.log('getvalues',values);
-                if(values.success){
+            caseForm.getFormValues(function(e){
+                console.log('getvalues',e);
+                if(e.success){
                     //console.log(message.message);
                     //return;
+                    e.values.id=getGlobal("currentId");
                     if(isAddPage){
-                        values.data.caseStatus['penalty']='0.00';
-                        values.data.caseStatus['paidAmount']='0.00';
-                        values.data.caseStatus['caseStatus']=-1;
-                        values.data.caseStatus['lawFirm']=0;
-                        values.data.caseStatus['attorney']='无0';
-                        values.data.caseStatus['FirstInstance']='0000-00-00 00:00:00';
-                        values.data.caseStatus['SecondInstance']='0000-00-00 00:00:00';
+                        e.caseStatus['penalty']='0.00';
+                        e.caseStatus['paidAmount']='0.00';
+                        e.caseStatus['caseStatus']=-1;
+                        e.caseStatus['lawFirm']=0;
+                        e.caseStatus['attorney']='无0';
+                        e.caseStatus['FirstInstance']='0000-00-00 00:00:00';
+                        e.caseStatus['SecondInstance']='0000-00-00 00:00:00';
                     }
-                    values.data.values=Object.assign(values.data.values,values.data.caseStatus);
-                    console.log('save data',values.data);
-                    values.data.values["caseCreateDate"]=getDateTime();
+                    e.values=Object.assign(e.values,e.caseStatus);
+                    console.log('save data',e);
+                    e.values["caseCreateDate"]=getDateTime();
                     //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
                     if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
                         $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
@@ -1133,10 +1254,10 @@ $('.edit-header-btn').on('click',async function(e){
                             window.location.href = 'index.html';
                         });
                     }else{
-                        values.data.values["caseApplicant"]=getGlobalJson("currentUser").id;
-                        if(enableReadOnlyMode) values.data.values["isReadOnly"]=_isReadOnlyCurrentForm();
-                        values.data.values["id"]=Number(values.data.values["id"]);
-                        fireDataChnaged("caseChanged",values.data.values,isAddPage?"add":"update");
+                        e.values["caseApplicant"]=getGlobalJson("currentUser").id;
+                        if(enableReadOnlyMode) e.values["isReadOnly"]=_isReadOnlyCurrentForm();
+                        e.values["id"]=Number(e.values["id"]);
+                        fireDataChnaged("caseChanged",e.values,isAddPage?"add":"update");
                     }
                     
                     
@@ -1148,10 +1269,11 @@ $('.edit-header-btn').on('click',async function(e){
         }
         //保存进展页面
         else if(sessionStorage.getItem('currentPage')=="#progress"){
-            progressInfoForm.instance.getValues(getGlobal("currentId"),progress_form_template.template,function(message,values){
+            progressInfoForm.getFormValues(function(e){
                 console.log('保存进展页面',values)
-                if(values.success){
-                    fireDataChnaged("caseStatusChanged",values.data.values,"update");
+                if(e.success){
+                    e.values.id=getGlobal("currentId");
+                    fireDataChnaged("caseStatusChanged",e.values,"update");
                     
                 }
             });
@@ -1159,18 +1281,19 @@ $('.edit-header-btn').on('click',async function(e){
         //保存个人信息页面
         else if(sessionStorage.getItem('currentPage')=="#infoPage"){
            
-            setting_info_form.instance.getValues(getGlobalJson("currentUser").id,settingPage_form.template,function(message,values){
+            setting_info_form.getFormValues(function(e){
                 //console.log(values)
-                if(values.success){
-                    console.log(values);
+                if(e.success){
+                    console.log(e);
                     var newData={};
-                    $.each(values.data.values,(key,val)=>{
+                    $.each(e.values,(key,val)=>{
                         if(key.replace("_p","")=='pass'){
                                 newData[key.replace("_p","")]=encrypt(val);
                         }else{
                             newData[key.replace("_p","")]=val;
                         }
                     })
+                    newData.id=getGlobalJson("currentUser").id;
                     update('id='+getGlobalJson("currentUser").id,userDbTableName,newData,function(r){
                         
                         if(r.data.data.affectedRows>0){
@@ -1193,20 +1316,21 @@ $('.edit-header-btn').on('click',async function(e){
     }else if($(this).text()=="添加"){
         //添加个人信息页面
         if(sessionStorage.getItem('currentPage')=="#infoPage"){
-            setting_add_form.instance.getValues((await getRecordLatestIndex(userDbTableName,'id'))+1,settingPage_add_form.template,function(message,values){
+            setting_add_form.getFormValues(async function(e){
                 //console.log(values)
-                if(values.success){
-                    console.log(values);
-                    values.data.values.createDate=getDateTime();
-                    values.data.values['isInactived']=values.data.values.isInactived_a;
-                    delete values.data.values.isInactived_a;
-                    values.data.values.pass=encrypt(values.data.values.pass)
-                    saveCurrentUser(values.data.values,true).then((r)=>{
+                if(e.success){
+                    console.log(e);
+                    e.values.createDate=getDateTime();
+                    e.values.id=(await getRecordLatestIndex(userDbTableName,'id'))+1;
+                    e.values['isInactived']=e.values.isInactived_a;
+                    delete e.values.isInactived_a;
+                    e.values.pass=encrypt(e.values.pass)
+                    saveCurrentUser(e.values,true).then((r)=>{
                         if(r.success){
                             console.log("添加成功。");
-                            if(values.data.values.position>0)
-                                resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,values.data.values,'id');
-                            resourceDatas['users']=updateOriginalData(resourceDatas['users'],values.data.values,'id');
+                            if(e.values.position>0)
+                                resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,e.values,'id');
+                            resourceDatas['users']=updateOriginalData(resourceDatas['users'],e.values,'id');
                             $().minfo('show',{title:"提示",message:"添加成功。"},function(){
                                 
                             });
@@ -1224,15 +1348,16 @@ $('.edit-header-btn').on('click',async function(e){
         if(sessionStorage.getItem('currentPage')=="#infoPage"){
             
             var userD=JSON.parse($(_this).data('item'));
-            setting_add_form.instance.getValues(userD.id,settingPage_add_form.template,function(message,values){
+            setting_add_form.getFormValues(function(message,values){
                 //console.log(values)
-                if(values.success){
+                if(e.success){
                     //values.data.values.createDate=getDateTime(userD.createDate);
-                    values.data.values['isInactived']=values.data.values.isInactived_a;
-                    delete values.data.values.isInactived_a;
+                    e.values['isInactived']=e.values.isInactived_a;
+                    e.values.id=userD.id;
+                    delete e.values.isInactived_a;
                     //console.log(values,userD);
                     var data=[];
-                    $.each(values.data.values,(key,val)=>{
+                    $.each(e.values,(key,val)=>{
                         if(key!='id'){
                             if(key.replace("_p","")=='pass') data.push(key.replace("_p","")+"=\""+encrypt(val)+"\"");
                             else data.push(key.replace("_p","")+"=\""+val+"\"");
@@ -1243,9 +1368,9 @@ $('.edit-header-btn').on('click',async function(e){
                         
                         if(r.data.data.affectedRows>0){
                             console.log("修改成功。");
-                            if(values.data.values.position>0)
-                                resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,values.data.values,'id');
-                            resourceDatas['users']=updateOriginalData(resourceDatas['users'],values.data.values,'id');
+                            if(e.values.position>0)
+                                resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,e.values,'id');
+                            resourceDatas['users']=updateOriginalData(resourceDatas['users'],e.values,'id');
                             $().minfo('show',{title:"提示",message:"修改成功。"},function(){
                                 
                             });

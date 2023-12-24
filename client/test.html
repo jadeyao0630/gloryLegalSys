@@ -6,6 +6,7 @@
     <title>Document</title>
     <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css">
     <link rel="stylesheet" href="./css/color.css">
+    <link rel="stylesheet" href="./css/superMultiSelect.css">
     <style>
         body{
             overflow-y:hidden;
@@ -287,6 +288,63 @@
 <script src="./utilities/templates.js"></script>
 <script src="./utilities/preload.js"></script>
 
+<script type="text/javascript" src="./js/chart.js"></script>
+<script type="text/javascript">
+  google.charts.load("current", {packages:["corechart"]});
+  google.charts.setOnLoadCallback(drawChart);
+  function drawChart() {
+    var data = google.visualization.arrayToDataTable([
+      ['Task', 'Hours per Day'],
+      ['Work',     11],
+      ['Eat',      2],
+      ['Commute',  2],
+      ['Watch TV', 2],
+      ['Sleep',    7]
+    ]);
+
+    var options = {
+      title: 'My Daily Activities',
+      is3D: true,
+    };
+
+    var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
+    chart.draw(data, options);
+  }
+</script>
+<div id="piechart_3d" style="width: 900px; height: 500px;"></div>
+<a href="#popupNested" data-rel="popup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-bars ui-btn-icon-left ui-btn-b" data-transition="pop">Choose a creature...</a>
+<div data-role="popup" id="popupNested" data-theme="none">
+    <ul class="ui-super-listview" id="test-menu" data-role="listview" data-filter="true" data-filter-placeholder="Find cars..." data-filter-theme="a">
+        <li data-role="list-divider" role="heading" class="ui-li-divider ui-bar-inherit ui-first-child">公司</li>
+        <li><div class="ui-controlgroup ui-m-controlgroup" >
+            <select>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+            <input type="checkbox" name="checkbox-v-2a" id="checkbox-v-2a">
+            <label for="checkbox-v-2a">One</label>
+        </div></li>
+        <li><div class="ui-controlgroup ui-m-controlgroup" >
+            <select>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+            <input type="checkbox" name="checkbox-v-2b" id="checkbox-v-2b">
+            <label for="checkbox-v-2b">Two</label>
+        </div></li>
+        <li><div class="ui-controlgroup ui-m-controlgroup" >
+            <select>
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+            <input type="checkbox" name="checkbox-v-2c" id="checkbox-v-2c">
+            <label for="checkbox-v-2c">Three</label>
+        </div></li>
+    </ul>
+</div><!-- /popup --> 
 <input id="filterTable-input" type="text">
 <a href="#" id="columntToggle">test</a>
 <div class="tableWrapper" >

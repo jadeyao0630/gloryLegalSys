@@ -53,7 +53,7 @@ var _summary_template;
                         label:"所属项目:",
                         type:"combobox",
                         isOptional:false,
-                        data:$.grep(resourceDatas.projects_,(d)=>d.isInactived==0),
+                        data:resourceDatas.projects_,
                         valueKey:'id',
                         displayFormat:'{name}'
                     },
@@ -100,6 +100,7 @@ var _summary_template;
                         label:"立案日期:",
                         type:"date",
                         isOptional:false,
+                        dateFormate:"yyyy-MM-dd"
                     },
                     /*
                     caseAttachments:{
@@ -146,7 +147,8 @@ var _summary_template;
                         valueKey:'id',
                         matchKey:"name",
                         displayFormat:'{name}',
-                        table:'caseStatus'
+                        table:'caseStatus',
+                        //defaultValue:1,
                     },
                     /*
                     legalCounsel:{
@@ -382,7 +384,7 @@ var _summary_template;
                 valueKey:'id',
                 displayFormat:'{name}',
             },
-            lawFirm:{
+            lawFirm_p:{
                 type:"combobox",
                 data:resourceDatas.lawFirms_,
                 valueKey:'id',
@@ -390,7 +392,7 @@ var _summary_template;
                 label:"代理律所：",
                 isOptional:true,
             },
-            attorney:{
+            attorney_p:{
                 type:"multicombobox",
                 data:resourceDatas.attorneys,
                 label:"代理律师：",
@@ -398,28 +400,29 @@ var _summary_template;
                 valueKey:'id',
                 matchKey:"name",
                 //table:'caseStatus',
-                displayFormat:'{name} {contact}'
+                displayFormat:'{name} {contact}',
+                defaultValue:'无0'
             },
-            penalty:{
+            penalty_p:{
                 type:"text",
                 label:"判决金额(万)：",
                 isOptional:true,
                 defaultValue:0.0
             },
-                paidAmount:{
+                paidAmount_p:{
                 type:"text",
                 label:"执行金额(万)：",
                 isOptional:true,
                 defaultValue:0.0,
                 isDisabled:true
             },
-            FirstInstance:{
+            FirstInstance_p:{
                 type:"date",
                 label:"一审日期：",
                 isOptional:true,
                 //defaultValue:0.0
             },
-            legalCounsel:{
+            legalCounsel_p:{
                 placeholder:"一审法官",
                 label:"一审法官:",
                 type:"multicombobox",
@@ -430,13 +433,13 @@ var _summary_template;
                 matchKey:"name",
                 displayFormat:'{name} {contact}',//'{name} {contact} {institution}'
             },
-            SecondInstance:{
+            SecondInstance_p:{
                 type:"date",
                 label:"二审日期：",
                 isOptional:true,
                 //defaultValue:0.0
             },
-            legalCounselSecond:{
+            legalCounselSecond_p:{
                 placeholder:"二审法官",
                 label:"二审法官:",
                 type:"multicombobox",
@@ -1106,6 +1109,7 @@ var _summary_template;
         data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
         '<a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-search btn-icon-green ui-btn-icon-left header-filter-btn">查询</a>'+
         '<button class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left header-filter-btn">复位</button>'+
+        '<a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-lock ui-btn-icon-notext header-filter-btn">锁定</a>'+
         '</div>',
         
         span:'5/5'

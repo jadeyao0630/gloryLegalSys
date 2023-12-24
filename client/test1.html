@@ -1,120 +1,69 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
-    <link rel="stylesheet" href="./css/form.css" />
-    <link rel="stylesheet" href="./css/popup.css" />
-    <link rel="stylesheet" href="./css/color.css" />
-    <link rel="stylesheet" href="./css/superMultiSelect.css" />
-    <script src="./js/jquery.js"></script>
-	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
-    
-	<script src="./elements/mform.js"></script>
-    
-    <script src="./utilities/tools.js"></script>
-    <script src="./utilities/db.js"></script>
-    <script src="./utilities/configs.js"></script>
-    <script src="./utilities/resourceData.js"></script>
-    <script src="./elements/superMutliSelect.js"></script>
-    <script src="./elements/superMultiSelect.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiple Charts Example</title>
+  <!-- Include FusionCharts.js library -->
+  <script src="https://cdn.fusioncharts.com/fusioncharts/latest/fusioncharts.js"></script>
 </head>
-
 <body>
-    <div data-role="page" id="casePage">
-	
-		<div data-role="header" data-position="fixed">
-				<a href="#casePage1" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-mini ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" >返回</a>
-			<h1 id="reg_form_title">My App</h1>
-			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
-		</div><!-- /header -->
-		
-        <div id="form_container">读取中</div>
-		
+  <div id="column-chart-container">Column chart will render here</div>
+  <div id="pie-chart-container">Pie chart will render here</div>
 
-	</div>
-    <div data-role="page" id="casePage1">
-	
-		<div data-role="header" data-position="fixed">
-				<a href="#casePage" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-mini ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" >返回</a>
-			<h1 id="reg_form_title">My App</h1>
-			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
-		</div><!-- /header -->
-		
-        <div>读取中1</div>
-		
-
-	</div>
-  
-  
-
-    <script>
-    $('.edit-header-btn').on('click',function(e){
-        if(this.text=='返回'){
-
+  <script>
+    FusionCharts.ready(function() {
+      // Create a new instance of the column chart
+      var columnChart = new FusionCharts({
+        type: 'column2d',
+        renderAt: 'column-chart-container',
+        width: '600',
+        height: '400',
+        dataFormat: 'json',
+        dataSource: {
+          "chart": {
+            "caption": "Monthly Sales Data",
+            "xAxisName": "Month",
+            "yAxisName": "Sales (in USD)",
+            "theme": "fusion"
+          },
+          "data": [
+            { "label": "Jan", "value": "420000" },
+            { "label": "Feb", "value": "810000" },
+            { "label": "Mar", "value": "720000" },
+            { "label": "Apr", "value": "550000" },
+            { "label": "May", "value": "910000" }
+          ]
         }
-    })
-    var preloadDone=false;
-    $('body').on(preload_completed_event_name,function(){  
-        console.log('preload_completed_event_name',preload_completed_event_name);
-        preloadDone=true;
-    });
-    $('body').on(main_load_completed_event_name,function(){  
-        
-        console.log('main_load_completed_event_name',main_load_completed_event_name);
-        const intervalId = setInterval(() => {
-                
-                console.log('setInterval',FormTemplate3);
-                if (FormTemplate3) {
-                    clearInterval(intervalId);
-                    FormTemplate3.template['caseInfo'].data['pass']={
-                        placeholder:"密码",
-                        label:"密码:",
-                        type:"password",
-                        isOptional:true,
-                        isChangeable:true,
-                    },
-                    FormTemplate3.template['caseInfo'].data['matchRange']={
-                        placeholders:["索引起始","索引结束"],
-                        label:"索引范围:",
-                        type:"textrange",
-                        isOptional:false,
-                    };
-                    FormTemplate3.template['caseInfo'].data['filePath']={
-                        label:"上传文件",
-                        type:"file",
-                        accept:".docx,.doc,.xlsx,.xls,.pdf,.png,.jpg,.jpeg,.txt,.zip,.rar"
-                    };
-                    FormTemplate3.template['caseInfo'].data['legalAgencies'].type='multicombobox';
-                    //FormTemplate3.template['baseInfo'].data['case2ndParty'].isFilterable=false;
-                    //FormTemplate3.template['caseInfo'].data['caseCause'].type='multicombobox';
-                    $('#form_container').empty();
-                    $('#form_container').append(new mform({template:FormTemplate3}).instance);
-                    $('#form_container').trigger('create')
-                    $().mloader('hide');
-                }
-            }, 100);
-        
-    });
-    
-    async function waitfor(condition){//无效，condition值在循环中不变
-        const response = new Promise(async(resolve,reject)=>{
-            const intervalId = setInterval(() => {
-                
-                console.log(condition);
-                if (condition) {
-                    clearInterval(intervalId);
-                    resolve();
-                }
-            }, 100);
-        });
-        return await response;
-    }
-    </script>
-    
-    <script src="./utilities/templates.js"></script>
-    <script src="./utilities/preload.js"></script>
-</body>
+      });
 
+      // Render the column chart
+      columnChart.render('column-chart-container');
+
+      // Create a new instance of the pie chart
+      var pieChart = new FusionCharts({
+        type: 'pie2d',
+        renderAt: 'pie-chart-container',
+        width: '600',
+        height: '400',
+        dataFormat: 'json',
+        dataSource: {
+          "chart": {
+            "caption": "Distribution of Sales by Category",
+            "theme": "fusion"
+          },
+          "data": [
+            { "label": "Electronics", "value": "250000" },
+            { "label": "Clothing", "value": "350000" },
+            { "label": "Furniture", "value": "400000" },
+            { "label": "Others", "value": "200000" }
+          ]
+        }
+      });
+
+      // Render the pie chart
+      pieChart.render('pie-chart-container');
+    });
+  </script>
+</body>
 </html>

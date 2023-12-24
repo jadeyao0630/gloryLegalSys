@@ -1535,6 +1535,8 @@ $.fn.extend({
                         }
                     }else if(catelog.type.toLowerCase()=="custom"){
 
+                    }else if(catelog.type.toLowerCase()=="label"){
+
                     }else{
                         var element=document.getElementById(catelog_key);
                         var val = dataValidation(element,catelog,function(he){

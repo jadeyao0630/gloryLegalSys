@@ -245,15 +245,18 @@ $.fn.extend({
         if(overlay!=undefined) $(overlay).addClass('popup-hide');
     },
     setTooltip:function(){
-        $(this).on('mouseover',(e)=>{
+        //console.log('selectmenucreate',this.get(0).nodeName);
+        $(this.get(0)).on('mouseover',(e)=>{
+            //console.log('selectmenucreate',$(this),$(this).get(0).scrollWidth,$(this).get(0).clientWidth);
             if ($(this).get(0).scrollWidth > $(this).get(0).clientWidth) {
-                $(this).tooltip('show',$(this).html());
+                $(this).tooltip('show',$(ele).html().replaceAll(",","</br>"));
             }
           });
           
-          $(this).on('mouseleave',(e)=>{
+          $(this.get(0)).on('mouseleave',(e)=>{
             $(this).tooltip('hide');
         });
+        
     },
     tooltip:function(visibility,html){
         if(visibility.toLowerCase()=="show"){
@@ -264,13 +267,41 @@ $.fn.extend({
             
             var position=$(this).offsetParent().hasClass('ui-popup')?$(this).position():$(this).offset();
             var thisWidth=$('.ui-tooltip').width();
+            var thisHeight=$('.ui-tooltip').height();
+            if(thisWidth+position.left>screen.width) position.left=screen.width-thisWidth-10;
+            var top=(position.top+$(this).height()+10);
+            console.log(thisHeight+position.top,$(window).height());
+            if(thisHeight+position.top+80>$(window).height()-$(window).scrollTop()) {
+                position.top=$(window).height()+$(window).scrollTop()-thisHeight-80;
+                top=position.top;
+            }
+            
+            $('.ui-tooltip').css({visibility: 'visible',
+                opacity: 1,
+                left:position.left,
+                top:top+'px'});
+        }else{
+            $('.ui-tooltip').remove();
+        }
+        
+    },
+    tooltipWithId:function(visibility,html){
+        var id=$(this).attr('id');
+        if(visibility.toLowerCase()=="show"){
+            var tooltip=$('<span id="'+id+'-tooltip" class="ui-tooltip" style=""></span>');
+            tooltip.html(html==undefined?$(this).text():html);
+
+            $('body').append(tooltip);
+            
+            var position=$(this).offsetParent().hasClass('ui-popup')?$(this).position():$(this).offset();
+            var thisWidth=$('.ui-tooltip').width();
             if(thisWidth+position.left>screen.width) position.left=screen.width-thisWidth-10;
             $('.ui-tooltip').css({visibility: 'visible',
                 opacity: 1,
                 left:position.left,
-                top:(position.top+$(this).height()+10)+'px'});
+                top:(position.top+$(this).height()+5)+'px'});
         }else{
-            $('.ui-tooltip').remove();
+            $('#'+id+'-tooltip').remove();
         }
         
     },

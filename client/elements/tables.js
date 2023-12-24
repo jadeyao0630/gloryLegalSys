@@ -527,20 +527,7 @@ pageTable.prototype.pageTable=function(command,data){
        // console.log($("#"+_this.opt.containerId).html());
     }
 }
-function _createNewCaseForm(template, constainerId){
-    
-    //console.log("_createNewCaseForm template");
-    //console.log(template);
-    var main_form= new mform({template:template});
-    var form=main_form.instance;
-    
-    const popup_form = document.getElementById(constainerId);
-    $(popup_form).append(form);
-    $(constainerId).trigger('create');
 
-
-    return main_form;
-}
 function getTdElement(columnSettings,value,key,_this){
     var td=$('<td name="'+key+'"></td>');
     if(columnSettings.style!=undefined) td.css(columnSettings.style);
@@ -601,7 +588,7 @@ function getTdElement(columnSettings,value,key,_this){
         var multiValues=[];
         vals.forEach(_v=>{
             //console.log(key,_v);
-            var _values=formatSuperMultiSelectOptionValue(_v);
+            var _values=_v.convertToSuperMultiSelectValue(columnSettings.data,columnSettings.valueKey,columnSettings.matchKey);
             //console.log('setSumList',_values);
             if(columnSettings.hasOwnProperty('displayFormat')){
                 var displayFormat=columnSettings.displayFormat;
@@ -626,7 +613,7 @@ function getTdElement(columnSettings,value,key,_this){
         var vals=value.split(',');
         var multiValues=[];
         vals.forEach(_v=>{
-            var _values=formatSuperMultiSelectData(_v);
+            var _values=_v.convertToSuperMultiInputValue();
             //console.log('setSumList',_values);
             if(columnSettings.hasOwnProperty('displayFormat')){
                 var displayFormat=columnSettings.displayFormat;

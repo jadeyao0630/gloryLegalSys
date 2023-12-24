@@ -5,6 +5,7 @@ caseForm,
 progressInfoForm,
 setting_info_form,
 setting_add_form;
+var isHeaderLocked=false;
 var currentData;
 var fancyTable;
 var slidedownOffset=0;
@@ -146,7 +147,7 @@ $('body').on(preload_completed_event_name,function(){
     container.append(form);
     $('#header-filter-container').prepend(container);
     form.hide();
-    filter_form.setEmptyData();
+    filter_form.setEmptyValues();
     form.trigger('create');
     $("#pageOneTable").trigger('create');
     //在过滤表格后同步表格头和身的宽度
@@ -158,10 +159,18 @@ $('body').on(preload_completed_event_name,function(){
             case "复位":
                 
                 
-                filter_form.setEmptyData();
+                filter_form.setEmptyValues();
                 currentData=DataList.combinedData;
                 //pageOnTable.sortColumn(currentData,pageOnTable.currentSort);
                 //setAvailableColumns('pageOneTable',1);
+                break;
+            case "锁定":
+                isHeaderLocked=!isHeaderLocked;
+                if(isHeaderLocked){
+                    $(this).addClass('btn-icon-green');
+                }else{
+                    $(this).removeClass('btn-icon-green');
+                }
                 break;
             case "查询":
                 //console.log("filter...",$(form).find('select,input'));
@@ -268,9 +277,13 @@ $('body').on(preload_completed_event_name,function(){
                     tb.instance.isTargetToggle=false;
                     
                     setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
-                    form.slideUp();
-                    $('#pageOneTable').animate({'margin-top':"0px"})
-                    $('#pageOneTable').trigger('create');
+                    if(!isHeaderLocked){
+                        form.slideUp();
+                        $('#pageOneTable').animate({'margin-top':"0px"})
+                        $('#pageOneTable').trigger('create');
+                    }
+                    
+
                     setAvailableColumns('pageOneTable',1);
                     $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height')});
                     $('#header-filter-container').trigger('create');
@@ -318,7 +331,7 @@ $('body').on('caseexcutesChanged',function(e){
             paidA+=parseFloat(exe.exexuteAmount);
         }
     })
-    $('#progress').find('#paidAmount').val(paidA);
+    $('#progress').find('#paidAmount_p').val(paidA);
     DataList.caseStatus.forEach((d,i)=>{
         if(d.id==e.value.id){
             DataList.caseStatus[i].paidAmount=paidA;
@@ -609,4 +622,18 @@ function setCheckAllBox(checkboxAll,targetTable){
         tr.not(':hidden').find('input[type="checkbox"]').prop( "checked", $(this).prop('checked') );
 
     });
+}
+function _createNewCaseForm(template, constainerId){
+    
+    //console.log("_createNewCaseForm template");
+    //console.log(template);
+    var main_form= new mform({template:template});
+    var form=main_form.instance;
+    
+    const popup_form = document.getElementById(constainerId);
+    $(popup_form).append(form);
+    $(constainerId).trigger('create');
+
+
+    return main_form;
 }

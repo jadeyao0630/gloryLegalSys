@@ -278,9 +278,19 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 .edit-lock{
     margin-right: 10px;
-    cursor: pointer;
+    margin-top:-10px;
+    margin-bottom:-10px;
+    background-color: #1362B7;
+    padding:2px;
+    border-radius: 16px;
 }
-
+.fa-background{
+    margin-right: 10px;
+    margin-top:-10px;
+    margin-bottom:-10px;
+    padding:3px;
+    border-radius: 16px;
+}
 #main-header{
     overflow:hidden;
     background: white;

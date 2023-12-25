@@ -1,16 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multiple Charts Example</title>
-  <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
+    <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
     <script type="text/javascript" src="../js/jquery.js"></script>
-    <script type="text/javascript" src="../js/jquery.mobile-1.4.5.js"></script>
 <script type="text/javascript" src="../js/fusioncharts/fusioncharts.js"></script>
+
 </head>
 <body>
-  <div data-role="page" id="chart_sum_page">
+    <div data-role="page" id="chart_sum_page">
 		<div data-role="header" data-position="fixed" data-tap-toggle="false">
 			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
 			<h1 id="preview_title">总览</h1>
@@ -24,61 +21,26 @@
 					</ul>
 			</div>
 		</div><!-- /header -->
-		<div style="display: grid;grid-template-columns: 50% 50%;">
-			<div id="chart_container" style="width: 100%; height: 400px ;"></div>
-			<div id="chart_amount_container" style="width: 100%; height: 400px ;"></div>
-		</div>
-	</div>
-
-  <script>
+        <div style="display: grid;grid-template-columns: 50% 50%;height:100%">
+            <div id="column-chart-container" style="width: 100%; height: 100% ;"></div>
+            <div id="pie-chart-container" style="width: 100%; height: 100% ;"></div>
+        </div>
+    </div>
+<script type="text/javascript">
+	
     FusionCharts.ready(function() {
       // Create a new instance of the column chart
       var columnChart = new FusionCharts({
-        type: 'bar3d',
-        renderAt: 'chart_container',
+        type: 'pie3d',
+        renderAt: 'column-chart-container',
         width: '100%',
-        height: '400px',
+        height: '100%',
         dataFormat: 'json',
         dataSource: {
           "chart": {
             "caption": "Monthly Sales Data",
-            "bgColor": "#ffffff",  
-                    "showBorder": "0",  
-                    "captionFontSize": "18",  
-                    "captionFontColor": "#333",
-                    "subcaptionFontSize": "18",  
-                    "formatNumberScale": "1",
-                    "numberScaleUnit": "万,亿",  // Setting the scale units in Chinese
-                    "numberScaleValue": "1,10000",  // Setting the scale values
-                    "palettecolors": "#5d62b5,#29c3be,#f2726f,#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",
-                    "plotBorderAlpha": "0", // Setting the plotBorderAlpha to 0 to remove the column borders
-                    "usePlotGradientColor": "0",
-                    "baseFontSize": "14",
-                    "legendShadow": '0', 
-          },
-          "data": [
-            { "label": "Jan", "value": "420000" },
-            { "label": "Feb", "value": "810000" },
-            { "label": "Mar", "value": "720000" },
-            { "label": "Apr", "value": "550000" },
-            { "label": "May", "value": "910000" }
-          ]
-        }
-      });
-
-      // Render the column chart
-      columnChart.render('chart_container');
-
-      // Create a new instance of the pie chart
-      var pieChart = new FusionCharts({
-        type: 'pie3d',
-        renderAt: 'chart_amount_container',
-        width: '100%',
-        height: '400px',
-        dataFormat: 'json',
-        dataSource: {
-          "chart": {
-            "caption": "Distribution of Sales by Category",
+            "xAxisName": "Month",
+            "yAxisName": "Sales (in USD)",
             "captionFontColor": "#333",
                     "subCaption": "",  
                     "paletteColors": "#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",  
@@ -111,31 +73,56 @@
                     "baseFontSize": "16",
           },
           "data": [
+            { "label": "Jan", "value": "420000" },
+            { "label": "Feb", "value": "810000" },
+            { "label": "Mar", "value": "720000" },
+            { "label": "Apr", "value": "550000" },
+            { "label": "May", "value": "910000" }
+          ]
+        }
+      });
+
+      // Render the column chart
+      columnChart.render('column-chart-container');
+
+      // Create a new instance of the pie chart
+      var pieChart = new FusionCharts({
+        type: 'bar3d',
+        renderAt: 'pie-chart-container',
+        width: '100%',
+        height: '100%',
+        dataFormat: 'json',
+        dataSource: {
+          "chart": {
+            "caption": "Distribution of Sales by Category",
+            "bgColor": "#ffffff",  
+                    "showBorder": "0",  
+                    "captionFontSize": "18",  
+                    "captionFontColor": "#333",
+                    "subcaptionFontSize": "18",  
+                    "formatNumberScale": "1",
+                    "numberScaleUnit": "万,亿",  // Setting the scale units in Chinese
+                    "numberScaleValue": "1,10000",  // Setting the scale values
+                    "palettecolors": "#5d62b5,#29c3be,#f2726f,#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",
+                    "plotBorderAlpha": "0", // Setting the plotBorderAlpha to 0 to remove the column borders
+                    "usePlotGradientColor": "0",
+                    "baseFontSize": "14",
+                    "legendShadow": '0', 
+          },
+          "data": [
             { "label": "Electronics", "value": "250000" },
             { "label": "Clothing", "value": "350000" },
             { "label": "Furniture", "value": "400000" },
-            { "label": "Others", "value": "200000" },
-            { "label": "Electronics1", "value": "250000" },
-            { "label": "Clothing1", "value": "350000" },
-            { "label": "Furniture1", "value": "400000" },
-            { "label": "Others1", "value": "200000" },
-            { "label": "Electronics2", "value": "250000" },
-            { "label": "Clothing2", "value": "350000" },
-            { "label": "Furniture2", "value": "400000" },
-            { "label": "Others2", "value": "200000" },
-            { "label": "Electronics3", "value": "250000" },
-            { "label": "Clothing3", "value": "350000" },
-            { "label": "Furniture3", "value": "400000" },
-            { "label": "Others3", "value": "200000" }
+            { "label": "Others", "value": "200000" }
           ]
         }
       });
 
       // Render the pie chart
-      pieChart.render('chart_amount_container');
+      pieChart.render('pie-chart-container');
     });
-    
 
-  </script>
+</script>
 </body>
+
 </html>

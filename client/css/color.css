@@ -16,6 +16,12 @@
 .text-blue{
     color: #1362B7;
 }
+.text-white{
+    color: white;
+}
 .text-green-background{
     background-color: green;
+}
+.text-blue-background{
+    background-color: #1362B7;
 }

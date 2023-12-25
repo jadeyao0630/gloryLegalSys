@@ -89,11 +89,13 @@
 				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
 					<a href="#casePage" id="case_reg_but_add" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn">新增</a>
 					<a href="#" id="case_reg_but_remove" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but">删除</a>
-					<button id="export_excel" class="btn-icon-blue btn-tooltip" data-icon="action" data-tooltip="案件编辑修改" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick="exportExcel()">导出</button>
-					<a href="#chart_sum_page" id="chart_sum" class="ui-btn ui-btn-icon-left ui-icon-info btn-icon-green case_reg_but admin-ui">总览</a>
 					<a href="#" id="case_reg_but_restore" class="ui-btn ui-btn-icon-left ui-icon-recycle btn-icon-blue case_reg_but admin-ui">还原</a>
 				</div>
 				<h1 id="footer_info_bar" class="footer-info-bar"></h1>
+				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-right ui-footer-btns">
+					<button id="export_excel" class="btn-icon-blue btn-tooltip" data-icon="action" data-tooltip="案件编辑修改" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick="exportExcel()">导出</button>
+					<a href="#chart_sum_page" id="chart_sum" rel="external" class="ui-btn case_reg_but admin-ui"><i class="fa fa-chart-gantt text-white fa-background text-green-background"></i>总览</a>
+				</div>
 			</div>
     </div>
     <!-- /主页面 -->
@@ -244,16 +246,16 @@
 			<div data-role="popup" id="chartCatelog" data-theme="a">
 					<ul data-role="listview" data-inset="true" style="min-width:210px;">
 						<li data-role="list-divider">选择查看类型</li>
-						<li><a href="#">纠纷</a></li>
-						<li><a href="#">涉案金额</a></li>
+						<li><a href="#" class="chart-btn" data-rel="back">纠纷</a></li>
+						<li><a href="#" class="chart-btn" data-rel="back">项目</a></li>
+						<li><a href="#" class="chart-btn" data-rel="back">诉讼类型</a></li>
 					</ul>
 			</div>
 		</div><!-- /header -->
-		<div style="display: grid;grid-template-columns: 50% 50%;">
-			<div id="chart_amount_container" style="width: 100%; height: 100%;"></div>
-			<div id="chart_container" style="width: 100%; height: 100%;"></div>
+		<div id="chart_sum" style="display: grid;grid-template-columns: 50% 50%; height:calc( 100% - 70px);">
+			<div id="chart_amount_container" style="width: 100%; height:calc( 100% - 70px);"></div>
+			<div id="chart_container" style="width: 100%; height:calc( 100% - 70px);"></div>
 		</div>
-	</div>
 	</div>
     <!--首页读取界面-->
 	<div id="main-container">
@@ -270,8 +272,7 @@
 	<script type="text/javascript" src="./utilities/templates.js"></script>
 	<script type="text/javascript" src="./utilities/formGenerator.js"></script>
     <script type="text/javascript" src="./pages/timelinePage.js"></script>
-	<script type="text/javascript" src="./js/chart.js"></script>
-	<script type="text/javascript" src="./js/fusioncharts.js" ></script>  
+	<script type="text/javascript" src="./js/fusioncharts/fusioncharts.js"></script>
     <script type="text/javascript" src="./utilities/setClickedEvents.js"></script>
     
     <script type="text/javascript" src="./pages/legal.js"></script>

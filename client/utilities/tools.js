@@ -98,15 +98,15 @@ function formatDateTime(date, format) {
   }
   function getDateTime(dateTimeStr){
       if (dateTimeStr==undefined||dateTimeStr=='0000-00-00 00:00:00')
-          return new Date().toLocaleString().substr(0,20);
+          return formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
       else
-          return new Date(dateTimeStr).toLocaleString().substr(0,20);
+          return formatDateTime(new Date(dateTimeStr),'yyyy-MM-dd HH:mm:ss');
   }
   function getDate(dateStr){
     if (dateStr==undefined||dateStr=='0000-00-00')
-        return new Date().toLocaleString().substr(0,10);
+        return formatDateTime(new Date(),'yyyy-MM-dd');
     else
-        return new Date(dateStr).toLocaleString().substr(0,10);
+        return formatDateTime(new Date(dateStr),'yyyy-MM-dd');
 }
   function formatDateTimeStr2Mysql(dateTimeStr){
     return new Date(dateTimeStr).toLocaleString().substr(0,20);

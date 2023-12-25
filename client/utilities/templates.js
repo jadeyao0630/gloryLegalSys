@@ -100,7 +100,8 @@ var _summary_template;
                         label:"立案日期:",
                         type:"date",
                         isOptional:false,
-                        dateFormate:"yyyy-MM-dd"
+                        dateFormate:"yyyy-MM-dd",
+                        defaultValue:getDateTime()
                     },
                     /*
                     caseAttachments:{
@@ -1109,7 +1110,7 @@ var _summary_template;
         data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
         '<a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-search btn-icon-green ui-btn-icon-left header-filter-btn">查询</a>'+
         '<button class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left header-filter-btn">复位</button>'+
-        '<a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-lock ui-btn-icon-notext header-filter-btn">锁定</a>'+
+        '<a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-lock ui-btn-icon-notext header-filter-btn" data-tooltip="锁定搜索栏" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)">锁定</a>'+
         '</div>',
         
         span:'5/5'

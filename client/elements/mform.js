@@ -722,7 +722,7 @@ mform.prototype={
         var element=$(_this.instance).find('#'+id);
         
         if(itemTemplate==undefined) return;
-        if(val==undefined || val == null){
+        if(val==undefined || val == null || val=="undefined"){
             if (itemTemplate.defaultValue!=undefined) val=itemTemplate.defaultValue;
         }
         console.log('setValues',id,val,itemTemplate);
@@ -767,7 +767,7 @@ mform.prototype={
             element.selectmenu().selectmenu('refresh');
         }else if(itemTemplate.type.toLowerCase()=="date" || itemTemplate.type.toLowerCase()=="datetime" || itemTemplate.type.toLowerCase()=="time") {
             console.log('日期',id,val);
-            if(val!='0000-00-00 00:00:00' && val!='0000-00-00' && val!='00:00:00'){
+            if(val!='0000-00-00 00:00:00' && val!='0000-00-00' && val!='00:00:00' && val!='1999-11-29T16:00:00.000Z'){
                 if( itemTemplate.type.toLowerCase()=="date") val=formatDateTime(new Date(val),'yyyy-MM-dd');
                 if( itemTemplate.type.toLowerCase()=="datetime") val=formatDateTime(new Date(val),'yyyy-MM-dd');
                 if( itemTemplate.type.toLowerCase()=="time") val=formatDateTime(new Date(val),'HH:mm:ss');
@@ -811,7 +811,7 @@ mform.prototype={
             element.val(val);
         }
     },
-    getValeById:function(id,itemTemplate){
+    getValeById:function(id,itemTemplate,prefix){
         var _this=this;
         if(itemTemplate==undefined) itemTemplate=_this.getItemTemplate(id);
         var element=$(_this.instance).find('#'+id);
@@ -834,7 +834,7 @@ mform.prototype={
         }else if(itemTemplate.type.toLowerCase()=="combobox"){
             var selected=element.find('option:selected');
             console.log('combobox',id,selected.val());
-            if(!itemTemplate.isOptional && selected.val().length==0){
+            if(!itemTemplate.isOptional && (selected.val().length==0 || selected.text()=="无")){
                 return null;
             }
             return selected.val();
@@ -875,9 +875,9 @@ mform.prototype={
                 if(!itemTemplate.isOptional){
                     return null;
                 }
-                if( itemTemplate.type.toLowerCase()=="date") val="0000-00-00 00:00:00";
-                if( itemTemplate.type.toLowerCase()=="datetime") val="0000-00-00 00:00:00";
-                if( itemTemplate.type.toLowerCase()=="time") val="00:00:00";
+                if( itemTemplate.type.toLowerCase()=="date") val=formatDateTimeStr2Mysql("0000-00-00 00:00:00");
+                if( itemTemplate.type.toLowerCase()=="datetime") val=formatDateTimeStr2Mysql("0000-00-00 00:00:00");
+                if( itemTemplate.type.toLowerCase()=="time") val=formatDateTimeStr2Mysql("00:00:00");
             }else{
                 if( itemTemplate.type.toLowerCase()=="date") val=formatDateTime(new Date(val),'yyyy-MM-dd HH:mm:ss');
                 if( itemTemplate.type.toLowerCase()=="datetime") val=formatDateTime(new Date(val),'yyyy-MM-dd HH:mm:ss');
@@ -893,6 +893,12 @@ mform.prototype={
                 return null;
             }
             return eles.val();
+        }else if(itemTemplate.type.toLowerCase()=="file"){
+            console.log('file',id,$(element).prop('files').length);
+            if(!itemTemplate.isOptional && $(element).prop('files').length==0){
+                return null;
+            }
+            return $(element).prop('files');
         }else{
             if(!itemTemplate.isOptional && element.val().length==0){
                 return null;
@@ -905,15 +911,17 @@ mform.prototype={
         var _this=this;
         var values={};
         var unSuccess=[];
-        //console.log(this.opt.template,template);
+        console.log(this.opt.template,template);
         $.each(template,(key,itemTemplate)=>{
-            if(itemTemplate.data!=undefined){
+            if(itemTemplate.data!=undefined && itemTemplate.type==undefined){
                 $.each(itemTemplate.data,(subKey,subItemTemplate)=>{
+                    if(subKey=="__formLabel") return;
                     var value=_this.getValeById(subKey,subItemTemplate);
                     if(value==null) unSuccess.push(subKey);
                     values[subKey]=value;
                 });
             }else{
+                if(key=="__formLabel") return;
                 var value=_this.getValeById(key,itemTemplate);
                 if(value==null) unSuccess.push(key);
                 values[key]=value;

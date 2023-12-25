@@ -4,138 +4,329 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Multiple Charts Example</title>
-  <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
-    <script type="text/javascript" src="../js/jquery.js"></script>
-    <script type="text/javascript" src="../js/jquery.mobile-1.4.5.js"></script>
-<script type="text/javascript" src="../js/fusioncharts/fusioncharts.js"></script>
 </head>
 <body>
-  <div data-role="page" id="chart_sum_page">
-		<div data-role="header" data-position="fixed" data-tap-toggle="false">
-			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
-			<h1 id="preview_title">总览</h1>
-			<a href="#chartCatelog" data-rel="popup" data-transition="slideup" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">类型</a>
-			<div data-role="popup" id="chartCatelog" data-theme="a">
-					<ul data-role="listview" data-inset="true" style="min-width:210px;">
-						<li data-role="list-divider">选择查看类型</li>
-						<li><a href="#" class="chart-btn" data-rel="back">纠纷</a></li>
-						<li><a href="#" class="chart-btn" data-rel="back">项目</a></li>
-						<li><a href="#" class="chart-btn" data-rel="back">诉讼类型</a></li>
-					</ul>
-			</div>
-		</div><!-- /header -->
-		<div style="display: grid;grid-template-columns: 50% 50%;">
-			<div id="chart_container" style="width: 100%; height: 400px ;"></div>
-			<div id="chart_amount_container" style="width: 100%; height: 400px ;"></div>
-		</div>
-	</div>
+  <script src="./js/jquery.js"></script>
+  <script src="./utilities/tools.js"></script>
+  <script src="./js/fusioncharts.js"></script>
+<script src="./js/fusioncharts.charts.js"></script>
 
-  <script>
-    FusionCharts.ready(function() {
-      // Create a new instance of the column chart
-      var columnChart = new FusionCharts({
-        type: 'bar3d',
-        renderAt: 'chart_container',
-        width: '100%',
-        height: '400px',
+<!-- Create a FusionChart using the FusionCharts constructor -->
+<div id="indicatorDiv">Method Name: <strong>exportChart()</strong>
+
+	<p>Exports a chart as an image or as a PDF document. Click <a href="http://www.fusioncharts.com/dev/api/fusioncharts/fusioncharts-methods.html#exportChart" target="_blank">here</a> to read more about the <strong>exportChart()</strong> method.</p>
+	<p>To export the chart, from the drop-down shown below, select a format to export the chart. Next, click <strong>Export Chart</strong>.</p>
+
+	<select id="format" class="mb-20">
+		<option value="png">png</option>
+		<option value="jpg">jpg</option>
+		<option value="pdf">pdf</option>
+		<option value="svg">svg</option>
+	</select>
+
+	<button id="export">Export Chart</button>       
+
+</div>
+<div id="chartContainer">FusionCharts will render here</div>
+<div id="chartContainer1">FusionCharts will render here</div>
+<script>
+  FusionCharts.ready(function(){
+    var revenueChart = new FusionCharts({
+        type: 'mscombidy2d',
+        renderAt: 'chartContainer',
+        width: '500',
+        height: '300',
         dataFormat: 'json',
         dataSource: {
-          "chart": {
-            "caption": "Monthly Sales Data",
-            "bgColor": "#ffffff",  
-                    "showBorder": "0",  
-                    "captionFontSize": "18",  
-                    "captionFontColor": "#333",
-                    "subcaptionFontSize": "18",  
-                    "formatNumberScale": "1",
-                    "numberScaleUnit": "万,亿",  // Setting the scale units in Chinese
-                    "numberScaleValue": "1,10000",  // Setting the scale values
-                    "palettecolors": "#5d62b5,#29c3be,#f2726f,#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",
-                    "plotBorderAlpha": "0", // Setting the plotBorderAlpha to 0 to remove the column borders
-                    "usePlotGradientColor": "0",
-                    "baseFontSize": "14",
-                    "legendShadow": '0', 
-          },
-          "data": [
-            { "label": "Jan", "value": "420000" },
-            { "label": "Feb", "value": "810000" },
-            { "label": "Mar", "value": "720000" },
-            { "label": "Apr", "value": "550000" },
-            { "label": "May", "value": "910000" }
-          ]
+            "chart": {
+                "caption": "Revenues and Profits",
+                    "subCaption": "For last year",
+                    "captionFontSize": "13",
+                    "subCaptionFontSize": "12",
+                    "xAxisname": "Month",
+                    "pYAxisName": "Amount (In USD)",
+                    "sYAxisName": "Profit %",
+                    "numberPrefix": "$",
+                    "sNumberSuffix": "%",
+                    "sYAxisMaxValue": "50",
+                    "primaryAxisOnLeft": "0",
+                    "theme": "fint",
+                    "exportEnabled": "1"
+            },
+                "categories": [{
+                "category": [{
+                    "label": "Jan"
+                }, {
+                    "label": "Feb"
+                }, {
+                    "label": "Mar"
+                }, {
+                    "label": "Apr"
+                }, {
+                    "label": "May"
+                }, {
+                    "label": "Jun"
+                }, {
+                    "label": "Jul"
+                }, {
+                    "label": "Aug"
+                }, {
+                    "label": "Sep"
+                }, {
+                    "label": "Oct"
+                }, {
+                    "label": "Nov"
+                }, {
+                    "label": "Dec"
+                }]
+            }],
+                "dataset": [{
+                "seriesName": "Revenues",
+                    "data": [{
+                    "value": "16000"
+                }, {
+                    "value": "20000"
+                }, {
+                    "value": "18000"
+                }, {
+                    "value": "19000"
+                }, {
+                    "value": "15000"
+                }, {
+                    "value": "21000"
+                }, {
+                    "value": "16000"
+                }, {
+                    "value": "20000"
+                }, {
+                    "value": "17000"
+                }, {
+                    "value": "22000"
+                }, {
+                    "value": "19000"
+                }, {
+                    "value": "23000"
+                }]
+            }, {
+                "seriesName": "Profits",
+                    "renderAs": "area",
+                    "showValues": "0",
+                    "data": [{
+                    "value": "4000"
+                }, {
+                    "value": "5000"
+                }, {
+                    "value": "3000"
+                }, {
+                    "value": "4000"
+                }, {
+                    "value": "1000"
+                }, {
+                    "value": "7000"
+                }, {
+                    "value": "1000"
+                }, {
+                    "value": "4000"
+                }, {
+                    "value": "1000"
+                }, {
+                    "value": "8000"
+                }, {
+                    "value": "2000"
+                }, {
+                    "value": "7000"
+                }]
+            }, {
+                "seriesName": "Profit %",
+                    "parentYAxis": "S",
+                    "renderAs": "line",
+                    "showValues": "0",
+                    "data": [{
+                    "value": "25"
+                }, {
+                    "value": "25"
+                }, {
+                    "value": "16.66"
+                }, {
+                    "value": "21.05"
+                }, {
+                    "value": "6.66"
+                }, {
+                    "value": "33.33"
+                }, {
+                    "value": "6.25"
+                }, {
+                    "value": "25"
+                }, {
+                    "value": "5.88"
+                }, {
+                    "value": "36.36"
+                }, {
+                    "value": "10.52"
+                }, {
+                    "value": "30.43"
+                }]
+            }]
         }
-      });
-
-      // Render the column chart
-      columnChart.render('chart_container');
-
-      // Create a new instance of the pie chart
-      var pieChart = new FusionCharts({
-        type: 'pie3d',
-        renderAt: 'chart_amount_container',
-        width: '100%',
-        height: '400px',
-        dataFormat: 'json',
-        dataSource: {
-          "chart": {
-            "caption": "Distribution of Sales by Category",
-            "captionFontColor": "#333",
-                    "subCaption": "",  
-                    "paletteColors": "#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",  
-                    "bgColor": "#ffffff",  
-                    "showBorder": "0",  
-                    "use3DLighting": "0",  
-                    "showShadow": "0",  
-                    "enableSmartLabels": "0",  
-                    "startingAngle": "0",  
-                    "showPercentValues": "1",  
-                    "showPercentInTooltip": "0",  
-                    "decimals": "2",  
-                    "captionFontSize": "18",  
-                    "subcaptionFontSize": "18",  
-                    "subcaptionFontBold": "0",  
-                    //"toolTipColor": "#ffffff",  
-                    //"toolTipBorderThickness": "0",  
-                    //"toolTipBgColor": "#000000",  
-                    //"toolTipBgAlpha": "80",  
-                    //"toolTipBorderRadius": "2",  
-                    //"toolTipPadding": "5",  
-                    "showHoverEffect":"1",  
-                    "showLegend": "1",  
-                    "legendBgColor": "#ffffff",  
-                    "legendBorderAlpha": '0',  
-                    "legendShadow": '0',  
-                    "legendItemFontSize": '14',  
-                    "legendItemFontColor": '#666666'  ,
-                    "labelFontSize": "14",
-                    "baseFontSize": "16",
-          },
-          "data": [
-            { "label": "Electronics", "value": "250000" },
-            { "label": "Clothing", "value": "350000" },
-            { "label": "Furniture", "value": "400000" },
-            { "label": "Others", "value": "200000" },
-            { "label": "Electronics1", "value": "250000" },
-            { "label": "Clothing1", "value": "350000" },
-            { "label": "Furniture1", "value": "400000" },
-            { "label": "Others1", "value": "200000" },
-            { "label": "Electronics2", "value": "250000" },
-            { "label": "Clothing2", "value": "350000" },
-            { "label": "Furniture2", "value": "400000" },
-            { "label": "Others2", "value": "200000" },
-            { "label": "Electronics3", "value": "250000" },
-            { "label": "Clothing3", "value": "350000" },
-            { "label": "Furniture3", "value": "400000" },
-            { "label": "Others3", "value": "200000" }
-          ]
-        }
-      });
-
-      // Render the pie chart
-      pieChart.render('chart_amount_container');
     });
-    
-
-  </script>
+    revenueChart.render();
+    var revenueChart1 = new FusionCharts({
+        type: 'mscombidy2d',
+        renderAt: 'chartContainer1',
+        width: '500',
+        height: '300',
+        dataFormat: 'json',
+        dataSource: {
+            "chart": {
+                "caption": "Revenues and Profits",
+                    "subCaption": "For last year",
+                    "captionFontSize": "13",
+                    "subCaptionFontSize": "12",
+                    "xAxisname": "Month",
+                    "pYAxisName": "Amount (In USD)",
+                    "sYAxisName": "Profit %",
+                    "numberPrefix": "$",
+                    "sNumberSuffix": "%",
+                    "sYAxisMaxValue": "50",
+                    "primaryAxisOnLeft": "0",
+                    "theme": "fint",
+                    "exportEnabled": "1"
+            },
+                "categories": [{
+                "category": [{
+                    "label": "Jan"
+                }, {
+                    "label": "Feb"
+                }, {
+                    "label": "Mar"
+                }, {
+                    "label": "Apr"
+                }, {
+                    "label": "May"
+                }, {
+                    "label": "Jun"
+                }, {
+                    "label": "Jul"
+                }, {
+                    "label": "Aug"
+                }, {
+                    "label": "Sep"
+                }, {
+                    "label": "Oct"
+                }, {
+                    "label": "Nov"
+                }, {
+                    "label": "Dec"
+                }]
+            }],
+                "dataset": [{
+                "seriesName": "Revenues",
+                    "data": [{
+                    "value": "16000"
+                }, {
+                    "value": "20000"
+                }, {
+                    "value": "18000"
+                }, {
+                    "value": "19000"
+                }, {
+                    "value": "15000"
+                }, {
+                    "value": "21000"
+                }, {
+                    "value": "16000"
+                }, {
+                    "value": "20000"
+                }, {
+                    "value": "17000"
+                }, {
+                    "value": "22000"
+                }, {
+                    "value": "19000"
+                }, {
+                    "value": "23000"
+                }]
+            }, {
+                "seriesName": "Profits",
+                    "renderAs": "area",
+                    "showValues": "0",
+                    "data": [{
+                    "value": "4000"
+                }, {
+                    "value": "5000"
+                }, {
+                    "value": "3000"
+                }, {
+                    "value": "4000"
+                }, {
+                    "value": "1000"
+                }, {
+                    "value": "7000"
+                }, {
+                    "value": "1000"
+                }, {
+                    "value": "4000"
+                }, {
+                    "value": "1000"
+                }, {
+                    "value": "8000"
+                }, {
+                    "value": "2000"
+                }, {
+                    "value": "7000"
+                }]
+            }, {
+                "seriesName": "Profit %",
+                    "parentYAxis": "S",
+                    "renderAs": "line",
+                    "showValues": "0",
+                    "data": [{
+                    "value": "25"
+                }, {
+                    "value": "25"
+                }, {
+                    "value": "16.66"
+                }, {
+                    "value": "21.05"
+                }, {
+                    "value": "6.66"
+                }, {
+                    "value": "33.33"
+                }, {
+                    "value": "6.25"
+                }, {
+                    "value": "25"
+                }, {
+                    "value": "5.88"
+                }, {
+                    "value": "36.36"
+                }, {
+                    "value": "10.52"
+                }, {
+                    "value": "30.43"
+                }]
+            }]
+        }
+    });
+    revenueChart1.render();
+    function export_chart() {
+        var format = document.getElementById("format").value;
+        revenueChart.exportChart({
+            "exportFormat": format
+        });
+    }
+    window.exportAllChartsToPDF = function() {
+      console.log(formatDateTimeStr2Mysql("0000-00-00 00:00:00"))
+      
+      /*
+      FusionCharts.batchExport({
+        "charts": [revenueChart, revenueChart1],
+        "exportFormat": "pdf"
+      });
+      */
+    }
+    document.getElementById("export").addEventListener("click", exportAllChartsToPDF);
+  });
+</script>
 </body>
 </html>

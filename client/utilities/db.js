@@ -326,7 +326,7 @@ async function updateLastLogin(id){
     return await fetch("http://"+ip+":"+port+"/update",{
         headers:headers,
         method: 'POST',
-        body: JSON.stringify({ where:"id="+id, table: userDbTableName, data:{lastLogin:new Date().toLocaleString().substr(0,20)}})
+        body: JSON.stringify({ where:"id="+id, table: userDbTableName, data:{lastLogin:formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss')}})
     })
     .then(response => {
         //console.log('updateLastLogin',response);

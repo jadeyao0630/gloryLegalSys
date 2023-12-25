@@ -136,6 +136,13 @@ $(window).on('popstate', function(event) {
 var currentProgress={};
 
 function showTooltip(self){
+    if($(self).hasClass('header-filter-btn')){
+        if($(self).hasClass('btn-icon-green')){
+            $(self).data('tooltip','解锁搜索栏');
+        }else{
+            $(self).data('tooltip','锁定搜索栏');
+        }
+    }
     $(self).tooltip('show',$(self).data('tooltip')!=undefined?$(self).data('tooltip'):$(self).text());
 }
 function hideTooltip(self){
@@ -735,7 +742,7 @@ function updateSubmitEvent(e){
     console.log(form.opt.template);
     form.getFormValues(function(e){
         console.log("获取到的表格值",e);
-        if(values.success){
+        if(e.success){
             var editableStatus=checkProgressEdiableStatus();
             var goNext=false;
             var intervalId;
@@ -1176,7 +1183,107 @@ $('.chart-btn').on('click',function(e){
         $.each(data2,(key,value)=>{
             chartData2.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartData1,caption:'诉讼类型数量比例',type:"pie3d"},{data:chartData2,caption:'诉讼类型数涉及金额',type:"column2d"});
+        setChartPage({data:chartData1,caption:'诉讼类型数量比例',type:"pie3d"},{data:chartData2,caption:'诉讼类型涉及金额',type:"column2d"});
+    }else if($(this).text()=="在审项目"){
+        var data1={};
+        var data2={};
+        DataList.casesDb.forEach(item=>{
+            var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseStatus>=0 && item.caseStatus<3));
+            if(match.length>0){
+                var catelog=match[0].name;
+                if(!data1.hasOwnProperty(catelog)) data1[catelog]=[];
+                if(!data2.hasOwnProperty(catelog)) data2[catelog]=0.0;
+                data1[catelog].push(item);
+                data2[catelog]+=item.requestAmount;
+            }
+            //console.log('chart_sum',match.label,match)
+            //caseCause.push({})
+        });
+        
+        var chartData1=[];
+        var chartData2=[];
+        $.each(data1,(key,items)=>{
+            chartData1.push({'label':key,'value':items.length})
+        });
+        $.each(data2,(key,value)=>{
+            chartData2.push({'label':key,'value':value, })
+        });
+        setChartPage({data:chartData1,caption:'在审项目数量比例',type:"pie3d"},{data:chartData2,caption:'在审项目涉及金额',type:"bar2d"});
+    }else if($(this).text()=="在执项目"){
+        var data1={};
+        var data2={};
+        DataList.casesDb.forEach(item=>{
+            var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseStatus>=3 && item.caseStatus<4));
+            if(match.length>0){
+                var catelog=match[0].name;
+                if(!data1.hasOwnProperty(catelog)) data1[catelog]=[];
+                if(!data2.hasOwnProperty(catelog)) data2[catelog]=0.0;
+                data1[catelog].push(item);
+                data2[catelog]+=item.requestAmount;
+            }
+            //console.log('chart_sum',match.label,match)
+            //caseCause.push({})
+        });
+        
+        var chartData1=[];
+        var chartData2=[];
+        $.each(data1,(key,items)=>{
+            chartData1.push({'label':key,'value':items.length})
+        });
+        $.each(data2,(key,value)=>{
+            chartData2.push({'label':key,'value':value, })
+        });
+        setChartPage({data:chartData1,caption:'在执项目数量比例',type:"pie3d"},{data:chartData2,caption:'在执项目涉及金额',type:"bar2d"});
+    }else if($(this).text()=="一千万以上"){
+        var data1={};
+        var data2={};
+        DataList.casesDb.forEach(item=>{
+            var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseLabel==2));
+            if(match.length>0){
+                var catelog=match[0].name;
+                if(!data1.hasOwnProperty(catelog)) data1[catelog]=[];
+                if(!data2.hasOwnProperty(catelog)) data2[catelog]=0.0;
+                data1[catelog].push(item);
+                data2[catelog]+=item.requestAmount;
+            }
+            //console.log('chart_sum',match.label,match)
+            //caseCause.push({})
+        });
+        
+        var chartData1=[];
+        var chartData2=[];
+        $.each(data1,(key,items)=>{
+            chartData1.push({'label':key,'value':items.length})
+        });
+        $.each(data2,(key,value)=>{
+            chartData2.push({'label':key,'value':value, })
+        });
+        setChartPage({data:chartData1,caption:'一千万以上案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'一千万以上案件项目涉及金额',type:"bar2d"});
+    }else if($(this).text()=="重大群诉"){
+        var data1={};
+        var data2={};
+        DataList.casesDb.forEach(item=>{
+            var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseLabel==3));
+            if(match.length>0){
+                var catelog=match[0].name;
+                if(!data1.hasOwnProperty(catelog)) data1[catelog]=[];
+                if(!data2.hasOwnProperty(catelog)) data2[catelog]=0.0;
+                data1[catelog].push(item);
+                data2[catelog]+=item.requestAmount;
+            }
+            //console.log('chart_sum',match.label,match)
+            //caseCause.push({})
+        });
+        
+        var chartData1=[];
+        var chartData2=[];
+        $.each(data1,(key,items)=>{
+            chartData1.push({'label':key,'value':items.length})
+        });
+        $.each(data2,(key,value)=>{
+            chartData2.push({'label':key,'value':value, })
+        });
+        setChartPage({data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"});
     }
 })
 function setChartPage(data1,data2){
@@ -1308,17 +1415,17 @@ $('.edit-header-btn').on('click',async function(e){
                     //return;
                     e.values.id=getGlobal("currentId");
                     if(isAddPage){
-                        e.caseStatus['penalty']='0.00';
-                        e.caseStatus['paidAmount']='0.00';
-                        e.caseStatus['caseStatus']=-1;
-                        e.caseStatus['lawFirm']=0;
-                        e.caseStatus['attorney']='无0';
-                        e.caseStatus['FirstInstance']='0000-00-00 00:00:00';
-                        e.caseStatus['SecondInstance']='0000-00-00 00:00:00';
+                        e.values['penalty']='0.00';
+                        e.values['paidAmount']='0.00';
+                        e.values['caseStatus']=-1;
+                        //e.values['lawFirm']=0;
+                        //e.values['attorney']='无0';
+                        //e.values['FirstInstance']='0000-00-00 00:00:00';
+                        //e.values['SecondInstance']='0000-00-00 00:00:00';
                     }
-                    e.values=Object.assign(e.values,e.caseStatus);
+                    //e.values=Object.assign(e.values,e.caseStatus);
+                    e.values["caseCreateDate"]=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
                     console.log('save data',e);
-                    e.values["caseCreateDate"]=getDateTime();
                     //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
                     if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
                         $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
@@ -1327,14 +1434,15 @@ $('.edit-header-btn').on('click',async function(e){
                         });
                     }else{
                         e.values["caseApplicant"]=getGlobalJson("currentUser").id;
-                        if(enableReadOnlyMode) e.values["isReadOnly"]=_isReadOnlyCurrentForm();
+                        //if(enableReadOnlyMode) e.values["isReadOnly"]=_isReadOnlyCurrentForm();
                         e.values["id"]=Number(e.values["id"]);
                         fireDataChnaged("caseChanged",e.values,isAddPage?"add":"update");
                     }
                     
                     
                 }else{
-                    console.log(message.message+(message.id==0?" 但是有错误。":""));
+                    
+                    console.log(e.valiation.join()," 有错误。");
                 }
             });
         
@@ -1342,7 +1450,7 @@ $('.edit-header-btn').on('click',async function(e){
         //保存进展页面
         else if(sessionStorage.getItem('currentPage')=="#progress"){
             progressInfoForm.getFormValues(function(e){
-                console.log('保存进展页面',values)
+                console.log('保存进展页面',e.values)
                 if(e.success){
                     e.values.id=getGlobal("currentId");
                     fireDataChnaged("caseStatusChanged",e.values,"update");

@@ -13,7 +13,6 @@
 	<link rel="stylesheet" href="./css/color.css" />
 	<link rel="stylesheet" href="./css/progressDiagram.css" />
 	<link rel="stylesheet" href="./css/superMultiSelect.css" />
-  	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.3.4/viewer.min.css">
 	<style>
 		.fc-tooltip-content {
   font-size: 14px; /* Set the desired font size */
@@ -22,7 +21,6 @@
     <script src="./js/jquery.js"></script>
 	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
 	
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/viewerjs/1.3.4/viewer.min.js"></script>
     <script src="./js/crypto/core.js"></script>
     <script src="./js/crypto/lib-typedarrays.js"></script>
     <script src="./js/crypto/x64-core.js"></script>
@@ -94,7 +92,7 @@
 				<h1 id="footer_info_bar" class="footer-info-bar"></h1>
 				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-right ui-footer-btns">
 					<button id="export_excel" class="btn-icon-blue btn-tooltip" data-icon="action" data-tooltip="导出成EXCEL" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick="exportExcel()">导出</button>
-					<a href="#chart_sum_page" id="chart_sum" rel="external" class="ui-btn case_reg_but admin-ui"><i class="fa fa-chart-gantt text-white fa-background text-green-background"></i>总览</a>
+					<a href="#chart_sum_page" id="chart_sum" rel="external" class="ui-btn case_reg_but admin-ui" data-tooltip="分析案件" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)"><i class="fa fa-chart-gantt text-white fa-background text-green-background"></i>分析</a>
 				</div>
 			</div>
     </div>
@@ -247,8 +245,12 @@
 					<ul data-role="listview" data-inset="true" style="min-width:210px;">
 						<li data-role="list-divider">选择查看类型</li>
 						<li><a href="#" class="chart-btn" data-rel="back">纠纷</a></li>
-						<li><a href="#" class="chart-btn" data-rel="back">项目</a></li>
 						<li><a href="#" class="chart-btn" data-rel="back">诉讼类型</a></li>
+						<li><a href="#" class="chart-btn" data-rel="back">项目</a></li>
+						<li><a href="#" class="chart-btn" data-rel="back">在审项目</a></li>
+						<li><a href="#" class="chart-btn" data-rel="back">在执项目</a></li>
+						<li><a href="#" class="chart-btn" data-rel="back">一千万以上</a></li>
+						<li><a href="#" class="chart-btn" data-rel="back">重大群诉</a></li>
 					</ul>
 			</div>
 		</div><!-- /header -->

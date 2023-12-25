@@ -300,7 +300,7 @@ app.post('/insertCase',(request,response) => {
                     if(val.constructor === String) val=parseInt(val.replace('"',''));
                     else val=val;
                 }
-                else if (template[tableKey].template[tablecol].toUpperCase().indexOf('DATETIME')>-1 && val.length<19) val="\""+val+" 00:00:00\"";
+                //else if (template[tableKey].template[tablecol].toUpperCase().indexOf('DATETIME')>-1 ) val="\""+new Date(val).toLocaleString().substr(0,20)+"\"";
                 else val='"'+val+'"';
                 update.push(tablecol+"="+val);
                 values.push(val);
@@ -318,7 +318,7 @@ app.post('/insertCase',(request,response) => {
         result
         .then(data => {
             //console.log("in loop",k,data);
-            results.push(data.success);
+            results.push(data);
             counter++;
         })
         .catch(err => console.log(err));
@@ -332,12 +332,12 @@ app.post('/insertCase',(request,response) => {
             resolve(results);
             var isSuccess=true;
             results.forEach(r=>{
-                if(!r) {
+                if(!r.success) {
                     isSuccess=false;
                     return false;
                 }
             })
-            response.json({data:{success:isSuccess,}});
+            response.json({data:{success:isSuccess,data:results}});
         }
         }, 100);
     });

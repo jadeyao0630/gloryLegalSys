@@ -82,6 +82,7 @@ $('body').on(preload_completed_event_name,function(){
         if(e){
             if(isbefore){
                 form.slideDown();
+                $('.header-btn-search').text('收起');
                 //form.animate({'height':"200px"});
                 $('#pageOneTable').animate({'margin-top':139+slidedownOffset+"px"})
             }
@@ -89,6 +90,7 @@ $('body').on(preload_completed_event_name,function(){
             //$('#header-filter-container').empty();
             if(isbefore){
                 form.slideUp();
+                $('.header-btn-search').text('更多');
                 $('#pageOneTable').animate({'margin-top':"0px"})
             }
         }
@@ -280,6 +282,7 @@ $('body').on(preload_completed_event_name,function(){
                     if(!isHeaderLocked){
                         form.slideUp();
                         $('#pageOneTable').animate({'margin-top':"0px"})
+                        $('.header-btn-search').text('更多');
                         $('#pageOneTable').trigger('create');
                     }
                     
@@ -367,15 +370,22 @@ $('body').on('caseStatusChanged',function(e){
     })
     //保存修改数据到数据库
     update('id='+newValue.id,'caseStatus',data.join(),function(r){
-        //更新缓存内数据
-        pageOnTable.updateTableData(newValue,$('#pageOneTable').find('tr[data-item='+newValue.id+']'));
-        DataList.caseStatus=updateOriginalData(DataList.caseStatus,newValue,'id');
-        DataList.combinedData=updateOriginalData(DataList.combinedData,newValue,'id');
-        currentData=updateOriginalData(currentData,newValue,'id');//tools.js
-        //console.log(DataList.caseStatus);
-        //更新页面ui数据显示
-        pageOnTable.updateTableData(e.value,$('#pageOneTable').find('tr[data-item='+e.value.id+']'));
-        setPersonCaseSum(DataList.combinedData);
+        console.log('caseStatusChanged',r);
+        if(r.data.success){
+            //更新缓存内数据
+            pageOnTable.updateTableData(newValue,$('#pageOneTable').find('tr[data-item='+newValue.id+']'));
+            DataList.caseStatus=updateOriginalData(DataList.caseStatus,newValue,'id');
+            DataList.combinedData=updateOriginalData(DataList.combinedData,newValue,'id');
+            currentData=updateOriginalData(currentData,newValue,'id');//tools.js
+            //console.log(DataList.caseStatus);
+            //更新页面ui数据显示
+            pageOnTable.updateTableData(e.value,$('#pageOneTable').find('tr[data-item='+e.value.id+']'));
+            setPersonCaseSum(DataList.combinedData);
+            $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
+        }else{
+            $().minfo('show',{title:"提示",message:"更新遇到问题。"+r.data.data.sqlMessage},function(){});
+        }
+        
         console.log("on data changed",DataList.combinedData,DataList.caseStatus,e);
         $(window).trigger('hidepopup');
     });
@@ -411,7 +421,21 @@ $('body').on('caseChanged',function(e){
                 $().mloader('hide');
             }else{
                 console.log(r);
-                $().minfo('show',{title:"错误",message:r.error});
+                $().mloader('hide');
+                var error="添加过程中有问题";
+                var result=[];
+                if(r.data.length>0){
+                    r.data.forEach(d=>{
+                        if(!d.success){
+                            result.push(d.error);
+                        }
+                    })
+                    
+                }
+                if(result.length>0){
+                    error=result.join();
+                }
+                $().minfo('show',{title:"错误",message:error});
             }
             
         });

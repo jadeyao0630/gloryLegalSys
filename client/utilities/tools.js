@@ -270,7 +270,7 @@ $.fn.extend({
             var thisHeight=$('.ui-tooltip').height();
             if(thisWidth+position.left>screen.width) position.left=screen.width-thisWidth-10;
             var top=(position.top+$(this).height()+10);
-            console.log(thisHeight+position.top,$(window).height());
+            //console.log(thisHeight+position.top,$(window).height());
             if(thisHeight+position.top+80>$(window).height()-$(window).scrollTop()) {
                 position.top=$(window).height()+$(window).scrollTop()-thisHeight-80;
                 top=position.top;

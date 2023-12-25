@@ -704,6 +704,56 @@ var _summary_template;
         },
         
     } 
+    export_chart_template={
+      settings:{
+        hasLabel:true,
+        hasPlaceHolder:true,
+        labelPosition:"left",
+        width:'550px',
+        textareaHeight:90,
+        isCollapsibleGrouping:false,
+      },
+      template:{
+        
+        exportType:{
+          label:"导出",
+          type:"radio",
+          isOptional:true,
+          data:['所有','选定'],
+        },
+        exportFileType:{
+          label:"文件类型:",
+          type:"combobox",
+          isOptional:true,
+          data:[{id:'png'},{id:'jpg'},{id:'pdf'}],
+          valueKey:'id',
+          displayFormat:'{id}',
+        },
+        exportFileName:{
+          label:"文件名:",
+          placeholder:"文件名",
+          type:"text",
+          isOptional:false,
+        },
+        /*
+        exportFileType1:{
+          label:"文件类型",
+          type:"custom",
+          data:'<label for="export-file-name">文件类型</label>'+
+                '<div data-role="controlgroup" data-type="horizontal">'+
+                '<select>'+
+                  '<option>png</option>'+
+                  '<option>jpg</option>'+
+                  '<option>pdf</option>'+
+                  '<option>svg</option>'+
+                '</select>'+
+                '<input id="export-file-name" type="text" data-wrapper-class="controlgroup-textinput ui-btn">'+
+                '<button>导出</button>'+
+                '</div>',
+        }
+        */
+      }
+    }
     add_update_template={
       settings:{
         hasLabel:true,

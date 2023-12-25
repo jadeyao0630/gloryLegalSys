@@ -357,6 +357,9 @@ mform.prototype={
                     _this.setPlaceholder(itemTemplate)+
                     ' value="'+value+'" '+_this.setRequired(itemTemplate.isOptional,"此项必须正确填写")+'>');
         var subContainer=$('<div class="form-original"></div>');
+        if(itemTemplate.isDisabled){
+            input.attr("disabled",true);
+        }
         subContainer.append(input);
         return subContainer;
     },
@@ -368,6 +371,9 @@ mform.prototype={
                     'data-wrapper-class="controlgroup-textinput ui-btn"'+
                     ' value="'+value+'" '+_this.setRequired(itemTemplate.isOptional,"此项必须正确填写")+'>');
         var subContainer=$('<div id="'+itemId+'_controlgroup" data-role="controlgroup" data-type="horizontal" class="form-original"></div>');
+        if(itemTemplate.isDisabled){
+            input.attr("disabled",true);
+        }
         subContainer.append(input);
         var showHideBtn=$('<a herf="#" class="ui-btn ui-btn-icon-notext ui-icon-eye btn-eye">显示关闭</a>');
         showHideBtn.on('click',showHideBtnEvent);
@@ -467,6 +473,9 @@ mform.prototype={
             console.log(placeholders[i]);
             var input=$('<input type="'+type+'" class="form-original" name="'+itemId+'_'+i+'"'+' id="'+itemId+'_'+i+'"'+
                         _this.setRequired(itemTemplate.isOptional,"此项必须填写完整")+placeholders[i]+'" value="">');
+            if(itemTemplate.isDisabled){
+                input.attr("disabled",true);
+            }
             if(i==0) {
                 subContainer.prepend(input);
                 var dash=$('<label style="text-align: center;min-width:40px;"> 到 </label>');
@@ -483,6 +492,9 @@ mform.prototype={
                     _this.setPlaceholder(itemTemplate)+'" '+_this.setRequired(itemTemplate.isOptional,"此项必须填写")+'>'+value+'</textarea>');
         var subContainer=$('<div class="form-original"></div>');
         
+        if(itemTemplate.isDisabled){
+            textarea.attr("disabled",true);
+        }
         subContainer.append(textarea);
         return subContainer;
     },
@@ -513,6 +525,9 @@ mform.prototype={
                     }
                 });
             }
+            if(itemTemplate.isDisabled){
+                radio_container.attr("disabled",true);
+            }
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(radio_container);
             return subContainer;
@@ -523,6 +538,10 @@ mform.prototype={
         var input=$('<input class="form-original" type="file" name="'+itemId+'" id="'+itemId+'" value=""'+accept+' '+this.setRequired(itemTemplate.isOptional,"此项必须选择")+'>');
         //item_container.append(input);
         var subContainer=$('<div class="form-original"></div>');
+        
+        if(itemTemplate.isDisabled){
+            input.attr("disabled",true);
+        }
         subContainer.append(input);
         return subContainer;
     },
@@ -594,6 +613,10 @@ mform.prototype={
         }
         var subContainer=$('<div class="form-original" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;"></div>');
         subContainer.append(selectItem);
+        
+        if(itemTemplate.isDisabled){
+            selectItem.attr("disabled",true);
+        }
         $(selectItem).on('change',function(){
             console.log('change',$(this).find('option.emptyOption'));
             if($(this).children('option:selected').text()!='无'){
@@ -629,6 +652,10 @@ mform.prototype={
                         ' data-valueFormat="'+itemTemplate.valueFormat+'"></div>');
 
         select.superMultiInput(itemTemplate);
+        
+        if(itemTemplate.isDisabled){
+            select.attr("disabled",true);
+        }
         subContainer.append(select);
         select.on('multiselectChanged',function(e){
             console.log('multiselectChanged',e);
@@ -651,6 +678,10 @@ mform.prototype={
                     ' data-matchKey="'+itemTemplate.matchKey+'"'+
                     ' data-valueFormat="'+itemTemplate.valueFormat+'"></div>')
         select.superMultiSelect(itemTemplate);
+        
+        if(itemTemplate.isDisabled){
+            select.attr("disabled",true);
+        }
         subContainer.append(select);
         
         //select.setSuperMultiSelectValues('4公司21',casePersonnel,itemTemplate.valueKey,itemTemplate.matchKey);
@@ -767,7 +798,7 @@ mform.prototype={
             element.selectmenu().selectmenu('refresh');
         }else if(itemTemplate.type.toLowerCase()=="date" || itemTemplate.type.toLowerCase()=="datetime" || itemTemplate.type.toLowerCase()=="time") {
             console.log('日期',id,val);
-            if(val!='0000-00-00 00:00:00' && val!='0000-00-00' && val!='00:00:00' && val!='1999-11-29T16:00:00.000Z'){
+            if(val!='0000-00-00 00:00:00' && val!='0000-00-00' && val!='00:00:00' && val!='1999-11-29T16:00:00.000Z' && val!='1999-11-30T00:00:00.000Z'){
                 if( itemTemplate.type.toLowerCase()=="date") val=formatDateTime(new Date(val),'yyyy-MM-dd');
                 if( itemTemplate.type.toLowerCase()=="datetime") val=formatDateTime(new Date(val),'yyyy-MM-dd');
                 if( itemTemplate.type.toLowerCase()=="time") val=formatDateTime(new Date(val),'HH:mm:ss');

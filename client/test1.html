@@ -8,7 +8,7 @@
 <body>
   <script src="./js/jquery.js"></script>
   <script src="./utilities/tools.js"></script>
-  <script src="./js/fusioncharts.js"></script>
+  <script src="./js/FusionCharts.js"></script>
 <script src="./js/fusioncharts.charts.js"></script>
 
 <!-- Create a FusionChart using the FusionCharts constructor -->
@@ -309,21 +309,15 @@
         }
     });
     revenueChart1.render();
-    function export_chart() {
-        var format = document.getElementById("format").value;
-        revenueChart.exportChart({
-            "exportFormat": format
-        });
-    }
     window.exportAllChartsToPDF = function() {
       console.log(formatDateTimeStr2Mysql("0000-00-00 00:00:00"))
       
-      /*
+      
       FusionCharts.batchExport({
         "charts": [revenueChart, revenueChart1],
-        "exportFormat": "pdf"
+        "exportFormat": "svg"
       });
-      */
+      
     }
     document.getElementById("export").addEventListener("click", exportAllChartsToPDF);
   });

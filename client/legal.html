@@ -92,7 +92,7 @@
 				<h1 id="footer_info_bar" class="footer-info-bar"></h1>
 				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-right ui-footer-btns">
 					<button id="export_excel" class="btn-icon-blue btn-tooltip" data-icon="action" data-tooltip="导出成EXCEL" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick="exportExcel()">导出</button>
-					<a href="#chart_sum_page" id="chart_sum" rel="external" class="ui-btn case_reg_but admin-ui" data-tooltip="分析案件" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)"><i class="fa fa-chart-gantt text-white fa-background text-green-background"></i>分析</a>
+					<a href="#chart_sum_page" id="chart_sum" rel="external" class="ui-btn case_reg_but" data-tooltip="分析案件" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)"><i class="fa fa-chart-gantt text-white fa-background text-green-background"></i>分析</a>
 				</div>
 			</div>
     </div>
@@ -240,7 +240,10 @@
 		<div data-role="header" data-position="fixed" data-tap-toggle="false">
 			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
 			<h1 id="preview_title">总览</h1>
-			<a href="#chartCatelog" data-rel="popup" data-transition="slideup" class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-gear">类型</a>
+			<div data-role="controlgroup" data-type="horizontal" class="ui-btn-right">
+				<button id="export_chart" class="btn-icon-blue btn-tooltip" data-icon="action" >导出</button>
+				<a href="#chartCatelog" data-rel="popup" data-transition="slideup" class="ui-btn i-corner-all ui-btn-icon-right ui-icon-gear">类型</a>
+			</div>
 			<div data-role="popup" id="chartCatelog" data-theme="a">
 					<ul data-role="listview" data-inset="true" style="min-width:210px;">
 						<li data-role="list-divider">选择查看类型</li>
@@ -251,12 +254,23 @@
 						<li><a href="#" class="chart-btn" data-rel="back">在执项目</a></li>
 						<li><a href="#" class="chart-btn" data-rel="back">一千万以上</a></li>
 						<li><a href="#" class="chart-btn" data-rel="back">重大群诉</a></li>
+						<li><a href="#" class="chart-btn" data-rel="back">全部</a></li>
 					</ul>
 			</div>
 		</div><!-- /header -->
-		<div id="chart_sum" style="display: grid;grid-template-columns: 50% 50%; height:calc( 100% - 70px);">
+		<div id="chart_sum_p" style="display: grid;grid-template-columns: 50% 50%; height:calc( 100% - 70px);">
 			<div id="chart_amount_container" style="width: 100%; height:calc( 100% - 70px);"></div>
 			<div id="chart_container" style="width: 100%; height:calc( 100% - 70px);"></div>
+		</div>
+		<div id="chart_sum_all" class="hide" style="display: grid;grid-template-columns: 50% 50%; height:calc( 100% - 70px);">
+		</div>
+		<div data-role="popup" id="export_popup" data-theme="a" style="z-index: 1100;padding: 20px;">
+			<h3 id="export_popup_title">test</h3>
+			<form id="export_popup_form"></form>
+			<fieldset class="ui-grid-a">
+				<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a></div>
+				<div class="ui-block-b"><a href="#" id="export_popup_form_submit" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green">提交</a></div>
+			</fieldset>
 		</div>
 	</div>
     <!--首页读取界面-->
@@ -274,7 +288,8 @@
 	<script type="text/javascript" src="./utilities/templates.js"></script>
 	<script type="text/javascript" src="./utilities/formGenerator.js"></script>
     <script type="text/javascript" src="./pages/timelinePage.js"></script>
-	<script type="text/javascript" src="./js/fusioncharts/fusioncharts.js"></script>
+	<script src="./js/FusionCharts.js"></script>
+  <script src="./js/fusioncharts.charts.js"></script>
     <script type="text/javascript" src="./utilities/setClickedEvents.js"></script>
     
     <script type="text/javascript" src="./pages/legal.js"></script>

@@ -1071,6 +1071,8 @@ $('.case_reg_but').on('click',async function(e){
             });
         }
     }else if(this.id=="chart_sum"){
+        $('#chart_sum_p').children().hide();
+        $('#chart_sum_all').show();
         var caseCause={};
         var caseCause1={};
         var project={};
@@ -1103,15 +1105,32 @@ $('.case_reg_but').on('click',async function(e){
         });
         $.each(caseCause1,(key,value)=>{
             chartCaseCause1.push({'label':key,'value':value, })
-        });
-        setChartPage({data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},{data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},);
+        });setChartsPage([
+            {data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},{data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},
+        ])
+        //setChartPage({data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},{data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},);
         //$('#chart_sum').trigger('create')
         goToPage( $(this).attr( "href" ));
     }
 })
+$('#export_chart').on('click',function(e){
+    var form= new mform({template:export_chart_template});
+
+    $('#export_popup_title').text("导出设置");
+    $('#export_popup_form').empty();
+    $('#export_popup_form').append(form.instance);
+    $('#export_popup_form').trigger('create');
+    //console.log(JSON.stringify(data));
+    $('#export_popup_form_submit').jqmData('form',form);
+    $('#export_popup').trigger('create');
+    $('#export_popup').popup('open');
+})
+
 $('.chart-btn').on('click',function(e){
     console.log('chart-btn');
     if($(this).text()=="纠纷"){
+        $('#chart_sum_p').children().hide();
+        $('#chart_sum_all').show();
         var caseCause={};
         var caseCause1={};
         DataList.casesDb.forEach(item=>{
@@ -1133,8 +1152,15 @@ $('.chart-btn').on('click',function(e){
         $.each(caseCause1,(key,value)=>{
             chartCaseCause1.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},{data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},);
+        setChartsPage([
+            {data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},{data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},
+        ])
+        //setChartPage({data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},{data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},);
     }else if($(this).text()=="项目"){
+        
+        $('#chart_sum_p').children().hide();
+        
+        $('#chart_sum_all').show();
         var project={};
         var project1={};
         DataList.casesDb.forEach(item=>{
@@ -1158,8 +1184,15 @@ $('.chart-btn').on('click',function(e){
         $.each(project1,(key,value)=>{
             chartProject1.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartProject,caption:'项目案件数量比例',type:"pie3d"},{data:chartProject1,caption:'项目涉及金额',type:"bar2d"});
+        setChartsPage([
+            {data:chartProject1,caption:'项目涉及金额',type:"bar2d"},{data:chartProject,caption:'项目案件数量比例',type:"pie3d"},
+        ])
+        //setChartPage({data:chartProject,caption:'项目案件数量比例',type:"pie3d"},{data:chartProject1,caption:'项目涉及金额',type:"bar2d"});
     }else if($(this).text()=="诉讼类型"){
+        
+        $('#chart_sum_p').children().hide();
+        
+        $('#chart_sum_all').show();
         var data1={};
         var data2={};
         DataList.casesDb.forEach(item=>{
@@ -1183,8 +1216,15 @@ $('.chart-btn').on('click',function(e){
         $.each(data2,(key,value)=>{
             chartData2.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartData1,caption:'诉讼类型数量比例',type:"pie3d"},{data:chartData2,caption:'诉讼类型涉及金额',type:"column2d"});
+        setChartsPage([
+            {data:chartData2,caption:'诉讼类型涉及金额',type:"column2d"},{data:chartData1,caption:'诉讼类型数量比例',type:"pie3d"},
+        ])
+        //setChartPage({data:chartData1,caption:'诉讼类型数量比例',type:"pie3d"},{data:chartData2,caption:'诉讼类型涉及金额',type:"column2d"});
     }else if($(this).text()=="在审项目"){
+        
+        $('#chart_sum_p').children().hide();
+        
+        $('#chart_sum_all').show();
         var data1={};
         var data2={};
         DataList.casesDb.forEach(item=>{
@@ -1208,8 +1248,16 @@ $('.chart-btn').on('click',function(e){
         $.each(data2,(key,value)=>{
             chartData2.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartData1,caption:'在审项目数量比例',type:"pie3d"},{data:chartData2,caption:'在审项目涉及金额',type:"bar2d"});
+        
+        setChartsPage([
+            {data:chartData2,caption:'在审项目涉及金额',type:"bar2d"},{data:chartData1,caption:'在审项目数量比例',type:"pie3d"},
+        ])
+        //setChartPage({data:chartData1,caption:'在审项目数量比例',type:"pie3d"},{data:chartData2,caption:'在审项目涉及金额',type:"bar2d"});
     }else if($(this).text()=="在执项目"){
+        
+        $('#chart_sum_p').children().hide();
+        
+        $('#chart_sum_all').show();
         var data1={};
         var data2={};
         DataList.casesDb.forEach(item=>{
@@ -1233,8 +1281,16 @@ $('.chart-btn').on('click',function(e){
         $.each(data2,(key,value)=>{
             chartData2.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartData1,caption:'在执项目数量比例',type:"pie3d"},{data:chartData2,caption:'在执项目涉及金额',type:"bar2d"});
+        
+        setChartsPage([
+            {data:chartData2,caption:'在执项目涉及金额',type:"bar2d"},{data:chartData1,caption:'在执项目数量比例',type:"pie3d"},
+        ])
+        //setChartPage({data:chartData1,caption:'在执项目数量比例',type:"pie3d"},{data:chartData2,caption:'在执项目涉及金额',type:"bar2d"});
     }else if($(this).text()=="一千万以上"){
+        
+        $('#chart_sum_p').children().hide();
+        
+        $('#chart_sum_all').show();
         var data1={};
         var data2={};
         DataList.casesDb.forEach(item=>{
@@ -1258,8 +1314,13 @@ $('.chart-btn').on('click',function(e){
         $.each(data2,(key,value)=>{
             chartData2.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartData1,caption:'一千万以上案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'一千万以上案件项目涉及金额',type:"bar2d"});
+        setChartsPage([
+            {data:chartData2,caption:'一千万以上案件项目涉及金额',type:"bar2d"},{data:chartData1,caption:'一千万以上案件项目数量比例',type:"pie3d"}
+        ])
+        //setChartPage({data:chartData1,caption:'一千万以上案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'一千万以上案件项目涉及金额',type:"bar2d"});
     }else if($(this).text()=="重大群诉"){
+        $('#chart_sum_p').children().hide();
+        $('#chart_sum_all').show();
         var data1={};
         var data2={};
         DataList.casesDb.forEach(item=>{
@@ -1283,16 +1344,309 @@ $('.chart-btn').on('click',function(e){
         $.each(data2,(key,value)=>{
             chartData2.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"});
+        setChartsPage([
+            {data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"},
+            {data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},
+        ])
+        //setChartPage({data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"});
+    }else if($(this).text()=="全部"){
+        $('#chart_sum_p').children().hide();
+        $('#chart_sum_all').show();
+        var data1={};
+        var data2={};
+        var caseCause={};
+        var caseCause1={};
+        var project={};
+        var project1={};
+        var caseType={};
+        var caseType1={};
+        var inProgress={};
+        var inProgress1={};
+        var inExcution={};
+        var inExcution1={};
+        var oneK={};
+        var oneK1={};
+        DataList.casesDb.forEach(item=>{
+            var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseLabel==3));
+            if(match.length>0){
+                var catelog=match[0].name;
+                if(!data1.hasOwnProperty(catelog)) data1[catelog]=[];
+                if(!data2.hasOwnProperty(catelog)) data2[catelog]=0.0;
+                data1[catelog].push(item);
+                data2[catelog]+=item.requestAmount;
+            }
+            match=$.grep(resourceDatas.caseCauses_,(d=>d.id==item.caseCause));
+            if(match.length>0){
+                var catelog=match[0].label;
+                if(!caseCause.hasOwnProperty(catelog)) caseCause[catelog]=[];
+                if(!caseCause1.hasOwnProperty(catelog)) caseCause1[catelog]=0.0;
+                caseCause[catelog].push(item);
+                caseCause1[catelog]+=item.requestAmount;
+            }
+            var matchp=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject));
+            if(matchp.length>0){
+                var catelog=matchp[0].name;
+                if(!project.hasOwnProperty(catelog)) project[catelog]=[];
+                if(!project1.hasOwnProperty(catelog)) project1[catelog]=0.0;
+                project[catelog].push(item);
+                project1[catelog]+=item.requestAmount;
+            }
+            match=$.grep(resourceDatas.caseLabels_,(d=>d.id==item.caseLabel));
+            if(match.length>0){
+                var catelog=match[0].label;
+                if(!caseType.hasOwnProperty(catelog)) caseType[catelog]=[];
+                if(!caseType1.hasOwnProperty(catelog)) caseType1[catelog]=0.0;
+                caseType[catelog].push(item);
+                caseType1[catelog]+=item.requestAmount;
+            }
+            match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseStatus>=0 && item.caseStatus<3));
+            if(match.length>0){
+                var catelog=match[0].name;
+                if(!inProgress.hasOwnProperty(catelog)) inProgress[catelog]=[];
+                if(!inProgress1.hasOwnProperty(catelog)) inProgress1[catelog]=0.0;
+                inProgress[catelog].push(item);
+                inProgress1[catelog]+=item.requestAmount;
+            }
+            match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseStatus>=3 && item.caseStatus<4));
+            if(match.length>0){
+                var catelog=match[0].name;
+                if(!inExcution.hasOwnProperty(catelog)) inExcution[catelog]=[];
+                if(!inExcution1.hasOwnProperty(catelog)) inExcution1[catelog]=0.0;
+                inExcution[catelog].push(item);
+                inExcution1[catelog]+=item.requestAmount;
+            }
+            match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseLabel==2));
+            if(match.length>0){
+                var catelog=match[0].name;
+                if(!oneK.hasOwnProperty(catelog)) oneK[catelog]=[];
+                if(!oneK1.hasOwnProperty(catelog)) oneK1[catelog]=0.0;
+                oneK[catelog].push(item);
+                oneK1[catelog]+=item.requestAmount;
+            }
+            //console.log('chart_sum',match.label,match)
+            //caseCause.push({})
+        });
+        
+        var chartData1=[];
+        var chartData2=[];
+        $.each(data1,(key,items)=>{
+            chartData1.push({'label':key,'value':items.length})
+        });
+        $.each(data2,(key,value)=>{
+            chartData2.push({'label':key,'value':value, })
+        });
+
+        var chartCaseCause=[];
+        var chartCaseCause1=[];
+        $.each(caseCause,(key,items)=>{
+            chartCaseCause.push({'label':key,'value':items.length})
+        });
+        $.each(caseCause1,(key,value)=>{
+            chartCaseCause1.push({'label':key,'value':value, })
+        });
+
+        var chartProject=[];
+        var chartProject1=[];
+        $.each(project,(key,items)=>{
+            chartProject.push({'label':key,'value':items.length})
+        });
+        $.each(project1,(key,value)=>{
+            chartProject1.push({'label':key,'value':value, })
+        });
+
+        var caseTypeData1=[];
+        var caseTypeData2=[];
+        $.each(caseType,(key,items)=>{
+            caseTypeData1.push({'label':key,'value':items.length})
+        });
+        $.each(caseType1,(key,value)=>{
+            caseTypeData2.push({'label':key,'value':value, })
+        });
+        
+        var inProgressData1=[];
+        var inProgressData2=[];
+        $.each(inProgress,(key,items)=>{
+            inProgressData1.push({'label':key,'value':items.length})
+        });
+        $.each(inProgress1,(key,value)=>{
+            inProgressData2.push({'label':key,'value':value, })
+        });
+
+        var inExcutionData1=[];
+        var inExcutionData2=[];
+        $.each(inExcution,(key,items)=>{
+            inExcutionData1.push({'label':key,'value':items.length})
+        });
+        $.each(inExcution1,(key,value)=>{
+            inExcutionData2.push({'label':key,'value':value, })
+        });
+
+        var oneK1Data1=[];
+        var oneK1Data2=[];
+        $.each(oneK,(key,items)=>{
+            oneK1Data1.push({'label':key,'value':items.length})
+        });
+        $.each(oneK1,(key,value)=>{
+            oneK1Data2.push({'label':key,'value':value, })
+        });
+
+        setChartsPage([
+            {data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},{data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},
+            {data:chartProject1,caption:'项目涉及金额',type:"bar2d"},{data:chartProject,caption:'项目案件数量比例',type:"pie3d"},
+            {data:caseTypeData2,caption:'诉讼类型涉及金额',type:"column2d"},{data:caseTypeData1,caption:'诉讼类型数量比例',type:"pie3d"},
+            {data:inProgressData2,caption:'在审项目涉及金额',type:"bar2d"},{data:inProgressData1,caption:'在审项目数量比例',type:"pie3d"},
+            {data:inExcutionData2,caption:'在执项目涉及金额',type:"bar2d"},{data:inExcutionData1,caption:'在执项目数量比例',type:"pie3d"},
+            {data:oneK1Data2,caption:'一千万以上案件项目涉及金额',type:"bar2d"},{data:oneK1Data1,caption:'一千万以上案件项目数量比例',type:"pie3d"},
+            {data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"},
+            {data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},
+        ])
+        //setChartPage({data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"});
     }
 })
+function setChartsPage(datas){
+    $('#chart_sum_all').empty();
+    var checkboxes=[];
+    var charts=[];
+    FusionCharts.ready(function(){
+        datas.forEach((data,index)=>{
+            var outterFrame=$('<div style="width: 100%; height:calc( 100% - 70px);"></div>');
+            var  checkboxFrame=$('<div style="position:absolute;width:50%"></div>');
+            var checkbox=$('<input type="checkbox" name="checkbox_'+index+'" id="checkbox_'+index+'">');
+            var caption=$('<label style="text-align: center;border: none;border-radius: 0;background:white;" data-iconpos="right" for="checkbox_'+index+'">'+data.caption+'</label>');
+            checkboxFrame.append(checkbox);
+            checkboxes.push(checkbox);
+            checkboxFrame.append(caption);
+            
+            outterFrame.append(checkboxFrame);
+            var container=$('<div id="chart_'+index+'" ></div>');
+            outterFrame.append(container);
+            data.renderAt='chart_'+index;
+            $('#chart_sum_all').append(outterFrame);
+            if(data.type=="pie3d"){
+                var chart=setPieChart(data);
+                checkbox.jqmData('chart',chart)
+                charts.push(chart);
+                chart.render();
+            }else if(data.type=="bar2d" || data.type=="column2d"){
+                var chart=setColumnBarChart(data);
+                checkbox.jqmData('chart',chart)
+                charts.push(chart);
+                chart.render();
+            }
+        })
+        $('#chart_sum_all').trigger('create');
+        window.exportAllChartsToPDF = function() {
+            //console.log($($(this).jqmData('form')).find('input:checked').val(),$('#exportFileType').val(),$('#exportFileName').val())
+            $(this).jqmData('form').getFormValues(function(e){
+
+                
+                
+                if(e.success){
+                    if(e.values.exportType!=0){
+                        charts=[];
+                        checkboxes.forEach((checkbox)=>{
+                            if($(checkbox).jqmData('chart')!=undefined && $(checkbox).prop('checked')){
+                                charts.push($(checkbox).jqmData('chart'));
+                            }
+                        })
+                    }
+                    console.log(charts);
+                    FusionCharts.batchExport({
+                        "charts": charts,
+                        "exportFormat": e.values.exportFileType,
+                        "exportFileName":e.values.exportFileName,
+                      });
+                    
+                }
+            })
+            
+
+        };
+        
+        document.getElementById("export_popup_form_submit").addEventListener("click", exportAllChartsToPDF);
+    });
+
+}
+function setColumnBarChart(data){
+    return new FusionCharts({
+        type: data.type, 
+        renderAt: data.renderAt,  
+        width: $(window).width()/2,  
+        height: $(window.top).height()-100,  
+        dataFormat: 'json',  
+        dataSource: {  
+            "chart": {  
+                "caption": data.caption,  
+                "bgColor": "#ffffff",  
+                "showBorder": "0",  
+                "captionFontSize": "18",  
+                "captionFontColor": "#333",
+                "subcaptionFontSize": "18",  
+                "formatNumberScale": "1",
+                "numberScaleUnit": "万,亿",  // Setting the scale units in Chinese
+                "numberScaleValue": "1,10000",  // Setting the scale values
+                "palettecolors": "#5d62b5,#29c3be,#f2726f,#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",
+                "plotBorderAlpha": "0", // Setting the plotBorderAlpha to 0 to remove the column borders
+                "usePlotGradientColor": "0",
+                "baseFontSize": "14",
+                "legendShadow": '0',  
+            },  
+            "data": data.data
+        }  
+    });
+}
+function setPieChart(data){
+    return new FusionCharts({ 
+        type: data.type,  
+        renderAt: data.renderAt,  
+        width: $(window).width()/2,  
+        height: $(window.top).height()-100,  
+        dataFormat: 'json',  
+        dataSource: {  
+            "chart": {  
+                "caption": data.caption,  
+                "captionFontColor": "#333",
+                "subCaption": "",  
+                "paletteColors": "#5d62b5,#29c3be,#f2726f,#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",  
+                "bgColor": "#ffffff",  
+                "showBorder": "0",  
+                "use3DLighting": "0",  
+                "showShadow": "0",  
+                "enableSmartLabels": "0",  
+                "startingAngle": "0",  
+                "showPercentValues": "1",  
+                "showPercentInTooltip": "0",  
+                "decimals": "2",  
+                "captionFontSize": "18",  
+                "subcaptionFontSize": "18",  
+                "subcaptionFontBold": "0",  
+                //"toolTipColor": "#ffffff",  
+                //"toolTipBorderThickness": "0",  
+                //"toolTipBgColor": "#000000",  
+                //"toolTipBgAlpha": "80",  
+                //"toolTipBorderRadius": "2",  
+                //"toolTipPadding": "5",  
+                "showHoverEffect":"1",  
+                "showLegend": "1",  
+                "legendBgColor": "#ffffff",  
+                "legendBorderAlpha": '0',  
+                "legendShadow": '0',  
+                "legendItemFontSize": '14',  
+                "legendItemFontColor": '#666666'  ,
+                "labelFontSize": "14",
+                "baseFontSize": "16",
+            },  
+            "data": data.data
+        }  
+    });
+}
 function setChartPage(data1,data2){
-    FusionCharts.ready(function () {  
-    //console.log('#chart_container height',$(window.top).height(),screen.height,data1);
-        var caseCauseNumChart = new FusionCharts({  
+    FusionCharts.ready(function(){
+        console.log($('#chart_container').css('width'),$(window).width())
+        var revenueChart = new FusionCharts({ 
             type: data1.type,  
             renderAt: 'chart_container',  
-            width: '100%',  
+            width: $(window).width()/2,  
             height: $(window.top).height()-50,  
             dataFormat: 'json',  
             dataSource: {  
@@ -1332,12 +1686,12 @@ function setChartPage(data1,data2){
                 "data": data1.data
             }  
         });
-        caseCauseNumChart.render('chart_container'); 
+        revenueChart.render(); 
         
-        var caseCauseAmountChart = new FusionCharts({  
+        var revenueChart1 = new FusionCharts({
             type: data2.type, 
             renderAt: 'chart_amount_container',  
-            width: '100%',  
+            width: $(window).width()/2,  
             height: $(window.top).height()-50,  
             dataFormat: 'json',  
             dataSource: {  
@@ -1360,7 +1714,27 @@ function setChartPage(data1,data2){
                 "data": data2.data
             }  
         });
-        caseCauseAmountChart.render('chart_amount_container');  
+        revenueChart1.render();  
+        window.exportAllChartsToPDF = function() {
+            //console.log($($(this).jqmData('form')).find('input:checked').val(),$('#exportFileType').val(),$('#exportFileName').val())
+            $(this).jqmData('form').getFormValues(function(e){
+                console.log(e);
+                if(e.success){
+                    if(Number(e.values.exportType)==0){
+                        FusionCharts.batchExport({
+                            "charts": [revenueChart, revenueChart1],
+                            "exportFormat": e.values.exportFileType,
+                            "exportFileName":e.values.exportFileName
+                          });
+                    }
+                    
+                }
+            })
+            
+
+        };
+        
+        document.getElementById("export_popup_form_submit").addEventListener("click", exportAllChartsToPDF);
     });
 }
 //#region 查看信息页面的按钮事件

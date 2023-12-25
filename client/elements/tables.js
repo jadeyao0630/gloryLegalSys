@@ -2,11 +2,11 @@ const resizeObserver = new ResizeObserver(entries => {
 		
     //setFontSize();
     for (let entry of entries) {
-        
+        //console.error("column size changed");
         var clone=$(entry.target).jqmData('clone');
-        if($(clone).width()!=$(entry.target).width())
+        //if($(clone).width()!=$(entry.target).width())
         //console.log('Element width changed to: ' + $(entry.target).width(),$(clone).width(),entry.target);
-            $(clone).css('width',$(entry.target).width());
+        $(clone).css('width',$(entry.target).width());
         
     }
     

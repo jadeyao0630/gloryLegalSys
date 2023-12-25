@@ -1087,7 +1087,7 @@ $('.case_reg_but').on('click',async function(e){
             chartData.push({'label':key,'value':items.length})
         });
         $.each(caseCause1,(key,value)=>{
-            chartData1.push({'label':key,'value':value,"style": { "color": "#ffffff" } })
+            chartData1.push({'label':key,'value':value, })
         });
         FusionCharts.ready(function () {  
             var caseCauseNumChart = new FusionCharts({  

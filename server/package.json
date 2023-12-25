@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "set NODE_ENV=test&& nodemon app.js",
     "home": "set NODE_ENV=home&& nodemon app.js",
     "local": "set NODE_ENV=local&& nodemon app.js"
   },

@@ -1097,7 +1097,7 @@ $('.case_reg_but').on('click',async function(e){
         $.each(caseCause1,(key,value)=>{
             chartCaseCause1.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartCaseCause,caption:'案件纠纷数量比例'},{data:chartCaseCause1,caption:'案件纠纷涉及金额'},);
+        setChartPage({data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},{data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},);
         //$('#chart_sum').trigger('create')
         goToPage( $(this).attr( "href" ));
     }
@@ -1126,7 +1126,7 @@ $('.chart-btn').on('click',function(e){
         $.each(caseCause1,(key,value)=>{
             chartCaseCause1.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartCaseCause,caption:'案件纠纷数量比例'},{data:chartCaseCause1,caption:'案件纠纷涉及金额'},);
+        setChartPage({data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},{data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},);
     }else if($(this).text()=="项目"){
         var project={};
         var project1={};
@@ -1151,7 +1151,7 @@ $('.chart-btn').on('click',function(e){
         $.each(project1,(key,value)=>{
             chartProject1.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartProject,caption:'项目案件数量比例'},{data:chartProject1,caption:'项目涉及金额'});
+        setChartPage({data:chartProject,caption:'项目案件数量比例',type:"pie3d"},{data:chartProject1,caption:'项目涉及金额',type:"bar2d"});
     }else if($(this).text()=="诉讼类型"){
         var data1={};
         var data2={};
@@ -1176,24 +1176,24 @@ $('.chart-btn').on('click',function(e){
         $.each(data2,(key,value)=>{
             chartData2.push({'label':key,'value':value, })
         });
-        setChartPage({data:chartData1,caption:'诉讼类型数量比例'},{data:chartData2,caption:'诉讼类型数涉及金额'});
+        setChartPage({data:chartData1,caption:'诉讼类型数量比例',type:"pie3d"},{data:chartData2,caption:'诉讼类型数涉及金额',type:"column2d"});
     }
 })
 function setChartPage(data1,data2){
     FusionCharts.ready(function () {  
-console.log('#chart_container height',$('#chart_container').css('height'),screen.height);
+    //console.log('#chart_container height',$(window.top).height(),screen.height,data1);
         var caseCauseNumChart = new FusionCharts({  
-            type: 'pie3d',  
+            type: data1.type,  
             renderAt: 'chart_container',  
             width: '100%',  
-            height: screen.height-80,  
+            height: $(window.top).height()-50,  
             dataFormat: 'json',  
             dataSource: {  
                 "chart": {  
                     "caption": data1.caption,  
                     "captionFontColor": "#333",
                     "subCaption": "",  
-                    "paletteColors": "#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",  
+                    "paletteColors": "#5d62b5,#29c3be,#f2726f,#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",  
                     "bgColor": "#ffffff",  
                     "showBorder": "0",  
                     "use3DLighting": "0",  
@@ -1228,10 +1228,10 @@ console.log('#chart_container height',$('#chart_container').css('height'),screen
         caseCauseNumChart.render('chart_container'); 
         
         var caseCauseAmountChart = new FusionCharts({  
-            type: 'bar2d',  
+            type: data2.type, 
             renderAt: 'chart_amount_container',  
             width: '100%',  
-            height: screen.height-80,  
+            height: $(window.top).height()-50,  
             dataFormat: 'json',  
             dataSource: {  
                 "chart": {  

@@ -125,7 +125,7 @@
     function getTdHtml(template,data,id){
         var td=$('<td name="'+id+'"" style="text-align: center;vertical-align: middle;"></td>');
         if(template.type!="checkbox" && template.type!="buttons"){
-            //data=getValueIfHaveDataRef(template,data);
+            data=getValueIfHaveDataRef(template,data);
             if(data==null||data.length==0) data=template.defaultValue!=undefined?template.defaultValue:"无";
         }
         var ele=$('<label>'+data+'</label>');
@@ -171,12 +171,38 @@
     
     
 <script>
+    var itemsPerPage=15;
+    var currentPage=0;
     $('body').on(main_load_completed_event_name,function(){
         //console.log(DataList);
         const intervalId = setInterval(() => {
             if (_firstPageTableColumns!=undefined) {
                 clearInterval(intervalId);
-                
+                var keys=Object.keys(_firstPageTableColumns);
+                var tbody=$('<tbody></tbody>');
+                $('#test_table').append(tbody);
+                DataList.casesDb.forEach(function(row,index){
+                    //$.each(data,(key,value)=>{
+                        if(itemsPerPage<index) return false;
+                        var tr=$('<tr></tr>');
+                        keys.forEach(k=>{
+                            if(row.hasOwnProperty(k)){
+                                var td=getTdHtml(_firstPageTableColumns[k],row[k],k);
+                                if(k=='caseApplicant') {
+                                    console.log('caseApplicant',td)
+                                }
+                                tr.append(td);
+                            }else{
+                                if(_firstPageTableColumns[k].type=="checkbox" || _firstPageTableColumns[k].type=="buttons")
+                                    tr.append(getTdHtml(_firstPageTableColumns[k],row,k));
+                            }
+                        })
+                        tbody.append(tr);
+                        console.log(itemsPerPage,index);
+                        
+                    //})
+                })
+                $('#test_table').trigger('create');
             }
         }, 100);
 

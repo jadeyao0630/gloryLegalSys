@@ -7,6 +7,7 @@ const resizeObserver = new ResizeObserver(entries => {
         //if($(clone).width()!=$(entry.target).width())
         //console.log('Element width changed to: ' + $(entry.target).width(),$(clone).width(),entry.target);
         $(clone).css('width',$(entry.target).width());
+        $(clone).css('min-width',$(entry.target).width());
         
     }
     

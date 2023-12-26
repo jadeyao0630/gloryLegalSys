@@ -140,6 +140,7 @@ $('body').on(preload_completed_event_name,function(){
         //setColumnToggleButton();
     }, 500);
     pageOnTable.setSort($('#pageOneTable-fixed').find('th'));
+    pageOnTable.setSort($('#pageOneTable').find('th'));
     
     $('#header-filter-container').css({top:$('#main-header').css('height')});
     //添加头部过滤表格

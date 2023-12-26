@@ -393,8 +393,6 @@ ui-collapsible.collapsible-listview .ui-btn{
     text-shadow: none;
     width: 100%;
     border-top: 2px solid orangered;
-    padding:5px 0px;
-    min-width: 25px;
 }
 #pageOneTable-fixed th{
 
@@ -406,7 +404,8 @@ ui-collapsible.collapsible-listview .ui-btn{
     padding:5px 0px;
     background: white;
     color:#333;
-    border-right:1px solid lightgray
+    border-right:1px solid lightgray;
+    min-width: 25px;
 }
 .table-regularFont{
     font-size: 12px;

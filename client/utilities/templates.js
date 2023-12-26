@@ -235,7 +235,7 @@ var _summary_template;
         type:"label",
         sortable:{
           type:'number',
-          isASC:true,
+          isASC:false,
           id:'id',
         }
         },
@@ -705,6 +705,35 @@ var _summary_template;
         },
         
     } 
+    export_excel_template={
+      settings:{
+        hasLabel:true,
+        hasPlaceHolder:true,
+        labelPosition:"left",
+        width:'550px',
+        textareaHeight:90,
+        isCollapsibleGrouping:false,
+      },
+      template:{
+        
+        exportType:{
+          label:"导出",
+          type:"radio",
+          isOptional:true,
+          data:['所有','选定'],
+        },
+        exportFileName:{
+          label:"文件名:",
+          placeholder:"文件名",
+          type:"text",
+          isOptional:true,
+        },
+        __formLabel:{
+          label:"文件名选填，默认文件名为当天日期 'export_yyyy年MM月dd日.xlsx'。",
+          type:"label",
+        }
+      }
+    }
     export_chart_template={
       settings:{
         hasLabel:true,

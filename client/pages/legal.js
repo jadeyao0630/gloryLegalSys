@@ -33,18 +33,41 @@ function setFontSize(){
     '</div>';
 }
 
-function exportExcel (tableId) {
+function exportExcel () {
+    var form= new mform({template:export_excel_template});
+
+    $('#export_excel_popup_title').text("导出设置");
+    $('#export_excel_popup_form').empty();
+    $('#export_excel_popup_form').append(form.instance);
+    $('#export_excel_popup_form').trigger('create');
+    //console.log(JSON.stringify(data));
+    $('#export_excel_popup_form_submit').jqmData('form',form);
+    $('#export_excel_popup').trigger('create');
+    $('#export_excel_popup').popup().popup('open');
+    //export2Excel('pageOneTable',);
+    $('#export_excel_popup_form_submit').on('click',function(e){
+        $(this).jqmData('form').getFormValues(function(e){
+            if(e.success){
+                export2Excel(e.values.exportFileName,e.values.exportType!=0,'pageOneTable');
+            }
+        });
+        //
+    })
+};
+function export2Excel(fileName,isSelectedOnly,tableId){
+
     $().mloader('show',{message:"导出中..."});
     setTimeout(() => {
         if(tableId==undefined) tableId='pageOneTable';
         var excel = new ExcelGen({
             "src_id": tableId,
-            "show_header": true
+            "show_header": true,
+            'selectedOnly':isSelectedOnly
         });
-        excel.generate();
+        excel.generate(fileName.length>0?fileName:undefined);
         $().mloader('hide');
     },200);
-};
+}
 $('body').on(main_load_completed_event_name,function(){
     const intervalId = setInterval(() => {
         if (pageOnTable!=undefined) {
@@ -304,6 +327,9 @@ $('body').on(preload_completed_event_name,function(){
     });
     
 })
+$.each($('.tooltip-btn'),(index,btn)=>{
+    $(btn).setTooltips();
+});
 $('body').on('userDataChanged',function(e){
     console.log('userDataChanged b',getGlobalJson("currentUser"),e);
     setGlobalJson("currentUser",updateOriginalData(getGlobalJson("currentUser"),e.value,'id'));
@@ -474,7 +500,7 @@ function setPersonCaseSum(data){
     console.log(personCaseSum);
     $('#footer_info_bar').empty();
     var info=$(`<label>共计<b>${personCaseSum.caseNum}</b>个案件`+
-        `，群诉<b id="footer_sum_label_group" style="color:blue;">${personCaseSum.caseLabels[3].length}</b>件`+
+        `，群诉<b id="footer_sum_label_group" style="color:#1362B7;">${personCaseSum.caseLabels[3].length}</b>件`+
         `，300万以上<b id="footer_sum_label_hundred" style="color:orange;">${personCaseSum.caseLabels[1].length+personCaseSum.caseLabels[2].length}</b>件`+
         ` 包含（1000万以上<b id="footer_sum_label_thousand" style="color:#E25C62;">${personCaseSum.caseLabels[2].length}</b>件）`+
         `，普通案件<b id="footer_sum_label_normal" style="color:green;">${personCaseSum.caseLabels[0].length}</b>件`+
@@ -483,16 +509,34 @@ function setPersonCaseSum(data){
         `，已执行金额为 <b id="footer_sum_paid">${personCaseSum.paidAmount.formatMoney(0, "￥")}</b> 万`+
     `</label>`);
     
-    var footWidth=$('#mainFooter').width()-20;
-    $.each($('#mainFooter').find('a, button'),(index,cg)=>{
-        footWidth-=90;
-        console.log($(cg).outerWidth());
-    });
-    $('#footer_info_bar').css({'max-width':footWidth+"px",'margin-left':'30px'});
+    
+    setInfoBarPosition();
     //$('#footer_info_bar').setTooltip();
     $('#footer_info_bar').append(info);
     $('#footer_info_bar').trigger('create');
-    console.log('mainFooter',footWidth)
+    
+    
+    $(info).setTooltip('，');
+    //console.log('mainFooter',footWidth)
+}
+$(window).on('resize',function() {
+    //console.log('window size changed')
+    setInfoBarPosition();
+  });
+function setInfoBarPosition(){
+    var footWidth=$('#mainFooter').width()-40;
+    var btns_l=[];
+    var btns_r=[];
+    $.each($('#mainFooter').find('[data-role="controlgroup"]'),(index,cg)=>{
+        $.each(($(cg)).find('a, button'),(i,b)=>{
+            footWidth-=90;
+            if(index==0) btns_l.push(b);
+            else btns_r.push(b);
+        })
+        //console.log($(cg).outerWidth());
+    });
+    var diff=((btns_r.length-btns_l.length)*90+40)/2
+    $('#footer_info_bar').css({'max-width':footWidth+"px",left:'calc( 50% - '+diff+'px )'});
 }
 function getPersonCaseSum(data){
     var sum={

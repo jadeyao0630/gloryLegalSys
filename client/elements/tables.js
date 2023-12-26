@@ -28,11 +28,13 @@ const setFixedHead = function(target,fixed) {
     $.each($(target).find('thead').find('th'),(index,th)=>{
         $(th).jqmData('clone',_ths[index]);
         if(index==_ths.length-1) {
-            var columnToggler=$('<i class="fa fa-gear"></i>');
+            var columnToggler=$('<i class="fa fa-gear" data-tooltip="筛选列"></i>');
             $(_ths[index]).empty();
             $(_ths[index]).removeClass('table-column-toggle');
             $(_ths[index]).append(columnToggler);
             $(_ths[index]).addClass('table-column-toggle');
+            $(_ths[index]).data('tooltip',"筛选列");
+            $(_ths[index]).setTooltips();
             //console.log('isNormal',($(ref_ths[index]).outerWidth()/window.innerWidth>0.1),$(ref_ths[index]).outerWidth(),window.innerWidth);
             //resizeTables($(ref_ths[index]).outerWidth()/window.innerWidth>0.1,true);
         }
@@ -191,11 +193,14 @@ pageTable.prototype.setSort=function(ths){
         var columnData=_this.opt.template[id];
         if(columnData.hasOwnProperty('sortable')){
             $(ths[index]).css({'cursor':'pointer'})
-            var indicator=$('<i class="fa fa-caret-up" />');
+            var indicator=$('<i class="fa '+(columnData.sortable.isASC?'fa-caret-up':'fa-caret-down')+'" />');
             if(id!='id') indicator.hide();
             else
                 _this.currentSort=columnData.sortable;
             $(ths[index]).append(indicator);
+            
+            $(ths[index]).data('tooltip',"按"+$(ths[index]).text()+"排序");
+            $(ths[index]).setTooltips();
             $(ths[index]).on('click',function(e){
                 
                 //$().mloader("show",{message:"排序中...."});

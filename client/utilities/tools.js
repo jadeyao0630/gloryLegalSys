@@ -304,12 +304,23 @@ $.fn.extend({
         $(this).removeClass('popin').addClass('popout');
         if(overlay!=undefined) $(overlay).addClass('popup-hide');
     },
-    setTooltip:function(){
+    setTooltips:function(){
+        $(this.get(0)).on('mouseover',(e)=>{
+            console.log("show tooltip");
+            //console.log('selectmenucreate',$(this),$(this).get(0).scrollWidth,$(this).get(0).clientWidth);
+            $(this).tooltip('show',$(this).data('tooltip'));
+          });
+          
+          $(this.get(0)).on('mouseleave',(e)=>{
+            $(this).tooltip('hide');
+        });
+    },
+    setTooltip:function(spliter){
         //console.log('selectmenucreate',this.get(0).nodeName);
         $(this.get(0)).on('mouseover',(e)=>{
             //console.log('selectmenucreate',$(this),$(this).get(0).scrollWidth,$(this).get(0).clientWidth);
             if ($(this).get(0).scrollWidth > $(this).get(0).clientWidth) {
-                $(this).tooltip('show',$(ele).html().replaceAll(",","</br>"));
+                $(this).tooltip('show',$(this).html().replaceAll(spliter||",","</br>"));
             }
           });
           
@@ -332,7 +343,7 @@ $.fn.extend({
             var top=(position.top+$(this).height()+10);
             //console.log(thisHeight+position.top,$(window).height());
             if(thisHeight+position.top+80>$(window).height()-$(window).scrollTop()) {
-                position.top=$(window).height()+$(window).scrollTop()-thisHeight-80;
+                position.top=$(window).height()+$(window).scrollTop()-thisHeight-70;
                 top=position.top;
             }
             
@@ -352,11 +363,12 @@ $.fn.extend({
             tooltip.html(html==undefined?$(this).text():html);
 
             $('body').append(tooltip);
-            
-            var position=$(this).offsetParent().hasClass('ui-popup')?$(this).position():$(this).offset();
+            console.log('tooltip',$(this).offsetParent());
+            var position=$(this).offset();
             var thisWidth=$('.ui-tooltip').width();
             if(thisWidth+position.left>screen.width) position.left=screen.width-thisWidth-10;
             $('.ui-tooltip').css({visibility: 'visible',
+            'z-index':$(this).offsetParent().hasClass('ui-popup')?$(this).offsetParent().css('z-index')+1:1000,
                 opacity: 1,
                 left:position.left,
                 top:(position.top+$(this).height()+5)+'px'});

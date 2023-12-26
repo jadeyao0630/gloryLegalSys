@@ -1116,7 +1116,6 @@ $('.case_reg_but').on('click',async function(e){
 })
 $('#export_chart').on('click',function(e){
     var form= new mform({template:export_chart_template});
-
     $('#export_popup_title').text("导出设置");
     $('#export_popup_form').empty();
     $('#export_popup_form').append(form.instance);
@@ -1537,6 +1536,7 @@ function setChartsPage(datas){
         })
         $('#chart_sum_all').trigger('create');
         window.exportAllChartsToPDF = function() {
+            console.log('export...');
             //console.log($($(this).jqmData('form')).find('input:checked').val(),$('#exportFileType').val(),$('#exportFileName').val())
             $(this).jqmData('form').getFormValues(function(e){
 

@@ -36,10 +36,10 @@
     <script src="./utilities/excel-gen.js"></script>
     <script src="./js/fancyTable.js"></script>
 	<script src="./utilities/configs.js"></script>
-    <script type="text/javascript" src="./utilities/tools.js"></script>\
+    <script type="text/javascript" src="./utilities/tools.js"></script>
 	<script type="text/javascript" src="./elements/mform.js"></script>
 	<script type="text/javascript" src="./elements/tables.js"></script>
-	<script type="text/javascript" src="./elements/progressDiagram.js"></script>\
+	<script type="text/javascript" src="./elements/progressDiagram.js"></script>
 	<script type="text/javascript" src="./elements/superMultiSelect.js"></script>
 	<script type="text/javascript" src="./utilities/eventManager.js"></script>
 	<script type="text/javascript" src="./elements/timeline.js"></script>
@@ -56,7 +56,7 @@
 
             <h1 style="font-size: 30px;margin-top:-15px;"><img src="./images/logo.png"  width="40px" height="40px" style="margin:10px 20px -10px 0;"></img>国瑞法务管理系统</h1>
             <div data-role="controlgroup" data-type="horizontal" class="ui-btn-right" style="margin-right:10px;margin-top:20px;">
-				<button class="header-btn-search">更多</button>
+				<button class="header-btn-search tooltip-btn" data-tooltip="查看更多过滤选项">更多</button>
 				<input type="search" id="header-search-input" placeholder="搜索关键字" data-wrapper-class="controlgroup-textinput ui-btn ui-corner-all" style="padding-top:.22em;padding-bottom:.22em;">
 				<a id="username" href="#popupMenu" data-rel="popup" data-transition="slide" class="ui-btn ui-btn-icon-left ui-icon-user btn-icon-blue">登录</a>
 			</div>
@@ -85,15 +85,23 @@
         <div data-role="footer"  data-position="fixed" id="mainFooter">
 
 				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
-					<a href="#casePage" id="case_reg_but_add" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn">新增</a>
-					<a href="#" id="case_reg_but_remove" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but">删除</a>
-					<a href="#" id="case_reg_but_restore" class="ui-btn ui-btn-icon-left ui-icon-recycle btn-icon-blue case_reg_but admin-ui">还原</a>
+					<a href="#casePage" id="case_reg_but_add" data-tooltip="新增案件" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn tooltip-btn">新增</a>
+					<a href="#" id="case_reg_but_remove" data-tooltip="删除选的案件" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but tooltip-btn">删除</a>
+					<a href="#" id="case_reg_but_restore" data-tooltip="恢复删除的案件" class="ui-btn ui-btn-icon-left ui-icon-recycle btn-icon-blue case_reg_but admin-ui tooltip-btn">还原</a>
 				</div>
 				<h1 id="footer_info_bar" class="footer-info-bar"></h1>
 				<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-right ui-footer-btns">
-					<button id="export_excel" class="btn-icon-blue btn-tooltip" data-icon="action" data-tooltip="导出成EXCEL" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick="exportExcel()">导出</button>
+					<button id="export_excel" class="btn-icon-blue btn-tooltip" data-icon="action" data-tooltip="导出当前表格成EXCEL" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick="exportExcel()">导出</button>
 					<a href="#chart_sum_page" id="chart_sum" rel="external" class="ui-btn case_reg_but" data-tooltip="分析案件" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)"><i class="fa fa-chart-gantt text-white fa-background text-green-background"></i>分析</a>
 				</div>
+			</div>
+			<div data-role="popup" id="export_excel_popup" data-theme="a" style="z-index: 1100;padding: 20px;">
+				<h3 id="export_excel_popup_title">test</h3>
+				<form id="export_excel_popup_form"></form>
+				<fieldset class="ui-grid-a">
+					<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a></div>
+					<div class="ui-block-b"><a href="#" id="export_excel_popup_form_submit" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green">提交</a></div>
+				</fieldset>
 			</div>
     </div>
     <!-- /主页面 -->

@@ -46,7 +46,8 @@ function ExcelGen(options) {
         "type": "table",
         "show_header": false,
         "header_row": null,
-        "body_rows": null
+        "body_rows": null,
+        "selectedOnly":false
     }
 
     this.options = {};
@@ -325,6 +326,7 @@ function ExcelGen(options) {
             });
             this.sheet.rows.push(row);
         }
+        var _this=this;
         //process content
         if (this.options.body_rows) {
             this.options.body_rows.each(function () {
@@ -332,7 +334,14 @@ function ExcelGen(options) {
                 $(this).children("td").not('[name="checkallbox"]').not('[name="rowButtons"]').each(function () {
                     row.push(outerThis.sharedStrings.add($(this).textOrValue().trim().replace(/ +(?= )/g, '')));
                 });
-                outerThis.sheet.rows.push(row);
+                if(_this.options.selectedOnly){
+                    if($(this).children('td[name="checkallbox"]').find('input:checked').length>0)
+                        outerThis.sheet.rows.push(row);
+                }else{
+                    outerThis.sheet.rows.push(row);
+                }
+                //$(this).children("td")
+                
             });
         }
     };

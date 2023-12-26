@@ -59,6 +59,9 @@
 .ui-input-text input, .ui-input-search input{
     line-height: var(--inputLineHeight);
 }
+.ui-checkbox{
+    margin:0;
+}
 .ui-checkbox input{
     width:var(--iconSize);
     height:var(--iconSize);
@@ -306,11 +309,6 @@ ui-collapsible.collapsible-listview .ui-btn{
     margin-right:10px;
     margin-top:15px;
 }
-.footer_info_bar{
-    text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
 .header-search-bar{
     display: grid;
     grid-template-columns: auto 1fr;
@@ -549,8 +547,11 @@ ui-collapsible.collapsible-listview .ui-btn{
   .footer-info-bar{
     position: absolute;
     transform: translateX(-50%);
-    left:50%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
+
   .logo-image{
     animation: blink 6s infinite;
   }

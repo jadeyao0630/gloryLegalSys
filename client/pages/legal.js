@@ -482,8 +482,17 @@ function setPersonCaseSum(data){
         `，判决金额为 <b id="footer_sum_penalty">${personCaseSum.penaltyAmount.formatMoney(0, "￥")}</b> 万`+
         `，已执行金额为 <b id="footer_sum_paid">${personCaseSum.paidAmount.formatMoney(0, "￥")}</b> 万`+
     `</label>`);
+    
+    var footWidth=$('#mainFooter').width()-20;
+    $.each($('#mainFooter').find('a, button'),(index,cg)=>{
+        footWidth-=90;
+        console.log($(cg).outerWidth());
+    });
+    $('#footer_info_bar').css({'max-width':footWidth+"px",'margin-left':'30px'});
+    //$('#footer_info_bar').setTooltip();
     $('#footer_info_bar').append(info);
     $('#footer_info_bar').trigger('create');
+    console.log('mainFooter',footWidth)
 }
 function getPersonCaseSum(data){
     var sum={

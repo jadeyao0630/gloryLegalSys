@@ -106,6 +106,7 @@
 }
 #mainFooter .ui-controlgroup {
     margin-top:0px;
+
 }
 #main-header{
     overflow:hidden;
@@ -305,6 +306,11 @@ ui-collapsible.collapsible-listview .ui-btn{
     margin-right:10px;
     margin-top:15px;
 }
+.footer_info_bar{
+    text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
 .header-search-bar{
     display: grid;
     grid-template-columns: auto 1fr;
@@ -361,12 +367,14 @@ ui-collapsible.collapsible-listview .ui-btn{
   }
   #main-body{
     padding:0px;
+    overflow: hidden;
   }
 
 /* 主表格 */
 #pageOneTable{
     margin: 0px 0px 0px 0px;
     width:100%;
+    overflow: hidden;
 }
 
 #pageOneTable tbody tr td{
@@ -539,7 +547,9 @@ ui-collapsible.collapsible-listview .ui-btn{
     text-shadow: none;
   }
   .footer-info-bar{
-    
+    position: absolute;
+    transform: translateX(-50%);
+    left:50%;
   }
   .logo-image{
     animation: blink 6s infinite;

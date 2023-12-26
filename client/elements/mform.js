@@ -368,7 +368,7 @@ mform.prototype={
         var value=itemTemplate.defaultValue || '';
         var input=$('<input type="password" class="form-original" name="'+itemId+'"'+' id="'+itemId+'"'+
                     _this.setPlaceholder(itemTemplate)+
-                    'data-wrapper-class="controlgroup-textinput ui-btn"'+
+                    'data-wrapper-class="controlgroup-textinput ui-btn" style="padding-top:.22em;padding-bottom:.22em;"'+
                     ' value="'+value+'" '+_this.setRequired(itemTemplate.isOptional,"此项必须正确填写")+'>');
         var subContainer=$('<div id="'+itemId+'_controlgroup" data-role="controlgroup" data-type="horizontal" class="form-original"></div>');
         if(itemTemplate.isDisabled){
@@ -797,7 +797,7 @@ mform.prototype={
             }
             element.selectmenu().selectmenu('refresh');
         }else if(itemTemplate.type.toLowerCase()=="date" || itemTemplate.type.toLowerCase()=="datetime" || itemTemplate.type.toLowerCase()=="time") {
-            console.log('日期',id,val);
+            console.log('日期 set 1',id,val);
             if(val!='0000-00-00 00:00:00' && val!='0000-00-00' && val!='00:00:00' && val!='1999-11-29T16:00:00.000Z' && val!='1999-11-30T00:00:00.000Z'){
                 if( itemTemplate.type.toLowerCase()=="date") val=formatDateTime(new Date(val),'yyyy-MM-dd');
                 if( itemTemplate.type.toLowerCase()=="datetime") val=formatDateTime(new Date(val),'yyyy-MM-dd');
@@ -806,6 +806,7 @@ mform.prototype={
                     val=formatDateTime(new Date(val),itemTemplate.dateFormate);
                 }
             }
+            console.log('日期 set 2',id,val);
             element.val(val);
         }else if(itemTemplate.type.toLowerCase()=="radio")  {
             var eles=element.find("input[id^="+id+"]");
@@ -902,19 +903,23 @@ mform.prototype={
         }else if(itemTemplate.type.toLowerCase()=="date" || itemTemplate.type.toLowerCase()=="datetime" || itemTemplate.type.toLowerCase()=="time") {
             
             var val=element.val();
+            console.log('日期 get1',id,val);
             if(element.val().length==0){
+                
                 if(!itemTemplate.isOptional){
                     return null;
                 }
-                if( itemTemplate.type.toLowerCase()=="date") val=formatDateTimeStr2Mysql("0000-00-00 00:00:00");
-                if( itemTemplate.type.toLowerCase()=="datetime") val=formatDateTimeStr2Mysql("0000-00-00 00:00:00");
-                if( itemTemplate.type.toLowerCase()=="time") val=formatDateTimeStr2Mysql("00:00:00");
+                if( itemTemplate.type.toLowerCase()=="date") val="0000-00-00 00:00:00";
+                if( itemTemplate.type.toLowerCase()=="datetime") val="0000-00-00 00:00:00";
+                if( itemTemplate.type.toLowerCase()=="time") val="00:00:00";
+                //val='NULL';
             }else{
                 if( itemTemplate.type.toLowerCase()=="date") val=formatDateTime(new Date(val),'yyyy-MM-dd HH:mm:ss');
                 if( itemTemplate.type.toLowerCase()=="datetime") val=formatDateTime(new Date(val),'yyyy-MM-dd HH:mm:ss');
                 if( itemTemplate.type.toLowerCase()=="time") val=formatDateTime(new Date(val),'HH:mm:ss');
             }
             
+            console.log('日期 get2',id,val);
             //console.log('日期',id,val);
             return val;
         }else if(itemTemplate.type.toLowerCase()=="radio")  {

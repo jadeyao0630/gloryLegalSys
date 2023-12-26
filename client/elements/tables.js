@@ -86,8 +86,16 @@ var duration=500;
             filterFielset.append(label);
             input.on("click",function(e){
                 //console.log( $('td[name="'+input.prop('name')+'"]'));
-                setAvailableColumn(target,input,duration);
-                saveChangedToUser(target);
+                $(window).trigger('waiting');
+        
+                console.log('setAvailableColumn');
+                setTimeout(() => {
+                    
+                    setAvailableColumn(target,input,duration);
+                    saveChangedToUser(target);
+                    $(window).trigger('hidepopup');
+                    //syncHeaderCloneWidth();
+                }, 100);
                 
             });
             if(columnData.isHidden){

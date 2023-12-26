@@ -70,6 +70,31 @@ function saveNewData2List(sourceData,newData,indexName){
       }
       return sourceData;
 }
+function formatAMPM(datestr){
+    dateString = dateString.replace('下午', '');
+
+    // 使用空格分割字符串
+    var parts = dateString.split(' ');
+
+    // 获取日期部分和时间部分
+    var datePart = parts[0];
+    var timePart = parts[1];
+
+    // 将日期部分拆分为年、月、日
+    var dateParts = datePart.split('-');
+    var year = parseInt(dateParts[0], 10);
+    var month = parseInt(dateParts[1], 10) - 1; // 月份从 0 开始
+    var day = parseInt(dateParts[2], 10);
+
+    // 将时间部分拆分为时、分、秒
+    var timeParts = timePart.split(':');
+    var hour = parseInt(timeParts[0], 10);
+    var minute = parseInt(timeParts[1], 10);
+    var second = parseInt(timeParts[2], 10);
+
+    // 创建 Date 对象
+    var date = new Date(year, month, day, hour, minute, second);
+}
 function formatDateTime(date, format) {
     const o = {
       'M+': date.getMonth() + 1, // 月份
@@ -108,8 +133,43 @@ function formatDateTime(date, format) {
     else
         return formatDateTime(new Date(dateStr),'yyyy-MM-dd');
 }
+function formatAMPM(dateString){
+    var isPM=false;
+    dateString=dateString.replace('年','-').replace('月','-').replace('日','');
+    if(dateString.indexOf('下午')>-1) {
+        isPM=true;
+        dateString = dateString.replace('下午', '');
+    }else if(dateString.indexOf('上午')>-1){
+        dateString = dateString.replace('上午', '');
+    }
+
+    // 使用空格分割字符串
+    var parts = dateString.split(' ');
+
+    // 获取日期部分和时间部分
+    var datePart = parts[0];
+    var timePart = parts[1];
+
+    // 将日期部分拆分为年、月、日
+    var dateParts = datePart.split('-');
+    var year = parseInt(dateParts[0], 10);
+    var month = parseInt(dateParts[1], 10) - 1; // 月份从 0 开始
+    var day = parseInt(dateParts[2], 10);
+
+    // 将时间部分拆分为时、分、秒
+    var timeParts = timePart.split(':');
+    var hour = parseInt(isPM?timeParts[0]+12:timeParts[0], 10);
+    var minute = parseInt(timeParts[1], 10);
+    var second = parseInt(timeParts[2], 10);
+
+    // 创建 Date 对象
+    var date = new Date(year, month, day, hour, minute, second);
+    return date;
+}
   function formatDateTimeStr2Mysql(dateTimeStr){
-    return new Date(dateTimeStr).toLocaleString().substr(0,20);
+    var datetime=new Date(dateTimeStr).toLocaleString();
+    //datetime=formatAMPM()
+    return datetime.substr(0,20);
   }
 function formatIndex(position){
     var main=Math.floor(position);

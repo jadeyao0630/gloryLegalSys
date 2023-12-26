@@ -310,14 +310,16 @@
     });
     revenueChart1.render();
     window.exportAllChartsToPDF = function() {
-      console.log(formatDateTimeStr2Mysql("0000-00-00 00:00:00"))
-      
-      
+      console.log(new Date())
+      console.log(new Date("0000-00-00 00:00:00"))
+      console.log(new Date("0000-00-00 00:00:00").toString())
+      console.log(new Date("0000-00-00 00:00:00").toLocaleString())
+      /*
       FusionCharts.batchExport({
         "charts": [revenueChart, revenueChart1],
         "exportFormat": "svg"
       });
-      
+      */
     }
     document.getElementById("export").addEventListener("click", exportAllChartsToPDF);
   });

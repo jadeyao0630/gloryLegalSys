@@ -55,6 +55,7 @@ $('#popupMenu').find('a').on('click',function(e){
             $.each(resourceDatas['users'],(index,user)=>{
                 console.log(user);
                 var option=$('<option value="'+(index+1)+'">'+user.name+'</option>');
+                if(user.isInactived.constructor == String) user.isInactived=parseInt(user.isInactived);
                 if(user.isInactived){
                     option.addClass('item-inActived');
                 }
@@ -840,9 +841,9 @@ function updateSubmitEvent(e){
                             e.values[data.dateKey]=getDateTime();
                             var newCaseStatus=currentProgress['targetPosition'].main+(currentProgress['originalPosition'].main>excutePoint && currentProgress['targetPosition'].main> currentProgress['originalPosition'].main?currentProgress['originalPosition'].sub:currentProgress['targetPosition'].sub)/10;
                             if(editableStatus=="new" || editableStatus=="shift"){
-        
+                                pageOnTable.updateTableData({caseStatus:newCaseStatus},$('#pageOneTable').find('tr[data-item='+data.id+']'));
                                 console.log("提交方式为",editableStatus,'状态更新为',newCaseStatus,'目标ID',data.id);
-        
+                                
                                 //因为是添加，需要更新节点在表格caseStatus的位置
                                 update("id="+data.id,'caseStatus','caseStatus="'+newCaseStatus+'"',async function(r){
                                     console.log('update result',r);
@@ -1839,6 +1840,7 @@ $('.edit-header-btn').on('click',async function(e){
                 //console.log(values)
                 if(e.success){
                     console.log(e);
+                    $().mloader("show",{message:"提交中...."});
                     var newData={};
                     $.each(e.values,(key,val)=>{
                         if(key.replace("_p","")=='pass'){
@@ -1862,6 +1864,7 @@ $('.edit-header-btn').on('click',async function(e){
                             console.log(r);
                             $().minfo('show',{title:"错误",message:r.error});
                         }
+                        $().mloader("hide");
                     });
                     
                 }
@@ -1874,6 +1877,7 @@ $('.edit-header-btn').on('click',async function(e){
                 //console.log(values)
                 if(e.success){
                     console.log(e);
+                    $().mloader("show",{message:"提交中...."});
                     e.values.createDate=getDateTime();
                     e.values.id=(await getRecordLatestIndex(userDbTableName,'id'))+1;
                     e.values['isInactived']=e.values.isInactived_a;
@@ -1892,6 +1896,7 @@ $('.edit-header-btn').on('click',async function(e){
                             console.log(r);
                             $().minfo('show',{title:"错误",message:r.error});
                         }
+                        $().mloader("hide");
                     });
                 }
             });
@@ -1902,10 +1907,11 @@ $('.edit-header-btn').on('click',async function(e){
         if(sessionStorage.getItem('currentPage')=="#infoPage"){
             
             var userD=JSON.parse($(_this).data('item'));
-            setting_add_form.getFormValues(function(message,values){
+            setting_add_form.getFormValues(function(e){
                 //console.log(values)
                 if(e.success){
                     //values.data.values.createDate=getDateTime(userD.createDate);
+                    $().mloader("show",{message:"提交中...."});
                     e.values['isInactived']=e.values.isInactived_a;
                     e.values.id=userD.id;
                     delete e.values.isInactived_a;
@@ -1932,7 +1938,7 @@ $('.edit-header-btn').on('click',async function(e){
                             console.log(r);
                             $().minfo('show',{title:"错误",message:r.error});
                         }
-                        
+                        $().mloader("hide");
                     });
                     
                 }

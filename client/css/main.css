@@ -52,6 +52,8 @@
 }
 .ui-input-text{
     font-size: var(--mfont);
+}
+.ui-input-text::not(.controlgroup-textinput){
     height: var(--inputHeight);
 }
 .ui-input-text input, .ui-input-search input{

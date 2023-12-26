@@ -116,7 +116,8 @@ $('body').on(preload_completed_event_name,function(){
 		//filterParent:"mainFooter",
 		rowButtons:tableFunBtns
 	});
-
+    
+    //表格重新排序
     $("#pageOneTable").on('sort',function(columnData){
         //console.log(columnData.value);
         $(window).trigger('waiting');
@@ -358,37 +359,40 @@ $('body').on('caseexcutesChanged',function(e){
 //影响的缓存内数据：DataList.caseStatus,DataList.combinedData
 //影响的UI数据：footer_sum,main_table
 $('body').on('caseStatusChanged',function(e){
+    if(e.action=='status'){
+    }else{
+        $(window).trigger('saving');
+        var data=[];
+        var newValue={};
+        $.each(e.value,(key,val)=>{
+            if(key!='id'){
+                data.push(key.replace("_p","")+"=\""+val+"\"");
+            }
+            newValue[key.replace("_p","")]=val;
+        })
+        //保存修改数据到数据库
+        update('id='+newValue.id,'caseStatus',data.join(),function(r){
+            console.log('caseStatusChanged',r,newValue,e.value);
+            if(r.data.success){
+                //更新缓存内数据
+                pageOnTable.updateTableData(newValue,$('#pageOneTable').find('tr[data-item='+newValue.id+']'));
+                DataList.caseStatus=updateOriginalData(DataList.caseStatus,newValue,'id');
+                DataList.combinedData=updateOriginalData(DataList.combinedData,newValue,'id');
+                currentData=updateOriginalData(currentData,newValue,'id');//tools.js
+                //console.log(DataList.caseStatus);
+                //更新页面ui数据显示
+                pageOnTable.updateTableData(e.value,$('#pageOneTable').find('tr[data-item='+e.value.id+']'));
+                setPersonCaseSum(DataList.combinedData);
+                $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
+            }else{
+                $().minfo('show',{title:"提示",message:"更新遇到问题。"+r.data.data.sqlMessage},function(){});
+            }
+            
+            console.log("on data changed",DataList.combinedData,DataList.caseStatus,e);
+            $(window).trigger('hidepopup');
+        });
+    }
     
-    $(window).trigger('saving');
-    var data=[];
-    var newValue={};
-    $.each(e.value,(key,val)=>{
-        if(key!='id'){
-            data.push(key.replace("_p","")+"=\""+val+"\"");
-        }
-        newValue[key.replace("_p","")]=val;
-    })
-    //保存修改数据到数据库
-    update('id='+newValue.id,'caseStatus',data.join(),function(r){
-        console.log('caseStatusChanged',r);
-        if(r.data.success){
-            //更新缓存内数据
-            pageOnTable.updateTableData(newValue,$('#pageOneTable').find('tr[data-item='+newValue.id+']'));
-            DataList.caseStatus=updateOriginalData(DataList.caseStatus,newValue,'id');
-            DataList.combinedData=updateOriginalData(DataList.combinedData,newValue,'id');
-            currentData=updateOriginalData(currentData,newValue,'id');//tools.js
-            //console.log(DataList.caseStatus);
-            //更新页面ui数据显示
-            pageOnTable.updateTableData(e.value,$('#pageOneTable').find('tr[data-item='+e.value.id+']'));
-            setPersonCaseSum(DataList.combinedData);
-            $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
-        }else{
-            $().minfo('show',{title:"提示",message:"更新遇到问题。"+r.data.data.sqlMessage},function(){});
-        }
-        
-        console.log("on data changed",DataList.combinedData,DataList.caseStatus,e);
-        $(window).trigger('hidepopup');
-    });
     
 })
 //案件基本数据更新

@@ -241,7 +241,8 @@ var _summary_template;
         },
         caseLabel:{
           label:"标签",
-            type:"backgroundColorLabel",
+            //type:"backgroundColorLabel",
+            type:"label",
             data:case_labels,
             backgroundData:resourceDatas.caseLabelsColors,
             //style:{'font-weight':'700','font-size':'18px'},

@@ -1,7 +1,7 @@
 var isRunLocal=false;
 var IPS=['192.168.10.141','192.168.10.68','cn.luyao.site']
 var showDebug=false;
-let ip=isRunLocal?IPS[1]:IPS[2];
+let ip=isRunLocal?IPS[1]:IPS[0];
 let port=5555;
 var auth_code='1234';
 var adminLevel=3;

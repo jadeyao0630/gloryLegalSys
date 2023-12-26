@@ -339,7 +339,7 @@ $.fn.extend({
             var thisWidth=$('.ui-tooltip').width();
             var thisHeight=$('.ui-tooltip').height();
             if(thisWidth+position.left>screen.width) {
-                position.left=screen.width-10;
+                position.left-=10;
                 $('.ui-tooltip').css({'transform':'translateX(-100%)'})
             }else{
                 $('.ui-tooltip').css({'transform':'translateX(-0%)'})

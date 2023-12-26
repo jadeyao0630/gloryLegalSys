@@ -6,15 +6,23 @@
     <title>Document</title>
     <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css">
     <link rel="stylesheet" href="./css/color.css">
+    <link rel="stylesheet" href="./css/all.css">
+    <link rel="stylesheet" href="./css/main.css">
     <link rel="stylesheet" href="./css/superMultiSelect.css">
     <style>
         body{
             overflow-y:hidden;
         }
-        .tableWrapper { height: 600px; width: 100%; overflow-y: scroll; overflow-x: scroll;}
+        #select-page-button::after {
+            display: none;
+        }
+        #select-page-button.ui-btn-icon-right{
+            padding-right:10px;
+        }
+        .tableWrapper { height: 600px; width: 100%; overflow-y: scroll; overflow-x: hidden;}
 
             td tr table { padding: 0; margin: 0; }
-            table td {border-right: 1px solid lightgray;max-width: 150px; text-align: center;vertical-align: middle;white-space:nowrap;}
+            table td {border-right: 1px solid lightgray;max-width: 150px; text-align: center;vertical-align: middle;}
             table th {border-right: 1px solid lightgray;padding: 0; margin: 0;text-align: center;vertical-align: middle;}
             tr.focused { background-color: #ddd; }
             .font12{
@@ -58,7 +66,7 @@
     <script src="./utilities/db.js"></script>
     <script src="./utilities/configs.js"></script>
     <script src="./utilities/resourceData.js"></script>
-    <script src="./elements/superMutliSelect.js"></script>
+    <script src="./elements/superMultiSelect.js"></script>
     
 </head>
 <body>
@@ -68,7 +76,8 @@
         var data=data.split(',');
         var multiValues=[];
         data.forEach(_v=>{
-            var _values=isMultiInput?formatSuperMultiSelectData(_v):formatSuperMultiSelectOptionValue(_v);
+            console.log(_v)
+            var _values=isMultiInput?_v.convertToSuperMultiInputValue():_v.convertToSuperMultiSelectValue(template.data,template.valueKey,template.matchKey);
             //console.log('setSumList',_values);
             if(template.hasOwnProperty('displayFormat')){
                 var displayFormat=template.displayFormat;
@@ -125,7 +134,7 @@
     function getTdHtml(template,data,id){
         var td=$('<td name="'+id+'"" style="text-align: center;vertical-align: middle;"></td>');
         if(template.type!="checkbox" && template.type!="buttons"){
-            data=getValueIfHaveDataRef(template,data);
+            //data=getValueIfHaveDataRef(template,data);
             if(data==null||data.length==0) data=template.defaultValue!=undefined?template.defaultValue:"无";
         }
         var ele=$('<label>'+data+'</label>');
@@ -149,6 +158,7 @@
                 break;
             case "checkbox":
                 ele=$('<input class="reg-checkbox" style="left:0px;" type="checkbox" data-mini="true" name="item_checkbox" data-item='+data+'>');
+                ele.jqmData('item',data)
                 break;
             case "buttons":
                 if(template.data!=undefined){
@@ -167,59 +177,364 @@
         //td.trigger('create');
         return td;
     }
+    function fnBtnClickEvent(e){
+        console.log(e);
+    }
     </script>
     
     
 <script>
-    var itemsPerPage=15;
+    var itemsPerPage=10;
     var currentPage=0;
+    var currentData;
+    var maxPage=0;
+    var tbody;
+    var keys;
+    var convertedData=[];
     $('body').on(main_load_completed_event_name,function(){
         //console.log(DataList);
         const intervalId = setInterval(() => {
             if (_firstPageTableColumns!=undefined) {
                 clearInterval(intervalId);
-                var keys=Object.keys(_firstPageTableColumns);
-                var tbody=$('<tbody></tbody>');
-                $('#test_table').append(tbody);
-                DataList.casesDb.forEach(function(row,index){
-                    //$.each(data,(key,value)=>{
-                        if(itemsPerPage<index) return false;
-                        var tr=$('<tr></tr>');
-                        keys.forEach(k=>{
-                            if(row.hasOwnProperty(k)){
-                                var td=getTdHtml(_firstPageTableColumns[k],row[k],k);
-                                if(k=='caseApplicant') {
-                                    console.log('caseApplicant',td)
-                                }
-                                tr.append(td);
-                            }else{
-                                if(_firstPageTableColumns[k].type=="checkbox" || _firstPageTableColumns[k].type=="buttons")
-                                    tr.append(getTdHtml(_firstPageTableColumns[k],row,k));
-                            }
-                        })
-                        tbody.append(tr);
-                        console.log(itemsPerPage,index);
-                        
-                    //})
-                })
+                console.log('load table...')
+                $().mloader('hide');
+                convertedData=[];
+                $.each(DataList.casesDb,(index,value)=>{
+                    var item={};
+                    $.each(value,(k,v)=>{
+                        if(_firstPageTableColumns.hasOwnProperty(k))
+                            item[k]=getValueIfHaveDataRef(_firstPageTableColumns[k],v);
+                        else
+                            item[k]=v;
+                    });
+                    convertedData.push(item);
+                });
+                currentData=convertedData;
+                keys=Object.keys(_firstPageTableColumns);
+                var fn_btns='<div data-role="controlgroup" data-type="horizontal" data-mini="true">'+
+                                '<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onclick=\'fnBtnClickEvent({0})\'>查看</a>'+
+                                '<a href="#casePage" name="fn_btn_edit" class="ui-btn btn-icon-blue btn-tooltip ui-btn-icon-notext ui-icon-edit" data-tooltip="案件编辑修改" data-transition="slidefade" onclick=\'fnBtnClickEvent({0})\'>修改</a>'+
+                                '<a href="#" name="fn_btn_update" class="ui-btn btn-icon-red btn-tooltip ui-btn-icon-notext ui-icon-calendar" data-tooltip="更新案件进展" data-transition="slidefade" onclick=\'fnBtnClickEvent({0})\'>更新</a>'+
+                            '</div>';
+                _firstPageTableColumns.rowButtons.data=fn_btns;
+                _firstPageTableColumns.rowButtons.width=150;
+                var thead=$('<thead></thead>');
+                var theadtr=$('<tr></tr>');
+                keys.forEach(k=>{
+                    var th=$('<th name="'+k+'"" style="text-align: center;vertical-align: middle;">'+_firstPageTableColumns[k].label+'</th>');
+                    if(_firstPageTableColumns[k].type=='checkbox'){
+                        th=$('<th name="'+k+'"" style="text-align: center;vertical-align: middle;"></th>');
+                        th.append($('<input class="reg-checkbox-all" style="left:0px;" type="checkbox" data-mini="true" name="item_checkbox">'));
+                    }
+                    if(_firstPageTableColumns[k].isHidden) th.hide();
+                    theadtr.append(th);
+                });
+                thead.append(theadtr);
+                $('#test_table').prepend(thead);
+                $('#test_table').pagination({source:convertedData,itemsPerPage:10});
+                $('#test_table').updateTable();
                 $('#test_table').trigger('create');
             }
         }, 100);
 
     });
-    
+    $.fn.extend({
+        pagination:function(arg){
+            var _this=$(this);
+            _this.jqmData('itemsPerPage',15);
+            _this.jqmData('currentPage',0);
+            _this.jqmData('maxPage',0);
+            _this.jqmData('source',[]);
+            
+            if(arg!=undefined){
+                $.each(arg,(k,v)=>{
+                    _this.jqmData(k,v);
+                })
+            }
+            _this.jqmData('currentData',_this.jqmData('source'));
+            _this.setFixedHead();
+        },
+        prevPage:function(){
+            var _this=$(this);
+            if(_this.jqmData('currentPage')>0){
+                _this.jqmData('currentPage',_this.jqmData('currentPage')-1);
+                _this.updateTable();
+            }
+        },
+        nextPage:function(){
+            var _this=$(this);
+            if(_this.jqmData('currentPage')<_this.jqmData('maxPage')-1){
+                _this.jqmData('currentPage',_this.jqmData('currentPage')+1);
+                _this.updateTable();
+            }
+        },
+        gotoPage:function(pageNum,isNewItem){
+            $(this).jqmData('currentPage',pageNum);
+            $(this).updateTable(isNewItem);
+        },
+        searchTable:function(searchStr){
+            //console.log('searchTable',searchStr);
+            $(this).jqmData('currentData',$.grep($(this).jqmData('source'),(d)=>{
+                var hasValue=false;
+                $.each(d,(k,v)=>{
+                    if( v!=null && v.toString().indexOf(searchStr)>-1){
+                        hasValue=true;
+                        return true;
+                    }
+                })
+                return hasValue;
+                //console.log($.map(d, function(v, k) { return v!=null && v.toString().indexOf(input.val())>-1; }));
+                //return $.map(d, function(v, k) { return v!=null && v.toString().indexOf(input.val())>-1; }).length>0;
+            }));
+            $(this).jqmData('currentPage',0);
+            $(this).updateTable();
+        },
+        addTableItem:function(data){
+            console.log($(this).jqmData('source'));
+            $(this).jqmData('source').unshift(data);
+            //$(this).jqmData('currentData').unshift(data);
+            $(this).jqmData('maxPage',Math.ceil($(this).jqmData('currentData').length/$(this).jqmData('itemsPerPage')));
+            $(this).gotoPage( 0 ,true);
+
+        },
+        removeTableItem:function(){
+            var _this=this;
+            var nextPageSart=($(this).jqmData('currentPage')+1)*$(this).jqmData('itemsPerPage');
+            var tbody=$(this).find('tbody');
+            var checked=$(this).find('.reg-checkbox:checked');
+            var removedRows=[];
+            var addedRows=[];
+            $.each(checked,(index,checkbox)=>{
+                console.log($(checkbox).jqmData('item'));
+                removedRows.push($(checkbox).closest('tr'));
+                //var itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
+                //$(this).jqmData('currentData').splice(itemIndex,1);
+                var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
+                $(this).jqmData('source').splice(itemIndex,1);
+            });
+            _this.rebuiltPageIndicator();
+            if (nextPageSart<$(this).jqmData('currentData').length){
+                for(var i=nextPageSart;i<nextPageSart+checked.length;i++){
+                
+                    var tr=$('<tr></tr>');
+                    var row=$(this).jqmData('currentData')[i];
+                    keys.forEach(k=>{
+                        if(row.hasOwnProperty(k)){
+                            var td=getTdHtml(_firstPageTableColumns[k],row[k],k);
+                            if(k=='caseApplicant') {
+                                console.log('caseApplicant',td)
+                            }
+                            tr.append(td);
+                        }else{
+                            if(_firstPageTableColumns[k].type=="checkbox" || _firstPageTableColumns[k].type=="buttons")
+                                tr.append(getTdHtml(_firstPageTableColumns[k],row,k));
+                        }
+                    })
+                    addedRows.push(tr);
+                }
+            }
+            
+            //console.log('removeTableItem',removedRows,addedItems);
+            removedRows.forEach((row,index)=>{
+                $(row).find('td').wrapInner('<div />').children().animate({
+                    'margin-left':'-'+(screen.width*2)+'px'
+                },500,function() {
+                    $(this).css({'padding':'0 .5em'})
+                    $(this).slideUp(500,function() {
+                        $(this).closest('tr').remove();
+                        if($(tbody).find('tr').length==0 && addedRows.length==0) _this.prevPage();
+                    });
+                    if(addedRows.length>0 && addedRows.length>index){
+                        var newItem=addedRows[index];
+                        $(newItem).find('td').css({'padding':'0 .5em'})
+                        tbody.append(newItem);
+                        
+                        var tds=$(newItem).find('td').wrapInner('<div style="height:100%" />').children();
+                        tds.css({'margin-top':'-70px','margin-right':'-'+(screen.width*2)+'px'})
+                        _this.trigger('create');
+                        setTimeout(() => {
+                            tds.animate({'margin-top':'0px'},300,function(){})
+                            setTimeout(() => {
+                                $(newItem).find('td').css({'padding':'.4em .5em'})
+                                tds.animate({'margin-right':'-10px'},500,function(){
+                                    tds.css({'margin-right':'0px'})
+                                    tds.contents().unwrap();
+                                    $(newItem).find('td').css({'border-right':'1px solid lightgray'})
+                                })
+                            }, 100); 
+                        }, 100);
+                    }
+                    
+                    
+                });
+                
+            })
+            
+        },
+        updateSource:function(source){
+            $(this).jqmData('source',source);
+            $(this).jqmData('currentData',_this.jqmData('source'));
+            $(this).updateTable();
+        },
+        rebuiltPageIndicator:function(){
+            var _this=this;
+            _this.jqmData('maxPage',Math.ceil(_this.jqmData('currentData').length/_this.jqmData('itemsPerPage')));
+            var pageIndicator=$('#select-page');
+            pageIndicator.empty();
+            for(var page=0;page< _this.jqmData('maxPage');page++){
+                var num=$('<option value='+page+'>'+(page+1)+'</option>');
+                if(_this.jqmData('currentPage')==page) num.prop('selected',true);
+                pageIndicator.append(num);
+            }
+            pageIndicator.selectmenu( "refresh" );
+        },
+        updateTable:function(isNewItem){
+            var _this=$(this);
+            var tbody=_this.find('tbody');
+            if(tbody.length==0) {
+                tbody=$('<tbody></tbody>');
+                _this.append(tbody);
+            }
+            tbody.empty();
+            console.log('pagination',_this.jqmData('currentPage'),_this.jqmData('itemsPerPage'),_this.jqmData('itemsPerPage'),_this.jqmData('currentData'),isNewItem);
+            _this.rebuiltPageIndicator();
+            //console.log('maxPage',currentData.length/itemsPerPage,maxPage);
+            var startPage=_this.jqmData('currentPage')*_this.jqmData('itemsPerPage');
+            var newItem;
+            var tds;
+            for(var index=startPage;index<startPage+_this.jqmData('itemsPerPage');index++){
+                //$.each(data,(key,value)=>{
+                    var row=_this.jqmData('currentData')[index];
+                    if(row==undefined) break;
+                    var tr=$('<tr></tr>');
+                    keys.forEach(k=>{
+                        if(row.hasOwnProperty(k)){
+                            var td=getTdHtml(_firstPageTableColumns[k],row[k],k);
+                            if(k=='caseApplicant') {
+                                console.log('caseApplicant',td)
+                            }
+                            tr.append(td);
+                        }else{
+                            if(_firstPageTableColumns[k].type=="checkbox" || _firstPageTableColumns[k].type=="buttons")
+                                tr.append(getTdHtml(_firstPageTableColumns[k],row,k));
+                        }
+                    })
+                    console.log("set new item",isNewItem,index,startPage,index==startPage);
+                    if(isNewItem && index==startPage && newItem==undefined) {
+                        
+                        console.log("set new item",index,startPage);
+                        newItem=tr;
+                        $(newItem).find('td').css({'border-right':'none','padding':'0 .5em'})
+                        tds=$(newItem).find('td').wrapInner('<div style="height:100%;" />').children();
+				        tds.css({'margin-top':'-70px','margin-left':'-'+(screen.width*2)+'px'})
+                        
+                    }
+                    tbody.append(tr);
+                    //console.log(itemsPerPage,index);
+                    
+                //})
+            }
+            _this.trigger('create');
+            if(isNewItem && newItem!=undefined){
+                
+            console.log('new item',newItem,tds.css('padding'));
+            tds.animate({'margin-top':'0px'},500,function(){
+                $(newItem).find('td').css({'padding':'.4em .5em'})
+				tds.animate({'margin-left':'-10px'},500,function(){
+                    tds.css({'margin-left':'0px'})
+					tds.contents().unwrap();
+                    $(newItem).find('td').css({'border-right':'1px solid lightgray'})
+					$(newItem).addClass('newTableItem');
+					$(newItem).on('click',(e)=>{$(newItem).removeClass('newTableItem');$(newItem).off('click','**')});
+				})
+            })
+            }
+        },
+        setFixedHead:function() {
+            const resizeObserver = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    var clone=$(entry.target).jqmData('clone');
+                    $(clone).css('width',$(entry.target).width());
+                }
+            });
+            //console.log('thead',table.find('thead'));
+            var _Header=$(this).find('thead').clone();
+            var _table_fixed=$('<table data-role="table" class="ui-responsive table-stroke fixed-header" style="margin: 0px 0px;text-shadow: none;width: 100%;position: fixed;z-index:100;"></table>');
+            _Header.css({'background': '#262626',color:'white'})
+            _table_fixed.append(_Header);
+            $(this).parent().prepend(_table_fixed);
+            _table_fixed.trigger('create');
+            //_table_fixed.hide();
+            $(this).parent().trigger('create');
+            var _ths=_table_fixed.find('thead').find('th');
+            $.each( $(this).find('thead').find('th'),(index,th)=>{
+                $(th).jqmData('clone',_ths[index]);
+                resizeObserver.observe(th);
+            });
+            //headResizeObserver.observe(_Header.get( 0 ));
+            
+        }
+    });
 </script>
 <script src="./utilities/templates.js"></script>
 <script src="./utilities/preload.js"></script>
 
 
-<input id="filterTable-input" type="text">
-<a href="#" id="columntToggle">test</a>
-<div class="tableWrapper" >
+    <input id="filterTable-input" type="text">
+    <a href="#" id="columntToggle">test</a>
+    <div class="tableWrapper" >
       <table id="test_table" data-role="table" class="ui-responsive table-stroke" data-input="#filterTable-input">
       </table>
     </div>
-    <div class="tableInfo">Rows: <span class="nRows"></span></div>
-    <div class="focus"><label for="rowNumber">Focus: </label><input id="rowNumber" name= "rowNumber" type="number" min="1"/><button id="focus">Go</button></div>
+    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+        <button class="page_btn page_btn_left" data-iconpos="notext"><i class="fa fa-angle-left "></i></button>
+        <label for="select-page" class="ui-hidden-accessible">page</label>
+        <select name="select-page" id="select-page" >
+        </select>
+        <button class="page_btn page_btn_right" data-iconpos="notext"><i class="fa fa-angle-right "></i></button>
+    </fieldset>
+    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
+        <button class="fn_btn btn-icon-green" style="padding:10px;" data-icon="plus" data-iconpos="notext"></button>
+        <button class="fn_btn btn-icon-red" style="padding:10px;" data-icon="delete" data-iconpos="notext"></button>
+    </fieldset>
+    <script>
+        var searchInput=$($('#test_table').data('input'));
+        if(searchInput.length>0){
+            searchInput.on('paste change keyup',function(e){
+                //console.log('searchInput changed');
+                var input=$(this);
+                
+                $('#test_table').searchTable(input.val());
+            })
+        }
+        $('.fn_btn').on('click',function(e){
+            if($(this).hasClass('ui-icon-plus')){
+                console.log('添加')
+                var data=DataList.casesDb[0];
+                data.caseName="我改变了";
+                data.id=294;
+                $('#test_table').addTableItem(data);
+            }else{
+                console.log('删除')
+                $('#test_table').removeTableItem();
+            }
+        })
+        $('.page_btn').on('click',function(e){
+            //console.log();
+            if($(this).hasClass('page_btn_left')){
+                console.log('前一页');
+                $('#test_table').prevPage();
+                    
+            }else{
+                console.log('后一页');
+                $('#test_table').nextPage();
+            }
+        });
+        $('#select-page').on('change',function(e){
+            console.log($(this).val());
+            $('#test_table').gotoPage(parseInt($(this).val()));
+        })
+        
+    </script>
 </body>
 </html>

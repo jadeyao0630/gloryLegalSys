@@ -333,20 +333,35 @@ $.fn.extend({
         if(visibility.toLowerCase()=="show"){
             var tooltip=$('<span class="ui-tooltip" style=""></span>');
             tooltip.html(html==undefined?$(this).text():html);
-
             $('body').append(tooltip);
             
             var position=$(this).offsetParent().hasClass('ui-popup')?$(this).position():$(this).offset();
             var thisWidth=$('.ui-tooltip').width();
             var thisHeight=$('.ui-tooltip').height();
-            if(thisWidth+position.left>screen.width) position.left=screen.width-thisWidth-10;
+            if(thisWidth+position.left>screen.width) {
+                position.left=screen.width-10;
+                $('.ui-tooltip').css({'transform':'translateX(-100%)'})
+            }else{
+                $('.ui-tooltip').css({'transform':'translateX(-0%)'})
+            }
             var top=(position.top+$(this).height()+10);
             //console.log(thisHeight+position.top,$(window).height());
-            if(thisHeight+position.top+80>$(window).height()-$(window).scrollTop()) {
-                position.top=$(window).height()+$(window).scrollTop()-thisHeight-70;
-                top=position.top;
+            if(thisHeight+position.top+80>$(window).height()+$(window).scrollTop()) {
+                //position.top=$(window).height()-$(window).scrollTop()-thisHeight-70;
+                top=position.top-10;
+                $('.ui-tooltip').css({'transform':'translateY(-100%)'})
+                console.log('tooltip over size',{
+                    windowHeight:$(window).height(),
+                    screenHeight:screen.height,
+                    windowsCrollTop:$(window).scrollTop(),
+                    positionTop:position.top,
+                    thisHeight:thisHeight
+                });
+            }else{
+                $('.ui-tooltip').css({'transform':'translateY(-0%)'})
             }
             
+            //console.log('tooltip',top);
             $('.ui-tooltip').css({visibility: 'visible',
                 opacity: 1,
                 left:position.left,

@@ -29,16 +29,18 @@ loginBut.onclick = async function (){
     //nameInput.value="";
     //alert(name);
     if (IsLoginVaild()){
-
-        await fetch("http://"+ip+":"+port+"/login",{
-            headers:{
-                'Content-Type': 'application/json'
-            },
-            method: 'POST',
-            body: JSON.stringify({ name: name, pass: pass})
-        })
-        .then(response => response.json())
-        .then(data => login(data['data']));
+        $().mloader('show',{message:"登录中..."});
+        setTimeout(async() => {
+            await fetch("http://"+ip+":"+port+"/login",{
+                headers:{
+                    'Content-Type': 'application/json'
+                },
+                method: 'POST',
+                body: JSON.stringify({ name: name, pass: pass})
+            })
+            .then(response => response.json())
+            .then(data => {login(data['data']);$().mloader('hide');});
+        },100);
     }else{
        // message.innerHTML=Message.LOGIN_IS_EMPTY;
     }
@@ -50,6 +52,7 @@ function insertRowIntoTable(data){
 }
 function login(data){
     //console.log(data.data[0].name);
+    
     if(data.success){
         //message.innerHTML=formatString(Message.LOGIN_WELCOME_F,JSON.parse(data.data).name);
         //console.log(data);
@@ -65,6 +68,7 @@ function login(data){
         $().minfo('show',{title:"错误",message:"请检查您的密码或用户名！"},function(){
         });
     }
+    
 }
 $(nameInput).on("change keyup", (event) => {
     $(nameInput).tooltip('hide');

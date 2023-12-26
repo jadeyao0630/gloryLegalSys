@@ -107,7 +107,7 @@ $('body').on(preload_completed_event_name,function(){
                 form.slideDown();
                 $('.header-btn-search').text('收起');
                 //form.animate({'height':"200px"});
-                $('#pageOneTable').animate({'margin-top':139+slidedownOffset+"px"})
+                $('#pageOneTable').animate({'margin-top':145+slidedownOffset+"px"})
             }
         }else{
             //$('#header-filter-container').empty();
@@ -115,6 +115,9 @@ $('body').on(preload_completed_event_name,function(){
                 form.slideUp();
                 $('.header-btn-search').text('更多');
                 $('#pageOneTable').animate({'margin-top':"0px"})
+                isHeaderLocked=false;
+                $('.header-filter-btn.ui-icon-lock.btn-icon-green').removeClass('btn-icon-green');
+                
             }
         }
     },{distance:200});
@@ -180,7 +183,7 @@ $('body').on(preload_completed_event_name,function(){
     //在过滤表格后同步表格头和身的宽度
     
     
-   
+    $('.header-filter-btn:contains("复位")').setTooltips();
     $('.header-filter-btn').on('click',function(e){
         switch($(this).text()){
             case "复位":

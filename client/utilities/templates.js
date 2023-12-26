@@ -893,7 +893,7 @@ var _summary_template;
                   cutom:{
                     type:"custom",
                     data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
-                    '<a class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left database-reset">复位</a>'+
+                    '<a class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left database-reset tooltip-btn">复位</a>'+
                     '<a class="ui-btn ui-corner-all ui-shadow ui-icon-check btn-icon-green ui-btn-icon-left database-submit">修改</a>'+
                     '</div>',
                     
@@ -1189,7 +1189,7 @@ var _summary_template;
         type:"custom",
         data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
         '<a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-search btn-icon-green ui-btn-icon-left header-filter-btn">查询</a>'+
-        '<button class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left header-filter-btn">复位</button>'+
+        '<button class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left header-filter-btn" data-tooltip="清除当前过滤选项，需要点击查询按钮以确认">复位</button>'+
         '<a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-lock ui-btn-icon-notext header-filter-btn" data-tooltip="锁定搜索栏" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)">锁定</a>'+
         '</div>',
         

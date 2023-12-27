@@ -7,6 +7,10 @@
 .btn-icon-blue:after{
     background-color: #1362B7;
 }
+.btn-icon-wendyblue:after{
+    background-color: #356395;
+}
+
 .text-green{
     color: green;
 }
@@ -16,6 +20,9 @@
 .text-blue{
     color: #1362B7;
 }
+.text-wendyblue{
+    color: #356395;
+}
 .text-white{
     color: white;
 }
@@ -24,4 +31,7 @@
 }
 .text-blue-background{
     background-color: #1362B7;
+}
+.text-wendyblue-background{
+    background-color: #356395;
 }

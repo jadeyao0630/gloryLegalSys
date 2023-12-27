@@ -22,7 +22,7 @@ function setFontSize(){
     document.documentElement.style.setProperty('--mfont', 14 + "px");
     document.documentElement.style.setProperty('--iconSize', 20 + "px");
     document.documentElement.style.setProperty('--iconMargin', -10 + "px");
-    document.documentElement.style.setProperty('--inputHeight', 36 + "px");
+    document.documentElement.style.setProperty('--inputHeight', 38 + "px");
     document.documentElement.style.setProperty('--inputLineHeight', 26 + "px");
     document.documentElement.style.setProperty('--HeaderFooterHeight', 44 + "px");
     slidedownOffset=40;
@@ -45,6 +45,8 @@ function exportExcel () {
     $('#export_excel_popup').trigger('create');
     $('#export_excel_popup').popup().popup('open');
     //export2Excel('pageOneTable',);
+    
+    $('#export_excel_popup_form_submit').off('click','**');
     $('#export_excel_popup_form_submit').on('click',function(e){
         $(this).jqmData('form').getFormValues(function(e){
             if(e.success){
@@ -54,6 +56,37 @@ function exportExcel () {
         //
     })
 };
+function setRowsPrePageEvent(){
+    var form= new mform({template:change_rows_page_template});
+    //change_rows_page_template.default
+    $('#export_excel_popup_title').text("表格显示设置");
+    $('#export_excel_popup_form').empty();
+    $('#export_excel_popup_form').append(form.instance);
+    form.setValueById('rowsNumber',$('#pageOneTable').jqmData('itemsPerPage'));
+    $('#export_excel_popup_form').trigger('create');
+    //console.log(JSON.stringify(data));
+    $('#export_excel_popup_form_submit').jqmData('form',form);
+    $('#export_excel_popup').trigger('create');
+    $('#export_excel_popup').popup().popup('open');
+    //export2Excel('pageOneTable',);
+    $('#export_excel_popup_form_submit').off('click','**');
+    $('#export_excel_popup_form_submit').on('click',function(e){
+        $(this).jqmData('form').getFormValues(function(e){
+            if(e.success){
+                
+                $('#export_excel_popup').popup('close');
+                $().mloader('show',{message:"请稍等..."});
+                    setTimeout(() => {
+
+                    $('#pageOneTable').setRowsPrePage(parseInt(e.values.rowsNumber));
+                    $().mloader('hide');
+                },200);
+                //export2Excel(e.values.exportFileName,e.values.exportType!=0,'pageOneTable');
+            }
+        });
+        //
+    })
+}
 function export2Excel(fileName,isSelectedOnly,tableId){
 
     $().mloader('show',{message:"导出中..."});
@@ -145,7 +178,7 @@ $('body').on(preload_completed_event_name,function(){
         $('.admin-ui').show();
     }
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
-    //setVisibleColumnToTemplate();
+    setVisibleColumnToTemplate();
     /*
     pageOnTable=new pageTable({
 		containerId:"pageOneTable",
@@ -430,13 +463,13 @@ $('body').on('caseStatusChanged',function(e){
             console.log('caseStatusChanged',r,newValue,e.value);
             if(r.data.success){
                 //更新缓存内数据
-                pageOnTable.updateTableData(newValue,$('#pageOneTable').find('tr[data-item='+newValue.id+']'));
+                //pageOnTable.updateTableData(newValue,$('#pageOneTable').find('tr[data-item='+newValue.id+']'));
                 DataList.caseStatus=updateOriginalData(DataList.caseStatus,newValue,'id');
                 DataList.combinedData=updateOriginalData(DataList.combinedData,newValue,'id');
                 currentData=updateOriginalData(currentData,newValue,'id');//tools.js
                 //console.log(DataList.caseStatus);
                 //更新页面ui数据显示
-                pageOnTable.updateTableData(e.value,$('#pageOneTable').find('tr[data-item='+e.value.id+']'));
+                $('#pageOneTable').updateTableItem(e.value);
                 setPersonCaseSum(DataList.combinedData);
                 $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
             }else{
@@ -482,10 +515,11 @@ $('body').on('caseChanged',function(e){
                 if(e.action=="add"){
                     history.back();
                     //pageOnTable.insertTableData(e.value);
-                    $('#test_table').addTableItem(e.value);
+                    $('#pageOneTable').addTableItem(e.value);
                     //setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+e.value.id+"]"));
                     $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
                 }else{
+                    $('#pageOneTable').updateTableItem(e.value);
                     //pageOnTable.updateTableData(e.value,$('#pageOneTable').find('tr[data-item='+e.value.id+']'));
                     $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
                 }

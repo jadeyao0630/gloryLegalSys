@@ -141,6 +141,7 @@ $.fn.extend({
         _this.jqmData('paginationContainer',undefined);
         _this.jqmData('toggleButton',undefined);
         _this.jqmData('columnVisibility',{});
+        _this.jqmData('runAnimation',true);
         
         if(arg!=undefined){
             $.each(arg,(k,v)=>{
@@ -153,20 +154,23 @@ $.fn.extend({
         _this.setPagination();
         _this.setTableHead();
         _this.setColumnToggle();
-        _this.trigger('create');
         _this.updateTable();
+        _this.trigger('create');
     },
     setPagination:function(){
         if(this.jqmData('paginationContainer')!=undefined){
             var _this=this;
-            var controlgroup=$('<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true"></fieldset>');
+            var controlgroup=$('<fieldset data-role="controlgroup" data-type="horizontal" data-mini="true" class="pagination_controlgroup"></fieldset>');
             var left_btn=$('<button class="page_btn page_btn_left" data-iconpos="notext"><i class="fa fa-angle-left "></i></button>');
-            var page_btn=$('<select name="select-page" id="select-page" ></select>')
+            var page_btn=$('<select name="select-page" id="'+$(_this).attr('id')+'select-page" calss="page_btn"></select>')
             var right_btn=$('<button class="page_btn page_btn_right" data-iconpos="notext"><i class="fa fa-angle-right "></i></button>');
             controlgroup.append(left_btn);
             controlgroup.append(page_btn);
             controlgroup.append(right_btn);
+            var exsit=$(this.jqmData('paginationContainer')).find('a');
+            
             $(this.jqmData('paginationContainer')).empty();
+            controlgroup.append(exsit);
             $(this.jqmData('paginationContainer')).append(controlgroup);
             $(this.jqmData('paginationContainer')).trigger('create');
 
@@ -225,7 +229,7 @@ $.fn.extend({
     convertDatas:function(datas){
         var _this=this;
         var convertedDatas=[];
-        datas= datas || _this.jqmData('source');
+        if(datas==undefined) datas=_this.jqmData('source');
         //console.log('convertedDatas',_this.jqmData('source'));
         if(datas==undefined) {
             console.error('no data source has been set');
@@ -246,6 +250,7 @@ $.fn.extend({
             else
                 convertedData[k]=v;
         });
+        //console.log('convertedData',convertedData);
         return convertedData;
     },
     setFilter:function(){
@@ -295,95 +300,198 @@ $.fn.extend({
         $(this).jqmData('currentPage',0);
         $(this).updateTable();
     },
+    updateTableItem:function(data){
+        var _this=this;
+        var template=$(this).jqmData('tableTemplate');
+        var columnVisibility=_this.jqmData('columnVisibility');
+        data=$(this).convertData(data);
+        var newDatas=updateOriginalData($(this).jqmData('currentData'),data,'id');
+        $(this).jqmData('currentData',newDatas);
+        console.log('updateTableItem',$(this).jqmData('currentData'),$(this).find('tr[data-item='+data.id+'] td'))
+        var dataKeys=Object.keys(data);
+        //console.log('updateTableData',$(tr).find('td'));
+        $.each($(this).find('tr[data-item='+data.id+'] td'),(index,td)=>{
+            var id=$(td).attr('name');
+            //console.log('updateTableData',id,dataKeys.includes(id));
+            if(dataKeys.includes(id)){
+                var newTd=_this.setTdElement(template,data,id,columnVisibility);
+                $(newTd).css({'display':$(td).css('display')});
+                $(td).before(newTd);
+                $(td).remove();
+            }
+        })
+        $(_this).trigger('create');
+    },
     addTableItem:function(data){
         console.log($(this).jqmData('source'));
-        $(this).jqmData('source').unshift(data);
-        //$(this).jqmData('currentData').unshift(data);
+        //$(this).jqmData('source').unshift($(this).convertData(data));
+        var newData=$(this).convertData(data);
+        $(this).jqmData('currentData').unshift(newData);
         $(this).jqmData('maxPage',Math.ceil($(this).jqmData('currentData').length/$(this).jqmData('itemsPerPage')));
         $(this).gotoPage( 0 ,true);
 
     },
-    removeTableItem:function(){
+    restoreTableItem:function(callback){
+        var checkboxAll=$($(this).jqmData('fixedHead')!=null?$(this).jqmData('fixedHead'):$(this)).find('.reg-checkbox-all');
+        checkboxAll.prop('checked',false);
+        var checked=$(this).find('.reg-checkbox:checked');
+        checkboxAll.trigger('change');
+        var deletedId=[];
+        $.each(checked,(index,checkbox)=>{
+            $(checkbox).closest('tr').removeClass('inactived-row');
+            var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
+            $(this).jqmData('source')[itemIndex].isInactived=0;
+            itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
+            $(this).jqmData('currentData')[itemIndex].isInactived=0;
+            deletedId.push($(checkbox).jqmData('item').id);
+            $(checkbox).prop('checked',false);
+        });
+        const intervalId = setInterval(() => {
+            if (deletedId.length==checked.length) {
+                clearInterval(intervalId);
+                if(callback!=undefined) callback(deletedId);
+                
+            }
+        }, 100);
+    },
+    removeTableItem:function(isColorRemove,callback){
         
         var _this=this;
         var template=$(this).jqmData('tableTemplate');
         var nextPageSart=($(this).jqmData('currentPage')+1)*$(this).jqmData('itemsPerPage');
         var checkboxAll=$($(this).jqmData('fixedHead')!=null?$(this).jqmData('fixedHead'):$(this)).find('.reg-checkbox-all');
         checkboxAll.prop('checked',false);
+        checkboxAll.trigger('change');
         var columnVisibility=_this.jqmData('columnVisibility');
         var tbody=$(this).find('tbody');
         var checked=$(this).find('.reg-checkbox:checked');
-        var removedRows=[];
-        var addedRows=[];
-        $.each(checked,(index,checkbox)=>{
-            console.log($(checkbox).jqmData('item'));
-            removedRows.push($(checkbox).closest('tr'));
-            //var itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
-            //$(this).jqmData('currentData').splice(itemIndex,1);
-            var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
-            $(this).jqmData('source').splice(itemIndex,1);
-        });
-        _this.rebuiltPageIndicator();
-        if (nextPageSart<$(this).jqmData('currentData').length){
-            for(var i=nextPageSart;i<nextPageSart+checked.length;i++){
+        var deletedId=[];
+        if(isColorRemove){
             
-                var tr=$('<tr></tr>');
-                var row=$(this).jqmData('currentData')[i];
-                keys.forEach(k=>{
-                    tr.append(_this.setTdElement(template,row,k,columnVisibility));
-                    
-                })
-                addedRows.push(tr);
+            $.each(checked,(index,checkbox)=>{
+                $(checkbox).closest('tr').addClass('inactived-row');
+                var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
+                $(this).jqmData('source')[itemIndex].isInactived=1;
+                itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
+                $(this).jqmData('currentData')[itemIndex].isInactived=1;
+                deletedId.push($(checkbox).jqmData('item').id);
+                $(checkbox).prop('checked',false);
+            });
+        }else{
+            var removedRows=[];
+            var addedRows=[];
+            $.each(checked,(index,checkbox)=>{
+                console.log($(checkbox).jqmData('item'));
+                removedRows.push($(checkbox).closest('tr'));
+                //var itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
+                //$(this).jqmData('currentData').splice(itemIndex,1);
+                var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
+                $(this).jqmData('source').splice(itemIndex,1);
+                itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
+                $(this).jqmData('currentData').splice(itemIndex,1);
+                deletedId.push($(checkbox).jqmData('item').id);
+                $(checkbox).prop('checked',false);
+            });
+            _this.rebuiltPageIndicator();
+            if (nextPageSart<$(this).jqmData('currentData').length){
+                for(var i=nextPageSart;i<nextPageSart+checked.length;i++){
+                
+                    var tr=$('<tr></tr>');
+                    var row=$(this).jqmData('currentData')[i];
+                    keys.forEach(k=>{
+                        tr.append(_this.setTdElement(template,row,k,columnVisibility));
+                        
+                    })
+                    addedRows.push(tr);
+                }
             }
+            
+            //console.log('removeTableItem',removedRows,addedItems);
+            removedRows.forEach((row,index)=>{
+                $(row).find('td').wrapInner('<div />').children().animate({
+                    'margin-left':'-'+(screen.width*2)+'px'
+                },500,function() {
+                    //$(this).css({'padding':'0 .5em'})
+                    $(this).slideUp(300,function() {
+                        $(this).closest('tr').remove();
+                        if($(tbody).find('tr').length==0 && addedRows.length==0) _this.prevPage();
+                    });
+                    if(addedRows.length>0 && addedRows.length>index){
+                        var newItem=addedRows[index];
+                        //$(newItem).find('td').css({'padding':'0 .5em'})
+                        tbody.append(newItem);
+                        
+                        var tds=$(newItem).find('td').wrapInner('<div style="height:100%" />').children();
+                        tds.css({'margin-top':'-70px','margin-right':'-'+(screen.width*2)+'px'})
+                        _this.trigger('create');
+                        setTimeout(() => {
+                            tds.animate({'margin-top':'0px'},300,function(){})
+                            setTimeout(() => {
+                                //$(newItem).find('td').css({'padding':'0'})
+                                tds.animate({'margin-right':'-10px'},500,function(){
+                                    tds.css({'margin-right':'0px'})
+                                    tds.contents().unwrap();
+                                    $(newItem).find('td').css({'border-right':'1px solid rgba(0,0,0,.05)'})
+                                })
+                            }, 100); 
+                        }, 100);
+                    }
+                    
+                    
+                });
+                
+            })
         }
         
-        //console.log('removeTableItem',removedRows,addedItems);
-        removedRows.forEach((row,index)=>{
-            $(row).find('td').wrapInner('<div />').children().animate({
-                'margin-left':'-'+(screen.width*2)+'px'
-            },500,function() {
-                $(this).css({'padding':'0 .5em'})
-                $(this).slideUp(300,function() {
-                    $(this).closest('tr').remove();
-                    if($(tbody).find('tr').length==0 && addedRows.length==0) _this.prevPage();
-                });
-                if(addedRows.length>0 && addedRows.length>index){
-                    var newItem=addedRows[index];
-                    $(newItem).find('td').css({'padding':'0 .5em'})
-                    tbody.append(newItem);
-                    
-                    var tds=$(newItem).find('td').wrapInner('<div style="height:100%" />').children();
-                    tds.css({'margin-top':'-70px','margin-right':'-'+(screen.width*2)+'px'})
-                    _this.trigger('create');
-                    setTimeout(() => {
-                        tds.animate({'margin-top':'0px'},300,function(){})
-                        setTimeout(() => {
-                            $(newItem).find('td').css({'padding':'.4em .5em'})
-                            tds.animate({'margin-right':'-10px'},500,function(){
-                                tds.css({'margin-right':'0px'})
-                                tds.contents().unwrap();
-                                $(newItem).find('td').css({'border-right':'1px solid lightgray'})
-                            })
-                        }, 100); 
-                    }, 100);
-                }
+        const intervalId = setInterval(() => {
+            if (deletedId.length==checked.length) {
+                clearInterval(intervalId);
+                if(callback!=undefined) callback(deletedId);
                 
-                
-            });
-            
-        })
+            }
+        }, 100);
         
+    },
+    itemRowAnimation:function(slide,duration,callback){
+        var _this=this;
+        var tds=$(_this).find('td').wrapInner('<div />').children();
+        tds.css({'margin-top':'-70px','margin-right':'-'+(screen.width*2)+'px'})
+        if(slide=='slidein'){
+            tds.animate({'margin-top':'0px'},duration*0.3,function(){
+                if(callback!=undefined) callback(false);
+                tds.animate({'margin-right':'-10px'},duration*0.7,function(){
+                    tds.css({'margin-right':'0px'})
+                    tds.contents().unwrap();
+                    $(_this).find('td').css({'border-right':'1px solid rgba(0,0,0,.05)'});
+                    if(callback!=undefined) callback(true);
+                })
+            })
+        }else if(slide=='slideout'){
+            $(_this).find('td').wrapInner('<div />').children().animate({
+                'margin-left':'-'+(screen.width*2)+'px'
+            },duration*0.7,function() {
+                //$(this).css({'padding':'0 .5em'})
+                if(callback!=undefined) callback(false);
+                $(this).slideUp(duration*0.3,function() {
+                    $(this).closest('tr').remove();
+                    if(callback!=undefined) callback(true);
+                });
+            });
+        }
     },
     updateSource:function(source){
         var datas=$(this).convertDatas(source);
         $(this).jqmData('source',datas);
         $(this).jqmData('currentData',$(this).jqmData('source'));
         $(this).updateTable();
+        console.log('updateSource',$(this).jqmData('source'),datas)
     },
     rebuiltPageIndicator:function(){
         var _this=this;
+        if(_this.jqmData('itemsPerPage')==0) return;
+
         _this.jqmData('maxPage',Math.ceil(_this.jqmData('currentData').length/_this.jqmData('itemsPerPage')));
-        var pageIndicator=$('#select-page');
+        var pageIndicator=$('#'+$(_this).attr('id')+'select-page');
         pageIndicator.empty();
         for(var page=0;page< _this.jqmData('maxPage');page++){
             var num=$('<option value='+page+'>'+(page+1)+'</option>');
@@ -411,7 +519,19 @@ $.fn.extend({
         }
         return td;
     },
-    updateTable:function(isNewItem){
+    setRowsPrePage:function(num){
+        if(num<0) num=0;
+        $(this).jqmData('currentPage',0);
+        $(this).jqmData('itemsPerPage',num);
+        $(this).jqmData('runAnimation',false);
+        $(this).updateTable().then(()=>{
+            $(this).jqmData('runAnimation',true);
+        });
+    },
+    disableRowAnimation:function(isDisabled){
+        $(this).jqmData('runAnimation',isDisabled);
+    },
+    updateTable:async function(isNewItem){
         var template=$(this).jqmData('tableTemplate');
         var _this=$(this);
         var tbody=_this.find('tbody');
@@ -423,29 +543,66 @@ $.fn.extend({
         //console.log('pagination',_this.jqmData('currentPage'),_this.jqmData('itemsPerPage'),_this.jqmData('itemsPerPage'),_this.jqmData('currentData'),isNewItem);
         _this.rebuiltPageIndicator();
         //console.log('maxPage',currentData.length/itemsPerPage,maxPage);
+        
         var startPage=_this.jqmData('currentPage')*_this.jqmData('itemsPerPage');
+        var endPage=startPage+_this.jqmData('itemsPerPage');
+        if(_this.jqmData('itemsPerPage')==0){
+            startPage=0;
+            endPage=_this.jqmData('currentData').length
+            $('.page_btn').hide();
+            $(this.jqmData('paginationContainer')).find('.ui-select').hide();
+        }else{
+            console.log({currentPage:_this.jqmData('currentPage'),maxPage:_this.jqmData('maxPage')});
+            $('.page_btn').show();
+            $(this.jqmData('paginationContainer')).find('.ui-select').show();
+            if(_this.jqmData('maxPage')==1){
+                $('.page_btn_right').addClass('ui-disabled');
+                $('.page_btn_left').addClass('ui-disabled');
+            }else if(_this.jqmData('currentPage')==_this.jqmData('maxPage')-1) {
+                $('.page_btn_right').addClass('ui-disabled');
+                $('.page_btn_left').removeClass('ui-disabled');
+                
+            }else if(_this.jqmData('currentPage')==0){
+                $('.page_btn_left').addClass('ui-disabled');
+                $('.page_btn_right').removeClass('ui-disabled');
+            }else{
+                $('.page_btn_right').removeClass('ui-disabled');
+                $('.page_btn_left').removeClass('ui-disabled');
+            }
+        }
+        
+        console.log("no page",startPage,endPage,_this.jqmData('itemsPerPage'));
         var newItem;
         var tds;
         var columnVisibility=_this.jqmData('columnVisibility');
-        for(var index=startPage;index<startPage+_this.jqmData('itemsPerPage');index++){
+        for(var index = startPage; index < endPage; index++){
             //$.each(data,(key,value)=>{
                 var row=_this.jqmData('currentData')[index];
                 if(row==undefined) break;
-                var tr=$('<tr></tr>');
+                var tr=$('<tr data-item="'+row.id+'"></tr>');
                 keys.forEach(k=>{
                     tr.append(_this.setTdElement(template,row,k,columnVisibility));
                 })
+                if(row.isInactived==1) tr.addClass('inactived-row');
                 //console.log("set new item",isNewItem,index,startPage,index==startPage);
                 if(isNewItem && index==startPage && newItem==undefined) {
                     
                     //console.log("set new item",index,startPage);
                     newItem=tr;
-                    $(newItem).find('td').css({'border-right':'none','padding':'0 .5em'})
+                    $(newItem).find('td').css({'border-right':'none'})
                     tds=$(newItem).find('td').wrapInner('<div style="height:100%;" />').children();
                     tds.css({'margin-top':'-70px','margin-left':'-'+(screen.width*2)+'px'})
                     
                 }
                 tbody.append(tr);
+                tbody.trigger('create');
+                if(_this.jqmData('runAnimation') && index<15*(_this.jqmData('currentPage')+1)){
+
+                    $(tr).itemRowAnimation('slidein',100,function(e){
+                        
+                    });
+                    await sleep(50);
+                }
                 //console.log(itemsPerPage,index);
                 
             //})
@@ -455,13 +612,13 @@ $.fn.extend({
             
         console.log('new item',newItem,tds.css('padding'));
         tds.animate({'margin-top':'0px'},500,function(){
-            $(newItem).find('td').css({'padding':'.4em .5em'})
+            $(newItem).find('td').css({'padding':'0'})
             tds.animate({'margin-left':'-10px'},500,function(){
                 tds.css({'margin-left':'0px'})
                 tds.contents().unwrap();
-                $(newItem).find('td').css({'border-right':'1px solid lightgray'})
-                $(newItem).addClass('newTableItem');
-                $(newItem).on('click',(e)=>{$(newItem).removeClass('newTableItem');$(newItem).off('click','**')});
+                $(newItem).find('td').css({'border-right':'1px solid rgba(0,0,0,.05)'})
+                $(newItem).addClass('newItem');
+                $(newItem).on('click',(e)=>{$(newItem).removeClass('newItem');$(newItem).off('click','**')});
             })
         })
         }
@@ -480,7 +637,7 @@ $.fn.extend({
             var hiddenList={};
             _this.jqmData('columnVisibility',{});
             var duration=500;
-            var filterPopup=$('<div data-role="popup" data-theme="a" class="ui-corner-all"></div>');
+            var filterPopup=$('<div data-role="popup" id="'+$(_this).attr('id')+'-columnFilter" data-theme="a" class="ui-corner-all"></div>');
             //$(that).append($(settings.toggleButton));
             $(this).parent().append(filterPopup);
             $(toggleButton).on('click',function(e){
@@ -515,7 +672,7 @@ $.fn.extend({
                     input.on("click",function(e){
                         //console.log( $('td[name="'+input.prop('name')+'"]'));
                         _this.setAvailableColumn(input,duration);
-                        //saveChangedToUser(target);
+                        saveChangedToUser(_this);
                         //setTimeout(() => {
                             //filterPopup.trigger('columnChanged');
                         //}, duration+100);

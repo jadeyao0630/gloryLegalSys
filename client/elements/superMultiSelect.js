@@ -225,7 +225,7 @@ $.fn.extend({
             }
             select.append(opt);
         })
-        var input=$('<input id="mutliselect-input-0" type="text" data-wrapper-class="controlgroup-textinput ui-btn">')
+        var input=$('<input type="text" data-wrapper-class="controlgroup-textinput ui-btn">')
         if(data!=undefined) {
             input.val(data.value);
         }
@@ -302,8 +302,8 @@ $.fn.extend({
         groupName=groupName||'';
         var valueFormat=template.valueFormat;
         var displayFormat=template.displayFormat;
-        var controlgroup=$('<div class="ui-controlgroup ui-m-controlgroup" ></div>');
-        var select=$('<select data-option-index="'+index+'" class="sub-selectmenu" data-corners="false" ></select>');
+        var controlgroup=$('<div class="ui-controlgroup ui-m-controlgroup" data-corners="false"></div>');
+        var select=$('<select data-option-index="'+index+'" class="sub-selectmenu" ></select>');
         casePersonnelStatus.forEach((s,idx)=>{
             var opt=$('<option class="sub-option" value='+idx+(idx==0?" selected":"")+'>'+s+'</option>');
             select.append(opt);
@@ -322,8 +322,8 @@ $.fn.extend({
                 text=text.replace("{"+k+"}",v);
             })
         }
-        var checkbox=$('<input type="checkbox" name="'+val+'" id="'+id+'-'+val+'" data-val="'+val+'" data-label="'+text+'" data-iconpos="right" data-corners="false">');
-        var checkboxLabel=$('<label for="'+id+'-'+val+'" data-corners="false">'+text+'</label>');
+        var checkbox=$('<input type="checkbox" name="'+val+'" id="'+id+'-'+val+'" data-val="'+val+'" data-label="'+text+'" data-iconpos="right" >');
+        var checkboxLabel=$('<label for="'+id+'-'+val+'" >'+text+'</label>');
         checkbox.jqmData('select',select);
         controlgroup.append(checkbox);
         controlgroup.append(checkboxLabel);

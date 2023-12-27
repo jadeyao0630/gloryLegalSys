@@ -418,28 +418,39 @@ class DbService{
             };
         }catch(error){
             console.log(error);
+            return {
+                success: false,
+                error: error.message
+            };
         }
     }
     async constrolRows(ids,isInactived){
+        var error_mesg;
         try{
             const response = await new Promise((resolve,reject)=>{
                 //console.log(table);
                 const query = `UPDATE caseStatus SET isInactived=`+isInactived+` WHERE \`id\` IN (`+ids.join()+`);`;
                 mquery(query, (err,result)=>{
-                    if (err) reject(new Error(err.message));
-                    //console.log(result);
+                    if (err) {
+                        reject(new Error(err.message));
+                        error_mesg=err;
+                    }
                     resolve(result);
                 });
             });
             
             //console.log("typeof: "+(typeof response));
             return {
-                success : response.length>0,
-                data: JSON.stringify(response[0])
+                success : true,
+                data: response
             };
         }catch(error){
             console.log(error);
         }
+        return {
+            success: false,
+            error: error_mesg
+        };
     }
     async constrolItem(where,table,isInactived){
         try{
@@ -459,17 +470,26 @@ class DbService{
             };
         }catch(error){
             console.log(error);
+            return {
+                success: false,
+                error: error.message
+            };
         }
     }
     //#endregion 删除
     async updateUser(where,value){
+        var error_mesg;
         try{
             var query;
             const response = await new Promise((resolve,reject)=>{
                 
                 query = `UPDATE names SET `+value+` WHERE `+where;
                 mquery(query, (err,result)=>{
-                    if (err) reject(new Error(err.message));
+                    
+                    if (err) {
+                        reject(new Error(err.message));
+                        error_mesg=err;
+                    }
                     //console.log(result);
                     resolve(result);
                 });
@@ -482,6 +502,10 @@ class DbService{
             };
         }catch(error){
             console.log(error);
+            return {
+                success: false,
+                error: error_mesg
+            };
         }
     }
     async update(where,table,value){

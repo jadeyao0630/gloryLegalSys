@@ -196,7 +196,7 @@ async function restoreCases(ids,res){
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data.error);
+        console.log(data);
         
         if(res!=undefined)res(data);
     });
@@ -209,7 +209,7 @@ async function inactiveCases(ids,res){
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data.error);
+        console.log(data);
         
         if(res!=undefined)res(data);
     });

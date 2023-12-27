@@ -869,7 +869,8 @@ function updateSubmitEvent(e){
                             e.values[data.dateKey]=getDateTime();
                             var newCaseStatus=currentProgress['targetPosition'].main+(currentProgress['originalPosition'].main>excutePoint && currentProgress['targetPosition'].main> currentProgress['originalPosition'].main?currentProgress['originalPosition'].sub:currentProgress['targetPosition'].sub)/10;
                             if(editableStatus=="new" || editableStatus=="shift"){
-                                pageOnTable.updateTableData({caseStatus:newCaseStatus},$('#pageOneTable').find('tr[data-item='+data.id+']'));
+                                //pageOnTable.updateTableData({caseStatus:newCaseStatus},$('#pageOneTable').find('tr[data-item='+data.id+']'));
+                                $('#pageOneTable').updateTableItem({caseStatus:newCaseStatus,id:data.id});
                                 console.log("提交方式为",editableStatus,'状态更新为',newCaseStatus,'目标ID',data.id);
                                 
                                 //因为是添加，需要更新节点在表格caseStatus的位置
@@ -1052,39 +1053,34 @@ $('.case_reg_but').on('click',async function(e){
             $().requestDialog({
                 title:'提示',
                 message:"确认删除所选案件吗？",
-            },function(form){
-                console.log("删除");
-                
-                pageOnTable.removeTableItem(getGlobalJson('currentUser').level,function(ids){
-                    console.log(ids);
-                    if(getGlobalJson('currentUser').level==adminLevel){
+            },function(go){
+                if(go){
+                    console.log("删除");
+                    $("#pageOneTable").removeTableItem(getGlobalJson('currentUser').level==adminLevel,function(ids){
+                        console.log(ids);
+                        if(getGlobalJson('currentUser').level==adminLevel){
+                            
+                            $.each(DataList.combinedData,function(index,item){
+                                if(ids.includes(item.id)){
+                                    DataList.combinedData[index].isInactived=1;
+                                }
+                            });
+                        }else{
+                            DataList.combinedData=$.grep(DataList.combinedData,function(val){
+                                return !ids.includes(val.id);
+                            });
+                            currentData=$.grep(currentData,function(val){
+                                return !ids.includes(val.id);
+                            });
+                        }
+                        console.log(DataList.combinedData);
+                        inactiveCases(ids,(res)=>{
+                            showResponse(res);
+                        });
                         
-                        $.each(DataList.combinedData,function(index,item){
-                            if(ids.includes(item.id)){
-                                DataList.combinedData[index].isInactived=1;
-                            }
-                        });
-                    }else{
-                        DataList.combinedData=$.grep(DataList.combinedData,function(val){
-                            return !ids.includes(val.id);
-                        });
-                        currentData=$.grep(currentData,function(val){
-                            return !ids.includes(val.id);
-                        });
-                    }
-                    
-                    console.log(DataList.combinedData);
-                    $('.reg-checkbox-all').prop("checked",false);
-                    //pageSeTable.pageTable('refresh');
-                    //DataList.combinedData=data;
-                    //if(enableRealDelete) 
-                        inactiveCases(ids,(res)=>console.log);
-                    setTimeout(() => {
-                        //fancyTable1.tableUpdate($("#pageOneTable"));
-                        $("#pageOneTable").trigger('create');
-                    }, 1000);
-                    
-                })
+                    })
+                }
+                
                 //_initRegTable(r,firstPageTableColumns,"pageOneTable");
                 
                 //$("#pageOneTable").hpaging({ limit: 5 });
@@ -1101,29 +1097,26 @@ $('.case_reg_but').on('click',async function(e){
             $().requestDialog({
                 title:'提示',
                 message:"确认恢复所选案件吗？",
-            },function(form){
-                console.log("恢复");
-                pageOnTable.restoreTableItem(function(ids){
-                    console.log(ids);
-                    
-                    $.each(DataList.combinedData,function(index,item){
-                        if(ids.includes(item.id)){
-                            DataList.combinedData[index].isInactived=0;
-                        }
+            },function(go){
+                if(go){
+                    console.log("恢复");
+                    $('#pageOneTable').restoreTableItem(function(ids){
+                        console.log(ids);
+                        
+                        $.each(DataList.combinedData,function(index,item){
+                            if(ids.includes(item.id)){
+                                DataList.combinedData[index].isInactived=0;
+                            }
+                        });
+                        
+                        console.log(DataList.combinedData);
+                        restoreCases(ids,(res)=>{
+                            showResponse(res);
+                        });
+                        
                     });
-                    
-                    console.log(DataList.combinedData);
-                    $('.reg-checkbox-all').prop("checked",false);
-                    //pageSeTable.pageTable('refresh');
-                    //DataList.combinedData=data;
-                    //if(enableRealDelete) 
-                        restoreCases(ids,(res)=>console.log);
-                        setTimeout(() => {
-                            //fancyTable1.tableUpdate($("#pageOneTable"));
-                            $("#pageOneTable").trigger('create');
-                        }, 1000);
-                    
-                });
+                }
+                
             });
         }
     }else if(this.id=="chart_sum"){
@@ -1169,6 +1162,7 @@ $('.case_reg_but').on('click',async function(e){
         goToPage( $(this).attr( "href" ));
     }
 })
+
 $('#export_chart').on('click',function(e){
     var form= new mform({template:export_chart_template});
     $('#export_popup_title').text("导出设置");

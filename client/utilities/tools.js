@@ -1,3 +1,4 @@
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
 function output(...args){
     if (enableConsoleLog) console.log(...args);
 }
@@ -13,6 +14,13 @@ function setAuthFunctions(){
         $('.admin-ui').show();
     }else{
         $('.admin-ui').hide();
+    }
+}
+function showResponse(res){
+    if(res.data.success){
+        $().minfo('show',{title:"提示",message:"完成。"},function(){});
+    }else{
+        $().minfo('show',{title:"错误",message:res.data.error});
     }
 }
 function waitTask(condition, callback){

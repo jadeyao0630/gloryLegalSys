@@ -705,6 +705,29 @@ var _summary_template;
         },
         
     } 
+    change_rows_page_template={
+      settings:{
+        hasLabel:true,
+        hasPlaceHolder:true,
+        labelPosition:"left",
+        width:'550px',
+        textareaHeight:90,
+        isCollapsibleGrouping:false,
+      },
+      template:{
+        
+        rowsNumber:{
+          label:"导出",
+          type:"number",
+          isOptional:false,
+          defaultValue:$('#pageOneTable').jqmData('itemsPerPage'),
+        },
+        __formLabel:{
+          label:"设置每页显示的行数，设置为0则表示显示全部。",
+          type:"label",
+        }
+      }
+    }
     export_excel_template={
       settings:{
         hasLabel:true,

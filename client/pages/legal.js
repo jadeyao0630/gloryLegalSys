@@ -70,6 +70,7 @@ function export2Excel(fileName,isSelectedOnly,tableId){
 }
 $('body').on(main_load_completed_event_name,function(){
     const intervalId = setInterval(() => {
+        /*
         if (pageOnTable!=undefined) {
             clearInterval(intervalId);
             currentData=DataList.combinedData;
@@ -90,6 +91,16 @@ $('body').on(main_load_completed_event_name,function(){
             
             
             
+        }
+        */
+        if (DataList.combinedData!=undefined) {
+            clearInterval(intervalId);
+            
+            currentData=DataList.combinedData;
+            $('#pageOneTable').updateSource(DataList.combinedData);
+            $('#pageOneTable').trigger('create');
+            $().mloader("hide");
+            $('#mainFooter').show();
         }
     }, 100);
 });
@@ -134,7 +145,8 @@ $('body').on(preload_completed_event_name,function(){
         $('.admin-ui').show();
     }
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
-    setVisibleColumnToTemplate();
+    //setVisibleColumnToTemplate();
+    /*
     pageOnTable=new pageTable({
 		containerId:"pageOneTable",
 		template:_firstPageTableColumns,
@@ -142,31 +154,43 @@ $('body').on(preload_completed_event_name,function(){
 		//filterParent:"mainFooter",
 		rowButtons:tableFunBtns
 	});
+    */
+   
     
+    _firstPageTableColumns.rowButtons.data=tableFunBtns;
+    $("#pageOneTable").pagination({
+        //source:DataList.casesDb,
+        tableTemplate:_firstPageTableColumns,
+        paginationContainer:$('#pagination_container'),
+        itemsPerPage:10,
+        //setFixHead:true
+    });
+    //setFixedHead($('#pageOneTable'),$('#pageOneTable-fixed'));
     //表格重新排序
     $("#pageOneTable").on('sort',function(columnData){
         //console.log(columnData.value);
         $(window).trigger('waiting');
         
         setTimeout(() => {
-            pageOnTable.sortColumn(currentData,columnData.value);
-        setAvailableColumns('pageOneTable',1);
+            //pageOnTable.sortColumn(currentData,columnData.value);
+        //setAvailableColumns('pageOneTable',1);
         
         $(window).trigger('hidepopup');
             //syncHeaderCloneWidth();
         }, 100);
         //$().mloader("hide");
     })
+    $("#pageOneTable").setFixedHead($('#pageOneTable-fixed'));
+    $("#pageOneTable").setColumnToggle();
     //设置主表格头固定顶部位置，需要克隆主表格的原有头
     //var t1Header=$('#pageOneTable').find('thead').clone();
     //$('#pageOneTable-fixed').append(t1Header);
-    setFixedHead($('#pageOneTable'),$('#pageOneTable-fixed'));
     setTimeout(() => {
-        tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
+        //tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
         //setColumnToggleButton();
     }, 500);
-    pageOnTable.setSort($('#pageOneTable-fixed').find('th'));
-    pageOnTable.setSort($('#pageOneTable').find('th'));
+    //pageOnTable.setSort($('#pageOneTable-fixed').find('th'));
+    //pageOnTable.setSort($('#pageOneTable').find('th'));
     
     $('#header-filter-container').css({top:$('#main-header').css('height')});
     //添加头部过滤表格
@@ -302,8 +326,9 @@ $('body').on(preload_completed_event_name,function(){
                     }
                     //console.log(matched);
                     currentData=matched;
-                    pageOnTable.addTableData(matched);
-                    pageOnTable.sortColumn(matched,pageOnTable.currentSort);
+                    //pageOnTable.addTableData(matched);
+                    //pageOnTable.sortColumn(matched,pageOnTable.currentSort);
+                    $('#pageOneTable').updateSource(currentData);
                     tb.instance.isTargetToggle=false;
                     
                     setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
@@ -315,7 +340,7 @@ $('body').on(preload_completed_event_name,function(){
                     }
                     
 
-                    setAvailableColumns('pageOneTable',1);
+                    //setAvailableColumns('pageOneTable',1);
                     $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height')});
                     $('#header-filter-container').trigger('create');
                     //resizeTables();
@@ -432,9 +457,22 @@ $('body').on('caseChanged',function(e){
     setTimeout(() => {
         insertCase(e.value,caseInfoList,function(r){
             //console.log(r);
-            if(r.success){
+            var error="添加过程中有问题";
+            var result=[];
+            if(r.length>0){
+                r.forEach(d=>{
+                    if(!d.success){
+                        result.push(d.error);
+                    }
+                })
+                
+            }
+            if(result.length>0){
+                error=result.join();
+            }
+            if(result.length==0){
                 console.log("修改添加成功。");
-                console.log("on data changed0",DataList.combinedData,DataList.caseStatus,e);
+                console.log("on data changed0",currentData,DataList.combinedData,DataList.caseStatus,e);
                 //更新缓存内数据
                 currentData=updateOriginalData(currentData,e.value,'id');//tools.js
                 DataList.combinedData=updateOriginalData(DataList.combinedData,e.value,'id');//tools.js
@@ -443,11 +481,12 @@ $('body').on('caseChanged',function(e){
                 //更新页面ui数据显示
                 if(e.action=="add"){
                     history.back();
-                    pageOnTable.insertTableData(e.value);
+                    //pageOnTable.insertTableData(e.value);
+                    $('#test_table').addTableItem(e.value);
                     //setTableRowFunctionButonClickedEvent($("[name^='fn_btn'][data-item="+e.value.id+"]"));
                     $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
                 }else{
-                    pageOnTable.updateTableData(e.value,$('#pageOneTable').find('tr[data-item='+e.value.id+']'));
+                    //pageOnTable.updateTableData(e.value,$('#pageOneTable').find('tr[data-item='+e.value.id+']'));
                     $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
                 }
                 console.log("on data changed1",DataList.combinedData,DataList.caseStatus,e);
@@ -456,19 +495,7 @@ $('body').on('caseChanged',function(e){
             }else{
                 console.log(r);
                 $().mloader('hide');
-                var error="添加过程中有问题";
-                var result=[];
-                if(r.data.length>0){
-                    r.data.forEach(d=>{
-                        if(!d.success){
-                            result.push(d.error);
-                        }
-                    })
-                    
-                }
-                if(result.length>0){
-                    error=result.join();
-                }
+                
                 $().minfo('show',{title:"错误",message:error});
             }
             
@@ -513,9 +540,9 @@ function setPersonCaseSum(data){
     `</label>`);
     
     
-    setInfoBarPosition();
+    //setInfoBarPosition();
     //$('#footer_info_bar').setTooltip();
-    $('#footer_info_bar').append(info);
+    //$('#footer_info_bar').append(info);
     $('#footer_info_bar').trigger('create');
     
     
@@ -524,7 +551,7 @@ function setPersonCaseSum(data){
 }
 $(window).on('resize',function() {
     //console.log('window size changed')
-    setInfoBarPosition();
+    //setInfoBarPosition();
   });
 function setInfoBarPosition(){
     var footWidth=$('#mainFooter').width()-40;

@@ -300,9 +300,6 @@ app.post('/insertCase',(request,response) => {
                     if(val.constructor === String) val=parseInt(val.replace('"',''));
                     else val=val;
                 }
-                else if (template[tableKey].template[tablecol].toUpperCase().indexOf('DATETIME')>-1 ){
-                  //if (val=='NULL') val=NULL;
-                }
                 else val='"'+val+'"';
                 update.push(tablecol+"="+val);
                 values.push(val);

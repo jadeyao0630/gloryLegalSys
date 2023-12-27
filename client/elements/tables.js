@@ -28,7 +28,7 @@ const setFixedHead = function(target,fixed) {
     $.each($(target).find('thead').find('th'),(index,th)=>{
         $(th).jqmData('clone',_ths[index]);
         if(index==_ths.length-1) {
-            var columnToggler=$('<i class="fa fa-gear" data-tooltip="筛选列"></i>');
+            var columnToggler=$('<i id="table_column_toggler" class="fa fa-gear" data-tooltip="筛选列"></i>');
             $(_ths[index]).empty();
             $(_ths[index]).removeClass('table-column-toggle');
             $(_ths[index]).append(columnToggler);

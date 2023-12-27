@@ -154,6 +154,12 @@ function functionBtnsEvent(but,index){
     //tableFuntionButListenerList.push(but.currentTarget);
     //console.log('functionBtnsEvent',index,this,e);
     //var index=data.id;
+    console.log('functionBtnsEvent',index);
+    if(index.constructor==String){
+        index=JSON.parse(index).id;
+    }else if(index.constructor==Object){
+        index=index.id;
+    }
     var matchItems=DataList.combinedData.filter((item) =>item.id == index);
     var matchedUpdates=DataList.caseUpdates.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     var matchedExcutes=DataList.caseExcutes.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));

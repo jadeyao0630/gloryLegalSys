@@ -388,15 +388,25 @@ ProgressesButton.prototype.init=function(arg){
                 //console.log(index,value.caseStatus,sourceIndex.main>_this.breakpoint,(sourceIndex.main>_this.breakpoint?sourceIndex.main:value.caseStatus==index));
                 return (sourceIndex.main>_this.breakpoint?sourceIndex.main:value.caseStatus)==index
             });
+            var a_counter=data.filter(value=>{ 
+                var sourceIndex=formatIndex(value.caseStatus);
+                //console.log(index,value.caseStatus,sourceIndex.main>_this.breakpoint,(sourceIndex.main>_this.breakpoint?sourceIndex.main:value.caseStatus==index));
+                return (sourceIndex.main>_this.breakpoint?sourceIndex.main:value.caseStatus)==index && value.isInactived==0
+            });
             console.log('setCounterIndecator',_counter.length,index,_counter);
             if(_counter.length>0){
-                $(counterElement).text(_counter.length);
+                $(counterElement).text(a_counter.length==0 || a_counter.length==_counter.length?_counter.length:a_counter.length+"/"+_counter.length);
                 if(_this.opt.showCounter){
+                    if(a_counter.length!=0){
+                        $(counterElement).removeClass('deactivated-counter-color').addClass('activated-counter-color');
+                    }else{
+                        $(counterElement).removeClass('activated-counter-color').addClass('deactivated-counter-color');
+                    }
                     $(counterElement).show();
-                    //$(counterElement).data('index',(index+(sub==undefined?0:sub)/10));
-                    //_this.outter_frame.append(counter)
                 }
                 
+            }else{
+                $(counterElement).hide();
             }
         }
     }
@@ -405,22 +415,110 @@ ProgressesButton.prototype.init=function(arg){
         return Math.round((Math.asin(sinOfAngleX)*180)/Math.PI);
     }
 }
-ProgressesButton.prototype.updateCounterIndicator=function(data){
-    
+ProgressesButton.prototype.setCounterNumber=function(counterElement,data,index){
+    //var _index=formatIndex(index);
+    var _this=this;
+    if(data.length>0){
+        
+        var _counter=data.filter(value=>{ 
+            var sourceIndex=formatIndex(value.caseStatus);
+            //console.log(index,value.caseStatus,sourceIndex.main>_this.breakpoint,(sourceIndex.main>_this.breakpoint?sourceIndex.main:value.caseStatus==index));
+            return (sourceIndex.main>_this.breakpoint?sourceIndex.main:value.caseStatus)==index
+        });
+        var a_counter=data.filter(value=>{ 
+            var sourceIndex=formatIndex(value.caseStatus);
+            //console.log(index,value.caseStatus,sourceIndex.main>_this.breakpoint,(sourceIndex.main>_this.breakpoint?sourceIndex.main:value.caseStatus==index));
+            return (sourceIndex.main>_this.breakpoint?sourceIndex.main:value.caseStatus)==index && value.isInactived==0
+        });
+        console.log('setCounterIndecator',_counter.length,index,_counter);
+        if(_counter.length>0){
+            $(counterElement).text(a_counter.length==0 || a_counter.length==_counter.length?_counter.length:a_counter.length+"/"+_counter.length);
+            if(_this.opt.showCounter){
+                if(a_counter.length!=0){
+                    $(counterElement).removeClass('deactivated-counter-color').addClass('activated-counter-color');
+                }else{
+                    $(counterElement).removeClass('activated-counter-color').addClass('deactivated-counter-color');
+                }
+                $(counterElement).show();
+            }
+            
+        }else{
+            $(counterElement).hide();
+        }
+    }
+}
+ProgressesButton.prototype.updateCounterIndicator=function(data,originalPosition){
+    var _this=this;
+    console.log('updateCounterIndicator',data,originalPosition);
     //console.log('updateCounterIndicator',this.instance.find('.counter-indicator'));
     var counter=$.grep(this.instance.find('.counter-indicator'),(cunter)=>{
         console.log('updateCounterIndicator', $(cunter).data('index'),data.caseStatus,( $(cunter).data('index')==data.caseStatus.toString()));
         return $(cunter).data('index')==data.caseStatus.toString();
     });
+    
     //console.log('updateCounterIndicator',counter);
     if(counter.length>0){
-        $(counter[0]).text($.grep(this.opt.counterData,(item)=>{
+        _this.setCounterNumber(counter[0],_this.opt.counterData,data.caseStatus);
+        /*
+        var events=$.grep(this.opt.counterData,(item)=>{
+            return item.id==data.id && compareStatus(item.caseStatus,data.caseStatus) && item.isInactived==0
+        });
+        $(counter[0]).text(events.length);
+        var isAllActived=true;
+        $.grep(this.opt.counterData,(item)=>{
             return item.id==data.id && compareStatus(item.caseStatus,data.caseStatus)
-        }).length);
+        }).forEach(c=>{
+            console.log('setCounterNumber',c)
+            if(!isAllActived) return;
+            if(c.isInactived!=0) {isAllActived=false; }
+        })
+        if(isAllActived){
+            $(counter[0]).removeClass('deactivated-counter-color').addClass('activated-counter-color');
+        }else{
+            $(counter[0]).removeClass('activated-counter-color').addClass('deactivated-counter-color');
+        }
         $(counter[0]).show();
+        */
     }else{
         $(counter[0]).hide();
     }
+    console.log('updateCounterIndicator','new item',counter);
+    if(originalPosition!=undefined){
+        
+        var o_counter=$.grep(this.instance.find('.counter-indicator'),(cunter)=>{
+            //console.log('updateCounterIndicator', $(cunter).data('index'),data.caseStatus,( $(cunter).data('index')==data.caseStatus.toString()));
+            return $(cunter).data('index')==(originalPosition.main+originalPosition.sub/10).toString();
+        });
+        
+        if(o_counter.length>0){
+            _this.setCounterNumber(o_counter[0],_this.opt.counterData,(originalPosition.main+originalPosition.sub/10));
+            /*
+            var events=$.grep(this.opt.counterData,(item)=>{
+                return item.id==data.id && compareStatus(item.caseStatus,data.caseStatus) && item.isInactived==0
+            });
+            $(o_counter[0]).text(events.length);
+            var isAllActived=true;
+            $.grep(this.opt.counterData,(item)=>{
+                return item.id==data.id && compareStatus(item.caseStatus,data.caseStatus)
+            }).forEach(c=>{
+                console.log('setCounterNumber',c)
+                if(!isAllActived) return;
+                if(c.isInactived!=0) {isAllActived=false; }
+            })
+            if(isAllActived){
+                $(o_counter[0]).removeClass('deactivated-counter-color').addClass('activated-counter-color');
+            }else{
+                $(o_counter[0]).removeClass('activated-counter-color').addClass('deactivated-counter-color');
+            }
+            $(o_counter[0]).show();
+            
+        */
+        }else{
+            $(o_counter[0]).hide();
+        }
+        console.log('updateCounterIndicator','old item',o_counter,_this.opt.counterData);
+    }
+    
 }
 ProgressesButton.prototype.MoveTo=async function(index,duration){
     var _this=this;
@@ -449,7 +547,7 @@ ProgressesButton.prototype.getPointByIndex=function(index){//这里牵扯到分�
     if(_this.pointMap.hasOwnProperty(index))
         return _this.pointMap[index].self;
     else{
-        console.log("无法找到对应数据",index,_this.pointMap);
+        console.error("无法找到对应数据",index,_this.pointMap);
         return undefined;
     }
         

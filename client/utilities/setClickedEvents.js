@@ -736,7 +736,7 @@ $('.progress_popup_edit_form_submit').on('click', function (e){
 })
 //节点添加保存
 function updateSubmitEvent(e){
-    console.log($(this).data('item'));
+    console.log('updateSubmitEvent',$(this).data('item'));
     var data=JSON.parse($(this).data('item'));
     
     var form=$(this).jqmData('form');
@@ -750,10 +750,13 @@ function updateSubmitEvent(e){
             console.log("提交方式为",editableStatus);
             if(editableStatus!="new" && editableStatus!="update"){
                 //var list2delete=[];
+
+                //需要删除旧的节点事件
                 var tables={};
                 var deleteItem=currentProgress['currentDiagramButton'].opt.counterData.filter((d)=>{
                     var isMatched=false;
-                    if(formatIndex(d.caseStatus).main>=currentProgress['targetPosition'].main && formatIndex(d.caseStatus).sub!=currentProgress['targetPosition'].sub){
+                    if(formatIndex(d.caseStatus).main>=currentProgress['targetPosition'].main && 
+                    formatIndex(d.caseStatus).sub!=currentProgress['targetPosition'].sub && d.isInactived==0){
                         var matcher=Object.keys(tableNamesMatcher);
                         matcher.forEach(match=>{
                             if(d.hasOwnProperty(match)){
@@ -768,7 +771,26 @@ function updateSubmitEvent(e){
                     }
                     return isMatched;
                 })
-                
+                //需要恢复新的节点删除事件
+                var activedtables={};
+                var activedItem=currentProgress['currentDiagramButton'].opt.counterData.filter((d)=>{
+                    var isMatched=false;
+                    if(formatIndex(d.caseStatus).main==currentProgress['targetPosition'].main && 
+                    formatIndex(d.caseStatus).sub==currentProgress['targetPosition'].sub && d.isInactived==1){
+                        var matcher=Object.keys(tableNamesMatcher);
+                        matcher.forEach(match=>{
+                            if(d.hasOwnProperty(match)){
+                                if(!activedtables.hasOwnProperty(tableNamesMatcher[match])){
+                                    activedtables[tableNamesMatcher[match]]=[];
+                                }
+                                activedtables[tableNamesMatcher[match]].push(d);
+                            }
+                        })
+                        //tables[]
+                        isMatched=true;
+                    }
+                    return isMatched;
+                })
                 
                 $('#progress_popup_add').popup('close');
                 setTimeout(() => {
@@ -866,16 +888,20 @@ function updateSubmitEvent(e){
                                     await currentProgress['currentDiagramButton'].MoveTo(targetPosition.main+targetPosition.sub/10);
                                 })
                                 if(editableStatus=="shift"){
+                                    //删除旧节点事件--更新数据库，更新缓存数据
                                     $.each(tables,(table,del)=>{
                             
                                         del.forEach((dl)=>{
                                             //console.log(table,del.length,dl.caseStatus,dl.id);
+                                            //更新数据库
                                             inactiveItem("caseStatus="+dl.caseStatus+" AND id="+dl.id,table);
+                                            //更新缓存数据
                                             var index=currentProgress['currentDiagramButton'].opt.counterData.indexOf(dl);
                                             console.log("indexOf",index)
                                             if(index>-1){
                                                 //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
-                                                currentProgress['currentDiagramButton'].opt.counterData.splice(index, 1);
+                                                //currentProgress['currentDiagramButton'].opt.counterData.splice(index, 1);
+                                                currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
                                             }
                                             index=DataList[table].indexOf(dl);
                                             if(index>-1){
@@ -884,17 +910,40 @@ function updateSubmitEvent(e){
                                             }
                                         })
                                     })
+                                    //恢复新的节点原有删除的事件--更新数据库，更新缓存数据
+                                    $.each(activedtables,(table,actived)=>{
+                            
+                                        actived.forEach((ac)=>{
+                                            //console.log(table,del.length,dl.caseStatus,dl.id);
+                                            //更新数据库
+                                            restoreItem("caseStatus="+ac.caseStatus+" AND id="+ac.id,table);
+                                            //更新缓存数据
+                                            var index=currentProgress['currentDiagramButton'].opt.counterData.indexOf(ac);
+                                            console.log("indexOf",index)
+                                            if(index>-1){
+                                                //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
+                                                currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=0;
+                                            }
+                                            index=DataList[table].indexOf(ac);
+                                            if(index>-1){
+                                                //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
+                                                DataList[table][index].isInactived=0;
+                                            }
+                                        })
+                                    })
                                     console.log('DataList',DataList);
                                 }
                             }
                             //更新节点数据
                             console.log("final values",data.table,e.values);
+                            //添加新提交的数据到数据库
                             pureinsert(data.table,e.values,(r)=>{
                                 console.log('insert result',data.table,r,currentProgress['target']);
+                                //添加新提交的数据到缓存
                                 DataList[data.table].push(e.values);
-        
                                 currentProgress['currentDiagramButton'].opt.counterData.push(e.values);
-                                currentProgress['currentDiagramButton'].updateCounterIndicator(data);
+                                //更新节点图
+                                currentProgress['currentDiagramButton'].updateCounterIndicator(data,editableStatus=="shift"?currentProgress['originalPosition']:undefined);
                                 if(data.table=='caseExcutes'){
                                     fireDataChnaged("caseexcutesChanged",e.values,"add");
                                 }

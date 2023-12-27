@@ -59,11 +59,16 @@ border-color: lightgray;
   z-index: 23;
   position: absolute;
   text-align: center;
-  background: orangered;
-  color:white;
-  text-align: center;
   vertical-align: middle;
   filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5));
+}
+.activated-counter-color{
+  background: orangered;
+  color:white;
+}
+.deactivated-counter-color{
+  background: gray;
+  color:white;
 }
 .event-lead-line{
   position: absolute;

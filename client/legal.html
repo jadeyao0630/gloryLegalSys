@@ -62,7 +62,7 @@
 			</div>
             <div data-role="popup" id="popupMenu" data-theme="a" data-history="false">
                 <ul data-role="listview" data-inset="true" style="min-width:140px;" data-theme="a">
-                    <li data-role="list-divider">操作</li>
+                    <li data-role="list-divider" style="border-bottom: 2px solid orangered;">操作</li>
                     <li><a class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-red ui-icon-power">退出</a></li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-icon-user btn-icon-blue ui-btn-icon-left popup-menu-btns" data-rel="back">个人信息</a></li>
 					<li data-role="list-divider" class="admin-ui">用户</li>
@@ -108,7 +108,7 @@
     <!-- 案件页面 -->
     <div data-role="page" id="casePage">
 	
-		<div data-role="header" data-position="fixed" data-tap-toggle="false">
+		<div data-role="header" data-position="fixed" data-tap-toggle="false" >
 				<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-corner-all ui-mini ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
 			<h1 id="reg_form_title">My App</h1>
 			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn">保存</button>
@@ -143,15 +143,15 @@
 		</div>
 		<div data-role="popup" id="progress_popupMenu" data-theme="a">
 			<ul data-role="listview" data-inset="false" style="min-width:210px;">
-				<li data-role="list-divider" id="progress_popupMenu_title">请选择操作</li>
-				<li><a href="#">查看</a></li>
+				<li data-role="list-divider" id="progress_popupMenu_title" style="border-bottom: 2px solid orangered;">请选择操作</li>
+				<li><a href="#"><i class="fa fa-eye text-green" style="margin-right:10px;"></i>查看</a></li>
 				<li data-role="list-divider" class="progress_popupMenu_add_group">添加</li>
 				<ul data-role="listview" id="progress_popupMenu_add_group" class="progress_popupMenu_add_group">
-					<li><a href="#">进展</a></li>
-					<li><a href="#">执行</a></li>
-					<li><a href="#">财产</a></li>
-					<li><a href="#">附件</a></li>
-					<li><a href="#casePage">关联</a></li>
+					<li><a href="#"><i class="fa fa-thumbtack text-blue" style="margin-right:10px;"></i>进展</a></li>
+					<li><a href="#"><i class="fa fa-check-double text-green" style="margin-right:10px;"></i>执行</a></li>
+					<li><a href="#"><i class="fa fa-sack-dollar text-red" style="margin-right:10px;"></i>财产</a></li>
+					<li><a href="#"><i class="fa fa-paperclip text-blue" style="margin-right:10px;"></i>附件</a></li>
+					<li><a href="#casePage"><i class="fa fa-link text-green" style="margin-right:10px;"></i>关联</a></li>
 				</ul>
 			</ul>
 		</div><!-- /collapsible -->
@@ -254,7 +254,7 @@
 			</div>
 			<div data-role="popup" id="chartCatelog" data-theme="a">
 					<ul data-role="listview" data-inset="true" style="min-width:210px;">
-						<li data-role="list-divider">选择查看类型</li>
+						<li data-role="list-divider" style="border-bottom: 2px solid orangered;">选择查看类型</li>
 						<li><a href="#" class="chart-btn" data-rel="back">纠纷</a></li>
 						<li><a href="#" class="chart-btn" data-rel="back">诉讼类型</a></li>
 						<li><a href="#" class="chart-btn" data-rel="back">项目</a></li>

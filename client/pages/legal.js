@@ -85,6 +85,7 @@ function setRowsPrePageEvent(){
                     setTimeout(() => {
                     
                     $('#pageOneTable').setRowsPrePage(parseInt(e.values.rowsNumber));
+                    saveTableSettingsToUser(e.values);
                     $().mloader('hide');
                 },200);
                 //export2Excel(e.values.exportFileName,e.values.exportType!=0,'pageOneTable');
@@ -168,6 +169,8 @@ $('body').on(preload_completed_event_name,function(){
     }
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
     setVisibleColumnToTemplate();
+    var tableSettings=getUserTableSettings();
+    console.log('tableSettings',tableSettings);
     /*
     pageOnTable=new pageTable({
 		containerId:"pageOneTable",
@@ -639,6 +642,12 @@ function setVisibleColumnToTemplate(){
         //$('#pageOneTable').trigger('create');
         //$('#pageOneTable-fixed').trigger('create'); 
     }
+}
+function getUserTableSettings(){
+    if(getGlobalJson('currentUser').table!=undefined && getGlobalJson('currentUser').table!=null){
+        return JSON.parse(getGlobalJson('currentUser').table);
+    }
+    return undefined;
 }
 function setColumnToggleButton(){
     if($('#pageOneTable-columnFilter').length==0){

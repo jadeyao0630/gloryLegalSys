@@ -368,7 +368,7 @@ mform.prototype={
         var value=itemTemplate.defaultValue || '';
         var input=$('<input type="password" class="form-original" name="'+itemId+'"'+' id="'+itemId+'"'+
                     _this.setPlaceholder(itemTemplate)+
-                    'data-wrapper-class="controlgroup-textinput ui-btn" style="padding-top:.22em;padding-bottom:.22em;"'+
+                    'data-wrapper-class="controlgroup-textinput ui-btn" style=""'+
                     ' value="'+value+'" '+_this.setRequired(itemTemplate.isOptional,"此项必须正确填写")+'>');
         var subContainer=$('<div id="'+itemId+'_controlgroup" data-role="controlgroup" data-type="horizontal" class="form-original"></div>');
         if(itemTemplate.isDisabled){

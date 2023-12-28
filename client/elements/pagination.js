@@ -12,6 +12,13 @@ function saveChangedToUser(target){
     userData.lastLogin=formatDateTimeStr2Mysql(userData.lastLogin);
     saveCurrentUser(userData);
 }
+function saveTableSettingsToUser(data){
+    var userData=getCurrentUserSaved();
+    console.log('saveTableSettingsToUser',JSON.stringify(data));
+    //userData.table="\'"+JSON.stringify(data)+"\'";
+    saveCurrentUser(userData);
+
+}
 function getSuperMultValue(template,data,isMultiInput){
     //console.log('getSuperMultValue',data);
     var data=data.split(',');

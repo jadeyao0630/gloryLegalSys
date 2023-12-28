@@ -78,31 +78,6 @@ function saveNewData2List(sourceData,newData,indexName){
       }
       return sourceData;
 }
-function formatAMPM(datestr){
-    dateString = dateString.replace('下午', '');
-
-    // 使用空格分割字符串
-    var parts = dateString.split(' ');
-
-    // 获取日期部分和时间部分
-    var datePart = parts[0];
-    var timePart = parts[1];
-
-    // 将日期部分拆分为年、月、日
-    var dateParts = datePart.split('-');
-    var year = parseInt(dateParts[0], 10);
-    var month = parseInt(dateParts[1], 10) - 1; // 月份从 0 开始
-    var day = parseInt(dateParts[2], 10);
-
-    // 将时间部分拆分为时、分、秒
-    var timeParts = timePart.split(':');
-    var hour = parseInt(timeParts[0], 10);
-    var minute = parseInt(timeParts[1], 10);
-    var second = parseInt(timeParts[2], 10);
-
-    // 创建 Date 对象
-    var date = new Date(year, month, day, hour, minute, second);
-}
 function formatDateTime(date, format) {
     const o = {
       'M+': date.getMonth() + 1, // 月份
@@ -141,7 +116,7 @@ function formatDateTime(date, format) {
     else
         return formatDateTime(new Date(dateStr),'yyyy-MM-dd');
 }
-function formatAMPM(dateString){
+function formatDateString(dateString){
     var isPM=false;
     dateString=dateString.replace('年','-').replace('月','-').replace('日','');
     if(dateString.indexOf('下午')>-1) {
@@ -164,11 +139,19 @@ function formatAMPM(dateString){
     var month = parseInt(dateParts[1], 10) - 1; // 月份从 0 开始
     var day = parseInt(dateParts[2], 10);
 
-    // 将时间部分拆分为时、分、秒
-    var timeParts = timePart.split(':');
-    var hour = parseInt(isPM?timeParts[0]+12:timeParts[0], 10);
-    var minute = parseInt(timeParts[1], 10);
-    var second = parseInt(timeParts[2], 10);
+    if(timePart==undefined){
+        var hour = 0;
+        var minute = 0;
+        var second = 0;
+
+    }else{
+        // 将时间部分拆分为时、分、秒
+        var timeParts = timePart.split(':');
+        var hour = parseInt(isPM?timeParts[0]+12:timeParts[0], 10);
+        var minute = parseInt(timeParts[1], 10);
+        var second = parseInt(timeParts[2], 10);
+    }
+    
 
     // 创建 Date 对象
     var date = new Date(year, month, day, hour, minute, second);
@@ -358,6 +341,7 @@ $.fn.extend({
                 //position.top=$(window).height()-$(window).scrollTop()-thisHeight-70;
                 top=position.top-10;
                 $('.ui-tooltip').css({'transform':'translateY(-100%)'})
+                /*
                 console.log('tooltip over size',{
                     windowHeight:$(window).height(),
                     screenHeight:screen.height,
@@ -365,6 +349,7 @@ $.fn.extend({
                     positionTop:position.top,
                     thisHeight:thisHeight
                 });
+                */
             }else{
                 $('.ui-tooltip').css({'transform':'translateY(-0%)'})
             }

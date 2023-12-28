@@ -63,6 +63,9 @@ function setRowsPrePageEvent(){
     $('#export_excel_popup_form').empty();
     $('#export_excel_popup_form').append(form.instance);
     form.setValueById('rowsNumber',$('#pageOneTable').jqmData('itemsPerPage'));
+    console.log('runAnimation',$('#pageOneTable').jqmData('runAnimation'));
+    form.setValueById('tableAnimations',$('#pageOneTable').jqmData('runAnimation')?'0':'1');
+    form.setValueById('tableStrip',$('#pageOneTable').hasClass('table-stripe')?'0':'1');
     $('#export_excel_popup_form').trigger('create');
     //console.log(JSON.stringify(data));
     $('#export_excel_popup_form_submit').jqmData('form',form);
@@ -73,11 +76,14 @@ function setRowsPrePageEvent(){
     $('#export_excel_popup_form_submit').on('click',function(e){
         $(this).jqmData('form').getFormValues(function(e){
             if(e.success){
-                
+                console.log(e);
                 $('#export_excel_popup').popup('close');
                 $().mloader('show',{message:"请稍等..."});
+                    $('#pageOneTable').hasRowAnimation(parseInt(e.values.tableAnimations)==0);
+                    $('#pageOneTable').setTableStripe(parseInt(e.values.tableStrip)==0);
+                    console.log($('#pageOneTable').jqmData('runAnimation'));
                     setTimeout(() => {
-
+                    
                     $('#pageOneTable').setRowsPrePage(parseInt(e.values.rowsNumber));
                     $().mloader('hide');
                 },200);
@@ -101,32 +107,15 @@ function export2Excel(fileName,isSelectedOnly,tableId){
         $().mloader('hide');
     },200);
 }
+var watinglist={};
 $('body').on(main_load_completed_event_name,function(){
+    
+
+    watinglist['main']=true;
+    console.error('main_load_completed_event_name','complate.........');
     const intervalId = setInterval(() => {
-        /*
-        if (pageOnTable!=undefined) {
-            clearInterval(intervalId);
-            currentData=DataList.combinedData;
-            setPersonCaseSum(DataList.combinedData);
-            pageOnTable.addTableData(DataList.combinedData);
-            //$('#pageOneTable').trigger('create');
-            
-            setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
-            
-            //resizeTables();
-            //resizeTables();
-            //resizeColumnFilter();
-            //$('#header-filter-container').trigger('create')
-            
-            $().mloader("hide");
-            $('#mainFooter').show();
-            
-            
-            
-            
-        }
-        */
-        if (DataList.combinedData!=undefined) {
+        console.log('waiting....',watinglist)
+        if (watinglist.hasOwnProperty('settings')) {
             clearInterval(intervalId);
             
             currentData=DataList.combinedData;
@@ -139,7 +128,7 @@ $('body').on(main_load_completed_event_name,function(){
 });
 $('body').on(preload_completed_event_name,function(){
 
-    
+    watinglist['settings']=true;
     setFontSize();
     
 
@@ -302,7 +291,7 @@ $('body').on(preload_completed_event_name,function(){
                                     }else{
                                         //console.log('数组');
                                         if(id=="casePersonnel"){
-                                            //console.log(item[id]);
+                                            console.log(id,item[id],$(ele).val());
                                             return $.grep(item[id].split(','),itm=>{
                                                 return $.grep($(ele).val(),(it)=>{
                                                 

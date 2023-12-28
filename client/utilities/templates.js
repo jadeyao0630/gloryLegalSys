@@ -716,8 +716,21 @@ var _summary_template;
       },
       template:{
         
+        
+        tableAnimations:{
+          label:"动画",
+          type:"radio",
+          isOptional:false,
+          data:['有','无']
+        },
+        tableStrip:{
+          label:"隔行底纹",
+          type:"radio",
+          isOptional:false,
+          data:['有','无']
+        },
         rowsNumber:{
-          label:"导出",
+          label:"每页行数",
           type:"number",
           isOptional:false,
           defaultValue:$('#pageOneTable').jqmData('itemsPerPage'),
@@ -725,7 +738,7 @@ var _summary_template;
         __formLabel:{
           label:"设置每页显示的行数，设置为0则表示显示全部。",
           type:"label",
-        }
+        },
       }
     }
     export_excel_template={

@@ -568,3 +568,12 @@ ui-collapsible.collapsible-listview .ui-btn{
   .orangeRed-border-bottom{
     border-bottom: 2px solid orangered;
   }
+  #pageOneTableselect-page{
+    padding-right:0px;
+  }
+  #pageOneTableselect-page::after{
+    display:none;
+  }
+  .table-stripe tbody tr:nth-child(2n+1):not(.inactived-row){
+    background-color: rgba(255, 255, 255, 0.974);
+  }

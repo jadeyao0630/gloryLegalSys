@@ -168,12 +168,14 @@ $.fn.extend({
             controlgroup.append(page_btn);
             controlgroup.append(right_btn);
             var exsit=$(this.jqmData('paginationContainer')).find('a');
-            
             $(this.jqmData('paginationContainer')).empty();
             controlgroup.append(exsit);
             $(this.jqmData('paginationContainer')).append(controlgroup);
             $(this.jqmData('paginationContainer')).trigger('create');
 
+            $.each(exsit,(i,a)=>{
+                $(a).setTooltips();
+            });
             $('.page_btn').on('click',function(e){
                 //console.log();
                 if($(this).hasClass('page_btn_left')){
@@ -211,7 +213,11 @@ $.fn.extend({
         thead.append(theadtr);
         
         $(this).prepend(thead);
-        if(_this.jqmData('setFixHead')) _this.setFixedHead();
+        if(_this.jqmData('setFixHead')) {
+            _this.setFixedHead();
+        }else{
+            _this.setSort();
+        }
         _this.setCheckboxes();
     },
     setCheckboxes:function(){
@@ -285,7 +291,7 @@ $.fn.extend({
     },
     searchTable:function(searchStr){
         //console.log('searchTable',searchStr);
-        $(this).jqmData('currentData',$.grep($(this).jqmData('source'),(d)=>{
+        var data=$.grep($(this).jqmData('source'),(d)=>{
             var hasValue=false;
             $.each(d,(k,v)=>{
                 if( v!=null && v.toString().indexOf(searchStr)>-1){
@@ -296,9 +302,15 @@ $.fn.extend({
             return hasValue;
             //console.log($.map(d, function(v, k) { return v!=null && v.toString().indexOf(input.val())>-1; }));
             //return $.map(d, function(v, k) { return v!=null && v.toString().indexOf(input.val())>-1; }).length>0;
-        }));
+        })
+        $(this).jqmData('currentData',data);
         $(this).jqmData('currentPage',0);
-        $(this).updateTable();
+        if($(this).jqmData('runAnimation')){
+            $(this).jqmData('runAnimation',false);
+            $(this).updateTable().then(()=>{
+                $(this).jqmData('runAnimation',true);
+            });
+        }
     },
     updateTableItem:function(data){
         var _this=this;
@@ -483,6 +495,7 @@ $.fn.extend({
         var datas=$(this).convertDatas(source);
         $(this).jqmData('source',datas);
         $(this).jqmData('currentData',$(this).jqmData('source'));
+        $(this).sortColumn($(this).jqmData('currentSort'));
         $(this).updateTable();
         console.log('updateSource',$(this).jqmData('source'),datas)
     },
@@ -494,7 +507,7 @@ $.fn.extend({
         var pageIndicator=$('#'+$(_this).attr('id')+'select-page');
         pageIndicator.empty();
         for(var page=0;page< _this.jqmData('maxPage');page++){
-            var num=$('<option value='+page+'>'+(page+1)+'</option>');
+            var num=$('<option value='+page+'>第'+(page+1)+'页</option>');
             if(_this.jqmData('currentPage')==page) num.prop('selected',true);
             pageIndicator.append(num);
         }
@@ -523,13 +536,63 @@ $.fn.extend({
         if(num<0) num=0;
         $(this).jqmData('currentPage',0);
         $(this).jqmData('itemsPerPage',num);
-        $(this).jqmData('runAnimation',false);
-        $(this).updateTable().then(()=>{
-            $(this).jqmData('runAnimation',true);
-        });
+        if($(this).jqmData('runAnimation')){
+            $(this).jqmData('runAnimation',false);
+            $(this).updateTable().then(()=>{
+                $(this).jqmData('runAnimation',true);
+            });
+        }
+        
     },
-    disableRowAnimation:function(isDisabled){
-        $(this).jqmData('runAnimation',isDisabled);
+    hasRowAnimation:function(has){
+        $(this).jqmData('runAnimation',has);
+    },
+    setSort:function(){
+        var _this=this;
+        var template=$(this).jqmData('tableTemplate');
+        var ids=Object.keys(template);
+        var fixedHead=$(this).jqmData('fixedHead');
+        var head=$(this).find('thead');
+        if(fixedHead==undefined) fixedHead=head;
+        var ths=fixedHead.find('th');
+        var _ths=head.find('th');
+        $.each(ids,function(index,id){
+            var columnData=template[id];
+            if(columnData.hasOwnProperty('sortable')){
+                $(ths[index]).css({'cursor':'pointer'})
+                var indicator=$(ths[index]).find('i');
+                if (indicator.length==0) indicator = $('<i class="fa '+(columnData.sortable.isASC?'fa-caret-up':'fa-caret-down')+'" />');
+                if(id!='id') indicator.hide();
+                else
+                    _this.jqmData('currentSort',columnData.sortable);
+                $(ths[index]).append(indicator);
+                
+                $(ths[index]).data('tooltip',"按"+$(ths[index]).text()+"排序");
+                $(ths[index]).setTooltips();
+                $(ths[index]).on('click',function(e){
+                    
+                    //$().mloader("show",{message:"排序中...."});
+                    //sortColumn(columnData.sortable);
+                    _this.jqmData('currentSort',columnData.sortable);
+                    $(ths).find('i').hide();
+                    $(_ths).find('i').hide();
+                    var event=jQuery.Event("sort");
+                    event.value=columnData.sortable;
+                    columnData.sortable.isASC=!columnData.sortable.isASC;
+                    $(_this).trigger(event);
+                    $(_this).sortColumn(columnData.sortable);
+                    $(this).find('i').show();
+                    $(_ths[index]).find('i').show();
+                    if(columnData.sortable.isASC) {
+                        $(this).find('i').removeClass('fa-caret-down').addClass('fa-caret-up');
+                    }else{
+                        $(this).find('i').removeClass('fa-caret-up').addClass('fa-caret-down');
+                    }
+                });
+                
+            }
+        });
+        
     },
     updateTable:async function(isNewItem){
         var template=$(this).jqmData('tableTemplate');
@@ -610,18 +673,23 @@ $.fn.extend({
         _this.trigger('create');
         if(isNewItem && newItem!=undefined){
             
-        console.log('new item',newItem,tds.css('padding'));
-        tds.animate({'margin-top':'0px'},500,function(){
-            $(newItem).find('td').css({'padding':'0'})
-            tds.animate({'margin-left':'-10px'},500,function(){
-                tds.css({'margin-left':'0px'})
-                tds.contents().unwrap();
-                $(newItem).find('td').css({'border-right':'1px solid rgba(0,0,0,.05)'})
-                $(newItem).addClass('newItem');
-                $(newItem).on('click',(e)=>{$(newItem).removeClass('newItem');$(newItem).off('click','**')});
+            //console.log('new item',newItem,tds.css('padding'));
+            tds.animate({'margin-top':'0px'},500,function(){
+                $(newItem).find('td').css({'padding':'0'})
+                tds.animate({'margin-left':'-10px'},500,function(){
+                    tds.css({'margin-left':'0px'})
+                    tds.contents().unwrap();
+                    $(newItem).find('td').css({'border-right':'1px solid rgba(0,0,0,.05)'})
+                    $(newItem).addClass('newItem');
+                    $(newItem).on('click',(e)=>{$(newItem).removeClass('newItem');$(newItem).off('click','**')});
+                })
             })
-        })
         }
+    },
+    setTableStripe:function(isEnabled){
+        if(isEnabled) $(this).addClass('table-stripe');
+        else $(this).removeClass('table-stripe');
+        $(this).trigger('create');
     },
     setColumnToggle:function(){
         var _this=this;
@@ -718,6 +786,34 @@ $.fn.extend({
         //setFontSize();
         //restart(1);
     },
+    sortColumn:function(columnData){
+        var data=$(this).jqmData('currentData');
+        
+        var source=$(this).jqmData('source');
+        if (columnData.type=='number') {
+            if(!columnData.isASC){
+                data=data.sort(function(a,b){return getNumbers(b[columnData.id].toString())-getNumbers(a[columnData.id].toString())});
+                source=source.sort(function(a,b){return getNumbers(b[columnData.id].toString())-getNumbers(a[columnData.id].toString())});
+            }else{
+                data=data.sort(function(a,b){return getNumbers(a[columnData.id].toString())-getNumbers(b[columnData.id].toString())});
+                source=source.sort(function(a,b){return getNumbers(a[columnData.id].toString())-getNumbers(b[columnData.id].toString())});
+            }
+            
+        }else if (columnData.type=='date') {
+            if(!columnData.isASC){
+                data=data.sort(function(a,b){return new Date(b[columnData.id])>new Date(a[columnData.id])});
+                source=source.sort(function(a,b){return new Date(b[columnData.id])>new Date(a[columnData.id])});
+            }else{
+                data=data.sort(function(a,b){return new Date(a[columnData.id])>new Date(b[columnData.id])});
+                source=source.sort(function(a,b){return new Date(b[columnData.id])>new Date(a[columnData.id])});
+            }
+        }
+        $(this).jqmData('currentData',data);
+        $(this).jqmData('source',source);
+
+        console.log(columnData,data);
+        $(this).updateTable();
+    },
     setFixedHead:function(container) {
         var _this=this;
         const resizeObserver = new ResizeObserver(entries => {
@@ -754,13 +850,15 @@ $.fn.extend({
                 $(_ths[index]).addClass('table-column-toggle');
                 $(_ths[index]).data('tooltip',"筛选列");
                 $(_ths[index]).setTooltips();
-                $(_this).jqmData('toggleButton',columnToggler)
+                $(_this).jqmData('toggleButton',$(_ths[index]))
                 //console.log('isNormal',($(ref_ths[index]).outerWidth()/window.innerWidth>0.1),$(ref_ths[index]).outerWidth(),window.innerWidth);
                 //resizeTables($(ref_ths[index]).outerWidth()/window.innerWidth>0.1,true);
             }
             resizeObserver.observe(th);
         });
         $(this).jqmData('fixedHead',_table_fixed);
+        
+        $(this).setSort();
         //headResizeObserver.observe(_Header.get( 0 ));
         
     }

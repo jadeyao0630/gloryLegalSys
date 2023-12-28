@@ -631,7 +631,7 @@ mform.prototype={
                 var textAndValue=_this.getDisplayTextAndValue(data,itemTemplate,key);
                 textAndValue.value=(textAndValue.value==undefined?index:textAndValue.value);
                 if(textAndValue.value==value) selected=' selected';
-                return $('<option value="'+key+textAndValue.value+'"'+selected+'>'+textAndValue.text+'</option>');
+                return $('<option value="'+textAndValue.value+'"'+selected+'>'+textAndValue.text+'</option>');
             }else{
                 if(index==value) selected=' selected';
                 return $('<option value="'+key+index+'"'+selected+'>'+data+'</option>');
@@ -810,8 +810,8 @@ mform.prototype={
             element.val(val);
         }else if(itemTemplate.type.toLowerCase()=="radio")  {
             var eles=element.find("input[id^="+id+"]");
-            console.log('radio',id,val,eles);
             val=val||0;
+            console.log('radio',id,val,eles);
             eles.prop( "checked", false );
             if(eles.length>0){
                 $.each(eles,(index,ele)=>{
@@ -829,7 +829,7 @@ mform.prototype={
                 
         }else if(itemTemplate.type.toLowerCase()=="textrange"){
             var inputs=element.find('input[id^='+id+']');
-            if(val==undefined) val="";
+            if(val==undefined) val=",";
             var rangeVals= val.split(',');
             if(inputs.length!=rangeVals.length) {
                 console.error("textrange 值 和 元素数量不匹配",id,val)

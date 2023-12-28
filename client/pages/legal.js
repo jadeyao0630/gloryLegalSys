@@ -34,7 +34,7 @@ function setFontSize(){
 }
 
 function exportExcel () {
-    var form= new mform({template:export_excel_template});
+    var form= new mform({template:export_excel_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
 
     $('#export_excel_popup_title').text("导出设置");
     $('#export_excel_popup_form').empty();
@@ -57,7 +57,7 @@ function exportExcel () {
     })
 };
 function setRowsPrePageEvent(){
-    var form= new mform({template:change_rows_page_template});
+    var form= new mform({template:change_rows_page_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
     //change_rows_page_template.default
     $('#export_excel_popup_title').text("表格显示设置");
     $('#export_excel_popup_form').empty();
@@ -188,8 +188,8 @@ $('body').on(preload_completed_event_name,function(){
         //source:DataList.casesDb,
         tableTemplate:_firstPageTableColumns,
         paginationContainer:$('#pagination_container'),
-        itemsPerPage:tableSettings.rowsNumber,
-        runAnimation:tableSettings.tableAnimations,
+        itemsPerPage:parseInt(tableSettings.rowsNumber),
+        runAnimation:tableSettings.tableAnimations==0,
         //setFixHead:true
     });
     $("#pageOneTable").setTableStripe(parseInt(tableSettings.tableStrip)==0);
@@ -222,7 +222,7 @@ $('body').on(preload_completed_event_name,function(){
     
     $('#header-filter-container').css({top:$('#main-header').css('height')});
     //添加头部过滤表格
-    var filter_form= new mform({template:header_filter_template});
+    var filter_form= new mform({template:header_filter_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
     form=filter_form.instance;
     form.addClass('header-filter-from')
     var container=$('<div class="header-filter-container-div"></div>')
@@ -776,7 +776,7 @@ function _createNewCaseForm(template, constainerId){
     
     //console.log("_createNewCaseForm template");
     //console.log(template);
-    var main_form= new mform({template:template});
+    var main_form= new mform({template:template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
     var form=main_form.instance;
     
     const popup_form = document.getElementById(constainerId);

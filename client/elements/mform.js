@@ -2,6 +2,7 @@ function mform(arg){
     this.opt = {
         template:{},
         buttons:undefined,
+        isAdmin:false,
     }
     this.init(arg);
     return this;
@@ -123,12 +124,21 @@ mform.prototype={
                     
                     return;
                 }
+                
                 var id=$(data.toPage).attr('id').replace('-dialog','');
+                var closeBtn=$(data.toPage).find('.ui-header .ui-icon-delete');
+                console.log('pagecontainerbeforeshow',data.toPage,closeBtn);
+                closeBtn.removeClass('ui-icon-delete').addClass('ui-icon-check').addClass('btn-icon-green').removeClass('ui-btn-left').addClass('ui-btn-right');
+                closeBtn.on('click',function(e){
+                    e.preventDefault();
+                    history.back();
+                })
                 data.toPage.find('a.ui-icon-delete').on('click',function(e){
                     //console.log('pagecontainerhide',$(data.toPage).find('input[data-type="search"]').val());
                     if ( pageIsSelectmenuDialog( data.toPage ) ) {
                         $(data.toPage).find('input[data-type="search"]').val('');
                         $(data.toPage).find('input[data-type="search"]').trigger('keyup');
+                        
                     }
                     
                 })
@@ -213,6 +223,8 @@ mform.prototype={
         if(seetings.labelPosition != undefined && seetings.labelPosition=="left"){//标签在左边
             item_container=$('<div class="form_item_panel"></div>');
         }
+        //console.log(key,_this.opt.isAdmin,rowTemplate[key].isAdminOnly)
+        
         //if(key=='caseDate_f') console.log('span',rowTemplate);
         
         //console.log(key,rowTemplate);
@@ -229,8 +241,7 @@ mform.prototype={
                 item_container.append(label);
             }else{
                 item_container.append(_this.generateLabel(key,form_item_template));
-            }
-                
+            } 
             switch(form_item_type){
                 case "text":
                     item_container.append(_this.generateInput(key,form_item_template));
@@ -287,6 +298,11 @@ mform.prototype={
                     item_container.css({'grid-template-columns':'auto'})
                     break;
             }
+            console.log(key,_this.opt.isAdmin,rowTemplate[key].isAdminOnly,(!_this.opt.isAdmin && rowTemplate.isAdminOnly))
+            if(!_this.opt.isAdmin && rowTemplate[key].isAdminOnly){
+                console.log(key,_this.opt.isAdmin,rowTemplate[key].isAdminOnly)
+                item_container.addClass('admin-ui');
+            }   
         }
         return item_container;
     },

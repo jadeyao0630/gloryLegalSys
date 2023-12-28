@@ -1,8 +1,8 @@
-var isRunLocal=false;
+var isRunLocal=true;
 var IPS=['192.168.10.141','192.168.10.68','cn.luyao.site']
 var showDebug=false;
 let ip=isRunLocal?IPS[1]:IPS[0];
-let port=5555;
+let port=5556;
 var auth_code='1234';
 var adminLevel=3;
 const keyStr = 'it@glory.com'
@@ -81,7 +81,7 @@ const fileTypes={
         tooltip:'PDF文件'
     },
 }
-var casePersonnelStatus=['无','原告','被告','被执行人','申请执行人','上诉人','原审被告'];
+var casePersonnelStatus=['无','原告','被告','被执行人','申请执行人','上诉人','原审被告','被上诉人'];
 var position=['无','法务人员','法务管理']
 var deads=["无需执行"]; 
 const TextColor="rgb(51, 51, 51)";

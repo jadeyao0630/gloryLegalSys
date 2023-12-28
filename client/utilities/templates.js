@@ -1194,7 +1194,7 @@ var _summary_template;
         caseStatus_f:{
           label:"状态:",
           //data:addEmptyValueToArray(resourceDatas.caseStatus),
-          data:resourceDatas.caseStatus_object,
+          data:formatStatus(resourceDatas.caseStatus_object),
           type:"multicombobox", 
           isOptional:true,
         },
@@ -1204,6 +1204,7 @@ var _summary_template;
         data:['正常','删除'],
         isOptional:true,
         isAdminOnly:true,
+        isHidden:true,
       },
       
       penalty_f:{
@@ -1234,7 +1235,18 @@ var _summary_template;
     }
   }
 });
-  
+
+function formatStatus(status){
+  var newStatus=[];
+  status.forEach(s=>{
+    if(s instanceof Object){
+      newStatus.push(s.name);
+    }else{
+      newStatus.push(s);
+    }
+  })
+  return newStatus;
+}
 function addEmptyValueToArray(array,value){
   if (value==undefined) value="无";
   array.unshift(value);

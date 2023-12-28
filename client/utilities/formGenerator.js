@@ -1,6 +1,6 @@
 function databaseBatchForm(data){
     var combineDB=Object.assign(basicTableList,caseTableList)
-    var form= new mform({template:databasePage_form});
+    var form= new mform({template:databasePage_form,isAdmin:getGlobalJson('currentUser').level==adminLevel});
     if(data==undefined) form.setEmptyValues();
     else form.setData(data);
     $('#database_container').empty();

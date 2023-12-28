@@ -26,7 +26,7 @@ $('#popupMenu').find('a').on('click',function(e){
     e.preventDefault();
     switch($(this).text()){
         case '个人信息':
-            setting_info_form= new mform({template:settingPage_form});
+            setting_info_form= new mform({template:settingPage_form,isAdmin:getGlobalJson('currentUser').level==adminLevel});
             var userInfo=getGlobalJson("currentUser");
             userInfo.pass=decrypt(userInfo.pass);
             setting_info_form.setValues(userInfo);
@@ -39,7 +39,7 @@ $('#popupMenu').find('a').on('click',function(e){
             goToPage( $(this).attr( "href" ));
             break;
         case '添加用户':
-            setting_add_form= new mform({template:settingPage_add_form});
+            setting_add_form= new mform({template:settingPage_add_form,isAdmin:getGlobalJson('currentUser').level==adminLevel});
             setting_add_form.setEmptyValues();
             $('#info_container').empty();
             $('#info_container').append(setting_add_form.instance);
@@ -75,7 +75,7 @@ $('#popupMenu').find('a').on('click',function(e){
                             userD.isInactived_a=userD.isInactived;
                             userD.pass=decrypt(userD.pass);
                             console.log(userD.name);
-                            setting_add_form= new mform({template:settingPage_add_form});
+                            setting_add_form= new mform({template:settingPage_add_form,isAdmin:getGlobalJson('currentUser').level==adminLevel});
                             setting_add_form.setValues(userD);
                             $('#info_container').empty();
                             $('#info_container').append(setting_add_form.instance);
@@ -506,7 +506,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                             switch (data.type){
                                 case 'caseUpdates':
                                     console.log("进展");
-                                    var form= new mform({template:add_update_template});
+                                    var form= new mform({template:add_update_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
                                     var data={table:data.type,idkey:'updatesId',dateKey:'dateUpdated',data:itemData};
                                     
                                     //itemData['dateUpdated']=getDateTime();
@@ -525,7 +525,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                                     break;
                                 case 'caseExcutes':
                                     console.log("执行");
-                                    var form= new mform({template:add_execute_template});
+                                    var form= new mform({template:add_execute_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
                                     var data={table:data.type,idkey:'excutesId',dateKey:'dateExecuted',data:itemData};
                                     
                                     //itemData['dateExecuted']=getDateTime();
@@ -543,7 +543,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                                     break;
                                 case 'caseProperties':
                                     console.log("财产");
-                                    var form= new mform({template:add_property_template});
+                                    var form= new mform({template:add_property_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
                                     var data={table:data.type,idkey:'propertyId',dateKey:'dateUpdated',data:itemData};
                                     
                                     //itemData['dateUpdated']=getDateTime();
@@ -562,7 +562,7 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                                     break;
                                 case 'caseAttachments':
                                     console.log("附件");
-                                    var form= new mform({template:add_evidence_template});
+                                    var form= new mform({template:add_evidence_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
                                     var data={table:data.type,idkey:'evidenceId',dateKey:'dateUploaded',data:itemData};
                                     
                                     //itemData['dateUploaded']=getDateTime();
@@ -992,7 +992,7 @@ function setProgressPopupForm(template,title,data){
             clearInterval(intervalId);
             setTimeout(() => {
                 $().mloader("show",{message:"读取中...."});
-                var form= new mform({template:template});
+                var form= new mform({template:template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
                 $('#progress_popup_add_title').text(getStatusLabel(currentProgress['targetPosition'],progresses)+" "+title);
                 $('#progress_popup_add_form').empty();
                 $('#progress_popup_add_form').append(form.instance);
@@ -1164,7 +1164,7 @@ $('.case_reg_but').on('click',async function(e){
 })
 
 $('#export_chart').on('click',function(e){
-    var form= new mform({template:export_chart_template});
+    var form= new mform({template:export_chart_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
     $('#export_popup_title').text("导出设置");
     $('#export_popup_form').empty();
     $('#export_popup_form').append(form.instance);

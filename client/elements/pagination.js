@@ -14,8 +14,10 @@ function saveChangedToUser(target){
 }
 function saveTableSettingsToUser(data){
     var userData=getCurrentUserSaved();
-    console.log('saveTableSettingsToUser',JSON.stringify(data));
-    //userData.table="\'"+JSON.stringify(data)+"\'";
+    console.log('saveTableSettingsToUser',JSON.stringify(data),userData);
+    userData.createDate=formatDateTimeStr2Mysql(userData.createDate);
+    userData.lastLogin=formatDateTimeStr2Mysql(userData.lastLogin);
+    userData.tables=JSON.stringify(data);
     saveCurrentUser(userData);
 
 }
@@ -148,7 +150,8 @@ $.fn.extend({
         _this.jqmData('paginationContainer',undefined);
         _this.jqmData('toggleButton',undefined);
         _this.jqmData('columnVisibility',{});
-        _this.jqmData('runAnimation',true);
+        _this.jqmData('runAnimation',false);
+        _this.jqmData('updateTask',undefined);
         
         if(arg!=undefined){
             $.each(arg,(k,v)=>{
@@ -503,7 +506,15 @@ $.fn.extend({
         $(this).jqmData('source',datas);
         $(this).jqmData('currentData',$(this).jqmData('source'));
         $(this).sortColumn($(this).jqmData('currentSort'));
-        $(this).updateTable();
+        if($(this).jqmData('runAnimation')){
+            $(this).jqmData('runAnimation',false);
+            $(this).updateTable().then(()=>{
+                $(this).jqmData('runAnimation',true);
+            });
+        }else{
+            $(this).updateTable();
+        }
+        
         console.log('updateSource',$(this).jqmData('source'),datas)
     },
     rebuiltPageIndicator:function(){
@@ -601,97 +612,113 @@ $.fn.extend({
         });
         
     },
-    updateTable:async function(isNewItem){
-        var template=$(this).jqmData('tableTemplate');
-        var _this=$(this);
-        var tbody=_this.find('tbody');
-        if(tbody.length==0) {
-            tbody=$('<tbody></tbody>');
-            _this.append(tbody);
-        }
-        tbody.empty();
-        //console.log('pagination',_this.jqmData('currentPage'),_this.jqmData('itemsPerPage'),_this.jqmData('itemsPerPage'),_this.jqmData('currentData'),isNewItem);
-        _this.rebuiltPageIndicator();
-        //console.log('maxPage',currentData.length/itemsPerPage,maxPage);
-        
-        var startPage=_this.jqmData('currentPage')*_this.jqmData('itemsPerPage');
-        var endPage=startPage+_this.jqmData('itemsPerPage');
-        if(_this.jqmData('itemsPerPage')==0){
-            startPage=0;
-            endPage=_this.jqmData('currentData').length
-            $('.page_btn').hide();
-            $(this.jqmData('paginationContainer')).find('.ui-select').hide();
+    refreshTable:function(){
+        if($(this).jqmData('runAnimation')){
+            $(this).jqmData('runAnimation',false);
+            $(this).updateTable().then(()=>{
+                $(this).jqmData('runAnimation',true);
+            });
         }else{
-            console.log({currentPage:_this.jqmData('currentPage'),maxPage:_this.jqmData('maxPage')});
-            $('.page_btn').show();
-            $(this.jqmData('paginationContainer')).find('.ui-select').show();
-            if(_this.jqmData('maxPage')==1){
-                $('.page_btn_right').addClass('ui-disabled');
-                $('.page_btn_left').addClass('ui-disabled');
-            }else if(_this.jqmData('currentPage')==_this.jqmData('maxPage')-1) {
-                $('.page_btn_right').addClass('ui-disabled');
-                $('.page_btn_left').removeClass('ui-disabled');
-                
-            }else if(_this.jqmData('currentPage')==0){
-                $('.page_btn_left').addClass('ui-disabled');
-                $('.page_btn_right').removeClass('ui-disabled');
-            }else{
-                $('.page_btn_right').removeClass('ui-disabled');
-                $('.page_btn_left').removeClass('ui-disabled');
-            }
+            $(this).updateTable();
         }
+    },
+    updateTable:function(isNewItem){
         
-        console.log("no page",startPage,endPage,_this.jqmData('itemsPerPage'));
-        var newItem;
-        var tds;
-        var columnVisibility=_this.jqmData('columnVisibility');
-        for(var index = startPage; index < endPage; index++){
-            //$.each(data,(key,value)=>{
-                var row=_this.jqmData('currentData')[index];
-                if(row==undefined) break;
-                var tr=$('<tr data-item="'+row.id+'"></tr>');
-                keys.forEach(k=>{
-                    tr.append(_this.setTdElement(template,row,k,columnVisibility));
-                })
-                if(row.isInactived==1) tr.addClass('inactived-row');
-                //console.log("set new item",isNewItem,index,startPage,index==startPage);
-                if(isNewItem && index==startPage && newItem==undefined) {
-                    
-                    //console.log("set new item",index,startPage);
-                    newItem=tr;
-                    $(newItem).find('td').css({'border-right':'none'})
-                    tds=$(newItem).find('td').wrapInner('<div style="height:100%;" />').children();
-                    tds.css({'margin-top':'-70px','margin-left':'-'+(screen.width*2)+'px'})
-                    
-                }
-                tbody.append(tr);
-                tbody.trigger('create');
-                if(_this.jqmData('runAnimation') && index<15*(_this.jqmData('currentPage')+1)){
-
-                    $(tr).itemRowAnimation('slidein',100,function(e){
-                        
-                    });
-                    await sleep(50);
-                }
-                //console.log(itemsPerPage,index);
-                
-            //})
-        }
-        _this.trigger('create');
-        if(isNewItem && newItem!=undefined){
+        var _this=$(this);
+        if(_this.jqmData('updateTask')!=undefined) clearTimeout(_this.jqmData('updateTask')); 
+        var updateTask=setTimeout( async function() {
+            var template=$(_this).jqmData('tableTemplate');
+            var tbody=_this.find('tbody');
+            if(tbody.length==0) {
+                tbody=$('<tbody></tbody>');
+                _this.append(tbody);
+            }
+            tbody.empty();
+            //console.log('pagination',_this.jqmData('currentPage'),_this.jqmData('itemsPerPage'),_this.jqmData('itemsPerPage'),_this.jqmData('currentData'),isNewItem);
+            _this.rebuiltPageIndicator();
+            //console.log('maxPage',currentData.length/itemsPerPage,maxPage);
             
-            //console.log('new item',newItem,tds.css('padding'));
-            tds.animate({'margin-top':'0px'},500,function(){
-                $(newItem).find('td').css({'padding':'0'})
-                tds.animate({'margin-left':'-10px'},500,function(){
-                    tds.css({'margin-left':'0px'})
-                    tds.contents().unwrap();
-                    $(newItem).find('td').css({'border-right':'1px solid rgba(0,0,0,.05)'})
-                    $(newItem).addClass('newItem');
-                    $(newItem).on('click',(e)=>{$(newItem).removeClass('newItem');$(newItem).off('click','**')});
+            var startPage=_this.jqmData('currentPage')*_this.jqmData('itemsPerPage');
+            var endPage=startPage+_this.jqmData('itemsPerPage');
+            if(_this.jqmData('itemsPerPage')==0){
+                startPage=0;
+                endPage=_this.jqmData('currentData').length
+                $('.page_btn').hide();
+                $(_this.jqmData('paginationContainer')).find('.ui-select').hide();
+            }else{
+                console.log({currentPage:_this.jqmData('currentPage'),maxPage:_this.jqmData('maxPage')});
+                $('.page_btn').show();
+                $(_this.jqmData('paginationContainer')).find('.ui-select').show();
+                if(_this.jqmData('maxPage')==1){
+                    $('.page_btn_right').addClass('ui-disabled');
+                    $('.page_btn_left').addClass('ui-disabled');
+                }else if(_this.jqmData('currentPage')==_this.jqmData('maxPage')-1) {
+                    $('.page_btn_right').addClass('ui-disabled');
+                    $('.page_btn_left').removeClass('ui-disabled');
+                    
+                }else if(_this.jqmData('currentPage')==0){
+                    $('.page_btn_left').addClass('ui-disabled');
+                    $('.page_btn_right').removeClass('ui-disabled');
+                }else{
+                    $('.page_btn_right').removeClass('ui-disabled');
+                    $('.page_btn_left').removeClass('ui-disabled');
+                }
+            }
+            
+            console.log("no page",startPage,endPage,_this.jqmData('itemsPerPage'));
+            var newItem;
+            var tds;
+            var columnVisibility=_this.jqmData('columnVisibility');
+            for(var index = startPage; index < endPage; index++){
+                //$.each(data,(key,value)=>{
+                    var row=_this.jqmData('currentData')[index];
+                    if(row==undefined) break;
+                    var tr=$('<tr data-item="'+row.id+'"></tr>');
+                    keys.forEach(k=>{
+                        tr.append(_this.setTdElement(template,row,k,columnVisibility));
+                    })
+                    if(row.isInactived==1) tr.addClass('inactived-row');
+                    //console.log("set new item",isNewItem,index,startPage,index==startPage);
+                    if(isNewItem && index==startPage && newItem==undefined) {
+                        
+                        //console.log("set new item",index,startPage);
+                        newItem=tr;
+                        $(newItem).find('td').css({'border-right':'none'})
+                        tds=$(newItem).find('td').wrapInner('<div style="height:100%;" />').children();
+                        tds.css({'margin-top':'-70px','margin-left':'-'+(screen.width*2)+'px'})
+                        
+                    }
+                    tbody.append(tr);
+                    tbody.trigger('create');
+                    if(_this.jqmData('runAnimation') && index<15*(_this.jqmData('currentPage')+1)){
+
+                        $(tr).itemRowAnimation('slidein',100,function(e){
+                            
+                        });
+                        await sleep(50);
+                    }
+                    //console.log(itemsPerPage,index);
+                    
+                //})
+            }
+            _this.trigger('create');
+            if(isNewItem && newItem!=undefined){
+                
+                //console.log('new item',newItem,tds.css('padding'));
+                tds.animate({'margin-top':'0px'},500,function(){
+                    $(newItem).find('td').css({'padding':'0'})
+                    tds.animate({'margin-left':'-10px'},500,function(){
+                        tds.css({'margin-left':'0px'})
+                        tds.contents().unwrap();
+                        $(newItem).find('td').css({'border-right':'1px solid rgba(0,0,0,.05)'})
+                        $(newItem).addClass('newItem');
+                        $(newItem).on('click',(e)=>{$(newItem).removeClass('newItem');$(newItem).off('click','**')});
+                    })
                 })
-            })
-        }
+            }
+        }, 1); 
+        _this.jqmData('updateTask',updateTask);
+        
     },
     setTableStripe:function(isEnabled){
         if(isEnabled) $(this).addClass('table-stripe');

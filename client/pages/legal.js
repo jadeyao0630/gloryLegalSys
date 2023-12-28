@@ -121,7 +121,8 @@ $('body').on(main_load_completed_event_name,function(){
             
             currentData=DataList.combinedData;
             $('#pageOneTable').updateSource(DataList.combinedData);
-            $('#pageOneTable').trigger('create');
+            
+            //$('#pageOneTable').trigger('create');
             $().mloader("hide");
             $('#mainFooter').show();
         }
@@ -187,9 +188,11 @@ $('body').on(preload_completed_event_name,function(){
         //source:DataList.casesDb,
         tableTemplate:_firstPageTableColumns,
         paginationContainer:$('#pagination_container'),
-        itemsPerPage:10,
+        itemsPerPage:tableSettings.rowsNumber,
+        runAnimation:tableSettings.tableAnimations,
         //setFixHead:true
     });
+    $("#pageOneTable").setTableStripe(parseInt(tableSettings.tableStrip)==0);
     //setFixedHead($('#pageOneTable'),$('#pageOneTable-fixed'));
     //表格重新排序
     $("#pageOneTable").on('sort',function(columnData){
@@ -644,10 +647,12 @@ function setVisibleColumnToTemplate(){
     }
 }
 function getUserTableSettings(){
-    if(getGlobalJson('currentUser').table!=undefined && getGlobalJson('currentUser').table!=null){
-        return JSON.parse(getGlobalJson('currentUser').table);
+    if(getGlobalJson('currentUser').tables!=undefined && getGlobalJson('currentUser').tables!=null){
+        return JSON.parse(getGlobalJson('currentUser').tables);
     }
-    return undefined;
+    return {rowsNumber:10,
+            tableAnimations:0,
+            tableStrip:1};
 }
 function setColumnToggleButton(){
     if($('#pageOneTable-columnFilter').length==0){

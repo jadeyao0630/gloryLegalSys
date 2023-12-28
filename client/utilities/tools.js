@@ -297,7 +297,7 @@ $.fn.extend({
     },
     setTooltips:function(){
         $(this.get(0)).on('mouseover',(e)=>{
-            console.log("show tooltip");
+            //console.log("show tooltip");
             //console.log('selectmenucreate',$(this),$(this).get(0).scrollWidth,$(this).get(0).clientWidth);
             $(this).tooltip('show',$(this).data('tooltip'));
           });

@@ -1335,7 +1335,7 @@ $('.chart-btn').on('click',function(e){
             {data:chartData2,caption:'在执项目涉及金额',type:"bar2d"},{data:chartData1,caption:'在执项目数量比例',type:"pie3d"},
         ])
         //setChartPage({data:chartData1,caption:'在执项目数量比例',type:"pie3d"},{data:chartData2,caption:'在执项目涉及金额',type:"bar2d"});
-    }else if($(this).text()=="一千万以上"){
+    }else if($(this).text()=="重大案件"){
         
         $('#chart_sum_p').children().hide();
         
@@ -1364,10 +1364,10 @@ $('.chart-btn').on('click',function(e){
             chartData2.push({'label':key,'value':value, })
         });
         setChartsPage([
-            {data:chartData2,caption:'一千万以上案件项目涉及金额',type:"bar2d"},{data:chartData1,caption:'一千万以上案件项目数量比例',type:"pie3d"}
+            {data:chartData2,caption:'重大案件项目涉及金额',type:"bar2d"},{data:chartData1,caption:'重大案件项目数量比例',type:"pie3d"}
         ])
         //setChartPage({data:chartData1,caption:'一千万以上案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'一千万以上案件项目涉及金额',type:"bar2d"});
-    }else if($(this).text()=="重大群诉"){
+    }else if($(this).text()=="群诉案件"){
         $('#chart_sum_p').children().hide();
         $('#chart_sum_all').show();
         var data1={};
@@ -1394,8 +1394,39 @@ $('.chart-btn').on('click',function(e){
             chartData2.push({'label':key,'value':value, })
         });
         setChartsPage([
-            {data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"},
-            {data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},
+            {data:chartData2,caption:'群诉案件项目涉及金额',type:"bar2d"},
+            {data:chartData1,caption:'群诉案件项目数量比例',type:"pie3d"},
+        ])
+        //setChartPage({data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"});
+    }else if($(this).text()=="法务统计"){
+        $('#chart_sum_p').children().hide();
+        $('#chart_sum_all').show();
+        var data1={};
+        var data2={};
+        DataList.casesDb.forEach(item=>{
+            var match=$.grep(resourceDatas.legalAgencies,(d=>d.id==item.legalAgencies));
+            if(match.length>0){
+                var catelog=match[0].name;
+                if(!data1.hasOwnProperty(catelog)) data1[catelog]=[];
+                if(!data2.hasOwnProperty(catelog)) data2[catelog]=0.0;
+                data1[catelog].push(item);
+                data2[catelog]+=item.requestAmount;
+            }
+            //console.log('chart_sum',match.label,match)
+            //caseCause.push({})
+        });
+        
+        var chartData1=[];
+        var chartData2=[];
+        $.each(data1,(key,items)=>{
+            chartData1.push({'label':key,'value':items.length})
+        });
+        $.each(data2,(key,value)=>{
+            chartData2.push({'label':key,'value':value, })
+        });
+        setChartsPage([
+            {data:chartData2,caption:'法务案件项目涉及金额',type:"bar2d"},
+            {data:chartData1,caption:'法务案件项目数量比例',type:"pie3d"},
         ])
         //setChartPage({data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"});
     }else if($(this).text()=="全部"){
@@ -1415,6 +1446,8 @@ $('.chart-btn').on('click',function(e){
         var inExcution1={};
         var oneK={};
         var oneK1={};
+        var legalAgencies={};
+        var legalAgencies1={};
         DataList.casesDb.forEach(item=>{
             var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseLabel==3));
             if(match.length>0){
@@ -1471,6 +1504,14 @@ $('.chart-btn').on('click',function(e){
                 if(!oneK1.hasOwnProperty(catelog)) oneK1[catelog]=0.0;
                 oneK[catelog].push(item);
                 oneK1[catelog]+=item.requestAmount;
+            }
+            match=$.grep(resourceDatas.legalAgencies,(d=>d.id==item.legalAgencies));
+            if(match.length>0){
+                var catelog=match[0].name;
+                if(!legalAgencies.hasOwnProperty(catelog)) legalAgencies[catelog]=[];
+                if(!legalAgencies1.hasOwnProperty(catelog)) legalAgencies1[catelog]=0.0;
+                legalAgencies[catelog].push(item);
+                legalAgencies1[catelog]+=item.requestAmount;
             }
             //console.log('chart_sum',match.label,match)
             //caseCause.push({})
@@ -1539,16 +1580,28 @@ $('.chart-btn').on('click',function(e){
             oneK1Data2.push({'label':key,'value':value, })
         });
 
-        setChartsPage([
+        var legalAgenciesData1=[];
+        var legalAgenciesData2=[];
+        $.each(legalAgencies,(key,items)=>{
+            legalAgenciesData1.push({'label':key,'value':items.length})
+        });
+        $.each(legalAgencies1,(key,value)=>{
+            legalAgenciesData2.push({'label':key,'value':value, })
+        });
+        var chartList=[
             {data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},{data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},
             {data:chartProject1,caption:'项目涉及金额',type:"bar2d"},{data:chartProject,caption:'项目案件数量比例',type:"pie3d"},
             {data:caseTypeData2,caption:'诉讼类型涉及金额',type:"column2d"},{data:caseTypeData1,caption:'诉讼类型数量比例',type:"pie3d"},
             {data:inProgressData2,caption:'在审项目涉及金额',type:"bar2d"},{data:inProgressData1,caption:'在审项目数量比例',type:"pie3d"},
             {data:inExcutionData2,caption:'在执项目涉及金额',type:"bar2d"},{data:inExcutionData1,caption:'在执项目数量比例',type:"pie3d"},
-            {data:oneK1Data2,caption:'一千万以上案件项目涉及金额',type:"bar2d"},{data:oneK1Data1,caption:'一千万以上案件项目数量比例',type:"pie3d"},
-            {data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"},
-            {data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},
-        ])
+            {data:oneK1Data2,caption:'重大案件项目涉及金额',type:"bar2d"},{data:oneK1Data1,caption:'重大案件项目数量比例',type:"pie3d"},
+            {data:chartData2,caption:'群诉案件项目涉及金额',type:"bar2d"},{data:chartData1,caption:'群诉案件项目数量比例',type:"pie3d"},
+            
+        ]
+        if(getGlobalJson('currentUser').level>1){
+            chartList.push({data:legalAgenciesData2,caption:'法务案件项目涉及金额',type:"bar2d"},{data:legalAgenciesData1,caption:'法务案件项目数量比例',type:"pie3d"});
+        }
+        setChartsPage(chartList);
         //setChartPage({data:chartData1,caption:'重大群诉案件项目数量比例',type:"pie3d"},{data:chartData2,caption:'重大群诉案件项目涉及金额',type:"bar2d"});
     }
 })

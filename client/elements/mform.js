@@ -31,7 +31,7 @@ mform.prototype={
             _self.opt[attr] = arg[attr];
         }
         var template=_self.opt.template;
-        console.log('template',template);
+        //console.log('template',template);
         _self.instance=$('<form onsubmit="javascript:return false;"></form>');
         _self.instance.jqmData('template',template.template);
         
@@ -55,6 +55,7 @@ mform.prototype={
             //console.log('setMainForm',template);
             _self.instance.append(_self.setForm(template.template));
         }
+        _self.instance.trigger('create');
         //#region 
         function pageIsSelectmenuDialog( page ) {
             var isDialog = false,
@@ -298,10 +299,11 @@ mform.prototype={
                     item_container.css({'grid-template-columns':'auto'})
                     break;
             }
-            console.log(key,_this.opt.isAdmin,rowTemplate[key].isAdminOnly,(!_this.opt.isAdmin && rowTemplate.isAdminOnly))
+            //console.log('mform 1',key,_this.opt.isAdmin,rowTemplate[key].isAdminOnly,(!_this.opt.isAdmin && rowTemplate[key].isAdminOnly))
             if(!_this.opt.isAdmin && rowTemplate[key].isAdminOnly){
-                console.log(key,_this.opt.isAdmin,rowTemplate[key].isAdminOnly)
+                //console.log('mform 1',key,_this.opt.isAdmin,rowTemplate[key].isAdminOnly)
                 item_container.addClass('admin-ui');
+                //item_container.trigger('create')
             }   
         }
         return item_container;
@@ -486,7 +488,7 @@ mform.prototype={
         var type='text';
         if(itemTemplate['subType']) type=itemTemplate.subType;
         for(var i=0;i<2;i++){
-            console.log(placeholders[i]);
+            //console.log(placeholders[i]);
             var input=$('<input type="'+type+'" class="form-original" name="'+itemId+'_'+i+'"'+' id="'+itemId+'_'+i+'"'+
                         _this.setRequired(itemTemplate.isOptional,"此项必须填写完整")+placeholders[i]+'" value="">');
             if(itemTemplate.isDisabled){
@@ -772,7 +774,7 @@ mform.prototype={
         if(val==undefined || val == null || val=="undefined"){
             if (itemTemplate.defaultValue!=undefined) val=itemTemplate.defaultValue;
         }
-        console.log('setValues',id,val,itemTemplate);
+        //console.log('setValues',id,val,itemTemplate);
         if(itemTemplate.type.toLowerCase()=="supermulticombobox"){
             if (val==null) val="";
             element.setSuperMultiSelectValues(val,itemTemplate.data,itemTemplate.valueKey,itemTemplate.matchKey);
@@ -851,7 +853,7 @@ mform.prototype={
                 console.error("textrange 值 和 元素数量不匹配",id,val)
             }else{
                 rangeVals.forEach((v,index)=>{
-                    console.log('textrange',v,index)
+                    //console.log('textrange',v,index)
                     $(inputs[index]).val(v);
                 })
             }

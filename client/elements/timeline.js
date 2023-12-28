@@ -194,7 +194,7 @@ function drawDateText(startPos,val,ctx,color){
     if(val instanceof Date){
         //console.log('Date',val);
         var offsetX=50;
-        text=val.getFullYear()+" | "+val.getMonth()+"月"+val.getDate()+"日";
+        text=val.getFullYear()+" | "+(val.getMonth()+1)+"月"+val.getDate()+"日";
         ctx.font = 'bold 30px Arial';
         let year_size = getTextSize(val.getFullYear(),ctx); 
         ctx.textStyle = TextColor;
@@ -206,10 +206,10 @@ function drawDateText(startPos,val,ctx,color){
         ctx.fillStyle = color;
         ctx.fillText(" | ", startPos.x-offsetX-seperater_size.width, startPos.y-14);
         ctx.font = 'bold 40px Arial';
-        let date_size = getTextSize(val.getMonth()+"月"+val.getDate()+"日",ctx); 
+        let date_size = getTextSize((val.getMonth()+1)+"月"+val.getDate()+"日",ctx); 
         ctx.textStyle = TextColor;
         ctx.fillStyle = TextColor;
-        ctx.fillText(val.getMonth()+"月"+val.getDate()+"日", startPos.x-offsetX+seperater_size.width, startPos.y-10);
+        ctx.fillText((val.getMonth()+1)+"月"+val.getDate()+"日", startPos.x-offsetX+seperater_size.width, startPos.y-10);
     }else{
         ctx.font = 'bold 40px Arial';
         let text_size = getTextSize(text,ctx); 

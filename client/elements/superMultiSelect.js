@@ -218,10 +218,10 @@ $.fn.extend({
         var li=$('<li data-option-index="'+idx+'" data-icon="false" class="" role="option" aria-selected="true"></li>');
         var controlgroup=$('<div data-option-index="'+idx+'" data-role="controlgroup" class="row-controlgroup" data-type="horizontal")></div>');
         var select=$('<select class="sub-selectmenu" data-corners="false"></select>');
-        $.each(casePersonnelStatus,(index,status)=>{
-            var opt=$('<option class="sub-option" value='+index+'>'+status+'</option>');
+        $.each(resourceDatas.casePersonnelStatus_,(index,status)=>{
+            var opt=$('<option class="sub-option" value='+status.id+'>'+status.label+'</option>');
             if(data!=undefined) {
-                if(data.statusId==index) opt=$('<option class="sub-option" value='+index+' selected>'+status+'</option>');
+                if(data.statusId==status.id) opt=$('<option class="sub-option" value='+status.id+' selected>'+status.label+'</option>');
             }
             select.append(opt);
         })
@@ -304,8 +304,8 @@ $.fn.extend({
         var displayFormat=template.displayFormat;
         var controlgroup=$('<div class="ui-controlgroup ui-m-controlgroup" data-corners="false"></div>');
         var select=$('<select data-option-index="'+index+'" class="sub-selectmenu" ></select>');
-        casePersonnelStatus.forEach((s,idx)=>{
-            var opt=$('<option class="sub-option" value='+idx+(idx==0?" selected":"")+'>'+s+'</option>');
+        resourceDatas.casePersonnelStatus_.forEach((status,i)=>{
+            var opt=$('<option class="sub-option" value='+status.id+(status.id==0?" selected":"")+'>'+status.label+'</option>');
             select.append(opt);
         });
         controlgroup.append(select);
@@ -425,8 +425,9 @@ String.prototype.convertToSuperMultiSelectValue=function(refData,valueKey,matchK
 
         }
     }
+    var matched=$.grep(resourceDatas.casePersonnelStatus_,(status=>status.id==statusid));
     return {
-        status:casePersonnelStatus[statusid],
+        status:matched.length>0?matched[0].label:'无',
         statusId:statusid,
         value:value,
         valueId:valueid,
@@ -450,8 +451,10 @@ String.prototype.convertToSuperMultiInputValue=function(){
     if(numbers.length==1){
         statusid=numbers[0];
     }
+    //console.log('convertToSuperMultiInputValue',$.grep(resourceDatas.casePersonnelStatus_,(status=>status.id==statusid)));
+    var matched=$.grep(resourceDatas.casePersonnelStatus_,(status=>status.id==statusid));
     return {
-        status:casePersonnelStatus[statusid],
+        status:matched.length>0?matched[0].label:'无',
         statusId:statusid,
         value:value,
     }

@@ -118,12 +118,13 @@ logingStatus().then(function(e){
                         resourceDatas[k]=auth_levels;
                         resourceDatas[k+"_"]=d;
                     }
-                    /*
-                    else if(k=="legalAgencies"){
-                        legalAffairs=getKeyValues(d,"name")
-                        resourceDatas[k]=legalAffairs;
+                    
+                    else if(k=="casePersonnelStatus"){
+                        casePersonnelStatus=getKeyValues(d,"label")
+                        resourceDatas[k]=casePersonnelStatus;
+                        resourceDatas[k+"_"]=d;
                     }
-                    */
+                    
                     else if(k=="lawFirms"){
                         lawFirms=getKeyValues(d,"name")
                         resourceDatas[k]=lawFirms;

@@ -2,7 +2,7 @@ var isRunLocal=true;
 var IPS=['192.168.10.141','192.168.10.68','cn.luyao.site']
 var showDebug=false;
 let ip=isRunLocal?IPS[1]:IPS[0];
-let port=5556;
+let port=5555;
 var auth_code='1234';
 var adminLevel=3;
 const keyStr = 'it@glory.com'
@@ -92,10 +92,18 @@ const users={
     name:"VARCHAR(255)",//我方当事人->corporateCompanies* && corporatePartners*
     position:"INT NOT NULL DEFAULT '0'",//所属项目->projects*
     level:"INT NOT NULL DEFAULT '0'",//所属项目->projects*
+    columns:"VARCHAR(255)",//所属项目->projects*
+    tables:"VARCHAR(255)",//所属项目->projects*
     createDate:"datetime NOT NULL",//申请日期
     contact:"VARCHAR(255)",
     descriptions:"VARCHAR(255)",
-    isInactived:"VARCHAR(255)",
+    isInactived:"INT(1) default '0' NOT NULL",
+}
+const _casePersonnelStatus={
+    id:"INT NOT NULL,PRIMARY KEY",//案件标签唯一序列号
+    label:"VARCHAR(255)",//案件标签名
+    descriptions:"VARCHAR(255)",//案件标签说明
+    isInactived:"INT(1) default '0' NOT NULL",
 }
 const columns={//案件主表
     id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
@@ -218,6 +226,7 @@ const caseLabels={//案件标签
     label:"VARCHAR(255)",//案件标签名
     labelStyle:"VARCHAR(255)",//案件标CSS设置数据
     descriptions:"VARCHAR(255)",//案件标签说明
+    isInactived:"INT(1) default '0' NOT NULL",
 }
 const caseTypes={//案件类型
     id:"INT NOT NULL,PRIMARY KEY",//案件类型唯一序列号

@@ -921,5 +921,42 @@ $.fn.extend({
         $(this).setSort();
         //headResizeObserver.observe(_Header.get( 0 ));
         
+    },
+    generateDataForExport:function(isVisibleColumn){
+        //if(slected)\
+        var _this=this;
+        var template=$(this).jqmData('tableTemplate');
+        var datas=_this.jqmData('currentData');
+        var columnVisibility=_this.jqmData('columnVisibility');
+        var newDatas=[];
+        var keys=Object.keys(template);
+        //var columnName=[];
+        $.each(datas,(index,data)=>{
+            var rowData={};
+            keys.forEach(key=>{
+                if(data.hasOwnProperty(key) && (!isVisibleColumn ||(isVisibleColumn && columnVisibility[key]))){
+                    var column_label=template[key].label;
+                    var value=data[key];
+                    
+                    if(template[key].type!=undefined && template[key].type.toLowerCase()=="date"){
+                        if(value=='0000-00-00 00:00:00'){
+                            value='尚未设定';
+                        }else{
+
+                            if(template[key].dateFormat != undefined){
+                                value=formatDateTime(new Date(value),template[key].dateFormat);
+                            }else{
+                                value=new Date(value).toLocaleString();
+                            }
+                        }
+                    }
+                    rowData[column_label]=value;
+                    //if(!columnName.includes(column_label)) columnName.push(column_label);
+                }
+            })
+            if(Object.keys(rowData).length>0)
+                newDatas.push(rowData);
+        });
+        return newDatas;
     }
 });

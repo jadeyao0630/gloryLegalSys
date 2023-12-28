@@ -50,7 +50,14 @@ function exportExcel () {
     $('#export_excel_popup_form_submit').on('click',function(e){
         $(this).jqmData('form').getFormValues(function(e){
             if(e.success){
-                export2Excel(e.values.exportFileName,e.values.exportType!=0,'pageOneTable');
+                var filename=e.values.exportFileName;
+                if(filename==undefined || filename.length==0) filename='export_'+formatDateTime(new Date(),"yyyy年MM月dd日")+".xlsx";
+                var data=$('#pageOneTable').generateDataForExport()
+                console.log('exportExcel',data);
+                if(e.values.exportType!=0){//is Selected Only
+
+                }
+                export2Excel(filename,data);
             }
         });
         //
@@ -94,17 +101,14 @@ function setRowsPrePageEvent(){
         //
     })
 }
-function export2Excel(fileName,isSelectedOnly,tableId){
-
+function export2Excel(fileName,data,tag){
+    tag=tag||"国瑞法务";
     $().mloader('show',{message:"导出中..."});
     setTimeout(() => {
-        if(tableId==undefined) tableId='pageOneTable';
-        var excel = new ExcelGen({
-            "src_id": tableId,
-            "show_header": true,
-            'selectedOnly':isSelectedOnly
-        });
-        excel.generate(fileName.length>0?fileName:undefined);
+        var ws = XLSX.utils.json_to_sheet(data);
+        var wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, tag);
+        XLSX.writeFile(wb,fileName);
         $().mloader('hide');
     },200);
 }
@@ -157,17 +161,7 @@ $('body').on(preload_completed_event_name,function(){
         }
     },{distance:200});
     //$('#case_reg_but_restore').hide();
-    $('.admin-ui').hide();
-    if(getGlobalJson('currentUser').level==1){
-        FormTemplate3.template.caseInfo.data.legalAgencies.isDisabled=true;
-        FormTemplate3.template.caseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
-        progress_form_template.template.legalAgencies_p.isDisabled=true;
-        header_filter_template.template.legalAgencies_f.isDisabled=true;
-        header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
-    }else if(getGlobalJson('currentUser').level==adminLevel){
-        //$('#case_reg_but_restore').show();
-        $('.admin-ui').show();
-    }
+    
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
     setVisibleColumnToTemplate();
     var tableSettings=getUserTableSettings();
@@ -233,7 +227,20 @@ $('body').on(preload_completed_event_name,function(){
     form.trigger('create');
     $("#pageOneTable").trigger('create');
     //在过滤表格后同步表格头和身的宽度
-    
+
+    //按权限设置可查看类型和元素
+    $('.admin-ui').hide();
+    if(getGlobalJson('currentUser').level==1){
+        FormTemplate3.template.caseInfo.data.legalAgencies.isDisabled=true;
+        FormTemplate3.template.caseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
+        progress_form_template.template.legalAgencies_p.isDisabled=true;
+        header_filter_template.template.legalAgencies_f.isDisabled=true;
+        header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
+        $('.super-auth').hide();
+    }else if(getGlobalJson('currentUser').level==adminLevel){
+        //$('#case_reg_but_restore').show();
+        $('.admin-ui').show();
+    }
     
     $('.header-filter-btn:contains("复位")').setTooltips();
     $('.header-filter-btn').on('click',function(e){
@@ -359,7 +366,7 @@ $('body').on(preload_completed_event_name,function(){
                     $('#pageOneTable').updateSource(currentData);
                     tb.instance.isTargetToggle=false;
                     
-                    setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
+                    //setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
                     if(!isHeaderLocked){
                         form.slideUp();
                         $('#pageOneTable').animate({'margin-top':"0px"})
@@ -652,8 +659,9 @@ function getUserTableSettings(){
     }
     return {rowsNumber:10,
             tableAnimations:0,
-            tableStrip:1};
+            tableStrip:0};
 }
+/*
 function setColumnToggleButton(){
     if($('#pageOneTable-columnFilter').length==0){
         
@@ -772,6 +780,7 @@ function setCheckAllBox(checkboxAll,targetTable){
 
     });
 }
+*/
 function _createNewCaseForm(template, constainerId){
     
     //console.log("_createNewCaseForm template");

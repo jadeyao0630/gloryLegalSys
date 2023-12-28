@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css">
     <link rel="stylesheet" href="./css/color.css">
     <link rel="stylesheet" href="./css/all.css">
-    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/progressDiagram.css">
     <link rel="stylesheet" href="./css/superMultiSelect.css">
     <style>
         body{
@@ -52,6 +52,16 @@
             .newTableItem{
                 animation: glowing-border 2s infinite;
             }
+
+            i.ui-btn-blue  {
+  background-color: #356395; /* Set the background color for the icon */
+  border-radius: 50%; /* Set the border radius to make it round */
+  padding: 5px; /* Adjust padding as needed */
+  margin-right: 10px; /* Add spacing between the icon and text */
+  width: 1em; /* Set the width to the same value as the font size */
+  height: 1em; /* Set the height to the same value as the font size */
+  color:white;
+}
         </style>
     <script src="./js/jquery.js"></script>
     <script src="./js/jquery.mobile-1.4.5.min.js"></script>
@@ -68,27 +78,37 @@
     <script src="./utilities/resourceData.js"></script>
     <script src="./elements/superMultiSelect.js"></script>
     <script src="./elements/pagination.js"></script>
+    <script src="./elements/progressDiagram.js"></script>
+    
+    <script type="text/javascript" src="./js/xlsx.export.js"></script> 
     
 </head>
 <body>
-    <script>
-    function setFontSize(){
-        document.documentElement.style.setProperty('--mfont', 14 + "px");
-        document.documentElement.style.setProperty('--iconSize', 20 + "px");
-        document.documentElement.style.setProperty('--iconMargin', -10 + "px");
-        document.documentElement.style.setProperty('--inputHeight', 36 + "px");
-        document.documentElement.style.setProperty('--inputLineHeight', 26 + "px");
-        document.documentElement.style.setProperty('--HeaderFooterHeight', 44 + "px");
-    }
-    
-    function fnBtnClickEvent(e){
-        console.log(e);
-    }
-    </script>
-    
-    
+    <a href="#" class="ui-btn"><i class="fa fa-table ui-btn-blue" ></i> Home</a>
+    <div id="progress_diagram"></div>
 <script>
+var case_status=["立案","一审","二审",{name:"执行中",data:["强制执行", "正常执行", "无需执行","再审","监督"]},"结案",];
 
+    
+var but=new ProgressesButton({
+                steps:case_status,
+                deadSteps:["无需执行","再审","监督"],
+                showLabel:true,
+                containerId:'#progress_diagram',
+                currentPosition:3.1,
+                fontSize:15,
+                line_size:2,
+                size:35,
+                width:700,
+                hasShadow:true,
+                isViewMode:true,
+                verticalGap:5,
+                //labelPosition:"bottom",
+                showSubSteps:true,
+                showCounter:true,
+                //eventsData:,
+            });
+/*
     setFontSize();
     console.log(formatDateString('2022年04月18日'))
     $('body').on(main_load_completed_event_name,function(){
@@ -107,7 +127,7 @@
                             '</div>';
                 _firstPageTableColumns.rowButtons.data=fn_btns;
                 _firstPageTableColumns.rowButtons.width=160;
-                
+                ExportData(DataList.casesDb);
 
                 $('#test_table').pagination({
                     source:DataList.casesDb,
@@ -122,44 +142,10 @@
         }, 100);
 
     });
+    */
 </script>
-<script src="./utilities/templates.js"></script>
-<script src="./utilities/preload.js"></script>
 
 
-    <input id="filterTable-input" type="text">
-    <a href="#" id="columntToggle">test</a>
-    <div class="tableWrapper" >
-      <table id="test_table" data-role="table" class="ui-responsive table-stroke" data-input="#filterTable-input">
-      </table>
-    </div>
-    <div id="table_pagination">
 
-    </div>
-    <fieldset data-role="controlgroup" data-type="horizontal" data-mini="true">
-        <button class="fn_btn btn-icon-green" style="padding:10px;" data-icon="plus" data-iconpos="notext"></button>
-        <button class="fn_btn btn-icon-red" style="padding:10px;" data-icon="delete" data-iconpos="notext"></button>
-    </fieldset>
-    <script>
-        
-        $('.fn_btn').on('click',function(e){
-            if($(this).hasClass('ui-icon-plus')){
-                console.log('添加')
-                var data={};
-                $.each(DataList.casesDb[0],(k,v)=>{
-                    if(_firstPageTableColumns.hasOwnProperty(k))
-                        data[k]=getValueIfHaveDataRef(_firstPageTableColumns[k],v);
-                })
-                //var data=getValueIfHaveDataRef(_firstPageTableColumns[k],v)DataList.casesDb[0];
-                data.caseName="我改变了";
-                data.id=294;
-                $('#test_table').addTableItem(data);
-            }else{
-                console.log('删除')
-                $('#test_table').removeTableItem();
-            }
-        })
-        
-    </script>
 </body>
 </html>

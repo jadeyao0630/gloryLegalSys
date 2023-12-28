@@ -339,7 +339,7 @@ var _summary_template;
             data:{},
             displayFormat:'{value} ({status})'
         },
-        caseApplicant:{label:"申请人",matchKey:"id",valueKey:"name",
+        caseApplicant:{label:"最后提交人",matchKey:"id",valueKey:"name",
           data:resourceDatas['users'],matchKey:"id",valueKey:"name",
           type:"label", isFilterable:true,isHidden:true},
         caseDate:{label:"立案日期",
@@ -515,7 +515,7 @@ var _summary_template;
           accept:".docx,.doc,.xlsx,.xls,.pdf,.png,.jpg,.jpeg,.txt,.zip,.rar"
         },
         __formLabel:{
-          label:"支持扩展名：rar. zip. xlsx. docx. pdf. jpg. jpeg. png. txt… 单个文件不超过50MB",
+          label:"<span class='optionMark'>*</span> 支持扩展名：rar. zip. xlsx. docx. pdf. jpg. jpeg. png. txt… 单个文件不超过50MB",
           type:"label",
         }
       }
@@ -720,23 +720,23 @@ var _summary_template;
         tableAnimations:{
           label:"动画",
           type:"radio",
-          isOptional:false,
+          isOptional:true,
           data:['有','无']
         },
         tableStrip:{
           label:"隔行底纹",
           type:"radio",
-          isOptional:false,
+          isOptional:true,
           data:['有','无']
         },
         rowsNumber:{
           label:"每页行数",
           type:"number",
-          isOptional:false,
+          isOptional:true,
           defaultValue:$('#pageOneTable').jqmData('itemsPerPage'),
         },
         __formLabel:{
-          label:"设置每页显示的行数，设置为0则表示显示全部。",
+          label:"<i class='fa fa-comment-dots text-green' /> 设置每页显示的行数，设置为 <b>0</b> 则表示显示全部。",
           type:"label",
         },
       }
@@ -751,13 +751,6 @@ var _summary_template;
         isCollapsibleGrouping:false,
       },
       template:{
-        
-        exportType:{
-          label:"导出",
-          type:"radio",
-          isOptional:true,
-          data:['所有','选定'],
-        },
         exportFileName:{
           label:"文件名:",
           placeholder:"文件名",
@@ -765,7 +758,7 @@ var _summary_template;
           isOptional:true,
         },
         __formLabel:{
-          label:"文件名选填，默认文件名为当天日期 'export_yyyy年MM月dd日.xlsx'。",
+          label:"<span class='optionMark'>*</span> 文件名选填，默认文件名为当天日期 'export_yyyy年MM月dd日.xlsx'。",
           type:"label",
         }
       }

@@ -88,6 +88,7 @@ function setRowsPrePageEvent(){
                 $().mloader('show',{message:"请稍等..."});
                     $('#pageOneTable').hasRowAnimation(parseInt(e.values.tableAnimations)==0);
                     $('#pageOneTable').setTableStripe(parseInt(e.values.tableStrip)==0);
+                    $('#pageOneTable').setTextOverflow(parseInt(e.values.tableTextOverflow)==0);
                     console.log($('#pageOneTable').jqmData('runAnimation'));
                     setTimeout(() => {
                     
@@ -184,6 +185,7 @@ $('body').on(preload_completed_event_name,function(){
         paginationContainer:$('#pagination_container'),
         itemsPerPage:parseInt(tableSettings.rowsNumber),
         runAnimation:tableSettings.tableAnimations==0,
+        textOverflow:tableSettings.tableTextOverflow==0
         //setFixHead:true
     });
     $("#pageOneTable").setTableStripe(parseInt(tableSettings.tableStrip)==0);
@@ -658,6 +660,7 @@ function getUserTableSettings(){
         return JSON.parse(getGlobalJson('currentUser').tables);
     }
     return {rowsNumber:10,
+            textOverflow:0,
             tableAnimations:0,
             tableStrip:0};
 }

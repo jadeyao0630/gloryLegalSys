@@ -729,6 +729,12 @@ var _summary_template;
           isOptional:true,
           data:['有','无']
         },
+        tableTextOverflow:{
+          label:"自动换行",
+          type:"radio",
+          isOptional:true,
+          data:['有','无']
+        },
         rowsNumber:{
           label:"每页行数",
           type:"number",

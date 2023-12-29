@@ -164,6 +164,7 @@ $.fn.extend({
         _this.jqmData('toggleButton',undefined);
         _this.jqmData('columnVisibility',{});
         _this.jqmData('runAnimation',false);
+        _this.jqmData('textOverflow',true);
         _this.jqmData('updateTask',undefined);
         _this.jqmData('currentAnimations',[]);
         
@@ -550,6 +551,14 @@ $.fn.extend({
     },
     setTdElement:function(template,rowData,key,columnVisibility){
         var td;
+        if(template[key].type=='supermulticombobox'||template[key].type=='supermultiinput'){
+            console.log('rowData[key]',$(this).jqmData('textOverflow'),rowData[key]);
+            if(rowData[key].constructor==Array){
+                rowData[key]=rowData[key].join("<br/>");
+            }else if(rowData[key].constructor==String){
+                rowData[key]=rowData[key].replace(",","<br/>");
+            }
+        }
         if(rowData.hasOwnProperty(key)){
             td=getTdHtml(template[key],rowData[key],key);
             
@@ -561,6 +570,9 @@ $.fn.extend({
                 td.find('.reg-checkbox').jqmData('table',this);
                }
             }
+        }
+        if($(this).jqmData('textOverflow')) {
+            td.addClass('textOverflow');
         }
         if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
             if(td!=undefined) td.hide();
@@ -701,7 +713,9 @@ $.fn.extend({
                     if(row==undefined) break;
                     var tr=$('<tr data-item="'+row.id+'"></tr>');
                     keys.forEach(k=>{
-                        tr.append(_this.setTdElement(template,row,k,columnVisibility));
+                        var td=_this.setTdElement(template,row,k,columnVisibility);
+                       
+                        tr.append(td);
                     })
                     if(row.isInactived==1) tr.addClass('inactived-row');
                     //console.log("set new item",isNewItem,index,startPage,index==startPage);
@@ -958,5 +972,9 @@ $.fn.extend({
                 newDatas.push(rowData);
         });
         return newDatas;
+    },
+    setTextOverflow:function(isEnabled,fouceRefresh){
+        $(this).jqmData('textOverflow',isEnabled);
+        if(fouceRefresh) $(this).updateTable();
     }
 });

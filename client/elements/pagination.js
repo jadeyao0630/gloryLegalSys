@@ -553,10 +553,19 @@ $.fn.extend({
         var td;
         if(template[key].type=='supermulticombobox'||template[key].type=='supermultiinput'){
             console.log('rowData[key]',$(this).jqmData('textOverflow'),rowData[key]);
-            if(rowData[key].constructor==Array){
-                rowData[key]=rowData[key].join("<br/>");
-            }else if(rowData[key].constructor==String){
-                rowData[key]=rowData[key].replace(",","<br/>");
+            if($(this).jqmData('textOverflow')) {
+                if(rowData[key].constructor==Array){
+                    rowData[key]=rowData[key].join(",");
+                }else if(rowData[key].constructor==String){
+                    rowData[key]=rowData[key].replaceAll("<br/>",",");
+                }
+            }else{
+                if(rowData[key].constructor==Array){
+                    rowData[key]=rowData[key].join("<br/>");
+                }else if(rowData[key].constructor==String){
+                    rowData[key]=rowData[key].replaceAll(",","<br/>");
+                }
+                
             }
         }
         if(rowData.hasOwnProperty(key)){
@@ -573,6 +582,9 @@ $.fn.extend({
         }
         if($(this).jqmData('textOverflow')) {
             td.addClass('textOverflow');
+            td.css({
+
+            })
         }
         if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
             if(td!=undefined) td.hide();

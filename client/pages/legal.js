@@ -73,6 +73,8 @@ function setRowsPrePageEvent(){
     console.log('runAnimation',$('#pageOneTable').jqmData('runAnimation'));
     form.setValueById('tableAnimations',$('#pageOneTable').jqmData('runAnimation')?'0':'1');
     form.setValueById('tableStrip',$('#pageOneTable').hasClass('table-stripe')?'0':'1');
+    form.setValueById('tableTextOverflow',$('#pageOneTable').jqmData('textOverflow')?'1':'0');
+    console.log('tableSettings',$('#pageOneTable').jqmData('textOverflow'));
     $('#export_excel_popup_form').trigger('create');
     //console.log(JSON.stringify(data));
     $('#export_excel_popup_form_submit').jqmData('form',form);
@@ -88,7 +90,7 @@ function setRowsPrePageEvent(){
                 $().mloader('show',{message:"请稍等..."});
                     $('#pageOneTable').hasRowAnimation(parseInt(e.values.tableAnimations)==0);
                     $('#pageOneTable').setTableStripe(parseInt(e.values.tableStrip)==0);
-                    $('#pageOneTable').setTextOverflow(parseInt(e.values.tableTextOverflow)==0);
+                    $('#pageOneTable').setTextOverflow(parseInt(e.values.tableTextOverflow)==1);
                     console.log($('#pageOneTable').jqmData('runAnimation'));
                     setTimeout(() => {
                     
@@ -185,7 +187,7 @@ $('body').on(preload_completed_event_name,function(){
         paginationContainer:$('#pagination_container'),
         itemsPerPage:parseInt(tableSettings.rowsNumber),
         runAnimation:tableSettings.tableAnimations==0,
-        textOverflow:tableSettings.tableTextOverflow==0
+        textOverflow:tableSettings.tableTextOverflow==1
         //setFixHead:true
     });
     $("#pageOneTable").setTableStripe(parseInt(tableSettings.tableStrip)==0);

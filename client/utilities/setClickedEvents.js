@@ -1806,8 +1806,8 @@ function setChartPage(data1,data2){
                     "captionFontColor": "#333",
                     "subcaptionFontSize": "18",  
                     "formatNumberScale": "1",
-                    "numberScaleUnit": "万,亿",  // Setting the scale units in Chinese
-                    "numberScaleValue": "1,10000",  // Setting the scale values
+                    "numberScaleUnit": "万,亿,兆",  // Setting the scale units in Chinese
+                    "numberScaleValue": "1,10000,100000000",  // Setting the scale values
                     "palettecolors": "#5d62b5,#29c3be,#f2726f,#0075c2,#1aaf5d,#f2c500,#f45b00,#8e0000",
                     "plotBorderAlpha": "0", // Setting the plotBorderAlpha to 0 to remove the column borders
                     "usePlotGradientColor": "0",

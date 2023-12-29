@@ -381,6 +381,9 @@ ui-collapsible.collapsible-listview .ui-btn{
     max-width: 160px;
     min-width: 25px;
     border-right: 1px solid rgba(0,0,0,.05);
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
 
 }
 #pageOneTable thead tr th{

@@ -53,9 +53,9 @@ function getValueIfHaveDataRef(template,data){
         var refData=template.data;
         //console.log('hasOwnProperty data',refData);
         if(template.type=='supermulticombobox'){
-            return getSuperMultValue(template,data,false).join("<br/>");
+            return getSuperMultValue(template,data,false)//.join("<br/>");
         }else if(template.type=='supermultiinput'){
-            return getSuperMultValue(template,data,true).join("<br/>");
+            return getSuperMultValue(template,data,true)//.join("<br/>");
         
         }else if(template.type=='progresses'){
             var val=data;

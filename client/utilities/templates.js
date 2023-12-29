@@ -295,7 +295,7 @@ var _summary_template;
         requestAmount:{
             label:"本诉金额(万)",
             type:"label", isFilterable:true,
-            displayFormat:'{}万',
+            displayFormat:'{}',
             sortable:{
               type:'number',
               isASC:true,
@@ -305,7 +305,7 @@ var _summary_template;
         penalty:{
           label:"判决金额(万)",
           type:"label", isFilterable:true,
-          displayFormat:'{}万',
+          displayFormat:'{}',
           sortable:{
             type:'number',
             isASC:true,

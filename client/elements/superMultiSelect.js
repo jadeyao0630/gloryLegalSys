@@ -312,8 +312,9 @@ $.fn.extend({
         select.trigger('create').selectmenu().selectmenu('refresh');
 
         var val=groupName+index;
+
         if(valueFormat!=undefined) {
-            val=valueFormat.replace('{key}',groupName).replace('{id}',index);
+            val=valueFormat.replace('{key}',groupName).replace('{id}',item.id);
         }
         var text=item;
         if(template.optionFormat!=undefined) {

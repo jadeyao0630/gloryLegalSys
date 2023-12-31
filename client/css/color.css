@@ -10,6 +10,9 @@
 .btn-icon-wendyblue:after{
     background-color: #356395;
 }
+.text-black{
+    color: #333;
+}
 .text-green{
     color: green;
 }

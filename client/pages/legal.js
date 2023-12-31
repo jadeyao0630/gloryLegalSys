@@ -46,7 +46,7 @@ function exportExcel () {
     $('#export_excel_popup').popup().popup('open');
     //export2Excel('pageOneTable',);
     
-    $('#export_excel_popup_form_submit').off('click','**');
+    $('#export_excel_popup_form_submit').off();
     $('#export_excel_popup_form_submit').on('click',function(e){
         $(this).jqmData('form').getFormValues(function(e){
             if(e.success){
@@ -58,6 +58,7 @@ function exportExcel () {
 
                 }
                 export2Excel(filename,data);
+                $('#export_excel_popup').popup('close');
             }
         });
         //
@@ -81,7 +82,7 @@ function setRowsPrePageEvent(){
     $('#export_excel_popup').trigger('create');
     $('#export_excel_popup').popup().popup('open');
     //export2Excel('pageOneTable',);
-    $('#export_excel_popup_form_submit').off('click','**');
+    $('#export_excel_popup_form_submit').off();
     $('#export_excel_popup_form_submit').on('click',function(e){
         $(this).jqmData('form').getFormValues(function(e){
             if(e.success){
@@ -133,6 +134,9 @@ $('body').on(main_load_completed_event_name,function(){
             $().mloader("hide");
             $('#mainFooter').show();
         }
+        $.each($('.tooltip-btn'),(index,btn)=>{
+            $(btn).setTooltips();
+        });
     }, 100);
 });
 $('body').on(preload_completed_event_name,function(){
@@ -150,6 +154,7 @@ $('body').on(preload_completed_event_name,function(){
                 $('.header-btn-search').text('收起');
                 //form.animate({'height':"200px"});
                 $('#pageOneTable').animate({'margin-top':145+slidedownOffset+"px"})
+                $('#table-fixed-column').animate({'top':83+145+slidedownOffset+"px"})
             }
         }else{
             //$('#header-filter-container').empty();
@@ -157,6 +162,7 @@ $('body').on(preload_completed_event_name,function(){
                 form.slideUp();
                 $('.header-btn-search').text('更多');
                 $('#pageOneTable').animate({'margin-top':"0px"})
+                $('#table-fixed-column').animate({'top':83+"px"})
                 isHeaderLocked=false;
                 $('.header-filter-btn.ui-icon-lock.btn-icon-green').removeClass('btn-icon-green');
                 
@@ -394,9 +400,9 @@ $('body').on(preload_completed_event_name,function(){
     });
     
 })
-$.each($('.tooltip-btn'),(index,btn)=>{
-    $(btn).setTooltips();
-});
+$('#main-body').on('scroll',function(e){
+    $("#pageOneTable").jqmData('fixedHead').css({'left':$("#main-body").scrollLeft()*-1})
+})
 $('body').on('userDataChanged',function(e){
     console.log('userDataChanged b',getGlobalJson("currentUser"),e);
     setGlobalJson("currentUser",updateOriginalData(getGlobalJson("currentUser"),e.value,'id'));
@@ -557,6 +563,36 @@ $(window).resize(function(e){
     //resizeTables();
     //resizeColumnFilter();
 });
+
+$('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
+    //console.log('expand');
+    //console.log(getLegalAngenciesSum());
+
+    $('#legalAgenciesSum-list').empty();
+    if(getGlobalJson('currentUser').level>=supervisorLevel){
+        $.each(getLegalAngenciesSum(),(name,data)=>{
+            var divider=$('<li data-role="list-divider">'+name+'<span class="ui-li-count">'+data.number.length+'</span></li>');
+            $('#legalAgenciesSum-list').append(divider);
+            var li=$('<li></li>');
+            var btn=$('<a href="#"></a>');
+            var p=$('<p>'+data.amount.formatMoney(0, "￥")+'万</p>');
+            var title=$('<h2>涉及金额</h2>');
+            $(li).append(btn);
+            $(btn).prepend(title);
+            $(btn).append(p);
+            $('#legalAgenciesSum-list').append(li);
+            $(btn).jqmData('index',data.number)
+            btn.on('click',function(e){
+                console.log($(this).jqmData('index'));
+            })
+        })
+        $('#legalAgenciesSum-list').listview( "refresh" );
+        $('#legalAgenciesSum').trigger('create');
+    }
+    
+    
+    //$('#legalAgenciesSum-list') 
+} );
 $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
     $('#pageOneTable').filterable({
         filter: function( event, ui ) {
@@ -665,6 +701,27 @@ function getUserTableSettings(){
             textOverflow:0,
             tableAnimations:0,
             tableStrip:0};
+}
+function getLegalAngenciesSum(){
+    //var legalAgencies={};
+    //var legalAgencies1={};
+    var summary={};
+    DataList.casesDb.forEach(item=>{
+        var match=$.grep(resourceDatas.legalAgencies,(d=>d.id==item.legalAgencies));
+        if(match.length>0){
+            var catelog=match[0].name;
+            //if(!legalAgencies.hasOwnProperty(catelog)) legalAgencies[catelog]=[];
+            //if(!legalAgencies1.hasOwnProperty(catelog)) legalAgencies1[catelog]=0.0;
+            if(!summary.hasOwnProperty(catelog)) summary[catelog]={};
+            if(!summary[catelog].hasOwnProperty('number')) summary[catelog]['number']=[];
+            if(!summary[catelog].hasOwnProperty('amount')) summary[catelog]['amount']=0.0;
+            //legalAgencies[catelog].push(item);
+            //legalAgencies1[catelog]+=item.requestAmount;
+            summary[catelog]['number'].push(item);
+            summary[catelog]['amount']+=item.requestAmount;
+        }
+    });
+    return summary;
 }
 /*
 function setColumnToggleButton(){

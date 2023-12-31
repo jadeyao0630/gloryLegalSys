@@ -225,7 +225,7 @@ $.fn.extend({
             }
             select.append(opt);
         })
-        var input=$('<input type="text" data-wrapper-class="controlgroup-textinput ui-btn">')
+        var input=$('<input type="text" data-wrapper-class="controlgroup-textinput ui-btn white-background" >')
         if(data!=undefined) {
             input.val(data.value);
         }

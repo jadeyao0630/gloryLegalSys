@@ -227,17 +227,25 @@ var _summary_template;
       _firstPageTableColumns={
         checkallbox:{
             width:25,
-            type:"checkbox"
+            type:"checkbox",
+            isFixed:true,
         },
         id:{
         label: "序号",
         width:50,
         type:"label",
+        isFixed:true,
         sortable:{
           type:'number',
           isASC:false,
           id:'id',
         }
+        },
+        caseNo:{
+            label:"案件编号",
+            type:"label",
+            defaultValue:'尚未设定',
+            isFixed:true,
         },
         caseLabel:{
           label:"标签",
@@ -247,11 +255,6 @@ var _summary_template;
             backgroundData:resourceDatas.caseLabelsColors,
             //style:{'font-weight':'700','font-size':'18px'},
             isFilterable:true,
-        },
-        caseNo:{
-            label:"案件编号",
-            type:"label",
-            defaultValue:'尚未设定'
         },
         caseName:{label:"案件名称",
           type:"label", isFilterable:true,isHidden:true,
@@ -353,7 +356,8 @@ var _summary_template;
         rowButtons:{
           width:150,
             label:"操作",
-            type:"buttons"
+            type:"buttons",
+            isFixed:true,
         }
     }
     

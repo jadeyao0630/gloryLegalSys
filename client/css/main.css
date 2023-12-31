@@ -396,6 +396,25 @@ ui-collapsible.collapsible-listview .ui-btn{
     min-width: 25px;
  
 }
+#table-fixed-column{
+    position: fixed;
+    z-index:1100;
+    background-color: #f2f2f2;
+    top:83px;
+}
+#table-fixed-column th{
+    position: absolute;
+    background: white;
+    color:#333;
+    border-right:1px solid rgba(0,0,0,.05);
+}
+#table-fixed-column td{
+    position: absolute;
+    background: #f2f2f2;
+    color:#333;
+    border-right:1px solid rgba(0,0,0,.05);
+    border-bottom:1px solid rgba(0,0,0,.05);
+}
 #pageOneTable-fixed{
     margin: 0px 0px;
     color:#333;
@@ -495,9 +514,6 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 .table-column-toggle:hover{
     cursor: pointer;
-    color:aqua;
-    font-size: 12px;
-    padding:0px 4px;
 }
 .table-smallFont label.ui-checkbox-off::after{
     width:12px;
@@ -599,3 +615,41 @@ ui-collapsible.collapsible-listview .ui-btn{
     color:white;
     background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2023 Fonticons, Inc. --><path d="M304 240V16.6c0-9 7-16.6 16-16.6C443.7 0 544 100.3 544 224c0 9-7.6 16-16.6 16H304zM32 272C32 150.7 122.1 50.3 239 34.3c9.2-1.3 17 6.1 17 15.4V288L412.5 444.5c6.7 6.7 6.2 17.7-1.5 23.1C371.8 495.6 323.8 512 272 512C139.5 512 32 404.6 32 272zm526.4 16c9.3 0 16.6 7.8 15.4 17c-7.7 55.9-34.6 105.6-73.9 142.3c-6 5.6-15.4 5.2-21.2-.7L320 288H558.4z" fill="%23ffffff"/></svg>');
   }
+  #nav-panel .ui-panel-inner{
+    padding:0;
+  }
+  #menuBtn:focus {
+    box-shadow: none; /* Disable the box shadow on active state */
+    border-color: transparent; /* Set the border color to transparent on active state */
+  }
+  #menuBtn:hover {
+    color:#1362B7;
+  }
+  .menuBtn:hover {
+    color:#1362B7;
+  }
+  .collapsible-head{
+  }
+  #menu-list .ui-btn.ui-btn-a:focus {
+    box-shadow: none;
+  }
+  #menu-list .ui-btn:focus {
+
+    box-shadow: none;
+  }
+  .ui-collapsible:not(.ui-collapsible-collapsed) .ui-btn.ui-btn-a{
+
+    border-bottom: 2px solid orangered;
+  }
+  .ui-controlgroup-controls .controlgroup-textinput.ui-btn{
+    background-color: white;
+  }
+  .menu_but{
+    background-color: white;
+}
+.listview-item-active {
+    background-color:       #1362B7 !important;
+    border-color:           #1362B7 !important;
+    color:                  #fff !important;
+    text-shadow: 0 0 #1362B7 !important;
+}

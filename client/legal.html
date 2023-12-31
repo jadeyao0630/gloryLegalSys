@@ -47,12 +47,12 @@
 </head>
 <body>
     <!-- 主页面 -->
-    <div data-role="page" id="main" style="overflow: hidden;">
+    <div data-role="page" id="main" style="overflow-y: hidden;overflow-x: auto;">
 		<span class="ui-tooltip"></span>
         <div data-role="header" id="main-header" data-position="fixed" data-tap-toggle="false">
 
 				
-
+			<a href="#nav-panel" class="ui-btn tooltip-btn" data-tooltip="更多菜单选项" id="menuBtn" style="margin-top:10px;margin-left:-10px;background: none;border:none;font-size: 20px;"><i class="fa fa-bars text-black menuBtn" ></i></a>
             <h1 style="font-size: 30px;margin-top:-15px;"><img src="./images/logo.png"  width="40px" height="40px" style="margin:10px 20px -10px 0;"></img>国瑞法务管理系统</h1>
             <div data-role="controlgroup" data-type="horizontal" class="ui-btn-right" style="margin-right:10px;margin-top:20px;">
 				<button class="header-btn-search tooltip-btn" data-tooltip="查看更多过滤选项">更多</button>
@@ -74,9 +74,9 @@
             
             
         </div>
-        <div id="main-body" class="ui-body-d ui-content">
+        <div id="main-body" class="ui-body-d ui-content" style="overflow-y: hidden;overflow-x: auto;">
             <table id="pageOneTable" data-role="table" class="ui-responsive table-stroke" data-input="#header-search-input"></table>
-            
+            <table id="table-fixed-column" data-role="table" class="ui-responsive table-stroke"></table>
             <div id="header-filter-container" class="header-filter-container">
                 <table id="pageOneTable-fixed" data-role="table" class="ui-responsive table-stroke"></table>
             </div>
@@ -106,6 +106,22 @@
 					<div class="ui-block-b"><a href="#" id="export_excel_popup_form_submit" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green">提交</a></div>
 				</fieldset>
 			</div>
+			<div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="nav-panel">
+				<div id="menu-list" data-role="collapsibleset" data-theme="a" data-content-theme="a" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-corners="false" style="margin:150px 0px;">
+					<div data-role="collapsible" data-collapsed="false" >
+						<h3 class="collapsible-head">分析和导出</h3>
+						<ul data-role="listview">
+							<li><a href="#chart_sum_page" id="chart_sum" style="background-color: white;" rel="external" class="ui-btn case_reg_but tooltip-btn ui-icon-gear btn-icon-green ui-btn-icon-right menu_but chart-pie" data-tooltip="分析案件">分析</a></li>
+							<li><a href="#" rel="external" style="background-color: white;" class="ui-btn tooltip-btn ui-icon-gear btn-icon-blue ui-btn-icon-right menu_but file-export" onclick="exportExcel()" data-tooltip="导出当前表格成EXCEL">导出成EXCEL</a></li>
+						</ul>
+					</div>
+					<div id="legalAgenciesSum" data-role="collapsible" >
+						<h3 class="collapsible-head">法务信息</h3>
+						<ul id="legalAgenciesSum-list" data-role="listview" data-inset="true">
+						</ul>
+					</div>
+				</div>
+			</div><!-- /panel -->
     </div>
     <!-- /主页面 -->
     <!-- 案件页面 -->
@@ -258,7 +274,7 @@
 			<div data-role="popup" id="chartCatelog" data-theme="a">
 					<ul data-role="listview" data-inset="true" style="min-width:210px;">
 						<li data-role="list-divider" style="border-bottom: 2px solid orangered;">选择查看类型</li>
-						<li><a href="#" class="chart-btn" data-rel="back">纠纷</a></li>
+						<li><a href="#" class="chart-btn listview-item-active" data-rel="back">纠纷</a></li>
 						<li><a href="#" class="chart-btn" data-rel="back">诉讼类型</a></li>
 						<li><a href="#" class="chart-btn" data-rel="back">项目</a></li>
 						<li><a href="#" class="chart-btn" data-rel="back">在审项目</a></li>

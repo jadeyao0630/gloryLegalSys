@@ -165,6 +165,7 @@ $.fn.extend({
         _this.jqmData('columnVisibility',{});
         _this.jqmData('runAnimation',false);
         _this.jqmData('textOverflow',true);
+        _this.jqmData('enableFixedColumn',true);
         _this.jqmData('updateTask',undefined);
         _this.jqmData('currentAnimations',[]);
         
@@ -586,9 +587,13 @@ $.fn.extend({
 
             })
         }
-        if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
+        if(template[key].isFixed){ 
+            td.addClass('fixedColumn');
+        }
+        if(!columnVisibility[key]){
             if(td!=undefined) td.hide();
         }
+        td.setTooltip();
         return td;
     },
     setRowsPrePage:function(num){
@@ -719,6 +724,7 @@ $.fn.extend({
             var newItem;
             var tds;
             var columnVisibility=_this.jqmData('columnVisibility');
+            console.log('columnVisibility',columnVisibility);
             for(var index = startPage; index < endPage; index++){
                 //$.each(data,(key,value)=>{
                     var row=_this.jqmData('currentData')[index];
@@ -742,12 +748,12 @@ $.fn.extend({
                     }
                     tbody.append(tr);
                     tbody.trigger('create');
-                    if(_this.jqmData('runAnimation') && index<15*(_this.jqmData('currentPage')+1)){
+                    if(_this.jqmData('runAnimation') && index<15+(_this.jqmData('currentPage')*_this.jqmData('itemsPerPage'))){
 
-                        $(_this).itemRowAnimation($(tr),'slidein',100,function(e){
+                        $(_this).itemRowAnimation($(tr),'slidein',50,function(e){
                             
                         });
-                        await sleep(50);
+                        await sleep();
                     }
                     //console.log(itemsPerPage,index);
                     
@@ -867,7 +873,7 @@ $.fn.extend({
             if($(_this).jqmData('fixedHead')!=undefined)$(_this).jqmData('fixedHead').find('th[name="'+$(checkbox).prop('name')+'"]').show(duration);
             $(_this).find('td[name="'+$(checkbox).prop('name')+'"]').show(duration);
         }
-        console.log(_this.jqmData('columnVisibility'));
+        console.log('columnVisibility',_this.jqmData('columnVisibility'));
         //setFontSize();
         //restart(1);
     },
@@ -904,9 +910,12 @@ $.fn.extend({
         var _this=this;
         const resizeObserver = new ResizeObserver(entries => {
             for (let entry of entries) {
-                var clone=$(entry.target).jqmData('clone');
-                $(clone).css('width',$(entry.target).width());
-                $(clone).css('min-width',$(entry.target).width());
+                var clones=$(entry.target).jqmData('clone');
+                clones.forEach(clone=>{
+
+                    $(clone).css('width',$(entry.target).width());
+                    $(clone).css('min-width',$(entry.target).width());
+                })
             }
         });
         //console.log('thead',table.find('thead'));
@@ -927,7 +936,7 @@ $.fn.extend({
         }
         var _ths=_table_fixed.find('thead').find('th');
         $.each( $(this).find('thead').find('th'),(index,th)=>{
-            $(th).jqmData('clone',_ths[index]);
+            $(th).jqmData('clone',[_ths[index]]);
             if(index==_ths.length-1) {
                 var columnToggler=$('<i class="fa fa-gear" data-tooltip="筛选列"></i>');
                 $(_ths[index]).empty();
@@ -944,6 +953,7 @@ $.fn.extend({
         });
         $(this).jqmData('fixedHead',_table_fixed);
         
+        $(this).setCheckboxes();
         $(this).setSort();
         //headResizeObserver.observe(_Header.get( 0 ));
         

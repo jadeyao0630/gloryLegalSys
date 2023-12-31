@@ -1122,6 +1122,8 @@ $('.case_reg_but').on('click',async function(e){
     }else if(this.id=="chart_sum"){
         $('#chart_sum_p').children().hide();
         $('#chart_sum_all').show();
+        $('.chart-btn').removeClass('listview-item-active');
+        $($('.chart-btn')[0]).addClass('listview-item-active');
         var caseCause={};
         var caseCause1={};
         var project={};
@@ -1147,6 +1149,7 @@ $('.case_reg_but').on('click',async function(e){
             //caseCause.push({})
         });
         console.log('chart_sum',caseCause1);
+
         var chartCaseCause=[];
         var chartCaseCause1=[];
         $.each(caseCause,(key,items)=>{
@@ -1177,6 +1180,8 @@ $('#export_chart').on('click',function(e){
 
 $('.chart-btn').on('click',function(e){
     console.log('chart-btn');
+    $('.chart-btn').removeClass('listview-item-active');
+    $(this).addClass('listview-item-active');
     if($(this).text()=="纠纷"){
         $('#chart_sum_p').children().hide();
         $('#chart_sum_all').show();
@@ -1598,7 +1603,7 @@ $('.chart-btn').on('click',function(e){
             {data:chartData2,caption:'群诉案件项目涉及金额',type:"bar2d"},{data:chartData1,caption:'群诉案件项目数量比例',type:"pie3d"},
             
         ]
-        if(getGlobalJson('currentUser').level>1){
+        if(getGlobalJson('currentUser').level>=supervisorLevel){
             chartList.push({data:legalAgenciesData2,caption:'法务案件项目涉及金额',type:"bar2d"},{data:legalAgenciesData1,caption:'法务案件项目数量比例',type:"pie3d"});
         }
         setChartsPage(chartList);

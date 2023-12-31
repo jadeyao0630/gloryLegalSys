@@ -41,9 +41,13 @@ content: "\00a0"; /* Unicode character for non-breaking space */
     padding-top:.22em;
     padding-bottom:.22em;
     padding-left:0px;
+    background-color: white;;
 }
 .controlgroup-textinput.ui-btn{
     padding:0px;
+}
+.white-background{
+    background-color: white;
 }
 .row-controlgroup{
     

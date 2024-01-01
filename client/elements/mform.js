@@ -632,8 +632,9 @@ mform.prototype={
         var subContainer=$('<div class="form-original" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;"></div>');
         subContainer.append(selectItem);
         
+        console.log('generateComboBoxItem',itemId,itemTemplate,itemTemplate.isDisabled);
         if(itemTemplate.isDisabled){
-            selectItem.attr("disabled",true);
+            selectItem.prop("disabled",true);
         }
         $(selectItem).on('change',function(){
             console.log('change',$(this).find('option.emptyOption'));
@@ -641,6 +642,8 @@ mform.prototype={
                 $($.grep($(this).find('option'),option=>$(option).text()==="无")).prop('selected',false);;
             }
         });
+        selectItem.trigger('create');
+        subContainer.trigger('create');
         return subContainer;
         function setOptionItem(index,data,itemTemplate,key){
             key=key||'';

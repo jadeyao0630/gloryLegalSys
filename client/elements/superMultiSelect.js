@@ -238,6 +238,8 @@ $.fn.extend({
         controlgroup.append(input);
         controlgroup.append(button);
         li.append(controlgroup);
+        input.trigger('create');
+        controlgroup.trigger('create')
         select.on('change',function () {
             $(_this).setSuperLabel(format);
         });
@@ -342,6 +344,8 @@ $.fn.extend({
         select.on('change',function () {
             $("#"+id).setSuperLabel(displayFormat,true);
         });
+        checkbox.checkboxradio().checkboxradio( "refresh" );;
+        controlgroup.trigger('create');
         return controlgroup;
     },
     setSuperMultiSelectValues:function(values,refData,valueKey,matchKey){

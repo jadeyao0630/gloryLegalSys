@@ -44,6 +44,7 @@
 	<script type="text/javascript" src="./elements/pagination.js"></script>
     <script type="text/javascript" src="./js/xlsx.export.js"></script> 
 	<script type="text/javascript" src="./elements/toggleButton.js"></script>
+	<script type="text/javascript" src="./elements/progressChartMain.js"></script>
 </head>
 <body>
     <!-- 主页面 -->
@@ -154,9 +155,8 @@
 	
 			</ul>
 		</div><!-- /panel -->
-		<div class="ui-body-d ui-content" style="display: grid;grid-template-columns: auto 1fr;column-gap: 30px; vertical-align: middle;">
+		<div class="ui-body-d ui-content" style="min-height:500px;height:100%">
 			
-			<div id="progress_details" style="width: 350px;"></div>
 			<div id="progress_diagram" style="display: inline;text-align: center; position: relative;margin-left: 10px;"></div>
 			
 		</div>
@@ -174,6 +174,17 @@
 				</ul>
 			</ul>
 		</div><!-- /collapsible -->
+		<div data-role="popup" id="progress_point_popupMenu" data-theme="a" style="min-width:240px;">
+			
+				<ul data-role="listview">
+					<li data-role="list-divider" id="progress_popupMenu_title" style="border-bottom: 2px solid orangered;">请选择操作</li>
+					<li><a href="#" id="progress_point_viewer_btn"><i class="fa fa-eye text-green" style="margin-right:10px;"></i>查看</a></li>
+					<div id="progress_point_popupMenu_add" data-role="collapsible" data-theme="a" data-content-theme="a" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" style="margin:0;border-radius:0;">
+						<h4><i class="fa fa-thumbtack text-blue" style="margin-right:10px;"></i>添加节点</h4>
+						<ul id="progress_point_popupMenu_add_list" data-role="listview" data-inset="false"></ul>
+					</div>
+				</ul>
+		</div><!-- /collapsible -->
 		<div data-role="popup" id="progress_popup_add" data-theme="a" style="z-index: 1100;padding: 20px;">
 			<h3 id="progress_popup_add_title">test</h3>
 			<form id="progress_popup_add_form"></form>
@@ -182,7 +193,14 @@
 				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green progress_popup_add_form_submit">提交</a></div>
 			</fieldset>
 		</div>
-		
+		<div data-role="popup" id="progress_point_add" data-theme="a" style="z-index: 1100;padding: 20px;">
+			<h3 id="progress_point_add_title">test</h3>
+			<form id="progress_point_add_form"></form>
+			<fieldset class="ui-grid-a">
+				<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a></div>
+				
+			</fieldset>
+		</div>
 	</div>
     <div data-role="page" id="timeline">
 		
@@ -215,6 +233,39 @@
 			
 	</div>
     <!-- /案件进度页面 -->
+    <div data-role="page" id="progress_point_info" >
+		<div data-role="header" data-position="fixed" data-tap-toggle="false">
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a>
+			<h1 id="progress_point_info_title">My App</h1>
+			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green">保存</button>
+			
+		</div><!-- /header -->
+		<div class="ui-body-d ui-content">
+			<form role="main" data-ajax="false" id="progress_point_info_form">
+
+			</form>
+		</div>
+		<div data-role="popup" id="progress_point_popupMenu_" data-theme="a" style="z-index: 1001;">
+			<ul data-role="listview" data-inset="false" style="min-width:210px;">
+				<li data-role="list-divider" id="progress_popupMenu_title" style="border-bottom: 2px solid orangered;">添加</li>
+				<li><a href="#"><i class="fa fa-thumbtack text-blue" style="margin-right:10px;"></i>进展</a></li>
+				<li><a href="#"><i class="fa fa-check-double text-green" style="margin-right:10px;"></i>执行</a></li>
+				<li><a href="#"><i class="fa fa-sack-dollar text-red" style="margin-right:10px;"></i>财产</a></li>
+				<li><a href="#"><i class="fa fa-paperclip text-blue" style="margin-right:10px;"></i>附件</a></li>
+				<li><a href="#"><i class="fa fa-link text-green" style="margin-right:10px;"></i>关联</a></li>
+				
+			</ul>
+		</div><!-- /collapsible -->
+		<div data-role="popup" id="progress_point_popup_add" data-theme="a" style="z-index: 1100;padding: 20px;">
+			<h3 id="progress_point_popup_add_title">test</h3>
+			<form id="progress_point_popup_add_form"></form>
+			<fieldset class="ui-grid-a">
+				<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a></div>
+				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green progress_popup_add_form_submit">提交</a></div>
+			</fieldset>
+		</div>
+		
+	</div>
     <div data-role="page" id="progress_details_info" >
 		<div data-role="header" data-position="fixed" data-tap-toggle="false">
 			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
@@ -232,7 +283,6 @@
 				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green progress_popup_edit_form_submit">提交</a></div>
 			</fieldset>
 		</div>
-		
 	</div>
 	<div data-role="page" id="infoPage" >
 		<div data-role="header" data-position="fixed" data-tap-toggle="false">

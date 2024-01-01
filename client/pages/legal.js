@@ -171,7 +171,6 @@ $('body').on(preload_completed_event_name,function(){
     },{distance:200});
     //$('#case_reg_but_restore').hide();
     
-    caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
     setVisibleColumnToTemplate();
     var tableSettings=getUserTableSettings();
     console.log('tableSettings',tableSettings);
@@ -246,12 +245,14 @@ $('body').on(preload_completed_event_name,function(){
         progress_form_template.template.legalAgencies_p.isDisabled=true;
         header_filter_template.template.legalAgencies_f.isDisabled=true;
         header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
+        console.log('FormTemplate3.template.caseInfo',FormTemplate3.template.caseInfo);
         $('.super-auth').hide();
     }else if(getGlobalJson('currentUser').level==adminLevel){
         //$('#case_reg_but_restore').show();
         $('.admin-ui').show();
     }
     
+    //caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
     $('.header-filter-btn:contains("复位")').setTooltips();
     $('.header-filter-btn').on('click',function(e){
         switch($(this).text()){

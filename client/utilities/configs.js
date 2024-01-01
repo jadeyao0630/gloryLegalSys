@@ -82,6 +82,8 @@ const fileTypes={
         tooltip:'PDF文件'
     },
 }
+var progressLabels=[{id:0,name:'立案'},{id:1,name:'一审'},{id:2,name:'二审'},{id:4,name:'正常执行'},{id:3,name:'强制执行'},{id:5,name:'无需执行'},{id:6,name:'结案'},{id:7,name:'再审'},{id:8,name:'监督'}];
+
 var casePersonnelStatus=['无','原告','被告','被执行人','申请执行人','上诉人','原审被告','被上诉人'];
 var position=['无','法务人员','法务管理']
 var deads=["无需执行"]; 

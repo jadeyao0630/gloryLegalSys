@@ -131,8 +131,8 @@ mform.prototype={
                 console.log('pagecontainerbeforeshow',data.toPage,closeBtn);
                 closeBtn.removeClass('ui-icon-delete').addClass('ui-icon-check').addClass('btn-icon-green').removeClass('ui-btn-left').addClass('ui-btn-right');
                 closeBtn.on('click',function(e){
-                    e.preventDefault();
-                    history.back();
+                    //e.preventDefault();
+                    //history.back();
                 })
                 data.toPage.find('a.ui-icon-delete').on('click',function(e){
                     //console.log('pagecontainerhide',$(data.toPage).find('input[data-type="search"]').val());

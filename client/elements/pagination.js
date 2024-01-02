@@ -590,8 +590,11 @@ $.fn.extend({
         if(template[key].isFixed){ 
             td.addClass('fixedColumn');
         }
-        if(!columnVisibility[key]){
+        console.log('columnVisibility',key,columnVisibility.hasOwnProperty(key),columnVisibility[key],(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]));
+        if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
             if(td!=undefined) td.hide();
+        }else{
+            if(td!=undefined) td.show();
         }
         td.setTooltip();
         return td;

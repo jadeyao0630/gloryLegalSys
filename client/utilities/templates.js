@@ -239,7 +239,7 @@ var _summary_template;
               label:"基础信息",
               data:{
                 
-                statusId_p:{
+                typeId_p:{
                   type:"combobox",
                   label:"节点类型：",
                   isOptional:true,
@@ -248,18 +248,24 @@ var _summary_template;
                   displayFormat:'{name}'
                   //defaultValue:0.0
               },
-                FirstInstance_p:{
+                Instance_p:{
                   type:"date",
                   label:"开庭日期：",
                   isOptional:true,
                   //defaultValue:0.0
               },
-              FirstInstanceF_p:{
+              InstanceF_p:{
                 type:"date",
                 label:"判决日期：",
                 isOptional:true,
                 //defaultValue:0.0
             },
+            CaseNo_p:{
+              type:"text",
+              label:"案件编号：",
+              isOptional:true,
+              //defaultValue:0.0
+          },
                 legalInstitution_p:{
                   type:"combobox",
                   data:resourceDatas.legalInstitution_,
@@ -312,6 +318,11 @@ var _summary_template;
                   isOptional:true,
                   defaultValue:0.0
               },
+              Result_p:{
+                  type:"textarea",
+                  label:"判决结果：",
+                  isOptional:true,
+              },
               
               }
           }
@@ -332,7 +343,7 @@ var _summary_template;
             label:"基础信息",
             data:{
               
-              statusId_p:{
+              typeId_p:{
                 type:"combobox",
                 label:"节点类型：",
                 isOptional:true,
@@ -341,6 +352,13 @@ var _summary_template;
                 displayFormat:'{name}'
                 //defaultValue:0.0
             },
+            
+            CaseNo_p:{
+              type:"text",
+              label:"案件编号：",
+              isOptional:true,
+              //defaultValue:0.0
+          },
               summary_p:{
                 type:"textarea",
                 label:"备注：",

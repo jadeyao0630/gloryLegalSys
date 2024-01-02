@@ -242,6 +242,10 @@ $('body').on(preload_completed_event_name,function(){
     if(getGlobalJson('currentUser').level==1){
         FormTemplate3.template.caseInfo.data.legalAgencies.isDisabled=true;
         FormTemplate3.template.caseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
+        FormTemplate3_instance.template.baseInfo.data.legalAgencies_p.defaultValue=getGlobalJson('currentUser').id;
+        FormTemplate3_instance.template.baseInfo.data.legalAgencies_p.isDisabled=true;
+        FormTemplate3_instance.template.baseInfo.data.typeId_p.isDisabled=true;
+        FormTemplate3_execute.template.baseInfo.data.typeId_p.isDisabled=true;
         progress_form_template.template.legalAgencies_p.isDisabled=true;
         header_filter_template.template.legalAgencies_f.isDisabled=true;
         header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;

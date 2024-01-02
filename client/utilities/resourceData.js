@@ -88,6 +88,7 @@ const caseTableList={
     caseProperties:{tablename:"caseProperties",template:properties},
     caseAttachments:{tablename:"caseAttachments",template:attachments},
     caseLinked:{tablename:"caseLinked",template:_caseLinked},
+    caseProgresses:{tablename:"caseProgresses",template:caseProgresses},
 }
 const caseInfoList={
     caseStatus:{tablename:"caseStatus",template:caseStatus},

@@ -153,7 +153,7 @@ $("#progress_point_popupMenu").on( "popupafterclose", function( event, ui ) {
     $('#progress_point_popupMenu_add').collapsible( "collapse" );
 } );
 $('#progress_point_viewer_btn').on('click',function(e){
-    console.log($(this).jqmData('itemUpdates'),$(this).jqmData('point'));
+    console.log($(this).jqmData('item'),$(this).jqmData('point'));
     var data=$(this).jqmData('item');
     var index=$(this).jqmData('point');
     var update_data=$(this).jqmData('itemUpdates');
@@ -174,14 +174,14 @@ $('#progress_point_viewer_btn').on('click',function(e){
         $('#progress_point_info_form').empty();
         var progress_point_form=_createNewCaseForm(template,"progress_point_info_form");
         data.statusId=index;
-        progress_point_form.setValues(data,'_p');
+        progress_point_form.setValues(data,index==0?'':'_p');
         var updateContainer=$('.updateContainer');
         if(updateContainer.length==0) {
             updateContainer=$('<div class="updateContainer"></div>');
         }else{
             updateContainer.empty();
         }
-        var collapsible=$('<div data-role="collapsible" data-theme="b" data-content-theme="a"><h3>更新</h3><div>');
+        var collapsible=$('<div data-role="collapsible" data-theme="b" data-content-theme="a" data-collapsed="false"><h3>更新</h3><div>');
         var newUpdateBtn=$('<a href="#progress_point_popupMenu_" data-rel="popup" style="position: absolute;z-index:100;margin-top:2px;right:10px;height:14px;line-height:14px;" class="ui-btn ui-btn-a ui-mini ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus btn-icon-green">添加</a>')
         updateContainer.append(newUpdateBtn);
         var listview=$('<ul data-role="listview" id="progress_point_info_body"></ul>');
@@ -533,20 +533,27 @@ function functionBtnsEvent(but,index){
             }else{
             }
             var eventsData=matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments);
-            $('#progress_diagram').progressChart({width:screen.width-32-80,eventsData:eventsData,data:progressLabels,steps:7})
+            $('#progress_diagram').progressChart({
+                width:screen.width-32-80,
+                eventsData:eventsData,
+                data:progressLabels,
+                steps:7})
             $('#progress_diagram').on('pointClick',function(e){
                 console.log(e);
+                //当前节点id
                 $('#progress_point_viewer_btn').jqmData('point',$(e.source).jqmData('id'));
+                //获取当前节点数据
                 var updates=getProgressEvents(eventsData,$(e.source).jqmData('id'));
                 $('#progress_point_viewer_btn').jqmData('itemUpdates',updates)
                 //var title=progresses[e.Position.main] instanceof Array?progresses[e.Position.main][e.Position.sub]:progresses[e.Position.main];
                 $('#progress_point_popupMenu_add_list').empty();
+                //获取已激活的节点id
                 var ids=[];
                 $.each($('#progress_diagram').find('.actived_point'),(i,point)=>{
                     if($(point).jqmData('index')!=undefined)
                         ids.push($(point).jqmData('id'));
                 });
-                if(ids.length<e.steps){
+                if($(e.source).hasClass('last_point')&&ids.length<progressLabels.length){
                     console.log('ids',ids);
                     
                     $('#progress_point_popupMenu_add').show();
@@ -559,7 +566,8 @@ function functionBtnsEvent(but,index){
                                 li.append(a);
                                 $('#progress_point_popupMenu_add_list').append(li);
                                 a.on('click',function(ee){
-                                    $('#progress_diagram').trigger({type:'moveNext',sourceData:label,sourceIndex:e.index,eventsData:updates});
+                                    var updatesdata=getProgressEvents(eventsData,label.id);
+                                    $('#progress_diagram').trigger({type:'moveNext',sourceData:label,sourceIndex:e.index,eventsData:updatesdata});
                                     $('#progress_point_popupMenu_add').collapsible( "collapse" );
                                     //console.log($(this).jqmData('index'),$(this).jqmData('item'))
                                 });

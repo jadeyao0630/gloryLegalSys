@@ -125,6 +125,11 @@ $.fn.progressChart = function(options){
         $(_this).on('moveNext',function(e){
             var exsited=$(_this).find('.progress_point.actived_point');
             settings.distance=(settings.width-settings.size)/(exsited.length+1);
+            $.each(exsited,(index,excistedPoint)=>{
+                $(excistedPoint).animate({
+                    left:settings.distance*index,
+                },500);
+            });
             //console.log(e);
             var currentIndex=e.sourceIndex;
             var next=$(_this).find('.progress_point[data-index='+(currentIndex+1)+']');

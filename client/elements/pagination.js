@@ -590,7 +590,7 @@ $.fn.extend({
         if(template[key].isFixed){ 
             td.addClass('fixedColumn');
         }
-        console.log('columnVisibility',key,columnVisibility.hasOwnProperty(key),columnVisibility[key],(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]));
+        //console.log('columnVisibility',key,columnVisibility.hasOwnProperty(key),columnVisibility[key],(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]));
         if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
             if(td!=undefined) td.hide();
         }else{

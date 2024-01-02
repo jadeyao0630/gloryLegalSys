@@ -756,7 +756,7 @@ $.fn.extend({
                         $(_this).itemRowAnimation($(tr),'slidein',50,function(e){
                             
                         });
-                        await sleep();
+                        await sleep(10);
                     }
                     //console.log(itemsPerPage,index);
                     

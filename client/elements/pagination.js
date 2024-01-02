@@ -59,14 +59,23 @@ function getValueIfHaveDataRef(template,data){
         
         }else if(template.type=='progresses'){
             var val=data;
-            var index=formatIndex(val);
-            //console.log('val....');
-            val=template.data[index.main];
-            //console.log(columnSettings.data);
-            if(val instanceof Array){
-                val=val[index.sub];
-                //console.log(val);
+            try{
+                val=JSON.parse(val);
+                if(val.constructor!=Array) val.split(',');
+                //console.log('JSON.parse',val);
+                val=template.data[val[val.length-1]];
+            }catch(e){
+                //console.log('JSON.parse',e);
+                var index=formatIndex(val);
+                //console.log('val....');
+                val=template.data[index.main];
+                //console.log(columnSettings.data);
+                if(val instanceof Array){
+                    val=val[index.sub];
+                    //console.log(val);
+                }
             }
+            
             if(val==undefined) val='未开始流程';
             return val;
         }else{

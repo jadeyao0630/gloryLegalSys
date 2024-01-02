@@ -300,11 +300,20 @@ $('body').on(preload_completed_event_name,function(){
                                     //console.log('数子');
                                     matched=$.grep(matched,(item)=>{
                                         return $.grep($(ele).val(),(v)=>{
-                                            if(parseFloat(v)>2){
-                                                return Math.round(parseFloat(v))==Math.round(parseFloat(item[id]));
-                                            }else{
-                                                return parseFloat(v)==parseFloat(item[id]);
+                                            console.log('JSON.parse',v,item[id])
+                                            var val=item[id];
+                                            try{
+                                                val=JSON.parse(val);
+                                                if(val.constructor!=Array) val.split(',');
+                                                return Math.round(parseFloat(v))==Math.round(parseFloat(val[val.length-1]));
+                                            }catch(e){
+                                                if(parseFloat(v)>2){
+                                                    return Math.round(parseFloat(v))==Math.round(parseFloat(item[id]));
+                                                }else{
+                                                    return parseFloat(v)==parseFloat(item[id]);
+                                                }
                                             }
+                                            
                                             
                                         }).length>0;
                                     });

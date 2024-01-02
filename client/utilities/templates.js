@@ -243,24 +243,24 @@ var _summary_template;
                   type:"combobox",
                   label:"节点类型：",
                   isOptional:true,
-                  data:progressLabels,
+                  data:resourceDatas.caseStatus_,
                   valueKey:'id',
                   displayFormat:'{name}'
                   //defaultValue:0.0
               },
-                Instance_p:{
+              trialDate_p:{
                   type:"date",
                   label:"开庭日期：",
                   isOptional:true,
                   //defaultValue:0.0
               },
-              InstanceF_p:{
+              judgmentDate_p:{
                 type:"date",
                 label:"判决日期：",
                 isOptional:true,
                 //defaultValue:0.0
             },
-            CaseNo_p:{
+            caseNo_p:{
               type:"text",
               label:"案件编号：",
               isOptional:true,
@@ -318,7 +318,7 @@ var _summary_template;
                   isOptional:true,
                   defaultValue:0.0
               },
-              Result_p:{
+              judgmentSum_p:{
                   type:"textarea",
                   label:"判决结果：",
                   isOptional:true,
@@ -347,19 +347,19 @@ var _summary_template;
                 type:"combobox",
                 label:"节点类型：",
                 isOptional:true,
-                data:progressLabels,
+                data:resourceDatas.caseStatus_,
                 valueKey:'id',
                 displayFormat:'{name}'
                 //defaultValue:0.0
             },
             
-            CaseNo_p:{
+            caseNo_p:{
               type:"text",
               label:"案件编号：",
               isOptional:true,
               //defaultValue:0.0
           },
-              summary_p:{
+          judgmentSum_p:{
                 type:"textarea",
                 label:"备注：",
                 isOptional:true,
@@ -1342,7 +1342,7 @@ var _summary_template;
         caseStatus_f:{
           label:"状态:",
           //data:addEmptyValueToArray(resourceDatas.caseStatus),
-          data:formatStatus(resourceDatas.caseStatus_object),
+          data:formatStatus(resourceDatas.caseStatus_),
           type:"multicombobox", 
           isOptional:true,
         },

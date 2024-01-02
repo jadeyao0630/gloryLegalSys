@@ -85,6 +85,7 @@ logingStatus().then(function(e){
                             }
                         }))
                         resourceDatas[k+"_object"]=progresses_object;
+                        resourceDatas[k+"_"]=d;
                     }
                     else if(k=="propertyStatus"){
                         property_status=getKeyValues(d,"label")
@@ -288,7 +289,7 @@ async function logingStatus(){
             //console.log('currentUser',getGlobalJson("currentUser"));
             getCurrentUser({id:getGlobalJson("currentUser").id,pass:getGlobalJson("currentUser").pass,user:getGlobalJson("currentUser").user})
             .then((d)=>{
-                //console.log('getCurrentUser',d.data);
+                console.log('getCurrentUser',d);
                 if(d.data.length>0 && d.data[0].hasOwnProperty('isInactived') && d.data[0].isInactived==0){
                     setGlobalJson("currentUser",d.data[0]);
                     resolve({sucess:true,message:'登录信息确认成功！'});

@@ -29,6 +29,7 @@ $.fn.progressChart = function(options){
         steps:6,
         hideInactived:true,
         eventsData:[],
+        mainEventData:[],
         status:[0],
         data:[{id:0,name:'立案'},{id:1,name:'一审'},{id:2,name:'二审'},{id:4,name:'正常执行'},{id:3,name:'强制执行'},{id:5,name:'无需执行'},{id:6,name:'结案'},{id:7,name:'再审'},{id:8,name:'监督'}]
     }
@@ -55,8 +56,7 @@ $.fn.progressChart = function(options){
         }
     }
     const addPoint=function(index){
-        var exsited=$(_this).find('.progress_point.actived_point');
-        settings.distance=(settings.width-settings.size)/(exsited.length-1);
+        settings.distance=(settings.width-settings.size)/(settings.status.length);
         var point=$('<div data-index='+index+' class="progress_point" style="left:'+index*settings.distance+'px; top:'+settings.topOffset+'px;width:'+settings.size+'px;height:'+settings.size+'px;border-radius:'+settings.size/2+'px"></div>');
         var span=$('<span><span>');
         var indicator=$('<div class="progress_num_indicator" ><div>');
@@ -76,6 +76,10 @@ $.fn.progressChart = function(options){
         
         point.append(indicator);
         
+        var mainInfo=$('<div class="main-info-panel"></div>');
+        mainInfo.css({'top':(settings.size+20)+"px",width:(settings.distance-50)+"px"});
+
+        point.append(mainInfo);
         if(settings.status.hasOwnProperty(index)) {
             var id=settings.status[index];
             var matched=$.grep(settings.data,(d)=>d.id==id);
@@ -89,6 +93,13 @@ $.fn.progressChart = function(options){
             $(_this).find('.progress_path.actived_point').css({
                 width:(index)*settings.distance
             })
+            console.log('mainEventData',settings.mainEventData);
+            settings.mainEventData.forEach(element => {
+                if(element.index==id){
+                    var p=$('<p><b>'+element.title+'</b></br>'+element.date+'</br>'+element.caseNo+'</br>'+element.legalInstitution+'</br>'+element.sum+'</p>');
+                    mainInfo.append(p);
+                }
+            });
         }
         else point.addClass('deactived_point');
         if(index==settings.status.length-1){
@@ -164,6 +175,8 @@ $.fn.progressChart = function(options){
                 next.css({left:settings.distance*(currentIndex+1)})
                 next.removeClass('deactived_point').addClass('actived_point').show();
             })
+            $(_this).jqmData('status',settings.status);
+            $(_this).trigger({type:'newPointAdded',status:settings.status})
         })
     }
     init();

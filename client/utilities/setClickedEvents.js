@@ -160,6 +160,9 @@ $('#progress_point_viewer_btn').on('click',function(e){
     
     var template=FormTemplate3;
     if(index==1 || index==2) template=FormTemplate3_instance;
+    else if(index>2){
+        template=FormTemplate3_execute;
+    }
     //if(index==0){
         $().mloader("show",{message:"读取中...."});
         //_showEditForm(matchItems[0]);//naviation.js
@@ -530,7 +533,7 @@ function functionBtnsEvent(but,index){
             }else{
             }
             var eventsData=matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments);
-            $('#progress_diagram').progressChart({width:1000,eventsData:eventsData,data:progressLabels})
+            $('#progress_diagram').progressChart({width:screen.width-32-80,eventsData:eventsData,data:progressLabels,steps:7})
             $('#progress_diagram').on('pointClick',function(e){
                 console.log(e);
                 $('#progress_point_viewer_btn').jqmData('point',$(e.source).jqmData('id'));

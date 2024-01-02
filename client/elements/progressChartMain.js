@@ -29,7 +29,7 @@ $.fn.progressChart = function(options){
         steps:6,
         hideInactived:true,
         eventsData:[],
-        status:[0,1,2],
+        status:[0],
         data:[{id:0,name:'立案'},{id:1,name:'一审'},{id:2,name:'二审'},{id:4,name:'正常执行'},{id:3,name:'强制执行'},{id:5,name:'无需执行'},{id:6,name:'结案'},{id:7,name:'再审'},{id:8,name:'监督'}]
     }
     const settings = $.extend({}, defaults, options);
@@ -100,6 +100,56 @@ $.fn.progressChart = function(options){
             
         }
     }
+    const addPoint=function(index){
+        var exsited=$(_this).find('.progress_point.actived_point');
+        settings.distance=(settings.width-settings.size)/(exsited.length);
+        var point=$('<div data-index='+index+' class="progress_point" style=" top:'+settings.topOffset+'px;width:'+settings.size+'px;height:'+settings.size+'px;border-radius:'+settings.size/2+'px"></div>');
+        var span=$('<span><span>');
+        var indicator=$('<div class="progress_num_indicator" ><div>');
+        indicator.css({
+            right:-settings.size*0.4/3,
+            top:-settings.size*0.4/3,
+            width:settings.size*0.4,
+            height:settings.size*0.4,
+            "line-height":settings.size*0.4+"px",
+            "fontSize":14*0.9+'px',
+            "fontWeight":700,
+            "borderRadius":(settings.size*0.4*0.5)+"px",
+
+        });
+        
+        point.append(span);
+        
+        point.append(indicator);
+        
+        if(settings.status.hasOwnProperty(index)) {
+            var id=settings.status[index];
+            var matched=$.grep(settings.data,(d)=>d.id==index);
+            
+            var events=getProgressEvents(settings.eventsData,index);
+            indicator.text(events.length);
+            if(matched.length>0) span.text(matched[0].name);
+            point.addClass('actived_point');
+            point.jqmData('index',index)
+            point.jqmData('id',id)
+            $(_this).find('.progress_path.actived_point').css({
+                width:(index)*settings.distance
+            })
+        }
+        else point.addClass('deactived_point');
+        if(index==settings.steps-1){
+            point.addClass('last_point');
+        }
+        if(settings.hasShadow) point.addClass('progress_point_shadow');
+        point.css({
+            left:settings.distance*index,
+        });
+        if(indicator.text()=="0") indicator.hide();
+        if(settings.hideInactived && point.hasClass('deactived_point')){
+            point.hide();
+        }
+        $(_this).append(point);
+    }
     const attachEvent=function(){
         
         $('.progress_point').on('click',function(e){
@@ -118,6 +168,8 @@ $.fn.progressChart = function(options){
             */
         })
         $(_this).on('moveNext',function(e){
+            var exsited=$(_this).find('.progress_point.actived_point');
+            //settings.distance=(settings.width-settings.size)/(exsited.length);
             console.log(e);
             var currentIndex=e.sourceIndex;
             var next=$(_this).find('.progress_point[data-index='+(currentIndex+1)+']');
@@ -130,6 +182,7 @@ $.fn.progressChart = function(options){
             $(_this).find('.progress_path.actived_point').animate({
                 width:(currentIndex+1)*settings.distance
             },500,function(){
+                next.css({left:settings.distance*(currentIndex+1)})
                 next.removeClass('deactived_point').addClass('actived_point').show();
             })
         })

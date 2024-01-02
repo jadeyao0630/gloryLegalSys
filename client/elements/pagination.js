@@ -590,8 +590,10 @@ $.fn.extend({
         if(template[key].isFixed){ 
             td.addClass('fixedColumn');
         }
-        if(!columnVisibility[key]){
+        if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
             if(td!=undefined) td.hide();
+        }else{
+            if(td!=undefined) td.show();
         }
         td.setTooltip();
         return td;
@@ -753,7 +755,7 @@ $.fn.extend({
                         $(_this).itemRowAnimation($(tr),'slidein',50,function(e){
                             
                         });
-                        await sleep();
+                        await sleep(10);
                     }
                     //console.log(itemsPerPage,index);
                     

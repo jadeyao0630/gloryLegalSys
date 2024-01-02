@@ -250,7 +250,7 @@ var _summary_template;
               },
                 FirstInstance_p:{
                   type:"date",
-                  label:"立案日期：",
+                  label:"开庭日期：",
                   isOptional:true,
                   //defaultValue:0.0
               },
@@ -316,7 +316,42 @@ var _summary_template;
               }
           }
       }
-  }
+  },
+  FormTemplate3_execute={
+    settings:{
+        templateColumn:"33.3% 33.3% 33.3%",
+        hasLabel:true,
+        hasPlaceHolder:true,
+        labelPosition:"left",
+        width:"100%",
+        textareaHeight:50,
+        isCollapsibleGrouping:true
+    },
+    template:{
+        baseInfo:{
+            label:"基础信息",
+            data:{
+              
+              statusId_p:{
+                type:"combobox",
+                label:"节点类型：",
+                isOptional:true,
+                data:progressLabels,
+                valueKey:'id',
+                displayFormat:'{name}'
+                //defaultValue:0.0
+            },
+              summary_p:{
+                type:"textarea",
+                label:"备注：",
+                isOptional:true,
+                //defaultValue:0.0
+            },
+            
+            }
+        }
+    }
+}
       _firstPageTableColumns={
         checkallbox:{
             width:25,
@@ -447,7 +482,6 @@ var _summary_template;
             id:'caseDate',
           }},
         rowButtons:{
-          width:150,
             label:"操作",
             type:"buttons",
             isFixed:true,

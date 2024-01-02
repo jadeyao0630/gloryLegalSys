@@ -51,59 +51,13 @@ $.fn.progressChart = function(options){
         })
         $(_this).append(path);
         for(var i=0;i<settings.steps;i++){
-            var point=$('<div data-index='+i+' class="progress_point" style=" top:'+settings.topOffset+'px;width:'+settings.size+'px;height:'+settings.size+'px;border-radius:'+settings.size/2+'px"></div>');
-            var span=$('<span><span>');
-            var indicator=$('<div class="progress_num_indicator" ><div>');
-            indicator.css({
-                right:-settings.size*0.4/3,
-                top:-settings.size*0.4/3,
-                width:settings.size*0.4,
-                height:settings.size*0.4,
-                "line-height":settings.size*0.4+"px",
-                "fontSize":14*0.9+'px',
-                "fontWeight":700,
-                "borderRadius":(settings.size*0.4*0.5)+"px",
-    
-            });
-            
-            point.append(span);
-            
-            point.append(indicator);
-            
-            if(settings.status.hasOwnProperty(i)) {
-                var index=settings.status[i];
-                var matched=$.grep(settings.data,(d)=>d.id==index);
-                
-                var events=getProgressEvents(settings.eventsData,index);
-                indicator.text(events.length);
-                if(matched.length>0) span.text(matched[0].name);
-                point.addClass('actived_point');
-                point.jqmData('index',i)
-                point.jqmData('id',index)
-                $(_this).find('.progress_path.actived_point').css({
-                    width:(i)*settings.distance
-                })
-            }
-            else point.addClass('deactived_point');
-            if(i==settings.steps-1){
-                point.addClass('last_point');
-            }
-            if(settings.hasShadow) point.addClass('progress_point_shadow');
-            point.css({
-                left:settings.distance*i,
-            });
-            if(indicator.text()=="0") indicator.hide();
-            if(settings.hideInactived && point.hasClass('deactived_point')){
-                point.hide();
-            }
-            $(_this).append(point);
-            
+            $(_this).append(addPoint(i));
         }
     }
     const addPoint=function(index){
         var exsited=$(_this).find('.progress_point.actived_point');
-        settings.distance=(settings.width-settings.size)/(exsited.length);
-        var point=$('<div data-index='+index+' class="progress_point" style=" top:'+settings.topOffset+'px;width:'+settings.size+'px;height:'+settings.size+'px;border-radius:'+settings.size/2+'px"></div>');
+        settings.distance=(settings.width-settings.size)/(exsited.length-1);
+        var point=$('<div data-index='+index+' class="progress_point" style="left:'+index*settings.distance+'px; top:'+settings.topOffset+'px;width:'+settings.size+'px;height:'+settings.size+'px;border-radius:'+settings.size/2+'px"></div>');
         var span=$('<span><span>');
         var indicator=$('<div class="progress_num_indicator" ><div>');
         indicator.css({
@@ -148,7 +102,8 @@ $.fn.progressChart = function(options){
         if(settings.hideInactived && point.hasClass('deactived_point')){
             point.hide();
         }
-        $(_this).append(point);
+        return point;
+        
     }
     const attachEvent=function(){
         
@@ -169,8 +124,8 @@ $.fn.progressChart = function(options){
         })
         $(_this).on('moveNext',function(e){
             var exsited=$(_this).find('.progress_point.actived_point');
-            //settings.distance=(settings.width-settings.size)/(exsited.length);
-            console.log(e);
+            settings.distance=(settings.width-settings.size)/(exsited.length+1);
+            //console.log(e);
             var currentIndex=e.sourceIndex;
             var next=$(_this).find('.progress_point[data-index='+(currentIndex+1)+']');
             next.jqmData('id',e.sourceData.id)

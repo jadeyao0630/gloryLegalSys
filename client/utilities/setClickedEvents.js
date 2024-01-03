@@ -382,7 +382,7 @@ function functionBtnsEvent(but,index){
             var penalty_label=$('<p>判决金额：'+penaltyPaidSum.penalty+'万元<p>');
             var paid_label=$('<p>执行金额：'+penaltyPaidSum.paid+'万元<p>');
             var penalty=$('<div class="penalty-bar">'+penaltyPaidSum.penalty+'</div>');
-            var paid=$('<div class="paid-bar">'+penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*100+'%</div>');
+            var paid=$('<div class="paid-bar">'+(penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*100).toFixed(2)+'%</div>');
             penalty.append(paid);
             $('#execute_summary').append(caption);
             $('#execute_summary').append(penalty_label);

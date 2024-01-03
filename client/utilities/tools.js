@@ -296,13 +296,13 @@ $.fn.extend({
         if(overlay!=undefined) $(overlay).addClass('popup-hide');
     },
     setTooltips:function(){
-        $(this.get(0)).on('mouseover',(e)=>{
+        $(this.get(0)).on('mouseover vmouseover',(e)=>{
             //console.log("show tooltip");
             //console.log('selectmenucreate',$(this),$(this).get(0).scrollWidth,$(this).get(0).clientWidth);
             $(this).tooltip('show',$(this).data('tooltip'));
           });
           
-          $(this.get(0)).on('mouseleave',(e)=>{
+          $(this.get(0)).on('mouseleave vmouseout',(e)=>{
             $(this).tooltip('hide');
         });
     },
@@ -310,6 +310,7 @@ $.fn.extend({
         //console.log('selectmenucreate',this.get(0).nodeName);
         $(this.get(0)).on('mouseover',(e)=>{
             //console.log('selectmenucreate',$(this),$(this).get(0).scrollWidth,$(this).get(0).clientWidth);
+            console.log('mouseover',$(this).get(0).scrollWidth , $(this).get(0).clientWidth);
             if ($(this).get(0).scrollWidth > $(this).get(0).clientWidth) {
                 $(this).tooltip('show',$(this).html().replaceAll(spliter||",","</br>"));
             }

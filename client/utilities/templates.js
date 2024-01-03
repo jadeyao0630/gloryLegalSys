@@ -359,6 +359,12 @@ var _summary_template;
               isOptional:true,
               //defaultValue:0.0
           },
+          judgmentDate_p:{
+            type:"date",
+            label:"执行日期：",
+            isOptional:true,
+            //defaultValue:0.0
+        },
           judgmentSum_p:{
                 type:"textarea",
                 label:"备注：",

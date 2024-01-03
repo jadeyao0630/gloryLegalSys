@@ -10,11 +10,14 @@ function getProgressEvents(datas,index){
                 else if(parseInt(data.caseStatus)==6 && index==8) return true;
             }
         }else
+        /*
             if (parseInt(data.caseStatus)>3){
                 if(parseInt(data.caseStatus)==4 && index==6) return true;
                 else if(parseInt(data.caseStatus)==5 && index==7) return true;
                 else if(parseInt(data.caseStatus)==6 && index==8) return true;
             }else
+            */
+           //console.log('updateIndicator',Number(data.caseStatus),index,(Number(data.caseStatus)==index));
                 return Number(data.caseStatus)==index;
     }));
 }
@@ -78,7 +81,7 @@ $.fn.progressChart = function(options){
         point.append(indicator);
         
         var mainInfo=$('<ul data-role="listview" data-inset="true" class="main-info-panel"></ul>');
-        mainInfo.css({'top':(settings.size+20)+"px",width:(settings.distance-50)+"px"});
+        mainInfo.css({'top':(settings.size+20)+"px",width:(settings.distance-40)+"px"});
 
         point.append(mainInfo);
         if(settings.status.hasOwnProperty(index)) {
@@ -123,11 +126,12 @@ $.fn.progressChart = function(options){
                     var content=element[l];
                     if(element[l]==null || element[l].length==0||element[l]=="无"||element[l]=="null") content='&nbsp;';
                     
-                    if(l=="date" && element[l]=='1999年11月30日'){
+                    if(l=="date" && (element[l]=='1999年11月30日' || element[l]=='N下午N年aN月aN日')){
                         console.log(l,element[l],(l=="date" && element[l]=='1999年11月30日'))
                         content='暂无'
                     }
-                    var li=$('<li>'+content+'</li>');
+                    var li=$('<li class="listview-item">'+content+'</li>');
+                    li.setTooltip();
                     if(l=="title") {
                         //li.css({'font-weight':700})
                         li=$('<li data-role="list-divider">'+content+'</li>');
@@ -140,7 +144,8 @@ $.fn.progressChart = function(options){
         });
     }
     const attachEvent=function(){
-        
+        $(_this).off();
+        $('.progress_point').off();
         $('.progress_point').on('click',function(e){
             //if($(_this).find('actived_point').length==settings.steps) return;
             //if($(this).hasClass('last_point')) return;
@@ -156,17 +161,34 @@ $.fn.progressChart = function(options){
             })
             */
         })
+        $(_this).on('updateIndicator',function(e){
+            settings.eventsData=e.eventsData;
+            var exsited=$(_this).find('.progress_point.actived_point');
+            console.log('updateIndicator',exsited.length,settings.status,settings.eventsData,e.eventsData);
+            $.each(exsited,(i,point)=>{
+                var indicator=$(point).find('.progress_num_indicator');
+                var id=settings.status[$(point).jqmData('index')];
+                var events=getProgressEvents(settings.eventsData,id);
+                console.log('updateIndicator',events,id,$(point).jqmData('index'),settings.eventsData);
+                indicator.text(events.length);
+                if(events.length>0) indicator.show();
+                else indicator.hide();
+            })
+        });
         $(_this).on('moveNext',function(e){
-            console.log('moveNext',e)
             var preDistance=settings.distance;
             var currentIndex=e.sourceIndex;
             var exsited=$(_this).find('.progress_point.actived_point');
             settings.status.push(e.sourceData.id);
+            settings.mainEventData.push(e.mainEventData);
+            console.log('moveNext',settings.status,settings.mainEventData,exsited)
             var next=addPoint(currentIndex+1)//$(_this).find('.progress_point[data-index='+(e.sourceData.id)+']');
             next.jqmData('index',currentIndex+1)
             next.jqmData('id',e.sourceData.id)
             next.hide();
+            $(_this).append(next);
             settings.distance=(settings.width-settings.size)/(exsited.length+1);
+            console.log('moveNext1',settings.status,settings.mainEventData,exsited)
             $.each(exsited,(index,excistedPoint)=>{
                 $(excistedPoint).animate({
                     left:settings.distance*index,
@@ -175,11 +197,10 @@ $.fn.progressChart = function(options){
                 listview.animate({width:(settings.distance-50)+"px"},500);
                 setMainEventList(listview,$(excistedPoint).jqmData('id'));
                 $(excistedPoint).removeClass('last_point');
-                listview.trigger('create').listview('refresh');
+                listview.trigger('create').listview().listview('refresh');
             });
             //console.log(e);
             
-            $(_this).append(next);
             next.on('click',function(e){
                 $(_this).trigger({type:'pointClick',event:e,source:$(this),index:$(this).data('index'),steps:settings.steps});
             })
@@ -201,6 +222,7 @@ $.fn.progressChart = function(options){
             })
             $(_this).jqmData('status',settings.status);
             $(_this).trigger({type:'newPointAdded',status:settings.status})
+            $(_this).trigger('create');
         })
     }
     init();

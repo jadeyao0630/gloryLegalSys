@@ -592,6 +592,7 @@ $.fn.extend({
         }
         if($(this).jqmData('textOverflow')) {
             td.addClass('textOverflow');
+            td.find('label').addClass('textOverflow');
             td.css({
 
             })
@@ -604,7 +605,7 @@ $.fn.extend({
         }else{
             if(td!=undefined) td.show();
         }
-        td.setTooltip();
+        td.find('label').setTooltip();
         return td;
     },
     setRowsPrePage:function(num){

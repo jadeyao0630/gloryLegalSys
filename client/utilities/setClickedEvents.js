@@ -149,12 +149,23 @@ function showTooltip(self){
 function hideTooltip(self){
     $(self).tooltip('hide');
 }
+
 $("#progress_point_popupMenu").on( "popupafterclose", function( event, ui ) {
     $('#progress_point_popupMenu_add').collapsible( "collapse" );
 } );
+function formatMainEventData(d){
+    var title=''
+    if(d.typeId==1||d.typeId==2) title='判决';
+    else if(d.typeId==7) title='裁定';
+    var legalInstitution=$.grep(resourceDatas.legalInstitution_,dd=>dd.id==d.legalInstitution);
+    if(legalInstitution.length>0) legalInstitution=legalInstitution[0].name;
+    console.log('legalInstitution',resourceDatas.legalInstitution_,d.legalInstitution,legalInstitution);
+    return {index:d.typeId,date:formatDateTime(new Date(d.judgmentDate),'yyyy年MM月dd日'),caseNo:d.caseNo,legalInstitution:legalInstitution,sum:d.judgmentSum,title:title};
+}
 //节点修改保存按钮事件
 $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
     //console.log($(this).jqmData('form'));
+    console.log('save_btn',$(this));
     var form=$(this).jqmData('form');
     var events=$(this).jqmData('events');
     form.getFormValues(function(e){
@@ -170,9 +181,16 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                 console.log(ee,getGlobal("currentIsAdd"));
                 if(ee.success){
                     if(parseInt(getGlobal("currentIsAdd"))==1){
-                        var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));
-                        if(matched.length>0)
-                            $('#progress_diagram').trigger({type:'moveNext',sourceData:matched[0],sourceIndex:parseInt(getGlobal("currentIndex")),eventsData:events});
+                        DataList.caseProgresses.push(newData);
+                        
+                        var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));//获取节点属性数据
+                        
+                        if(matched.length>0){
+                            $('#progress_diagram').trigger({type:'moveNext',sourceData:matched[0],sourceIndex:parseInt(getGlobal("currentIndex")),
+                                        eventsData:events,
+                                        mainEventData:formatMainEventData(newData)});
+                            $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
+                        }
                         update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
                             $().mloader("hide");
                             if(eee.data.success){
@@ -249,17 +267,55 @@ function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
             }
             dateSortItems[date].push(_data);
         })
-        var sortedItems=Object.keys(dateSortItems).sort(function(a,b){
-            return dateSortItems[a][0].originalDate>dateSortItems[b][0].originalDate;
-        });
-        generateUpdateInfoList(listview,sortedItems,dateSortItems);
+        console.log('progress_point_editor',update_data,dateSortItems);
+        generateUpdateInfoList(listview,dateSortItems);
         $().mloader("hide");
     }, 100);
+}
+function getUpdateEvents(){
+    var index=getGlobal("currentId");
+    var matchedUpdates=DataList.caseUpdates.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var matchedExcutes=DataList.caseExcutes.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var matchedProperties=DataList.caseProperties.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var matchedAttachments=DataList.caseAttachments.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    //var matchedCaseLinked=DataList.caseLinked.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    var eventsData=matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments);
+    return eventsData;
+}
+function getSortedUpdateEvents(){
+    var dateSortItems={};
+    getProgressEvents(getUpdateEvents(),getGlobal("currentPoint")).forEach(item=>{
+        var _data=getEventsDetails(item);
+        var date=_data.date.replace(" ","");
+        if(!dateSortItems.hasOwnProperty(date)){
+            dateSortItems[date]=[];
+        }
+        dateSortItems[date].push(_data);
+    })
+    return dateSortItems;
 }
 $('#progress_point_viewer_btn').on('click',function(e){
     //console.log('pointIndex',$(this).jqmData('pointIndex'));
     progress_point_editor(parseInt($(this).jqmData('point')),parseInt($(this).jqmData('pointIndex')),$(this).jqmData('item'),$(this).jqmData('itemUpdates'));
 });
+function calcPenaltyAmount(data){
+    var penaltySum=0.0;
+    data.forEach(progress=>{
+        if(progress.penalty==null) progress.penalty=0.0;
+        penaltySum+=progress.penalty.constructor==String?parseFloat(progress.penalty):progress.penalty;
+    });
+    return penaltySum;
+}
+function calcPaidAmount(data){
+    var paidSum=0.0;
+    data.forEach(excute=>{
+        paidSum+=parseFloat(excute.exexuteAmount);
+    });
+    return paidSum;
+}
+function calcPenaltyPaidSum(penalty,paid){
+    return {penalty:calcPenaltyAmount(penalty),paid:calcPaidAmount(paid)}
+}
 //#region 主表里的功能按钮
 function functionBtnsEvent(but,index){
     //tableFuntionButListenerList.push(but.currentTarget);
@@ -319,19 +375,30 @@ function functionBtnsEvent(but,index){
         goToPage( '#progress');
         if(matchItems.length>0){
             //流程图下主要事件数据提取
+            $('#execute_summary').empty();
+            var penaltyPaidSum=calcPenaltyPaidSum(matchedProgressStatus,matchedExcutes);
+            var caption=$('<h3>执行金额情况：<h3>');
+            
+            var penalty_label=$('<p>判决金额：'+penaltyPaidSum.penalty+'万元<p>');
+            var paid_label=$('<p>执行金额：'+penaltyPaidSum.paid+'万元<p>');
+            var penalty=$('<div class="penalty-bar">'+penaltyPaidSum.penalty+'</div>');
+            var paid=$('<div class="paid-bar">'+penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*100+'%</div>');
+            penalty.append(paid);
+            $('#execute_summary').append(caption);
+            $('#execute_summary').append(penalty_label);
+            $('#execute_summary').append(paid_label);
+            $('#execute_summary').append(penalty);
+            
+            paid.css({width:penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*(screen.width)+"px"})
+            console.log("execute summary",penaltyPaidSum,penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*(screen.width-100),penalty.width());
+            $('#execute_summary').trigger('create');
             var progressChartMainEvents=[];
             
             var legalInstitution=$.grep(resourceDatas.legalInstitution_,d=>d.id==matchItems[0].legalInstitution);
             if(legalInstitution.length>0) legalInstitution=legalInstitution[0].name;
             progressChartMainEvents.push({index:0,date:formatDateTime(new Date(matchItems[0].caseDate),'yyyy年MM月dd日'),caseNo:matchItems[0].caseNo,legalInstitution:legalInstitution,sum:matchItems[0].caseSum,title:'立案'})
             $.each(matchedProgressStatus,(i,d)=>{
-                var title=''
-                if(d.typeId==1||d.typeId==2) title='判决';
-                else if(d.typeId==7) title='裁定';
-                legalInstitution=$.grep(resourceDatas.legalInstitution_,dd=>dd.id==d.legalInstitution);
-                if(legalInstitution.length>0) legalInstitution=legalInstitution[0].name;
-                console.log('legalInstitution',resourceDatas.legalInstitution_,d.legalInstitution,legalInstitution);
-                progressChartMainEvents.push({index:d.typeId,date:formatDateTime(new Date(d.judgmentDate),'yyyy年MM月dd日'),caseNo:d.caseNo,legalInstitution:legalInstitution,sum:d.judgmentSum,title:title})
+                progressChartMainEvents.push(formatMainEventData(d))
             })
 
             _setTitleBar("progress_title",titleBarDisplayFormat);
@@ -358,6 +425,7 @@ function functionBtnsEvent(but,index){
                 //当前节点id
                 $('#progress_point_viewer_btn').jqmData('point',$(e.source).jqmData('id'));
                 //获取当前节点数据
+                console.log('eventsData',eventsData,$(e.source).jqmData('id'));
                 var updates=getProgressEvents(eventsData,$(e.source).jqmData('id'));
                 $('#progress_point_viewer_btn').jqmData('itemUpdates',updates)
                 $('#progress_point_viewer_btn').jqmData('pointIndex',e.index)
@@ -390,6 +458,7 @@ function functionBtnsEvent(but,index){
                                 li.append(a);
                                 $('#progress_point_popupMenu_add_list').append(li);
                                 a.on('click',function(ee){
+                                    console.log('eventsData',eventsData);
                                     var updatesdata=getProgressEvents(eventsData,label.id);
                                     progress_point_editor(label.id,e.index,matchItems[0],updatesdata,true);
                                     //$('#progress_diagram').trigger({type:'moveNext',sourceData:label,sourceIndex:e.index,eventsData:updatesdata});
@@ -458,6 +527,7 @@ $('#progress_point_popupMenu_').find('a').on('click',async function(e){
             break;
     }
 });
+/*
 function getMatchedEventData(){
     var matchedUpdates=$.grep(DataList.caseUpdates,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     var matchedExcutes=$.grep(DataList.caseExcutes,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
@@ -476,7 +546,13 @@ function getMatchedEventData(){
     })
     return dateSortItems;
 }
-function generateUpdateInfoList(listview,sortedItems,dateSortItems){
+*/
+function generateUpdateInfoList(listview,dateSortItems){
+    console.log('generateUpdateInfoList',dateSortItems);
+    var sortedItems=Object.keys(dateSortItems).sort(function(a,b){
+        console.log(dateSortItems,a,b)
+        return dateSortItems[a][0].originalDate>dateSortItems[b][0].originalDate;
+    });
     listview.empty();
     sortedItems.forEach(date=>{
         var items=dateSortItems[date];
@@ -722,6 +798,7 @@ function bindUpdateInfoBtnClick(){
         }
     });
 }
+/*
 $('#progress_popupMenu').find('a').on('click',async function(e){
     $('#progress_popupMenu').popup('close');
     var title=progresses[currentProgress['targetPosition'].main] instanceof Array?progresses[currentProgress['targetPosition'].main][currentProgress['targetPosition'].sub]:progresses[currentProgress['targetPosition'].main];
@@ -748,9 +825,9 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                 //console.log('查看...',index,caseStatus,DataList.caseUpdates);
                 
                 //console.log('查看...',greatMatched);
-                generateUpdateInfoList(sortedItems,dateSortItems);
+                //generateUpdateInfoList(sortedItems,dateSortItems);
                 
-            
+                console.log('generateUpdateInfoList',dateSortItems);
                 
                 //$('#progress_details_info_body').trigger('create');
                 
@@ -812,11 +889,10 @@ $('#progress_popupMenu').find('a').on('click',async function(e){
                 //$("#fullscreenPage").trigger('create');
                 //main_form.instance.trigger('create');
             });
-            */
+            
             break;
     }
 })
-
 function checkProgressEdiableStatus(){
     console.log("clicked position",currentProgress['targetPosition'],"status position",currentProgress['originalPosition']);
     if(currentProgress['targetPosition'].main>currentProgress['originalPosition'].main){
@@ -834,6 +910,8 @@ function checkProgressEdiableStatus(){
     //currentProgress['targetPosition']=e.Position;
     //currentProgress['originalPosition']=formatIndex(but.opt.currentPosition);
 }
+
+*/
 //节点添加保存
 $('.progress_popup_add_form_submit').on('click', _updateSubmitEvent)
 //节点修改保存
@@ -869,6 +947,7 @@ $('.progress_popup_edit_form_submit').on('click', function (e){
                 if(data.table=='caseExcutes'){
                     
                     newData.id=data.data.id;
+                    //DataList.caseExcutes=updateOriginalData(DataList[data.table],newData,data.idkey);
                     fireDataChnaged("caseexcutesChanged",newData,"update");
                 }
                 history.back();
@@ -938,11 +1017,13 @@ function _updateSubmitEvent(e){
                         //添加新提交的数据到缓存
                         DataList[data.table].push(e.values);
                         //更新当前视图事件列表
-
+                        console.log(getSortedUpdateEvents(),$('#progress_point_info_body'));
+                        generateUpdateInfoList($('#progress_point_info_body'),getSortedUpdateEvents());
                         //更新节点视图计数器
-
+                        $('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
                         //更新节点图
                         if(data.table=='caseExcutes'){
+                            //DataList.caseExcutes=updateOriginalData(DataList.caseExcutes,newData,data.idkey);
                             fireDataChnaged("caseexcutesChanged",e.values,"add");
                         }
                         $().mloader("hide");
@@ -955,6 +1036,7 @@ function _updateSubmitEvent(e){
         }
     });
 }
+/*
 //节点添加保存
 function updateSubmitEvent(e){
     console.log('updateSubmitEvent',$(this).data('item'));
@@ -1183,6 +1265,7 @@ function updateSubmitEvent(e){
 
     });
 }
+*/
 function setProgressPopupFormWithoutCheck(template,title,data){
     $().mloader("show",{message:"读取中...."});
     var form= new mform({template:template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
@@ -1197,6 +1280,7 @@ function setProgressPopupFormWithoutCheck(template,title,data){
         $().mloader("hide");
     },200);
 }
+/*
 function setProgressPopupForm(template,title,data){
     console.log('checkProgressEdiableStatus',checkProgressEdiableStatus());
     var editableStatus=checkProgressEdiableStatus();
@@ -1236,6 +1320,7 @@ function setProgressPopupForm(template,title,data){
     }, 100);
     
 }
+*/
 //第一页左下方 添加 删除 按钮事件
 $('.case_reg_but').on('click',async function(e){
     e.preventDefault();

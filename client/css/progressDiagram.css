@@ -127,3 +127,8 @@ filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5));
   position: absolute;
   max-width: 400px;
 }
+.listview-item{
+  white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

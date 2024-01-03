@@ -34,7 +34,7 @@ $.fn.progressChart = function(options){
         data:[{id:0,name:'立案'},{id:1,name:'一审'},{id:2,name:'二审'},{id:4,name:'正常执行'},{id:3,name:'强制执行'},{id:5,name:'无需执行'},{id:6,name:'结案'},{id:7,name:'再审'},{id:8,name:'监督'}]
     }
     const settings = $.extend({}, defaults, options);
-    settings.distance=(settings.width-settings.size)/(settings.steps-1);
+    settings.distance=(settings.width-settings.size)/(settings.status.length-1);
     
     settings.topOffset=settings.size*0.4/3;
     const init = function() {
@@ -120,10 +120,17 @@ $.fn.progressChart = function(options){
         settings.mainEventData.forEach(element => {
             if(element.index==id){
                 list.forEach((l)=>{
-                    var li=$('<li>'+element[l]+'</li>');
+                    var content=element[l];
+                    if(element[l]==null || element[l].length==0||element[l]=="无"||element[l]=="null") content='&nbsp;';
+                    
+                    if(l=="date" && element[l]=='1999年11月30日'){
+                        console.log(l,element[l],(l=="date" && element[l]=='1999年11月30日'))
+                        content='暂无'
+                    }
+                    var li=$('<li>'+content+'</li>');
                     if(l=="title") {
                         //li.css({'font-weight':700})
-                        li=$('<li data-role="list-divider">'+element[l]+'</li>');
+                        li=$('<li data-role="list-divider">'+content+'</li>');
                     }
                     listview.append(li);
                 })
@@ -173,9 +180,6 @@ $.fn.progressChart = function(options){
             //console.log(e);
             
             $(_this).append(next);
-            listview=$(next).find('ul');
-            setMainEventList(listview,$(next).jqmData('id'));
-            listview.trigger('create').listview().listview('refresh');
             next.on('click',function(e){
                 $(_this).trigger({type:'pointClick',event:e,source:$(this),index:$(this).data('index'),steps:settings.steps});
             })

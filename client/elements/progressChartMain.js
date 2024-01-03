@@ -39,6 +39,7 @@ $.fn.progressChart = function(options){
     settings.topOffset=settings.size*0.4/3;
     const init = function() {
 
+        _this.empty();
         var main_path=$('<div class="progress_path deactived_point" style="width:'+(settings.width-settings.size)+'px;height:'+settings.pathSize+'px;"></div>');
         main_path.css({
             left:settings.size/2+"px",
@@ -76,7 +77,7 @@ $.fn.progressChart = function(options){
         
         point.append(indicator);
         
-        var mainInfo=$('<div class="main-info-panel"></div>');
+        var mainInfo=$('<ul data-role="listview" data-inset="true" class="main-info-panel"></ul>');
         mainInfo.css({'top':(settings.size+20)+"px",width:(settings.distance-50)+"px"});
 
         point.append(mainInfo);
@@ -94,12 +95,7 @@ $.fn.progressChart = function(options){
                 width:(index)*settings.distance
             })
             console.log('mainEventData',settings.mainEventData);
-            settings.mainEventData.forEach(element => {
-                if(element.index==id){
-                    var p=$('<p><b>'+element.title+'</b></br>'+element.date+'</br>'+element.caseNo+'</br>'+element.legalInstitution+'</br>'+element.sum+'</p>');
-                    mainInfo.append(p);
-                }
-            });
+            setMainEventList(mainInfo,id);
         }
         else point.addClass('deactived_point');
         if(index==settings.status.length-1){
@@ -117,6 +113,24 @@ $.fn.progressChart = function(options){
         }
         return point;
         
+    }
+    const setMainEventList=function(listview,id){
+        var list=['title','date','caseNo','legalInstitution','sum'];
+        listview.empty();
+        settings.mainEventData.forEach(element => {
+            if(element.index==id){
+                list.forEach((l)=>{
+                    var li=$('<li>'+element[l]+'</li>');
+                    if(l=="title") {
+                        //li.css({'font-weight':700})
+                        li=$('<li data-role="list-divider">'+element[l]+'</li>');
+                    }
+                    listview.append(li);
+                })
+                listview.trigger('create').listview().listview('refresh');
+                //mainInfo.append(listview);
+            }
+        });
     }
     const attachEvent=function(){
         
@@ -145,17 +159,23 @@ $.fn.progressChart = function(options){
             next.jqmData('index',currentIndex+1)
             next.jqmData('id',e.sourceData.id)
             next.hide();
-            $(_this).append(next);
             settings.distance=(settings.width-settings.size)/(exsited.length+1);
             $.each(exsited,(index,excistedPoint)=>{
                 $(excistedPoint).animate({
                     left:settings.distance*index,
                 },500);
+                var listview=$(excistedPoint).find('ul');
+                listview.animate({width:(settings.distance-50)+"px"},500);
+                setMainEventList(listview,$(excistedPoint).jqmData('id'));
                 $(excistedPoint).removeClass('last_point');
+                listview.trigger('create').listview('refresh');
             });
             //console.log(e);
             
-            
+            $(_this).append(next);
+            listview=$(next).find('ul');
+            setMainEventList(listview,$(next).jqmData('id'));
+            listview.trigger('create').listview().listview('refresh');
             next.on('click',function(e){
                 $(_this).trigger({type:'pointClick',event:e,source:$(this),index:$(this).data('index'),steps:settings.steps});
             })

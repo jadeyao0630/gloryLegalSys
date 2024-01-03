@@ -198,7 +198,7 @@ function progress_point_editor(pointId,pointIndex,data,update_data,isAdd){
     console.log({pointId:pointId,data:data,update_data:update_data,pointIndex:pointIndex});
 
     var template=FormTemplate3;
-    if(pointId==1 || pointId==2) template=FormTemplate3_instance;
+    if(pointId==1 || pointId==2 || pointId==7) template=FormTemplate3_instance;
     else if(pointId>2){
         template=FormTemplate3_execute;
     }
@@ -591,12 +591,14 @@ function functionBtnsEvent(but,index){
 
             console.log('caseStatus',matchItems[0].caseStatus,JSON.parse(matchItems[0].caseStatus));
             var eventsData=matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments);
+            var status=JSON.parse(matchItems[0].caseStatus);
+            if(status.constructor!=Array)status=[status];
             $('#progress_diagram').progressChart({
                 width:screen.width-32-80,
                 eventsData:eventsData,
                 mainEventData:progressChartMainEvents,
                 data:progressLabels,
-                status:JSON.parse(matchItems[0].caseStatus),
+                status:status,
                 steps:7})
             $('#progress_diagram').on('newPointAdded',function(e){
                 console.log(e.status)

@@ -315,6 +315,7 @@ function getUpdateEvents(){
     var matchedProperties=DataList.caseProperties.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     var matchedAttachments=DataList.caseAttachments.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     //var matchedCaseLinked=DataList.caseLinked.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
+    //var matchedProgresses=DataList.caseProgresses.filter((d)=>d.id==index&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     var eventsData=matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments);
     return eventsData;
 }
@@ -1065,7 +1066,9 @@ function _updateSubmitEvent(e){
                             //DataList.caseExcutes=updateOriginalData(DataList.caseExcutes,newData,data.idkey);
                             fireDataChnaged("caseexcutesChanged",e.values,"add");
                         }
+                        var canGo=true;
                         if(parseInt(getGlobal("currentIsAdd"))==1) {
+                            canGo=false;
                             currentForm.getFormValues(function(e){
                                 console.log(e);
                                 var newData={};
@@ -1088,15 +1091,17 @@ function _updateSubmitEvent(e){
                                                                 eventsData:currentEvents,
                                                                 mainEventData:formatMainEventData(newData)});
                                                     $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
+                                                    canGo=true;
                                                 }
                                                 update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
-                                                    $().mloader("hide");
+                                                    
                                                     if(eee.data.success){
                                                         DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify($('#progress_diagram').jqmData('status'))},'id');
                                                         $().minfo('show',{title:"提示",message:"保存成功。"},function(){});
                                                     }else{
                                                         $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
                                                     }
+                                                    $().mloader("hide");
                                                 });
                                             
                                             
@@ -1109,7 +1114,18 @@ function _updateSubmitEvent(e){
                                 }
                             });
                         }
-                        $('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
+                        //console.log('getUpdateEvents',getUpdateEvents())
+                        setTimeout(() => {
+                            const intervalId = setInterval(() => {
+                                if (canGo) {
+                                    clearInterval(intervalId);
+                                    $('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
+                                    
+                                }
+                            }, 100);
+                        }, 100);
+                        
+                        
                         $().mloader("hide");
                     
                     });

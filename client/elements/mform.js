@@ -130,10 +130,10 @@ mform.prototype={
                 var closeBtn=$(data.toPage).find('.ui-header .ui-icon-delete');
                 console.log('pagecontainerbeforeshow',data.toPage,closeBtn);
                 closeBtn.removeClass('ui-icon-delete').addClass('ui-icon-check').addClass('btn-icon-green').removeClass('ui-btn-left').addClass('ui-btn-right');
-                closeBtn.on('click',function(e){
-                    e.preventDefault();
-                    history.back();
-                })
+                //closeBtn.on('click',function(e){
+                    //e.preventDefault();
+                    //history.back();
+                //})
                 data.toPage.find('a.ui-icon-delete').on('click',function(e){
                     //console.log('pagecontainerhide',$(data.toPage).find('input[data-type="search"]').val());
                     if ( pageIsSelectmenuDialog( data.toPage ) ) {
@@ -548,6 +548,7 @@ mform.prototype={
             }
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(radio_container);
+            radio_container.find('input[type="radio"]').checkboxradio().checkboxradio('refresh');
             return subContainer;
     },
     generateFileInput:function(itemId,itemTemplate){
@@ -643,6 +644,7 @@ mform.prototype={
             }
         });
         selectItem.trigger('create');
+        selectItem.selectmenu().selectmenu('refresh')
         subContainer.trigger('create');
         return subContainer;
         function setOptionItem(index,data,itemTemplate,key){
@@ -965,6 +967,7 @@ mform.prototype={
     },
     getFormValues:function(valiationCallback){
         var template=this.opt.template.template;
+        console.log('getFormValues',template,this);
         var _this=this;
         var values={};
         var unSuccess=[];

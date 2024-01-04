@@ -175,6 +175,16 @@ $.fn.progressChart = function(options){
                 else indicator.hide();
             })
         });
+        $(_this).on('updateMainEvent',function(e){
+            var targetIndex=e.targetIndex;
+            var targetMainEvent=e.mainEventData;
+            settings.mainEventData=updateOriginalData(settings.mainEventData,targetMainEvent,'index')
+            var point=_this.find('.progress_point.actived_point[data-index="'+targetIndex+'"]');
+            if(point.length>0){
+                var listview=$(point[0]).find('ul');
+                setMainEventList(listview,$(point[0]).jqmData('id'));
+            }
+        });
         $(_this).on('moveNext',function(e){
             var preDistance=settings.distance;
             var currentIndex=e.sourceIndex;
@@ -188,7 +198,6 @@ $.fn.progressChart = function(options){
             next.hide();
             $(_this).append(next);
             settings.distance=(settings.width-settings.size)/(exsited.length+1);
-            console.log('moveNext1',settings.status,settings.mainEventData,exsited)
             $.each(exsited,(index,excistedPoint)=>{
                 $(excistedPoint).animate({
                     left:settings.distance*index,

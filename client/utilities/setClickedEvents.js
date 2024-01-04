@@ -164,7 +164,8 @@ function formatMainEventData(d){
 }
 //节点修改保存按钮事件
 $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
-    //console.log($(this).jqmData('form'));
+    console.log('save_btn',getGlobal("currentPoint"),$(this).jqmData('form'));
+    //if(parseInt(getGlobal("currentPoint"))==0) return;
     console.log('save_btn',$(this));
     var form=$(this).jqmData('form');
     var events=$(this).jqmData('events');
@@ -175,47 +176,77 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
             $.each(e.values,(key,val)=>{
                 newData[key.replace("_p","")]=val;
             })
-            newData.id=parseInt(getGlobal("currentId"));
-            $().mloader("show",{message:"提交中...."});
-            insert('caseProgresses',newData,function(ee){
-                console.log(ee,getGlobal("currentIsAdd"));
-                if(ee.success){
-                    if(parseInt(getGlobal("currentIsAdd"))==1){
-                        DataList.caseProgresses.push(newData);
-                        
-                        var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));//获取节点属性数据
-                        
-                        if(matched.length>0){
-                            $('#progress_diagram').trigger({type:'moveNext',sourceData:matched[0],sourceIndex:parseInt(getGlobal("currentIndex")),
-                                        eventsData:events,
-                                        mainEventData:formatMainEventData(newData)});
-                            $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
-                        }
-                        update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
-                            $().mloader("hide");
-                            if(eee.data.success){
-                                DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify($('#progress_diagram').jqmData('status'))},'id');
-                                $().minfo('show',{title:"提示",message:"保存成功。"},function(){});
-                            }else{
-                                $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
+            if(parseInt(getGlobal("currentPoint"))==0) {
+                
+                newData["caseCreateDate"]=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
+                console.log('save data',e);
+                //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
+                if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
+                    $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
+                        //HideMessage();
+                        window.location.href = 'index.html';
+                    });
+                }else{
+                    newData["caseApplicant"]=getGlobalJson("currentUser").id;
+                    //if(enableReadOnlyMode) e.values["isReadOnly"]=_isReadOnlyCurrentForm();
+                    newData["id"]=parseInt(getGlobal("currentId"));
+                    fireDataChnaged("caseChanged",newData,"update");
+                    
+                    var legalInstitution=$.grep(resourceDatas.legalInstitution_,d=>d.id==newData.legalInstitution);
+                    if(legalInstitution.length>0) legalInstitution=legalInstitution[0].name;
+                    var mainEventData={index:0,date:formatDateTime(new Date(newData.caseDate),'yyyy年MM月dd日'),caseNo:newData.caseNo,legalInstitution:legalInstitution,sum:newData.caseSum,title:'立案'};
+                    $('#progress_diagram').trigger({type:'updateMainEvent',targetIndex:0,
+                    mainEventData:mainEventData})
+                }
+            }else{
+                newData.id=parseInt(getGlobal("currentId"));
+                $().mloader("show",{message:"提交中...."});
+                insert('caseProgresses',newData,function(ee){
+                    console.log(ee,getGlobal("currentIsAdd"));
+                    if(ee.success){
+                        if(parseInt(getGlobal("currentIsAdd"))==1){
+                            DataList.caseProgresses.push(newData);
+                            
+                            var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));//获取节点属性数据
+                            
+                            if(matched.length>0){
+                                $('#progress_diagram').trigger({type:'moveNext',sourceData:matched[0],sourceIndex:parseInt(getGlobal("currentIndex")),
+                                            eventsData:events,
+                                            mainEventData:formatMainEventData(newData)});
+                                $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
                             }
-                        });
+                            update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
+                                $().mloader("hide");
+                                if(eee.data.success){
+                                    DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify($('#progress_diagram').jqmData('status'))},'id');
+                                    $().minfo('show',{title:"提示",message:"保存成功。"},function(){});
+                                }else{
+                                    $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
+                                }
+                            });
+                        }else{
+                            $().mloader("hide");
+                            $().minfo('show',{title:"提示",message:"更新成功。"},function(){});
+                        }
                     }else{
                         $().mloader("hide");
-                        $().minfo('show',{title:"提示",message:"更新成功。"},function(){});
+                        $().minfo('show',{title:"错误",message:ee.error});
                     }
-                }else{
-                    $().minfo('show',{title:"错误",message:ee.error});
-                }
-            })
+                })
+            }
+            
         }
     });
 })
 function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     console.log({typeId:typeId,data:data,update_data:update_data,pointIndex:pointIndex});
     
-    var template=FormTemplate3;
+    var template=FormTemplate3_p;
+    
     if(typeId==1 || typeId==2 || typeId==7) template=FormTemplate3_instance;
+    else if(typeId==0){
+        
+    }
     else if(typeId>2){
         template=FormTemplate3_execute;
     }
@@ -231,7 +262,7 @@ function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     $('#progress_point_info_form').empty();
     var progress_point_form=_createNewCaseForm(template,"progress_point_info_form");
     data.typeId=typeId;
-    progress_point_form.setValues(data,typeId==0?'':'_p');
+    progress_point_form.setValues(data,'_p');
 
     var updateContainer=$('.updateContainer');
     if(updateContainer.length==0) {
@@ -246,7 +277,7 @@ function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     collapsible.append(listview);
     updateContainer.append(collapsible);
     progress_point_form.instance.append(updateContainer);
-
+    console.log('progress_point_form.instance',progress_point_form.instance,updateContainer);
     var pointName=$.grep(progressLabels,label=>label.id==typeId);
     if(pointName.length>0) pointName=pointName[0].name;
 
@@ -255,6 +286,7 @@ function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     $('#progress_point_info').find('[name="save_btn"]').jqmData('form',progress_point_form);
     $('#progress_point_info').find('[name="save_btn"]').jqmData('events',update_data);
     progress_point_form.instance.trigger('create')
+    console.log('progress_point_form',progress_point_form);
     $('#progress_point_info_form').trigger('create')
     setTimeout(function() {
         goToPage('#progress_point_info');
@@ -316,6 +348,24 @@ function calcPaidAmount(data){
 function calcPenaltyPaidSum(penalty,paid){
     return {penalty:calcPenaltyAmount(penalty),paid:calcPaidAmount(paid)}
 }
+function generatePenaltyPaidSummary(container,penaltyPaidSum){
+    $(container).empty();
+    var caption=$('<h3>执行金额情况：<h3>');
+    
+    var penalty_label=$('<p>判决金额：'+penaltyPaidSum.penalty+'万元<p>');
+    var paid_label=$('<p>执行金额：'+penaltyPaidSum.paid+'万元<p>');
+    var penalty=$('<div class="penalty-bar">'+penaltyPaidSum.penalty+'</div>');
+    var paid=$('<div class="paid-bar">'+(penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*100).toFixed(2)+'%</div>');
+    penalty.append(paid);
+    $(container).append(caption);
+    $(container).append(penalty_label);
+    $(container).append(paid_label);
+    $(container).append(penalty);
+    
+    paid.css({width:penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*(screen.width)+"px"})
+    console.log("execute summary",penaltyPaidSum,penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*(screen.width-100),penalty.width());
+    $(container).trigger('create');
+}
 //#region 主表里的功能按钮
 function functionBtnsEvent(but,index){
     //tableFuntionButListenerList.push(but.currentTarget);
@@ -375,23 +425,8 @@ function functionBtnsEvent(but,index){
         goToPage( '#progress');
         if(matchItems.length>0){
             //流程图下主要事件数据提取
-            $('#execute_summary').empty();
-            var penaltyPaidSum=calcPenaltyPaidSum(matchedProgressStatus,matchedExcutes);
-            var caption=$('<h3>执行金额情况：<h3>');
-            
-            var penalty_label=$('<p>判决金额：'+penaltyPaidSum.penalty+'万元<p>');
-            var paid_label=$('<p>执行金额：'+penaltyPaidSum.paid+'万元<p>');
-            var penalty=$('<div class="penalty-bar">'+penaltyPaidSum.penalty+'</div>');
-            var paid=$('<div class="paid-bar">'+(penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*100).toFixed(2)+'%</div>');
-            penalty.append(paid);
-            $('#execute_summary').append(caption);
-            $('#execute_summary').append(penalty_label);
-            $('#execute_summary').append(paid_label);
-            $('#execute_summary').append(penalty);
-            
-            paid.css({width:penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*(screen.width)+"px"})
-            console.log("execute summary",penaltyPaidSum,penaltyPaidSum.paid/(penaltyPaidSum.penalty+2000)*(screen.width-100),penalty.width());
-            $('#execute_summary').trigger('create');
+            generatePenaltyPaidSummary($('#execute_summary'),calcPenaltyPaidSum(matchedProgressStatus,matchedExcutes));
+
             var progressChartMainEvents=[];
             
             var legalInstitution=$.grep(resourceDatas.legalInstitution_,d=>d.id==matchItems[0].legalInstitution);
@@ -1327,9 +1362,7 @@ $('.case_reg_but').on('click',async function(e){
     if(this.id=="case_reg_but_add"){//第一页左下方 添加
         isAddPage=true;
         $().mloader("show",{message:"读取中...."});
-        await getCaseLatestIndex().then(id=>{
-            
-            sessionStorage.setItem("currentId", id+1);
+        
             
             //main_form.readOnly(false);
             //main_form.instance.setEmptyValues(FormTemplate.template);
@@ -1346,14 +1379,18 @@ $('.case_reg_but').on('click',async function(e){
             goToPage( $(this).attr( "href" ));
            // main_form.readOnly(false).setEmptyValues();
                 //$().mloader("hide");
-            setTimeout(function() {
-                //caseForm.setEmptyValues();
+           //setTimeout(function() {
+                caseForm.setEmptyValues();
                 
                 $().mloader("hide");
-            }, 10);
+            //}, 10);
             //main_form.setValues(getGlobalJson("mainData")[0]);
             //$("#fullscreenPage").trigger('create');
             //main_form.instance.trigger('create');
+        getCaseLatestIndex().then(id=>{
+            console.error('currentId',id+1)
+            sessionStorage.setItem("currentId", id+1);
+            
         });
         
     }else if(this.id=="case_reg_but_remove"){
@@ -2194,6 +2231,45 @@ function showProgressDetails(datas,updates,excutes,properties,attachments,caseLi
         $().mloader("hide");
     },10);
 }
+function saveMainForm(form,isAddPage){
+    form.getFormValues(function(e){
+        console.log('getvalues',e);
+        if(e.success){
+            //console.log(message.message);
+            //return;
+            e.values.id=getGlobal("currentId");
+            if(isAddPage){
+                e.values['penalty']='0.00';
+                e.values['paidAmount']='0.00';
+                e.values['caseStatus']=[0];
+                //e.values['lawFirm']=0;
+                //e.values['attorney']='无0';
+                //e.values['FirstInstance']='0000-00-00 00:00:00';
+                //e.values['SecondInstance']='0000-00-00 00:00:00';
+            }
+            //e.values=Object.assign(e.values,e.caseStatus);
+            e.values["caseCreateDate"]=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
+            console.log('save data',e);
+            //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
+            if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
+                $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
+                    //HideMessage();
+                    window.location.href = 'index.html';
+                });
+            }else{
+                e.values["caseApplicant"]=getGlobalJson("currentUser").id;
+                //if(enableReadOnlyMode) e.values["isReadOnly"]=_isReadOnlyCurrentForm();
+                e.values["id"]=Number(e.values["id"]);
+                fireDataChnaged("caseChanged",e.values,isAddPage?"add":"update");
+            }
+            
+            
+        }else{
+            
+            console.log(e.valiation.join()," 有错误。");
+        }
+    });
+}
 //#region 保存按钮事件
 $('.edit-header-btn').on('click',async function(e){
     console.log('currentPage',sessionStorage.getItem('currentPage'));
@@ -2203,45 +2279,9 @@ $('.edit-header-btn').on('click',async function(e){
 
         //保存案件页面
         if(sessionStorage.getItem('currentPage')=="#casePage"){
-            /*
-            caseForm.getFormValues(function(e){
-                console.log('getvalues',e);
-                if(e.success){
-                    //console.log(message.message);
-                    //return;
-                    e.values.id=getGlobal("currentId");
-                    if(isAddPage){
-                        e.values['penalty']='0.00';
-                        e.values['paidAmount']='0.00';
-                        e.values['caseStatus']=-1;
-                        //e.values['lawFirm']=0;
-                        //e.values['attorney']='无0';
-                        //e.values['FirstInstance']='0000-00-00 00:00:00';
-                        //e.values['SecondInstance']='0000-00-00 00:00:00';
-                    }
-                    //e.values=Object.assign(e.values,e.caseStatus);
-                    e.values["caseCreateDate"]=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
-                    console.log('save data',e);
-                    //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
-                    if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
-                        $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
-                            //HideMessage();
-                            window.location.href = 'index.html';
-                        });
-                    }else{
-                        e.values["caseApplicant"]=getGlobalJson("currentUser").id;
-                        //if(enableReadOnlyMode) e.values["isReadOnly"]=_isReadOnlyCurrentForm();
-                        e.values["id"]=Number(e.values["id"]);
-                        fireDataChnaged("caseChanged",e.values,isAddPage?"add":"update");
-                    }
-                    
-                    
-                }else{
-                    
-                    console.log(e.valiation.join()," 有错误。");
-                }
-            });
-        */
+            saveMainForm(caseForm,isAddPage);
+            
+        
         }
         //保存进展页面
         else if(sessionStorage.getItem('currentPage')=="#progress"){

@@ -256,7 +256,7 @@ $('body').on(preload_completed_event_name,function(){
         $('.admin-ui').show();
     }
     
-    //caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
+    caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
     $('.header-filter-btn:contains("复位")').setTooltips();
     $('.header-filter-btn').on('click',function(e){
         switch($(this).text()){

@@ -743,7 +743,7 @@ mform.prototype={
         console.log('setValues',data,prefix);
         prefix=prefix||'';
         //var template=this.opt.template.template;
-        //this.currentData=data;
+        this.currentData=data;
         var _this=this;
         //var templateKeys=Object.keys(template);
         if (data instanceof Object){

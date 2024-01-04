@@ -101,6 +101,7 @@
     transition: opacity 0.3s;
     z-index: 1000;
     text-shadow: none;
+    max-width: 400px;
 }
 #username{
     text-align: right;

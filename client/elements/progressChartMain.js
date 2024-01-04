@@ -121,6 +121,7 @@ $.fn.progressChart = function(options){
         var list=['title','date','caseNo','legalInstitution','sum'];
         listview.empty();
         settings.mainEventData.forEach(element => {
+            console.log('updateMainEvent',element.index,id)
             if(element.index==id){
                 list.forEach((l)=>{
                     var content=element[l];
@@ -131,12 +132,13 @@ $.fn.progressChart = function(options){
                         content='暂无'
                     }
                     var li=$('<li class="listview-item">'+content+'</li>');
-                    li.setTooltip();
+                    
                     if(l=="title") {
                         //li.css({'font-weight':700})
                         li=$('<li data-role="list-divider">'+content+'</li>');
                     }
                     listview.append(li);
+                    li.setTooltip(";");
                 })
                 listview.trigger('create').listview().listview('refresh');
                 //mainInfo.append(listview);
@@ -180,8 +182,10 @@ $.fn.progressChart = function(options){
             var targetMainEvent=e.mainEventData;
             settings.mainEventData=updateOriginalData(settings.mainEventData,targetMainEvent,'index')
             var point=_this.find('.progress_point.actived_point[data-index="'+targetIndex+'"]');
+            
             if(point.length>0){
                 var listview=$(point[0]).find('ul');
+                console.log('updateMainEvent',settings.mainEventData,point,listview);
                 setMainEventList(listview,$(point[0]).jqmData('id'));
             }
         });

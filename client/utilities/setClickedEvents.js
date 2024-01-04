@@ -238,6 +238,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
         }
     });
 })
+var currentForm,currentEvents;
 function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     console.log({typeId:typeId,data:data,update_data:update_data,pointIndex:pointIndex});
     
@@ -261,6 +262,8 @@ function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     //节点信息表格及相关事件列表
     $('#progress_point_info_form').empty();
     var progress_point_form=_createNewCaseForm(template,"progress_point_info_form");
+    
+    currentForm = progress_point_form;
     data.typeId=typeId;
     progress_point_form.setValues(data,'_p');
 
@@ -285,6 +288,7 @@ function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     $('#progress_point_info_title').text((isAdd?'添加':'修改')+' '+pointName+' ['+data.id+']');
     $('#progress_point_info').find('[name="save_btn"]').jqmData('form',progress_point_form);
     $('#progress_point_info').find('[name="save_btn"]').jqmData('events',update_data);
+    currentEvents=update_data;
     progress_point_form.instance.trigger('create')
     console.log('progress_point_form',progress_point_form);
     $('#progress_point_info_form').trigger('create')
@@ -1055,12 +1059,57 @@ function _updateSubmitEvent(e){
                         console.log(getSortedUpdateEvents(),$('#progress_point_info_body'));
                         generateUpdateInfoList($('#progress_point_info_body'),getSortedUpdateEvents());
                         //更新节点视图计数器
-                        $('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
+                        
                         //更新节点图
                         if(data.table=='caseExcutes'){
                             //DataList.caseExcutes=updateOriginalData(DataList.caseExcutes,newData,data.idkey);
                             fireDataChnaged("caseexcutesChanged",e.values,"add");
                         }
+                        if(parseInt(getGlobal("currentIsAdd"))==1) {
+                            currentForm.getFormValues(function(e){
+                                console.log(e);
+                                var newData={};
+                                $.each(e.values,(key,val)=>{
+                                    newData[key.replace("_p","")]=val;
+                                })
+                                
+                                newData.id=parseInt(getGlobal("currentId"));
+                                if(e.success){
+                                    insert('caseProgresses',newData,function(ee){
+                                        console.log(ee,getGlobal("currentIsAdd"));
+                                        if(ee.success){
+                                            
+                                                DataList.caseProgresses.push(newData);
+                                                
+                                                var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));//获取节点属性数据
+                                                
+                                                if(matched.length>0){
+                                                    $('#progress_diagram').trigger({type:'moveNext',sourceData:matched[0],sourceIndex:parseInt(getGlobal("currentIndex")),
+                                                                eventsData:currentEvents,
+                                                                mainEventData:formatMainEventData(newData)});
+                                                    $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
+                                                }
+                                                update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
+                                                    $().mloader("hide");
+                                                    if(eee.data.success){
+                                                        DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify($('#progress_diagram').jqmData('status'))},'id');
+                                                        $().minfo('show',{title:"提示",message:"保存成功。"},function(){});
+                                                    }else{
+                                                        $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
+                                                    }
+                                                });
+                                            
+                                            
+                                        }else{
+                                            $().mloader("hide");
+                                            $().minfo('show',{title:"错误",message:ee.error});
+                                        }
+                                    })
+                                
+                                }
+                            });
+                        }
+                        $('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
                         $().mloader("hide");
                     
                     });

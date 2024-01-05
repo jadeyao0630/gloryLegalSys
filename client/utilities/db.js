@@ -67,6 +67,26 @@ async function getCaseLatestIndex(){
     });
     return latestId;
 }
+async function getTheLastIndex(table,key,where){
+    var latestId=-1;
+    var where_str=where!=undefined?" WHERE "+where:"";
+    var query="SELECT * FROM "+table+where_str+" ORDER BY "+key+" DESC LIMIT 1";
+    const response = new Promise(async(resolve,reject)=>{
+        await fetch("http://"+ip+":"+port+"/select",{
+            headers:headers,
+            method: 'POST',
+            body: JSON.stringify({ query: query})
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('getTheLastIndex',data);
+            if(data['data'].length>0) latestId = data['data'][0][key];
+            resolve(latestId);
+        }).catch(err => console.log(err));
+        
+    });
+    return await response;
+}
 async function getRecordLatestIndex(table,key,where){
     var latestId=-1;
     var where_str=where!=undefined?" WHERE "+where:"";

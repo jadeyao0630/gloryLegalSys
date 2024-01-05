@@ -115,9 +115,21 @@ function compareValues(source,target,prefix){
     $.each(source,(k,v)=>{
         console.log(k,k.replace(prefix,""))
         if(target[k.replace(prefix,"")]!=undefined){
-            if(v.toString()!=target[k.replace(prefix,"")].toString()) {isSame=false; return false;}
+            var sourceVal=v.toString();
+            var targetVal=target[k.replace(prefix,"")].toString();
+            if(k.replace(prefix,"")=="judgmentDate" || k.replace(prefix,"")=="trialDate"){
+                if(targetVal!="0000-00-00 00:00:00")
+                    targetVal=getDateTime(targetVal);
+            }
+            //getDateTime
+            if(sourceVal!=targetVal) {
+                console.log('compareValues',k.replace(prefix,""),sourceVal,targetVal,target[k.replace(prefix,"")].toString());
+                isSame=false; 
+                return false;
+            }
         }
     });
+    if(isSame && waitingTasks.length>0) isSame=false;
     return isSame;
 }
 $('#progress_point_info').find('a[data-rel="back"]').on('click',function(e){
@@ -216,6 +228,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
             $.each(e.values,(key,val)=>{
                 newData[key.replace("_p","")]=val;
             })
+            runWaitingTask();
             if(parseInt(getGlobal("currentPoint"))==0) {
                 
                 newData["caseCreateDate"]=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
@@ -260,6 +273,8 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                                 if(eee.data.success){
                                     DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify($('#progress_diagram').jqmData('status'))},'id');
                                     $().minfo('show',{title:"提示",message:"保存成功。"},function(){});
+                                    form.setValues(newData);
+                                    
                                 }else{
                                     $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
                                 }
@@ -280,7 +295,9 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                             updatePenaltyPaidSummary($('#execute_summary'));
                             console.log("更新成功",newData.typeId,formatMainEventData(newData));
                             $('#progress_diagram').trigger({type:'updateMainEvent',targetIndex:parseInt(getGlobal("currentIndex")),
-                                mainEventData:formatMainEventData(newData)})
+                                mainEventData:formatMainEventData(newData)});
+                            
+                            form.setValues(newData);
                         }
                     }else{
                         $().mloader("hide");
@@ -372,9 +389,10 @@ function getUpdateEvents(){
     var eventsData=matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments);
     return eventsData;
 }
-function getSortedUpdateEvents(){
+function getSortedUpdateEvents(source){
     var dateSortItems={};
-    getProgressEvents(getUpdateEvents(),getGlobal("currentPoint")).forEach(item=>{
+    source=source||getUpdateEvents();
+    getProgressEvents(source,getGlobal("currentPoint")).forEach(item=>{
         var _data=getEventsDetails(item);
         var date=_data.date.replace(" ","");
         if(!dateSortItems.hasOwnProperty(date)){
@@ -427,15 +445,16 @@ function generatePenaltyPaidSummary(container,penaltyPaidSum){
     var paid_label=$('<p>执行金额：'+penaltyPaidSum.paid+'万元<p>');
     var penalty=$('<div class="penalty-bar">'+'</div>');
     var percentage=(penaltyPaidSum.paid/(penaltyPaidSum.penalty)*100);
-
-    var paid=$('<div class="paid-bar">'+(Number.isNaN(percentage)||percentage==0?'':percentage.toFixed(2)+'%')+'</div>');
+    if (Number.isNaN(percentage)) percentage=0;
+    else if(!Number.isFinite(percentage)) percentage=100;
+    var paid=$('<div class="paid-bar">'+(percentage==0?'':percentage.toFixed(2)+'%')+'</div>');
     penalty.append(paid);
     $(container).append(caption);
     $(container).append(penalty_label);
     $(container).append(paid_label);
     $(container).append(penalty);
     
-    paid.css({width:percentage*(screen.width)+"px"})
+    paid.css({width:percentage/100*(screen.width-90)+"px"})
     console.log("execute summary",penaltyPaidSum,percentage*(screen.width-100),percentage);
     $(container).trigger('create');
 }
@@ -642,26 +661,6 @@ $('#progress_point_popupMenu_').find('a').on('click',async function(e){
             break;
     }
 });
-/*
-function getMatchedEventData(){
-    var matchedUpdates=$.grep(DataList.caseUpdates,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
-    var matchedExcutes=$.grep(DataList.caseExcutes,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
-    var matchedProperties=$.grep(DataList.caseProperties,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
-    var matchedAttachments=$.grep(DataList.caseAttachments,(d)=>Number(d.id)==index && compareStatus(d.caseStatus,caseStatus) && (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
-    
-    var greatMatched=matchedUpdates.concat(matchedExcutes,matchedProperties,matchedAttachments);
-    var dateSortItems={}
-    greatMatched.forEach(item=>{
-        var _data=getEventsDetails(item);
-        var date=_data.date.replace(" ","");
-        if(!dateSortItems.hasOwnProperty(date)){
-            dateSortItems[date]=[];
-        }
-        dateSortItems[date].push(_data);
-    })
-    return dateSortItems;
-}
-*/
 function generateUpdateInfoList(listview,dateSortItems){
     console.log('generateUpdateInfoList',dateSortItems);
     var sortedItems=Object.keys(dateSortItems).sort(function(a,b){
@@ -913,120 +912,125 @@ function bindUpdateInfoBtnClick(){
         }
     });
 }
-/*
-$('#progress_popupMenu').find('a').on('click',async function(e){
-    $('#progress_popupMenu').popup('close');
-    var title=progresses[currentProgress['targetPosition'].main] instanceof Array?progresses[currentProgress['targetPosition'].main][currentProgress['targetPosition'].sub]:progresses[currentProgress['targetPosition'].main];
-    var index=Number(sessionStorage.getItem("currentId"));
-    var caseStatus=currentProgress['targetPosition'].main+currentProgress['targetPosition'].sub/10;
-    var caseStatus_=$.grep(DataList.caseStatus,(d)=>Number(d.id)==index);
-    
-    console.log('currentId',index,caseStatus_,DataList.caseStatus)
-    
-    //console.log('dateSortItems',sortedItems,dateSortItems);
-    var caseNo=caseStatus_[0].caseNo;
-    switch($(this).text()){
-        case '查看':
-            //$( "#update_panel" ).panel( "open" );
-            //$( "#progress_details_info" ).removeClass('hide');
-            $().mloader('show',{message:"读取中..."});
-            setTimeout(() => {
-                var dateSortItems=getMatchedEventData();
-                var sortedItems=Object.keys(dateSortItems).sort(function(a,b){
-                    return dateSortItems[a][0].originalDate>dateSortItems[b][0].originalDate;
-                });
-                //console.log('查看...',sessionStorage.getItem("currentId"));
-                //_setTitleBar("progress_details_info_title",'caseNo');
-                //console.log('查看...',index,caseStatus,DataList.caseUpdates);
-                
-                //console.log('查看...',greatMatched);
-                //generateUpdateInfoList(sortedItems,dateSortItems);
-                
-                console.log('generateUpdateInfoList',dateSortItems);
-                
-                //$('#progress_details_info_body').trigger('create');
-                
-                goToPage( "#progress_details_info");
-                setTimeout(() => {
-                    $().mloader('hide');
-                },200);
-            }, 200);
-            //goToPage( "#progress_details_info");
-            break;
-        case '进展':
-            console.log("进展");
-            
-            setProgressPopupForm(add_update_template,"添加新的进展",{table:'caseUpdates',key:'updatesId',dateKey:'dateUpdated',id:index,caseStatus:caseStatus,caseNo:caseNo});
-            break;
-        case '执行':
-            console.log("执行");
-            setProgressPopupForm(add_execute_template,"添加新的执行",{table:'caseExcutes',key:'excutesId',dateKey:'dateExecuted',id:index,caseStatus:caseStatus,caseNo:caseNo});
-            break;
-        case '财产':
-            console.log("财产");
-            setProgressPopupForm(add_property_template,"添加新的财产变更",{table:'caseProperties',key:'propertyId',dateKey:'dateUpdated',id:index,caseStatus:caseStatus,caseNo:caseNo});
-            break;
-        case '附件':
-            console.log("附件");
-            
-            setProgressPopupForm(add_evidence_template,"添加新的附件证明",{table:'caseAttachments',key:'evidenceId',dateKey:'dateUploaded',id:index,caseStatus:caseStatus,caseNo:caseNo});
-            break;
-        case '关联':
-            console.log("关联");
-            /*
-            isAddPage=true;
-            $().mloader("show",{message:"读取中...."});
-            await getCaseLatestIndex().then(id=>{
-                
-                sessionStorage.setItem("currentId", id+1);
-                
-                //main_form.readOnly(false);
-                //main_form.instance.setEmptyValues(FormTemplate.template);
-                //main_form.readOnly(false).setEmptyValues();
-                //main_form.instance.setEmptyValues()
-                //
-                
-                //main_form.readOnly(false).setEmptyValues();
-                $('.progress_lock.edit-info').addClass('hide');
-                //console.log($('.progress_lock.edit-info'));
-                $("#reg_form_title").html("新增档案");
-                $('.edit-header-btn[name="save_btn"').show();
-                //_setBlurBackgroundVisibility(true);
-                goToPage( $(this).attr( "href" ));
-            // main_form.readOnly(false).setEmptyValues();
-                    //$().mloader("hide");
-                setTimeout(function() {
-                    caseForm.readOnly(false).setEmptyValues();
+var waitingTasks=[];
+function runWaitingTask(){
+    var fileName;
+    waitingTasks.forEach((task)=>{
+        if(task.type=='update'){
+            update(task.where,
+                task.table,
+                task.value,async function(r){
+                DataList[task.tableData.table]=updateOriginalData(DataList[task.tableData.table],task.newData,task.tableData.idkey);
+                if(task.tableData.table=='caseExcutes'){
+                    task.newData.id=task.tableData.data.id;
+                    //DataList.caseExcutes=updateOriginalData(DataList[data.table],newData,data.idkey);
+                    fireDataChnaged("caseexcutesChanged",task.newData,"update");
+                    updatePenaltyPaidSummary($('#execute_summary'));
+                }
+            })
+        }else if(task.type="upload"){
+            var filePaths= [];
                     
-                    $().mloader("hide");
-                }, 10);
-                //main_form.setValues(getGlobalJson("mainData")[0]);
-                //$("#fullscreenPage").trigger('create');
-                //main_form.instance.trigger('create');
+            uploadFiles(task.id,task.value).then(r=>{
+                //console.log(r);
+                $.each(r,(index,uploadResult)=>{
+                    if(!uploadResult.success){
+                        console.log(uploadResult.fileName+" 上传失败！");
+                        //cango=false;
+                        //$().mloader("hide");
+                    }else{
+                        console.log(uploadResult.fileName+" 上传成功！");
+                        filePaths.push(uploadResult.fileName);
+                    }
+                });
+                fileName=filePaths.join(',');
+                //task.newData.filePath=filePaths.join(',');
             });
-            
-            break;
-    }
-})
-function checkProgressEdiableStatus(){
-    console.log("clicked position",currentProgress['targetPosition'],"status position",currentProgress['originalPosition']);
-    if(currentProgress['targetPosition'].main>currentProgress['originalPosition'].main){
-        return "new";
-    }else{
-        if(currentProgress['targetPosition'].main==currentProgress['originalPosition'].main){
-            if(currentProgress['targetPosition'].sub==currentProgress['originalPosition'].sub || currentProgress['originalPosition'].main>excutePoint) return "update";
-            else return "shift";
-        }else{
-            if(currentProgress['targetPosition'].main==excutePoint && currentProgress['originalPosition'].main>excutePoint && currentProgress['targetPosition'].sub!=currentProgress['originalPosition'].sub)
-                return "shift";
-            else return "update";
-        }
-    }
-    //currentProgress['targetPosition']=e.Position;
-    //currentProgress['originalPosition']=formatIndex(but.opt.currentPosition);
-}
+        }else if(task.type="pureinsert"){
+            if(fileName!=undefined) task.newData.filePath=fileName;
+            pureinsert(task.table,task.value,(r)=>{
+                console.log('insert result',task.table,r);
+                //添加新提交的数据到缓存
+                DataList[task.table].push(task.newData);
+                //更新当前视图事件列表
+                //console.log(getSortedUpdateEvents(),$('#progress_point_info_body'));
+                //generateUpdateInfoList($('#progress_point_info_body'),getSortedUpdateEvents());
+                //更新节点视图计数器
+                
+                //更新节点图
+                if(task.table=='caseExcutes'){
+                    //DataList.caseExcutes=updateOriginalData(DataList.caseExcutes,newData,data.idkey);
+                    fireDataChnaged("caseexcutesChanged",task.newData,"add");
+                }
+                var canGo=true;
+                if(parseInt(getGlobal("currentIsAdd"))==1) {
+                    canGo=false;
+                    currentForm.getFormValues(function(e){
+                        console.log(e);
+                        var newData={};
+                        $.each(task.newData,(key,val)=>{
+                            newData[key.replace("_p","")]=val;
+                        })
+                        
+                        newData.id=parseInt(getGlobal("currentId"));
+                        if(e.success){
 
-*/
+                            //type:insert,table:"caseProgresses",value:newData
+
+                            insert('caseProgresses',newData,function(ee){
+                                console.log(ee,getGlobal("currentIsAdd"));
+                                if(ee.success){
+                                    
+                                        DataList.caseProgresses.push(newData);
+                                        
+                                        var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));//获取节点属性数据
+                                        
+                                        if(matched.length>0){
+                                            $('#progress_diagram').trigger({type:'moveNext',sourceData:matched[0],sourceIndex:parseInt(getGlobal("currentIndex")),
+                                                        eventsData:currentEvents,
+                                                        mainEventData:formatMainEventData(newData)});
+                                            $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
+                                            canGo=true;
+                                        }
+                                        //type:update,table:"caseStatus",where:'id='+newData.id,value:{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))}
+                                        update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
+                                            
+                                            if(eee.data.success){
+                                                DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify($('#progress_diagram').jqmData('status'))},'id');
+                                                $().minfo('show',{title:"提示",message:"保存成功。"},function(){});
+                                            }else{
+                                                $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
+                                            }
+                                            $().mloader("hide");
+                                        });
+                                    
+                                    
+                                }else{
+                                    $().mloader("hide");
+                                    $().minfo('show',{title:"错误",message:ee.error});
+                                }
+                            })
+                        
+                        }
+                    });
+                }
+                //console.log('getUpdateEvents',getUpdateEvents())
+                setTimeout(() => {
+                    const intervalId = setInterval(() => {
+                        if (canGo) {
+                            clearInterval(intervalId);
+                            $('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
+                            updatePenaltyPaidSummary($('#execute_summary'));
+                        }
+                    }, 100);
+                }, 100);
+            });
+            //history.back();
+        }
+        
+    })
+    waitingTasks=[];
+}
 //节点添加保存
 $('.progress_popup_add_form_submit').on('click', _updateSubmitEvent)
 //节点修改保存
@@ -1049,14 +1053,30 @@ $('.progress_popup_edit_form_submit').on('click', function (e){
             })
             newData[data.dateKey]=getDateTime();
             newData[data.idkey]=data.data[data.idkey];
+
+            //type:update,table:data.table,where:"id="+data.data.id+,value:vals.join()
+            waitingTasks.push({
+                type:'update',
+                table:data.table,
+                where:"id="+data.data.id+" AND "+data.idkey+"="+data.data[data.idkey],
+                tableData:data,
+                newData:newData
+            });
+            var formatData=getEventsDetails(newData);
+                
+            form.instance.jqmData('label').text(formatData.description);
+            form.instance.jqmData('label').prepend(getIconFromTypeName(formatData.typeName));
+            history.back();
+            $(window).trigger('hidepopup');
+            /*
             update("id="+data.data.id+" AND "+data.idkey+"="+data.data[data.idkey],
                 data.table,
                 vals.join(),async function(r){
                 //console.log('update result',r);
-                var formatData=getEventsDetails(newData);
+                //var formatData=getEventsDetails(newData);
                 
-                form.instance.jqmData('label').text(formatData.description);
-                form.instance.jqmData('label').prepend(getIconFromTypeName(formatData.typeName))
+                //form.instance.jqmData('label').text(formatData.description);
+                //form.instance.jqmData('label').prepend(getIconFromTypeName(formatData.typeName))
                 //console.log('DataList['+data.table+'] before',DataList[data.table]);
                 DataList[data.table]=updateOriginalData(DataList[data.table],newData,data.idkey);
                 if(data.table=='caseExcutes'){
@@ -1066,12 +1086,13 @@ $('.progress_popup_edit_form_submit').on('click', function (e){
                     fireDataChnaged("caseexcutesChanged",newData,"update");
                     updatePenaltyPaidSummary($('#execute_summary'));
                 }
+                //form.setValues(newData);
                 history.back();
                 $(window).trigger('hidepopup');
                 //console.log('DataList['+data.table+'] after',DataList[data.table]);
                 //await currentProgress['currentDiagramButton'].setStep(currentProgress['target']);
             })
-            
+            */
         }
     });
 })
@@ -1098,6 +1119,12 @@ function _updateSubmitEvent(e){
                 fileOk=false;
                 //files=values.data.caseAttachments;
                 if(e.values.filePath.length>0){
+                    
+                    //type:upload,id:data.id,value:values.filePath
+                    waitingTasks.push({type:'upload',id:data.id,value:values.filePath,newData:e.values});
+                    //e.values.filePath=filePaths.join(',');
+                    fileOk=true;
+                    /*
                     var filePaths= [];
                     
                     uploadFiles(data.id,e.values.filePath).then(r=>{
@@ -1115,6 +1142,7 @@ function _updateSubmitEvent(e){
                         e.values.filePath=filePaths.join(',');
                         fileOk=true;
                     });
+                    */
                 }
             }
             var _intervalId = setInterval(async() => {
@@ -1127,13 +1155,19 @@ function _updateSubmitEvent(e){
                     e.values.caseStatus=data.caseStatus;
                     e.values[data.dateKey]=getDateTime();
                     console.log("final values",data.table,e.values);
+
+                    waitingTasks.push({type:'pureinsert',table:data.table,value:e.values,newData:e.values});
+                    var updateEvents=getUpdateEvents().concat([e.values]);
+                    console.log('UpdateEvents',getUpdateEvents(),updateEvents,getSortedUpdateEvents(updateEvents))
+                    generateUpdateInfoList($('#progress_point_info_body'),getSortedUpdateEvents(updateEvents));
+                    /*
                     //添加新提交的数据到数据库
                     pureinsert(data.table,e.values,(r)=>{
                         console.log('insert result',data.table,r);
                         //添加新提交的数据到缓存
                         DataList[data.table].push(e.values);
                         //更新当前视图事件列表
-                        console.log(getSortedUpdateEvents(),$('#progress_point_info_body'));
+                        //console.log(getSortedUpdateEvents(),$('#progress_point_info_body'));
                         generateUpdateInfoList($('#progress_point_info_body'),getSortedUpdateEvents());
                         //更新节点视图计数器
                         
@@ -1154,6 +1188,9 @@ function _updateSubmitEvent(e){
                                 
                                 newData.id=parseInt(getGlobal("currentId"));
                                 if(e.success){
+
+                                    //type:insert,table:"caseProgresses",value:newData
+
                                     insert('caseProgresses',newData,function(ee){
                                         console.log(ee,getGlobal("currentIsAdd"));
                                         if(ee.success){
@@ -1169,6 +1206,7 @@ function _updateSubmitEvent(e){
                                                     $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
                                                     canGo=true;
                                                 }
+                                                //type:update,table:"caseStatus",where:'id='+newData.id,value:{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))}
                                                 update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
                                                     
                                                     if(eee.data.success){
@@ -1205,6 +1243,7 @@ function _updateSubmitEvent(e){
                         $().mloader("hide");
                     
                     });
+                    */
                     //history.back();
                 }
             });
@@ -1212,236 +1251,7 @@ function _updateSubmitEvent(e){
         }
     });
 }
-/*
-//节点添加保存
-function updateSubmitEvent(e){
-    console.log('updateSubmitEvent',$(this).data('item'));
-    var data=JSON.parse($(this).data('item'));
-    
-    var form=$(this).jqmData('form');
-    console.log(form.opt.template);
-    form.getFormValues(function(e){
-        console.log("获取到的表格值",e);
-        if(e.success){
-            var editableStatus=checkProgressEdiableStatus();
-            var goNext=false;
-            var intervalId;
-            console.log("提交方式为",editableStatus);
-            if(editableStatus!="new" && editableStatus!="update"){
-                //var list2delete=[];
 
-                //需要删除旧的节点事件
-                var tables={};
-                var deleteItem=currentProgress['currentDiagramButton'].opt.counterData.filter((d)=>{
-                    var isMatched=false;
-                    if(formatIndex(d.caseStatus).main>=currentProgress['targetPosition'].main && 
-                    formatIndex(d.caseStatus).sub!=currentProgress['targetPosition'].sub && d.isInactived==0){
-                        var matcher=Object.keys(tableNamesMatcher);
-                        matcher.forEach(match=>{
-                            if(d.hasOwnProperty(match)){
-                                if(!tables.hasOwnProperty(tableNamesMatcher[match])){
-                                    tables[tableNamesMatcher[match]]=[];
-                                }
-                                tables[tableNamesMatcher[match]].push(d);
-                            }
-                        })
-                        //tables[]
-                        isMatched=true;
-                    }
-                    return isMatched;
-                })
-                //需要恢复新的节点删除事件
-                var activedtables={};
-                var activedItem=currentProgress['currentDiagramButton'].opt.counterData.filter((d)=>{
-                    var isMatched=false;
-                    if(formatIndex(d.caseStatus).main==currentProgress['targetPosition'].main && 
-                    formatIndex(d.caseStatus).sub==currentProgress['targetPosition'].sub && d.isInactived==1){
-                        var matcher=Object.keys(tableNamesMatcher);
-                        matcher.forEach(match=>{
-                            if(d.hasOwnProperty(match)){
-                                if(!activedtables.hasOwnProperty(tableNamesMatcher[match])){
-                                    activedtables[tableNamesMatcher[match]]=[];
-                                }
-                                activedtables[tableNamesMatcher[match]].push(d);
-                            }
-                        })
-                        //tables[]
-                        isMatched=true;
-                    }
-                    return isMatched;
-                })
-                
-                $('#progress_popup_add').popup('close');
-                setTimeout(() => {
-                    $().requestDialog({
-                        title:'提示',
-                        message:"再次确认！这个操作将会删除已有的("+deleteItem.length+")条记录，你继续吗？",
-                    },function(go){
-                        goNext=go;
-                        if(!go) clearInterval(intervalId);
-                        else{
-                            
-                        }
-                        setTimeout(() => {
-                            $('#progress_popup_add').popup('open');
-                        }, 200);
-                    });
-                }, 200);
-                
-            }else{
-                
-                goNext=true;
-            }
-            intervalId = setInterval(async() => {
-                if (goNext) {
-                    clearInterval(intervalId);
-                    $().mloader("show",{message:"提交中...."});
-                    //var files=[];
-                    //var cango=true;
-                    var fileOk=true;
-                    var idx=await getRecordLatestIndex(data.table,data.key);
-                    if(data.table!='caseAttachments'){
-                        var subidx=await getRecordLatestIndex(data.table,'subId','caseStatus='+data.caseStatus);
-                        e.values.subId=subidx+1;
-                    }else{
-                        fileOk=false;
-                        //files=values.data.caseAttachments;
-                        if(e.values.filePath.length>0){
-                            var filePaths= [];
-                            
-                            uploadFiles(data.id,e.values.filePath).then(r=>{
-                                //console.log(r);
-                                $.each(r,(index,uploadResult)=>{
-                                    if(!uploadResult.success){
-                                        console.log(uploadResult.fileName+" 上传失败！");
-                                        //cango=false;
-                                        //$().mloader("hide");
-                                    }else{
-                                        console.log(uploadResult.fileName+" 上传成功！");
-                                        filePaths.push(uploadResult.fileName);
-                                    }
-                                });
-                                e.values.filePath=filePaths.join(',');
-                                fileOk=true;
-                            });
-                            
-                            
-                        }
-                        
-                        //values.data.caseAttachments
-                    }
-
-                    var _intervalId = setInterval(async() => {
-                        if (fileOk) {
-                            clearInterval(_intervalId);
-                            e.values[data.key]=idx+1;
-                            e.values.caseNo=data.caseNo;
-                            e.values.id=data.id;
-                            e.values.isInactived=0;
-                            e.values.caseStatus=data.caseStatus;
-                            e.values[data.dateKey]=getDateTime();
-                            var newCaseStatus=currentProgress['targetPosition'].main+(currentProgress['originalPosition'].main>excutePoint && currentProgress['targetPosition'].main> currentProgress['originalPosition'].main?currentProgress['originalPosition'].sub:currentProgress['targetPosition'].sub)/10;
-                            if(editableStatus=="new" || editableStatus=="shift"){
-                                //pageOnTable.updateTableData({caseStatus:newCaseStatus},$('#pageOneTable').find('tr[data-item='+data.id+']'));
-                                $('#pageOneTable').updateTableItem({caseStatus:newCaseStatus,id:data.id});
-                                console.log("提交方式为",editableStatus,'状态更新为',newCaseStatus,'目标ID',data.id);
-                                
-                                //因为是添加，需要更新节点在表格caseStatus的位置
-                                update("id="+data.id,'caseStatus','caseStatus="'+newCaseStatus+'"',async function(r){
-                                    console.log('update result',r);
-                                    $.each(DataList.combinedData,(index,item)=>{
-                                        if(item.id == data.id) {
-                                            DataList.combinedData[index].caseStatus=newCaseStatus;
-                                            return false;
-                                        }
-                                    });
-                                    //await currentProgress['currentDiagramButton'].setStep(currentProgress['target']);
-                                    var targetPosition=currentProgress['targetPosition'];
-                                    if(currentProgress['originalPosition'].main>=currentProgress['currentDiagramButton'].opt.breakpoint){
-                                        
-                                        if(targetPosition.main==currentProgress['currentDiagramButton'].opt.breakpoint){
-        
-                                        }else{
-                                            targetPosition.sub=currentProgress['originalPosition'].sub;
-                                        }
-                                    }
-                                    await currentProgress['currentDiagramButton'].MoveTo(targetPosition.main+targetPosition.sub/10);
-                                })
-                                if(editableStatus=="shift"){
-                                    //删除旧节点事件--更新数据库，更新缓存数据
-                                    $.each(tables,(table,del)=>{
-                            
-                                        del.forEach((dl)=>{
-                                            //console.log(table,del.length,dl.caseStatus,dl.id);
-                                            //更新数据库
-                                            inactiveItem("caseStatus="+dl.caseStatus+" AND id="+dl.id,table);
-                                            //更新缓存数据
-                                            var index=currentProgress['currentDiagramButton'].opt.counterData.indexOf(dl);
-                                            console.log("indexOf",index)
-                                            if(index>-1){
-                                                //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
-                                                //currentProgress['currentDiagramButton'].opt.counterData.splice(index, 1);
-                                                currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
-                                            }
-                                            index=DataList[table].indexOf(dl);
-                                            if(index>-1){
-                                                //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
-                                                DataList[table][index].isInactived=1;
-                                            }
-                                        })
-                                    })
-                                    //恢复新的节点原有删除的事件--更新数据库，更新缓存数据
-                                    $.each(activedtables,(table,actived)=>{
-                            
-                                        actived.forEach((ac)=>{
-                                            //console.log(table,del.length,dl.caseStatus,dl.id);
-                                            //更新数据库
-                                            restoreItem("caseStatus="+ac.caseStatus+" AND id="+ac.id,table);
-                                            //更新缓存数据
-                                            var index=currentProgress['currentDiagramButton'].opt.counterData.indexOf(ac);
-                                            console.log("indexOf",index)
-                                            if(index>-1){
-                                                //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
-                                                currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=0;
-                                            }
-                                            index=DataList[table].indexOf(ac);
-                                            if(index>-1){
-                                                //currentProgress['currentDiagramButton'].opt.counterData[index].isInactived=1;
-                                                DataList[table][index].isInactived=0;
-                                            }
-                                        })
-                                    })
-                                    console.log('DataList',DataList);
-                                }
-                            }
-                            //更新节点数据
-                            console.log("final values",data.table,e.values);
-                            //添加新提交的数据到数据库
-                            pureinsert(data.table,e.values,(r)=>{
-                                console.log('insert result',data.table,r,currentProgress['target']);
-                                //添加新提交的数据到缓存
-                                DataList[data.table].push(e.values);
-                                currentProgress['currentDiagramButton'].opt.counterData.push(e.values);
-                                //更新节点图
-                                currentProgress['currentDiagramButton'].updateCounterIndicator(data,editableStatus=="shift"?currentProgress['originalPosition']:undefined);
-                                if(data.table=='caseExcutes'){
-                                    fireDataChnaged("caseexcutesChanged",e.values,"add");
-                                }
-                                $().mloader("hide");
-                            
-                            });
-                            history.back();
-                        }
-                    });
-                    
-                }
-            }, 100);
-        }
-        
-
-    });
-}
-*/
 function setProgressPopupFormWithoutCheck(template,title,data){
     $().mloader("show",{message:"读取中...."});
     var form= new mform({template:template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
@@ -1456,47 +1266,7 @@ function setProgressPopupFormWithoutCheck(template,title,data){
         $().mloader("hide");
     },200);
 }
-/*
-function setProgressPopupForm(template,title,data){
-    console.log('checkProgressEdiableStatus',checkProgressEdiableStatus());
-    var editableStatus=checkProgressEdiableStatus();
-    var goNext=false;
-    var intervalId;
-    if(editableStatus!="new" && editableStatus!="update"){
-        $().requestDialog({
-            title:'提示',
-            message:"这个操作将会删除已有的记录，你确定吗？",
-        },function(go){
-            goNext=go;
-            if(!go) clearInterval(intervalId);
-            else{
 
-            }
-        });
-    }else{
-        goNext=true;
-    }
-    intervalId = setInterval(() => {
-        if (goNext) {
-            clearInterval(intervalId);
-            setTimeout(() => {
-                $().mloader("show",{message:"读取中...."});
-                var form= new mform({template:template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
-                $('#progress_popup_add_title').text(getStatusLabel(currentProgress['targetPosition'],progresses)+" "+title);
-                $('#progress_popup_add_form').empty();
-                $('#progress_popup_add_form').append(form.instance);
-                $('#progress_popup_add_form').trigger('create');
-                $('.progress_popup_add_form_submit').data('item',JSON.stringify(data));
-                $('.progress_popup_add_form_submit').jqmData('form',form);
-                $('#progress_popup_add').popup('open');
-                $().mloader("hide");
-            }, 200);
-            
-        }
-    }, 100);
-    
-}
-*/
 //第一页左下方 添加 删除 按钮事件
 $('.case_reg_but').on('click',async function(e){
     e.preventDefault();

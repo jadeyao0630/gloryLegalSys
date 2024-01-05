@@ -680,6 +680,9 @@ function getEventsDetails(item){
     var id;
     var type;
     var key;
+    var fileName;
+    var caseId=item.id;
+    var isTemp=item.isTemp?true:false;
     if(item.hasOwnProperty('updatesId')){//updates
         originalDate=new Date(item.dateUpdated);
         date=formatDateTime(new Date(item.dateUpdated),"MM月dd日 ");
@@ -695,6 +698,7 @@ function getEventsDetails(item){
         id=item[add_evidence_template.settings.idkey];
         type=add_evidence_template.settings.type;
         key=add_evidence_template.settings.idkey;
+        fileName=item.filePath;
         typeName="附件";
     }else if(item.hasOwnProperty('propertyId')){//property
         originalDate=new Date(item.dateOccur);
@@ -713,7 +717,17 @@ function getEventsDetails(item){
         key=add_execute_template.settings.idkey;
         typeName="执行";
     }
-    return {date:date,description:text,id:id,type:type,key:key,isInactived:item.isInactived,originalDate:originalDate,typeName:typeName};
+    return {date:date,
+        description:text,
+        id:id,
+        type:type,
+        key:key,
+        fileName:fileName,
+        caseId:caseId,
+        isTemp:isTemp,
+        isInactived:item.isInactived,
+        originalDate:originalDate,
+        typeName:typeName};
 }
 function getFormatString(template,item){
     var settings=template.settings;

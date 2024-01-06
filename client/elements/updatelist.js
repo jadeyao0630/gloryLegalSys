@@ -1,128 +1,9 @@
 var waitingList={};
+var tempFile={};
 function appendToWaiting(key,task){
     waitingList[key]=task;
 }
-function _updateSubmitEvent(e){
-    //console.log('updateSubmitEvent',$(this).data('item'));
-    var data=JSON.parse($(this).data('item'));
-    
-    var form=$(this).jqmData('form');
-    console.log(form.opt.template);
-    form.getFormValues(async function(e){
-        console.log("获取到的表格值",e,data);
-        if(e.success){
-            $('#progress_point_popup_add').popup('close');
-            $().mloader("show",{message:"提交中...."});
-            var fileOk=true;
-            //console.log('getTheLastIndex',data.table,data.key);
-            getTheLastIndex(data.table,data.key).then((r)=>{
-                //console.log('getTheLastIndex',r);
-                if(data.table!='caseAttachments'){
-                    getTheLastIndex(data.table,'subId','caseStatus='+data.caseStatus).then((rr)=>{
-                        //console.log('last index',r,'last sub index',rr)
 
-                    });
-                }else{
-                    //console.log('last index',r)
-                    //getSortedUpdateEvents();
-                    var uploadValue=e.values;
-                    e.values.caseNo=data.caseNo;
-                    e.values.id=data.id;
-                    e.values.isInactived=0;
-                    e.values.caseStatus=data.caseStatus;
-                    e.values[data.dateKey]=getDateTime();
-                    //e.values.isTemp=true;
-                    var _data=getEventsDetails(e.values);
-                    
-                    console.log(data,_data);
-                    var date=_data.date.replace(" ","");
-                    if(!dateSortItems.hasOwnProperty(date)){
-                        dateSortItems[date]=[];
-                    }
-                    dateSortItems[date].push(_data);
-                    console.log(uploadValue,e.values);
-                    waitingList[data.key+data.id]=function(){
-                        uploadFiles(data.id,uploadValue.filePath).then(rr=>{
-                            //console.log(r);
-                            $.each(rr,(index,uploadResult)=>{
-                                if(!uploadResult.success){
-                                    console.log(uploadResult.fileName+" 上传失败！");
-                                    //cango=false;
-                                    //$().mloader("hide");
-                                }else{
-                                    console.log(uploadResult.fileName+" 上传成功！");
-                                    filePaths.push(uploadResult.fileName);
-                                    
-                                }
-                            });
-                            e.values.filePath=filePaths.join(',');
-                            e.values[data.key]=r+1;
-                            
-                            //fileOk=true;
-                        });
-                    }
-                }
-            
-            })
-            /*
-            var idx=await getRecordLatestIndex(data.table,data.key);
-            if(data.table!='caseAttachments'){//非文件上传类
-                var subidx=await getRecordLatestIndex(data.table,'subId','caseStatus='+data.caseStatus);
-                e.values.subId=subidx+1;
-            }else{
-                fileOk=false;
-                //files=values.data.caseAttachments;
-                if(e.values.filePath.length>0){
-                    
-                    //type:upload,id:data.id,value:values.filePath
-                    //waitingTasks.push({type:'upload',id:data.id,value:e.values.filePath,newData:e.values});
-                    //e.values.filePath=filePaths.join(',');
-                    //fileOk=true;
-                    
-                    var filePaths= [];
-                    
-                    uploadFiles(data.id,e.values.filePath).then(r=>{
-                        //console.log(r);
-                        $.each(r,(index,uploadResult)=>{
-                            if(!uploadResult.success){
-                                console.log(uploadResult.fileName+" 上传失败！");
-                                //cango=false;
-                                //$().mloader("hide");
-                            }else{
-                                console.log(uploadResult.fileName+" 上传成功！");
-                                filePaths.push(uploadResult.fileName);
-                            }
-                        });
-                        e.values.filePath=filePaths.join(',');
-                        fileOk=true;
-                    });
-                    
-                }
-            }
-            var _intervalId = setInterval(async() => {
-                if (fileOk) {
-                    clearInterval(_intervalId);
-                    e.values[data.key]=idx+1;
-                    e.values.caseNo=data.caseNo;
-                    e.values.id=data.id;
-                    e.values.isInactived=0;
-                    e.values.caseStatus=data.caseStatus;
-                    e.values[data.dateKey]=getDateTime();
-                    e.values.isTemp=true;
-                    //console.log("final values",data.table,e.values);
-                    DataList[data.table].push(e.values);
-                    storeTempData(data.table,e.values);
-                    waitingTasks.push({type:'pureinsert',table:data.table,value:e.values,newData:e.values});
-                    //var updateEvents=getUpdateEvents().concat([e.values]);
-                    //console.log('UpdateEvents',getUpdateEvents(),updateEvents,getSortedUpdateEvents())
-                    generateUpdateInfoList($('.updateContainer'),getSortedUpdateEvents());
-                }
-            });
-            */
-            $().mloader('hide')
-        }
-    });
-}
 $.fn.updateListView=function(args){
     var _this=this;
     var collapsible=$('<div data-role="collapsible" data-theme="b" data-content-theme="a" data-collapsed="false"><h3>更新</h3><div>');
@@ -184,18 +65,31 @@ $.fn.updateListView=function(args){
                 if(e.success){
                     $('#progress_point_popup_add').popup('close');
                     $().mloader("show",{message:"提交中...."});
-                    var fileOk=true;
+
+                    e.values.caseNo=data.caseNo;
+                    e.values.id=data.id;
+                    e.values.isInactived=0;
+                    e.values.caseStatus=data.caseStatus;
+                    e.values[data.dateKey]=getDateTime();
+                    e.values.isTemp=true;
                     //console.log('getTheLastIndex',data.table,data.key);
                     getTheLastIndex(data.table,data.key).then((r)=>{
                         //console.log('getTheLastIndex',r);
+                        
+                        
+                        
+                        var canSetWatingList=false;
                         if(data.table!='caseAttachments'){
+                            e.values[data.key]=r+1;
                             getTheLastIndex(data.table,'subId','caseStatus='+data.caseStatus).then((rr)=>{
                                 //console.log('last index',r,'last sub index',rr)
-
+                                e.values.subId=rr+1;
+                                canSetWatingList=true;
                             });
                         }else{
                             //console.log('last index',r)
                             //getSortedUpdateEvents();
+                            e.values[data.key]=r+Object.keys(tempFile).length+1;
                             uploadFiles(data.id,e.values.filePath).then(rr=>{
                                 //console.log(r);
                                 var filePaths=[];
@@ -211,13 +105,21 @@ $.fn.updateListView=function(args){
                                     }
                                 });
                                 e.values.filePath=filePaths.join(',');
-                                e.values.caseNo=data.caseNo;
-                                e.values.id=data.id;
-                                e.values.isInactived=0;
-                                e.values.caseStatus=data.caseStatus;
-                                e.values[data.dateKey]=getDateTime();
-                                e.values.isTemp=true;
-                                e.values[data.key]=r+1;
+                                
+                                
+                                
+                                if(!tempFile.hasOwnProperty(data.id)) tempFile[data.id]=[];
+                                tempFile[data.id].push(filePath);
+                                //fileOk=true;
+                                
+                                canSetWatingList=true;
+                            });
+                            
+                            
+                        }
+                        const intervalId = setInterval(() => {
+                            if (canSetWatingList) {
+                                clearInterval(intervalId);
                                 var dateSortItems=_this.jqmData('lastData');
                                 var _data=getEventsDetails(e.values);
                                 var date=_data.date.replace(" ","");
@@ -226,14 +128,33 @@ $.fn.updateListView=function(args){
                                 }
                                 dateSortItems[date].push(_data);
                                 _this.updateListViewData(dateSortItems);
-                                
-                                //fileOk=true;
-                            });
-                            
-                            waitingList[data.key+data.id]=function(){
-                                
+                                waitingList[data.key+data.id]=function(){
+                                    if(e.values.hasOwnProperty('isTemp'))
+                                        delete e.values.isTemp;
+                                    pureinsert(data.table,e.values,(r)=>{
+                                        console.log('insert result',data.table,r);
+                                        //添加新提交的数据到缓存
+                                        console.log("更新缓存前",DataList[data.table],e.values)
+                                        DataList[data.table].push(e.values);
+                                        
+                                        console.log("更新缓存后",DataList[data.table])
+                                        //更新当前视图事件列表
+                                        //console.log(getSortedUpdateEvents(),$('#progress_point_info_body'));
+                                        //generateUpdateInfoList($('#progress_point_info_body'),getSortedUpdateEvents());
+                                        //更新节点视图计数器
+                                        
+                                        //更新节点图
+                                        if(data.table=='caseExcutes'){
+                                            //DataList.caseExcutes=updateOriginalData(DataList.caseExcutes,newData,data.idkey);
+                                            fireDataChnaged("caseexcutesChanged",e.values,"add");
+                                        }
+                                        console.log("更新缓存后",getUpdateEvents())
+                                        $('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
+                                        updatePenaltyPaidSummary($('#execute_summary'));
+                                    });
+                                }
                             }
-                        }
+                        }, 100);
                     
                     })
                     $().mloader('hide')
@@ -362,6 +283,15 @@ $.fn.updateListViewData=function(data){
                     console.log('查看',data,itemData);
                     $('#preview_container').empty();
                     //var headerHeight=$('#progress_file_preview').find('div[data-role="header"]').outerHeight();
+
+                    
+                    if(itemData==undefined) {
+                    
+                        itemData={};
+                        itemData.filePath=data.fileName;
+                        itemData.id=data.caseId;
+                        console.log('itemData',itemData)
+                    }
 
                     var extension=itemData.filePath.split('.').pop().toLowerCase();
                     if(extension=='docx'||extension=='xlsx'){
@@ -506,20 +436,25 @@ $.fn.updateListViewData=function(data){
                         _this.jqmData('lastData')[k]=$.grep(v,d=>d.id!=data.id);
                         if(_this.jqmData('lastData')[k].length==0) delete _this.jqmData('lastData')[k];
                     });
-                    console.log('删除',_this.jqmData('lastData'));
+                    console.log('删除',_this.jqmData('lastData'),data);
                     _this.updateListViewData(_this.jqmData('lastData'));
-
+                    deleteFile(data.caseId,data.fileName);
+                    if(waitingList.hasOwnProperty(data.updatesId+data.id))
+                        delete waitingList[data.updatesId+data.id];
                 }else{
                     _this.updateListViewItem(data)
                     //storeTempData(data.type,value,data.key)
                 }
                 waitingList[data.key+data.id]=function(){
+                    console.log('删除',data);
+                    if(data.isTemp) _this.updateListViewData(_this.jqmData('lastData'));
+                    DataList[data.type]=updateOriginalData(DataList[data.type],value,data.key);
                     inactiveItem(data.key+'='+data.id,data.type,function(r){});
                 };
                 break;
             case '还原':
                 data.isInactived=0;
-                var value={isInactived:0}
+                var value={isInactived:data.isInactived}
                 value[data.key]=data.id;
                 if(data.isTemp){
                     //storeTempData(data.type,value,data.key)
@@ -532,6 +467,7 @@ $.fn.updateListViewData=function(data){
                 }
                 
                 waitingList[data.key+data.id]=function(){
+                    DataList[data.type]=updateOriginalData(DataList[data.type],value,data.key);
                     restoreItem(data.key+'='+data.id,data.type,function(r){});
                 };
                 break;

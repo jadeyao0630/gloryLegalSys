@@ -129,10 +129,12 @@ function compareValues(source,target,prefix){
             }
         }
     });
-    if(isSame && Object.keys(waitingList).length>0) isSame=false;
+    console.log('compareValues',waitingList)
+    if(isSame && Object.keys(waitingList).length>0) {isSame=false;}
     return isSame;
 }
-$('#progress_point_info').find('a[data-rel="back"]').on('click',function(e){
+console.log('backbtn',$('#progress_point_info').find('[data-role="header"]'))
+$('#progress_point_info').find('[data-role="header"]').find('a[data-rel="back"]').on('click',function(e){
     //console.log(getGlobal('currentPage'));
     e.preventDefault();
     currentForm.getFormValues(function(e){
@@ -215,16 +217,22 @@ function formatMainEventData(d){
     var legalInstitution=$.grep(resourceDatas.legalInstitution_,dd=>dd.id==d.legalInstitution);
     if(legalInstitution.length>0) legalInstitution=legalInstitution[0].name;
     console.log('legalInstitution',resourceDatas.legalInstitution_,d.legalInstitution,legalInstitution);
-    return {index:d.typeId,date:formatDateTime(new Date(d.judgmentDate),'yyyy年MM月dd日'),caseNo:d.caseNo,legalInstitution:legalInstitution,sum:d.judgmentSum,title:title};
+    var date=d.judgmentDate!="0000-00-00 00:00:00"?formatDateTime(new Date(d.judgmentDate),'yyyy年MM月dd日'):d.judgmentDate;
+    return {index:d.typeId,date:date,caseNo:d.caseNo,legalInstitution:legalInstitution,sum:d.judgmentSum,title:title};
 }
 //节点修改保存按钮事件
 $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
+    
     console.log('save_btn',getGlobal("currentPoint"),$(this).jqmData('form'));
     //if(parseInt(getGlobal("currentPoint"))==0) return;
     console.log('save_btn',$(this));
     var form=$(this).jqmData('form');
     var events=$(this).jqmData('events');
     form.getFormValues(function(e){
+        if(compareValues(e.values,form.currentData,"_p")){
+            $().minfo('show',{title:"提示",message:"您还没有修改过任何数据。不需要保存。"},function(){});
+            return;
+        }
         console.log(e);
         var newData={};
         if(e.success){
@@ -266,6 +274,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                             var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));//获取节点属性数据
                             
                             if(matched.length>0){
+                                console.log("add progress",newData,formatMainEventData(newData));
                                 $('#progress_diagram').trigger({type:'moveNext',sourceData:matched[0],sourceIndex:parseInt(getGlobal("currentIndex")),
                                             eventsData:events,
                                             mainEventData:formatMainEventData(newData)});
@@ -311,6 +320,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
             
         }
     });
+    
 })
 function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     console.log({typeId:typeId,data:data,update_data:update_data,pointIndex:pointIndex});
@@ -749,7 +759,7 @@ function runWaitingTask(){
     */
 }
 //节点添加保存
-$('.progress_popup_add_form_submit').on('click', _updateSubmitEvent)
+//$('.progress_popup_add_form_submit').on('click', _updateSubmitEvent)
 //节点修改保存
 
 var tempData;

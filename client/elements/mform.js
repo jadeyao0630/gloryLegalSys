@@ -644,7 +644,7 @@ mform.prototype={
             }
         });
         selectItem.trigger('create');
-        selectItem.selectmenu().selectmenu('refresh')
+        //selectItem.selectmenu().selectmenu('refresh')
         subContainer.trigger('create');
         return subContainer;
         function setOptionItem(index,data,itemTemplate,key){

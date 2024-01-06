@@ -20,7 +20,19 @@ async function getDocxFile(folder,fileName){
     });
     return await response;
 }
-
+async function deleteFile(folder,fileName){
+    const response = new Promise(async(resolve,reject)=>{
+        await fetch("http://"+ip+":"+port+"/deleteLocal?fileName="+fileName+"&folder="+folder) // Replace with the actual server URL
+        .then(res => {res.json();console.log(res)})
+        .then(data => {
+            resolve(data);
+        })
+        .catch(error => {
+            console.error('Error delete the file:', error);
+        });
+    });
+    return await response;
+}
 async function uploadFiles(folder,files){
     var results=[];
     $.each(files,(index,file)=>{

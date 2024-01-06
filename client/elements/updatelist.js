@@ -351,10 +351,18 @@ $.fn.updateListViewData=function(data){
             case '查看':
                 $().mloader('show',{message:"读取中..."});
                 setTimeout(() => {
+                    console.log();
                     var itemData=getDataById(DataList[data.type],data.key,data.id);
+                    if(itemData==undefined) {
+                        itemData={};
+                        itemData.filePath=data.fileName;
+                        itemData.id=data.caseId;
+                    }
+
                     console.log('查看',data,itemData);
                     $('#preview_container').empty();
                     //var headerHeight=$('#progress_file_preview').find('div[data-role="header"]').outerHeight();
+
                     var extension=itemData.filePath.split('.').pop().toLowerCase();
                     if(extension=='docx'||extension=='xlsx'){
                         const docxOptions = Object.assign(docx.defaultOptions, {

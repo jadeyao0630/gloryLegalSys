@@ -117,6 +117,28 @@ app.get('/downloadLocal', (req, res) => {
     }
   });
 });
+app.get('/deleteLocal', (req, res) => {
+  const fileName = decodeURIComponent(req.query.fileName);
+  const folder = req.query.folder;
+  const file = path.join(env.UPLOADS_PATH,folder,fileName);
+  try {
+    fs.unlinkSync(file);
+    res.json({
+      status:200,
+      message:`Deleted the file under ${file}`,
+      success:true
+    });
+  } catch (err) {
+    res.json({
+      status:500,
+      message:'An error occurred: '+err.message,
+      error:err,
+      success:false
+    });
+  }
+  
+  
+});
 app.get('/preview', async (req, res) => {
   const fileName = decodeURIComponent(req.query.fileName);
   const folder = req.query.folder;

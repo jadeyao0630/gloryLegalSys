@@ -41,7 +41,26 @@ function _updateSubmitEvent(e){
                     }
                     dateSortItems[date].push(_data);
                     console.log(uploadValue,e.values);
+                    uploadFiles(data.id,uploadValue.filePath).then(rr=>{
+                        //console.log(r);
+                        $.each(rr,(index,uploadResult)=>{
+                            if(!uploadResult.success){
+                                console.log(uploadResult.fileName+" 上传失败！");
+                                //cango=false;
+                                //$().mloader("hide");
+                            }else{
+                                console.log(uploadResult.fileName+" 上传成功！");
+                                filePaths.push(uploadResult.fileName);
+                                
+                            }
+                        });
+                        e.values.filePath=filePaths.join(',');
+                        e.values[data.key]=r+1;
+                        
+                        //fileOk=true;
+                    });
                     waitingList[data.key+data.id]=function(){
+                        /*
                         uploadFiles(data.id,uploadValue.filePath).then(rr=>{
                             //console.log(r);
                             $.each(rr,(index,uploadResult)=>{
@@ -60,6 +79,7 @@ function _updateSubmitEvent(e){
                             
                             //fileOk=true;
                         });
+                        */
                     }
                 }
             
@@ -355,6 +375,14 @@ $.fn.updateListViewData=function(data){
                     console.log('查看',data,itemData);
                     $('#preview_container').empty();
                     //var headerHeight=$('#progress_file_preview').find('div[data-role="header"]').outerHeight();
+                    
+                    if(itemData==undefined) {
+                    
+                        itemData={};
+                        itemData.filePath=data.fileName;
+                        itemData.id=data.caseId;
+                        console.log('itemData',itemData)
+                    }
                     var extension=itemData.filePath.split('.').pop().toLowerCase();
                     if(extension=='docx'||extension=='xlsx'){
                         const docxOptions = Object.assign(docx.defaultOptions, {

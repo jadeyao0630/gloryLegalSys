@@ -439,18 +439,19 @@ $.fn.updateListViewData=function(data){
                     console.log('删除',_this.jqmData('lastData'),data);
                     _this.updateListViewData(_this.jqmData('lastData'));
                     deleteFile(data.caseId,data.fileName);
-                    if(waitingList.hasOwnProperty(data.updatesId+data.id))
-                        delete waitingList[data.updatesId+data.id];
+                    _this.updateListViewData(_this.jqmData('lastData'));
+                    if(waitingList.hasOwnProperty(data.key+data.id))
+                        delete waitingList[data.key+data.id];
                 }else{
                     _this.updateListViewItem(data)
                     //storeTempData(data.type,value,data.key)
+                    waitingList[data.key+data.id]=function(){
+                        console.log('删除',data);
+                        DataList[data.type]=updateOriginalData(DataList[data.type],value,data.key);
+                        inactiveItem(data.key+'='+data.id,data.type,function(r){});
+                    };
                 }
-                waitingList[data.key+data.id]=function(){
-                    console.log('删除',data);
-                    if(data.isTemp) _this.updateListViewData(_this.jqmData('lastData'));
-                    DataList[data.type]=updateOriginalData(DataList[data.type],value,data.key);
-                    inactiveItem(data.key+'='+data.id,data.type,function(r){});
-                };
+                
                 break;
             case '还原':
                 data.isInactived=0;

@@ -219,7 +219,7 @@ $('body').on(preload_completed_event_name,function(){
     setTimeout(() => {
         //tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
         //setColumnToggleButton();
-        setPersonCaseSum(DataList.combinedData);
+        setPersonCaseSum(currentData);
     }, 500);
     //pageOnTable.setSort($('#pageOneTable-fixed').find('th'));
     //pageOnTable.setSort($('#pageOneTable').find('th'));
@@ -251,6 +251,7 @@ $('body').on(preload_completed_event_name,function(){
         header_filter_template.template.legalAgencies_f.isDisabled=true;
         header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
         console.log('FormTemplate3.template.caseInfo',FormTemplate3.template.caseInfo);
+        $('#legalAgenciesSum').hide();
         $('.super-auth').hide();
     }else if(getGlobalJson('currentUser').level==adminLevel){
         //$('#case_reg_but_restore').show();
@@ -391,6 +392,7 @@ $('body').on(preload_completed_event_name,function(){
                     $('#pageOneTable').updateSource(currentData);
                     tb.instance.isTargetToggle=false;
                     
+                    setPersonCaseSum(currentData);
                     //setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
                     if(!isHeaderLocked){
                         form.slideUp();
@@ -461,7 +463,12 @@ $('body').on('caseexcutesChanged',function(e){
             DataList.combinedData[i].paidAmount=paidA;
         }
     });
-    setPersonCaseSum(DataList.combinedData);
+    currentData.forEach((d,i)=>{
+        if(d.id==e.value.id){
+            currentData[i].paidAmount=paidA;
+        }
+    });
+    setPersonCaseSum(currentData);
     update("id="+e.value.id,'caseStatus',{paidAmount:paidA},function(r){
         //console.log(r)
         if(!r.data.success){
@@ -493,11 +500,12 @@ $('body').on('caseStatusChanged',function(e){
                 //pageOnTable.updateTableData(newValue,$('#pageOneTable').find('tr[data-item='+newValue.id+']'));
                 DataList.caseStatus=updateOriginalData(DataList.caseStatus,newValue,'id');
                 DataList.combinedData=updateOriginalData(DataList.combinedData,newValue,'id');
+
                 currentData=updateOriginalData(currentData,newValue,'id');//tools.js
                 //console.log(DataList.caseStatus);
                 //更新页面ui数据显示
                 $('#pageOneTable').updateTableItem(e.value);
-                setPersonCaseSum(DataList.combinedData);
+                setPersonCaseSum(currentData);
                 $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
             }else{
                 $().minfo('show',{title:"提示",message:"更新遇到问题。"+r.data.data.sqlMessage},function(){});
@@ -551,7 +559,7 @@ $('body').on('caseChanged',function(e){
                     $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
                 }
                 console.log("on data changed1",DataList.combinedData,DataList.caseStatus,e);
-                setPersonCaseSum(DataList.combinedData);
+                setPersonCaseSum(currentData);
                 $().mloader('hide');
             }else{
                 console.log(r);
@@ -585,6 +593,7 @@ $('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
 
     $('#legalAgenciesSum-list').empty();
     if(getGlobalJson('currentUser').level>=supervisorLevel){
+        $('#legalAgenciesSum-list').empty();
         $.each(getLegalAngenciesSum(),(name,data)=>{
             var divider=$('<li data-role="list-divider">'+name+'<span class="ui-li-count">'+data.number.length+'</span></li>');
             $('#legalAgenciesSum-list').append(divider);
@@ -617,14 +626,16 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
     });
 });
 function setPersonCaseSum(data){
+    $('#legalAgenciesSum').trigger('collapsibleexpand');
+    if(data==undefined) data=DataList.combinedData;
     var personCaseSum=getPersonCaseSum(data);
     console.log(personCaseSum);
     $('#panel_sum_info').empty();
-    var info=$(`<li data-role="list-divider">当前表格案件总数<span class="ui-li-count">${personCaseSum.caseNum}</span></li>`+
-        `<li>群诉<b id="footer_sum_label_group" style="color:#1362B7;">${personCaseSum.caseLabels[3].length}</b>件</li>`+
-        `<li>重大案件<b id="footer_sum_label_thousand" style="color:#E25C62;">${personCaseSum.caseLabels[2].length}</b>件</li>`+
-        `<li>普通案件<b id="footer_sum_label_normal" style="color:green;">${personCaseSum.caseLabels[0].length}</b>件</li>`+
-        `<li data-role="list-divider">金额</li>`+
+    var info=$(`<li data-role="list-divider" style="border-bottom: 2px solid orangered;">当前表格案件总数<span class="ui-li-count">${personCaseSum.caseNum}</span></li>`+
+        `<li>群诉<b id="footer_sum_label_group" style="color:#1362B7;"> ${personCaseSum.caseLabels[3].length} </b>件</li>`+
+        `<li>重大案件<b id="footer_sum_label_thousand" style="color:#E25C62;"> ${personCaseSum.caseLabels[2].length} </b>件</li>`+
+        `<li>普通案件<b id="footer_sum_label_normal" style="color:green;"> ${personCaseSum.caseLabels[0].length} </b>件</li>`+
+        `<li data-role="list-divider" style="border-bottom: 2px solid orangered;">涉及金额</li>`+
         `<li>本诉金额为 <b id="footer_sum_request">${personCaseSum.rquestAmount.formatMoney(0, "￥")}</b> 万</li>`+
         `<li>判决金额为 <b id="footer_sum_penalty">${personCaseSum.penaltyAmount.formatMoney(0, "￥")}</b> 万</li>`+
         `<li>已执行金额为 <b id="footer_sum_paid">${personCaseSum.paidAmount.formatMoney(0, "￥")}</b> 万</li>`
@@ -723,7 +734,8 @@ function getLegalAngenciesSum(){
     //var legalAgencies={};
     //var legalAgencies1={};
     var summary={};
-    DataList.casesDb.forEach(item=>{
+    var data=currentData || DataList.combinedData
+    data.forEach(item=>{
         var match=$.grep(resourceDatas.legalAgencies,(d=>d.id==item.legalAgencies));
         if(match.length>0){
             var catelog=match[0].name;

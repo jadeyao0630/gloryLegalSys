@@ -109,18 +109,19 @@
 				</fieldset>
 			</div>
 			<div data-role="panel" data-position-fixed="true" data-display="overlay" data-theme="a" id="nav-panel">
-				<ul data-role="listview" id="panel_sum_info" style="margin:50px 0px;"></ul> 
-				<div id="menu-list" data-role="collapsibleset" data-theme="a" data-content-theme="a" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-corners="false" style="margin:50px 0px;">
+				<ul data-role="listview" id="panel_sum_info" style="margin:0px 0px;"></ul> 
+				<div id="menu-list" data-role="collapsibleset" data-theme="a" data-content-theme="a" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" data-corners="false" style="margin:0px 0px;">
+					
+					<div id="legalAgenciesSum" data-role="collapsible" >
+						<h3 class="collapsible-head">法务信息</h3>
+						<ul id="legalAgenciesSum-list" data-role="listview" data-inset="true">
+						</ul>
+					</div>
 					<div data-role="collapsible" data-collapsed="false" >
 						<h3 class="collapsible-head">分析和导出</h3>
 						<ul data-role="listview">
 							<li><a href="#chart_sum_page" id="chart_sum" style="background-color: white;" rel="external" class="ui-btn case_reg_but tooltip-btn ui-icon-gear btn-icon-green ui-btn-icon-right menu_but chart-pie" data-tooltip="分析案件">分析</a></li>
 							<li><a href="#" rel="external" style="background-color: white;" class="ui-btn tooltip-btn ui-icon-gear btn-icon-blue ui-btn-icon-right menu_but file-export" onclick="exportExcel()" data-tooltip="导出当前表格成EXCEL">导出成EXCEL</a></li>
-						</ul>
-					</div>
-					<div id="legalAgenciesSum" data-role="collapsible" >
-						<h3 class="collapsible-head">法务信息</h3>
-						<ul id="legalAgenciesSum-list" data-role="listview" data-inset="true">
 						</ul>
 					</div>
 				</div>

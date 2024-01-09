@@ -310,7 +310,7 @@ $.fn.extend({
         //console.log('selectmenucreate',this.get(0).nodeName);
         $(this.get(0)).on('mouseover',(e)=>{
             //console.log('selectmenucreate',$(this),$(this).get(0).scrollWidth,$(this).get(0).clientWidth);
-            console.log('mouseover',$(this).get(0).scrollWidth , $(this).get(0).clientWidth);
+            //console.log('mouseover',$(this).get(0).scrollWidth , $(this).get(0).clientWidth);
             if ($(this).get(0).scrollWidth > $(this).get(0).clientWidth) {
                 $(this).tooltip('show',$(this).html().replaceAll(spliter||",","</br>"));
             }
@@ -354,10 +354,11 @@ $.fn.extend({
             }else{
                 $('.ui-tooltip').css({'transform':'translateY(-0%)'})
             }
-            
-            //console.log('tooltip',top);
+            var index=$('.ui-panel').css('display')=='none'?1000:$('.ui-tooltip').css('z-index')+1;
+            //console.log('tooltip',top,position.left,$('.ui-panel').css('z-index'),$('.ui-tooltip').css('z-index'));
             $('.ui-tooltip').css({visibility: 'visible',
                 opacity: 1,
+                'z-index':index,
                 left:position.left,
                 top:top+'px'});
         }else{

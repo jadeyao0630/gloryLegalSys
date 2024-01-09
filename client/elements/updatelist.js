@@ -323,7 +323,7 @@ $.fn.updateListViewData=function(data){
                         
                     }else{
                         var url="http://"+ip+":"+port+"/preview?fileName="+itemData.filePath+"&folder="+itemData.id;
-                        var frame=$("<iframe src='"+url+"' style='position: absolute;top: "+40+"px;left: 0;width: 100%;height: 100%;border: none;'>"+
+                        var frame=$("<iframe src='"+url+"' style='position: absolute;top: "+50+"px;left: 0;width: 100%;height: 100%;border: none;'>"+
                                     +"</iframe>");
                         $('#preview_container').append(frame);
                     }

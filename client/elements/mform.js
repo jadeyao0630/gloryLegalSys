@@ -73,10 +73,6 @@ mform.prototype={
                 //console.error('selectmenucreate1');
             }).on( "pagecontainerbeforeshow", function( event, data ) {
                 
-                if ( !pageIsSelectmenuDialog( data.toPage ) ) {
-                    
-                    //return;
-                }
                 
                 var closeBtn=$(data.toPage).find('.ui-header .ui-icon-delete');
                 //console.error('selectmenucreate2',closeBtn);

@@ -219,6 +219,7 @@ $('body').on(preload_completed_event_name,function(){
     setTimeout(() => {
         //tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
         //setColumnToggleButton();
+        setPersonCaseSum(DataList.combinedData);
     }, 500);
     //pageOnTable.setSort($('#pageOneTable-fixed').find('th'));
     //pageOnTable.setSort($('#pageOneTable').find('th'));
@@ -618,25 +619,27 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
 function setPersonCaseSum(data){
     var personCaseSum=getPersonCaseSum(data);
     console.log(personCaseSum);
-    $('#footer_info_bar').empty();
-    var info=$(`<label>共计<b>${personCaseSum.caseNum}</b>个案件`+
-        `，群诉<b id="footer_sum_label_group" style="color:#1362B7;">${personCaseSum.caseLabels[3].length}</b>件`+
-        `，300万以上<b id="footer_sum_label_hundred" style="color:orange;">${personCaseSum.caseLabels[1].length+personCaseSum.caseLabels[2].length}</b>件`+
-        ` 包含（1000万以上<b id="footer_sum_label_thousand" style="color:#E25C62;">${personCaseSum.caseLabels[2].length}</b>件）`+
-        `，普通案件<b id="footer_sum_label_normal" style="color:green;">${personCaseSum.caseLabels[0].length}</b>件`+
-        `，本诉金额为 <b id="footer_sum_request">${personCaseSum.rquestAmount.formatMoney(0, "￥")}</b> 万`+
-        `，判决金额为 <b id="footer_sum_penalty">${personCaseSum.penaltyAmount.formatMoney(0, "￥")}</b> 万`+
-        `，已执行金额为 <b id="footer_sum_paid">${personCaseSum.paidAmount.formatMoney(0, "￥")}</b> 万`+
-    `</label>`);
+    $('#panel_sum_info').empty();
+    var info=$(`<li data-role="list-divider">当前表格案件总数<span class="ui-li-count">${personCaseSum.caseNum}</span></li>`+
+        `<li>群诉<b id="footer_sum_label_group" style="color:#1362B7;">${personCaseSum.caseLabels[3].length}</b>件</li>`+
+        `<li>重大案件<b id="footer_sum_label_thousand" style="color:#E25C62;">${personCaseSum.caseLabels[2].length}</b>件</li>`+
+        `<li>普通案件<b id="footer_sum_label_normal" style="color:green;">${personCaseSum.caseLabels[0].length}</b>件</li>`+
+        `<li data-role="list-divider">金额</li>`+
+        `<li>本诉金额为 <b id="footer_sum_request">${personCaseSum.rquestAmount.formatMoney(0, "￥")}</b> 万</li>`+
+        `<li>判决金额为 <b id="footer_sum_penalty">${personCaseSum.penaltyAmount.formatMoney(0, "￥")}</b> 万</li>`+
+        `<li>已执行金额为 <b id="footer_sum_paid">${personCaseSum.paidAmount.formatMoney(0, "￥")}</b> 万</li>`
+    );
     
     
     //setInfoBarPosition();
     //$('#footer_info_bar').setTooltip();
     //$('#footer_info_bar').append(info);
-    $('#footer_info_bar').trigger('create');
+    $('#panel_sum_info').append(info);
+    $('#panel_sum_info').trigger('create');
+    $('#panel_sum_info').listview().listview('refresh')
     
     
-    $(info).setTooltip('，');
+    //$(info).setTooltip('，');
     //console.log('mainFooter',footWidth)
 }
 $(window).on('resize',function() {

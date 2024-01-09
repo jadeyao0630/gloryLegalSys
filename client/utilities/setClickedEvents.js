@@ -129,7 +129,7 @@ function compareValues(source,target,prefix){
             }
         }
     });
-    console.log('compareValues',waitingList)
+    console.log('compareValues',waitingList,isSame)
     if(isSame && Object.keys(waitingList).length>0) {isSame=false;}
     return isSame;
 }
@@ -323,7 +323,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
     
 })
 function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
-    console.log({typeId:typeId,data:data,update_data:update_data,pointIndex:pointIndex});
+    console.log('progress_point_editor',{typeId:typeId,data:data,update_data:update_data,pointIndex:pointIndex});
     
     var template=FormTemplate3_p;
     
@@ -425,6 +425,7 @@ $('#progress_point_viewer_btn').on('click',function(e){
     var typeId=parseInt($(this).jqmData('point'));
     var progressData=$.grep(matchedProgressStatus,d=>d.typeId==typeId);
     if(progressData.length>0) progressData=progressData[0];
+    else progressData={typeId:typeId}
     //console.log('pointIndex',$(this).jqmData('pointIndex'));
     console.log('progress_point_viewer_btn',progressData,typeId);
     progress_point_editor(typeId,parseInt($(this).jqmData('pointIndex')),typeId==0?matchItems[0]:progressData,getProgressEvents(eventsData,typeId));

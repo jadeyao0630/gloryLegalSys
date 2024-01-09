@@ -69,6 +69,22 @@ mform.prototype={
             return isDialog;
         }
         $.mobile.document
+            .on("selectmenucreate", '.multiSelect', function (event) {
+                //console.error('selectmenucreate1');
+            }).on( "pagecontainerbeforeshow", function( event, data ) {
+                
+                if ( !pageIsSelectmenuDialog( data.toPage ) ) {
+                    
+                    //return;
+                }
+                
+                var closeBtn=$(data.toPage).find('.ui-header .ui-icon-delete');
+                //console.error('selectmenucreate2',closeBtn);
+                console.log('pagecontainerbeforeshow',data.toPage,closeBtn);
+                closeBtn.removeClass('ui-icon-delete').addClass('ui-icon-check').addClass('btn-icon-green').removeClass('ui-btn-left').addClass('ui-btn-right');
+            }),
+        
+        $.mobile.document
             // Upon creation of the select menu, we want to make use of the fact that the ID of the
             // listview it generates starts with the ID of the select menu itself, plus the suffix "-menu".
             // We retrieve the listview and insert a search input before it.
@@ -165,27 +181,6 @@ mform.prototype={
                 // Put the form back in the popup. It goes ahead of the listview.
                 //if($('#'+id+'-searchInput').length==0)
                     listview.before( form );
-            })
-            .on("selectmenucreate", '.multiSelect', function (event) {
-                //$(".smlFontForm .ui-select.ui-mini").selectmenu().selectmenu("widget").addClass("ui-mini");
-                var selectmenu = $( event.target ),
-                    button = $( "#" + selectmenu.attr( "id" ) + "-button" );
-                
-                $.each(button.find('span').not('.ui-li-count'),(idx,el)=>{
-                    //var isOpened
-                    
-                    $(el).on('mouseover',(e)=>{
-                        console.log('selectmenucreate',$(el).closest('a'));
-                        if (el.scrollWidth > el.clientWidth) {
-                            
-                            //console.log('over',$('#'+id+'_tooltip'));
-                        }
-                    });
-                      
-                    $(el).on('mouseleave',(e)=>{
-                    });
-                })
-                //ele.setTooltip();
             })
             //#endregion
     },

@@ -219,15 +219,15 @@ logingStatus().then(function(e){
                 if(!DataList.hasOwnProperty('caseLinked')) DataList.caseLinked=[];
                 DataList.combinedData=combinedData;
 
-                console.log('format2NewStatus',format2NewStatus(DataList.caseStatus,'caseStatus','id'));
+                //console.log('format2NewStatus',format2NewStatus(DataList.caseStatus,'caseStatus','id'));
                 
-                console.log('format2NewStatus',format2NewStatus(DataList.caseUpdates,'caseUpdates','updatesId'));
+                //console.log('format2NewStatus',format2NewStatus(DataList.caseUpdates,'caseUpdates','updatesId'));
                 
-                console.log('format2NewStatus',format2NewStatus(DataList.caseExcutes,'caseExcutes','excutesId'));
+                // console.log('format2NewStatus',format2NewStatus(DataList.caseExcutes,'caseExcutes','excutesId'));
                 
-                console.log('format2NewStatus',format2NewStatus(DataList.caseProperties,'caseProperties','propertyId'));
+                // console.log('format2NewStatus',format2NewStatus(DataList.caseProperties,'caseProperties','propertyId'));
                 
-                console.log('format2NewStatus',format2NewStatus(DataList.caseAttachments,'caseAttachments','evidenceId'));
+                // console.log('format2NewStatus',format2NewStatus(DataList.caseAttachments,'caseAttachments','evidenceId'));
                 //DataList.combinedData=d.data.casesDb;
                 //setGlobalJson("combinedData",combinedData);
                 //setGlobalJson("datalist",d.data);
@@ -331,12 +331,15 @@ function showAutoLogin(message){
 }
 function format2NewStatus(data,table,matchId){
     var newData=[];
+    
     data.forEach((d)=>{
+        //console.log('insertRows',table,d);
         var val=d.caseStatus;
         if(val.constructor===String && (val.indexOf('[')>-1 || val.indexOf(',')>-1)){
 
         }else{
             //var status=d.caseStatus;
+            //console.log('insertRows',table);
             if(val<3){
                 val=table.toLowerCase()=='casestatus'?'['+getNewCaseStatus(val).join()+']':val;
             }else if(val<4){
@@ -364,6 +367,7 @@ function format2NewStatus(data,table,matchId){
     // insertRows(table,newData,(e)=>{
     //     console.log('insertRows',e);
     // })
+    console.log('insertRows','完成');
     return newData;
 }
 function getNewCaseStatus(val,subIndex){

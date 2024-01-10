@@ -226,13 +226,14 @@ mform.prototype={
                 item_container.css({'grid-column':form_item_template.span})
             }
             var form_item_type= form_item_template.type.toLowerCase() || 'text';
-            
+            var label;
             if(form_item_type=='label') {
                 item_container=$('<div></div>');
-                var label=$('<label>'+(form_item_template.label || '')+'</label>')
+                label=$('<label>'+(form_item_template.label || '')+'</label>')
                 item_container.append(label);
             }else{
-                item_container.append(_this.generateLabel(key,form_item_template));
+                label=_this.generateLabel(key,form_item_template);
+                item_container.append(label);
             } 
             switch(form_item_type){
                 case "text":
@@ -243,6 +244,10 @@ mform.prototype={
                     break;
                 case "number":
                     item_container.append(_this.generateInput(key,form_item_template));
+                    break;
+                case "checkbox":
+                    label.prop('for',key)
+                    item_container.append(_this.generateCheckbox(key,form_item_template));
                     break;
                 case "date":
                     item_container.append(_this.generateInput(key,form_item_template));
@@ -357,6 +362,20 @@ mform.prototype={
         var label=$('<label>'+_this.setOptionMark(itemTemplate)+'</label>');
         _this.setLabelStyle(label);
         return label;
+    },
+    generateCheckbox:function(itemId,itemTemplate){
+        var _this=this;
+        var value=itemTemplate.defaultValue || '';
+        
+        var input=$('<input type="'+itemTemplate.type.toLowerCase()+'" class="form-original" data-iconpos="right" name="'+itemId+'"'+' id="'+itemId+'"'+
+                    _this.setPlaceholder(itemTemplate)+
+                    ' value="'+value+'" '+_this.setRequired(itemTemplate.isOptional,"此项必须正确填写")+'>');
+        var subContainer=$('<div class="form-original"></div>');
+        if(itemTemplate.isDisabled){
+            input.attr("disabled",true);
+        }
+        subContainer.append(input);
+        return subContainer;
     },
     generateInput:function(itemId,itemTemplate){
         var _this=this;
@@ -777,6 +796,8 @@ mform.prototype={
         }else if(itemTemplate.type.toLowerCase()=="supermultiinput"){
             if (val==null) val="";
             element.setSuperMultiInputValues(val);
+        }else if(itemTemplate.type.toLowerCase()=="checkbox"){
+            element.prop('checked',val);
         }else if(itemTemplate.type.toLowerCase()=="combobox"){
             if (val==null) val=-1;
             if(val.constructor ==String){
@@ -877,6 +898,8 @@ mform.prototype={
                 return null;
             }
             return values.join();
+        }else if(itemTemplate.type.toLowerCase()=="checkbox"){
+            return element.prop('checked');
         }else if(itemTemplate.type.toLowerCase()=="combobox"){
             var selected=element.find('option:selected');
             console.log('combobox',id,selected.val());

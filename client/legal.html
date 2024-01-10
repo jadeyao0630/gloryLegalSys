@@ -321,11 +321,21 @@
 	<div data-role="page" id="user_notification">
 		<div data-role="header" data-position="fixed" data-tap-toggle="false">
 			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a>
-			<h1 id="preview_title">信息中心</h1>
-			
+			<h1 id="preview_title">消息中心</h1>
+			<button href="#new_message_page" name="new_message" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-plus btn-icon-green admin-ui">新建</button>
 		</div><!-- /header -->
 		<div class="ui-body-d ui-content" style="height: 100%;">
 			<ul data-role="listview" id="notification_list" data-inset="true"></ul>
+		</div>
+	</div>
+	<div data-role="page" id="new_message_page">
+		<div data-role="header" data-position="fixed" data-tap-toggle="false">
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a>
+			<h1 id="new_message_title">发送消息</h1>
+			<button name="send_new_message" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green">发送</button>
+		</div><!-- /header -->
+		<div class="ui-body-d ui-content" id="new_message_body" style="height: 100%;padding:10px;">
+			
 		</div>
 	</div>
 	<div data-role="page" id="chart_sum_page">

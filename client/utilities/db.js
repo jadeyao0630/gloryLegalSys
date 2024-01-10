@@ -147,7 +147,7 @@ async function getLegalAgencies(){
         await fetch("http://"+ip+":"+port+"/select",{
             headers:headers,
             method: 'POST',
-            body: JSON.stringify({ query: 'SELECT id,name,position,isInactived,notifications,unread FROM '+userDbTableName})
+            body: JSON.stringify({ query: 'SELECT id,name,position,isInactived FROM '+userDbTableName})
         })
         .then(response => response.json())
         .then(data => {

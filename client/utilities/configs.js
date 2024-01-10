@@ -1,4 +1,4 @@
-var isRunLocal=true;
+var isRunLocal=false;
 var IPS=['192.168.10.141','192.168.10.68','cn.luyao.site']
 var showDebug=false;
 let ip=isRunLocal?IPS[1]:IPS[0];
@@ -111,7 +111,7 @@ const _casePersonnelStatus={
 const _notifications={
     id:"INT NOT NULL,PRIMARY KEY",//案件标签唯一序列号
     title:"VARCHAR(255)",//案件标签名
-    message:"VARCHAR(255)",//案件标签说明
+    message:"VARCHAR(1000)",//案件标签说明
     sender:"INT(1) default '0' NOT NULL",
     isInactived:"INT(1) default '0' NOT NULL",
     targetGroup:"VARCHAR(255)",

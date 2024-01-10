@@ -1071,6 +1071,56 @@ var _summary_template;
         },
         
     } 
+    new_message_template={
+      settings:{
+        hasLabel:true,
+        hasPlaceHolder:true,
+        labelPosition:"left",
+        textareaHeight:270,
+        isCollapsibleGrouping:false,
+      },
+      template:{
+        
+        isSystemMessage:{
+          label:"是系统消息吗:",
+          type:"checkbox",
+          isOptional:true,
+          default:true,
+        },
+        isInactived:{
+          label:"禁用吗:",
+          type:"checkbox",
+          isOptional:true,
+        },
+        targetGroup:{
+          label:"收件组群:",
+          type:"multicombobox",
+          isOptional:true,
+          valueKey:'id',
+          displayFormat:'{title}',
+          data:resourceDatas.authLevels_,
+          defaultValue:-1
+        },
+        targetPerson:{
+          label:"收件人:",
+          type:"multicombobox",
+          isOptional:true,
+          valueKey:'id',
+          displayFormat:'{name}',
+          data:resourceDatas.users
+        },
+        title:{
+          label:"标题:",
+          type:"text",
+          isOptional:false,
+        },
+        message:{
+          label:"信息内容:",
+          type:"textarea",
+          isOptional:false,
+        },
+      }
+    }
     change_rows_page_template={
       settings:{
         hasLabel:true,

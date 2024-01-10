@@ -257,30 +257,7 @@ $('body').on(preload_completed_event_name,function(){
         //$('#case_reg_but_restore').show();
         $('.admin-ui').show();
     }
-    $('#notif_num').hide();
-    var userData=getGlobalJson('currentUser');
-    var unread=[];
-    if(userData.unread!=null||userData.unread!='null'){
-        unread=JSON.parse(userData.unread)
-    }
-    var notifications=JSON.parse(userData.notifications);
-    var level=userData.level;
-    var userId=userData.id;
-    var unreads=[];
-    resourceDatas.notifications.forEach(notification=>{
-        if((JSON.parse(notification.targetGroup).includes(level)|| JSON.parse(notification.targetPerson).includes(userId)) && 
-            !notifications.includes(notification.id)){
-                unreads.push(notification.id);
-            }
-    })
-    userData.unread=JSON.stringify(unread.concat(unreads));
-    userData.notifications=JSON.stringify(notifications.concat(unreads));
-    setGlobalJson('currentUser',userData);
-    console.log("unreads",getGlobalJson('currentUser'));
-    if(JSON.parse(userData.unread).length>0){
-        $('#notif_num').show();
-        $('#notif_num').text(JSON.parse(userData.unread).length);
-    }
+    setUserNotifiications();
     
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
     $('.header-filter-btn:contains("复位")').setTooltips();
@@ -681,6 +658,7 @@ $(window).on('resize',function() {
     //console.log('window size changed')
     //setInfoBarPosition();
   });
+
 function setInfoBarPosition(){
     var footWidth=$('#mainFooter').width()-40;
     var btns_l=[];

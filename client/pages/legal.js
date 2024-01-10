@@ -258,16 +258,28 @@ $('body').on(preload_completed_event_name,function(){
         $('.admin-ui').show();
     }
     $('#notif_num').hide();
-    if(getGlobalJson('currentUser').unread!=null||getGlobalJson('currentUser').unread!='null'){
-        try{
-            var unread=JSON.parse(getGlobalJson('currentUser').unread);
-            if(unread.length>0){
-                $('#notif_num').show();
-                $('#notif_num').text(unread.length);
+    var userData=getGlobalJson('currentUser');
+    var unread=[];
+    if(userData.unread!=null||userData.unread!='null'){
+        unread=JSON.parse(userData.unread)
+    }
+    var notifications=JSON.parse(userData.notifications);
+    var level=userData.level;
+    var userId=userData.id;
+    var unreads=[];
+    resourceDatas.notifications.forEach(notification=>{
+        if((JSON.parse(notification.targetGroup).includes(level)|| JSON.parse(notification.targetPerson).includes(userId)) && 
+            !notifications.includes(notification.id)){
+                unreads.push(notification.id);
             }
-        }catch(e){
-
-        }
+    })
+    userData.unread=JSON.stringify(unread.concat(unreads));
+    userData.notifications=JSON.stringify(notifications.concat(unreads));
+    setGlobalJson('currentUser',userData);
+    console.log("unreads",getGlobalJson('currentUser'));
+    if(JSON.parse(userData.unread).length>0){
+        $('#notif_num').show();
+        $('#notif_num').text(JSON.parse(userData.unread).length);
     }
     
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");

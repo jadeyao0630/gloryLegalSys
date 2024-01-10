@@ -692,3 +692,13 @@ ui-collapsible.collapsible-listview .ui-btn{
   text-align: center;
   line-height: 18px;
 }
+.no-check{
+  font-size:12px;
+  padding:3px 5px 3px 5px;
+}
+.no-check.ui-checkbox-off::after{
+  display: none;
+}
+.no-check.ui-checkbox-on::after{
+  display: none;
+}

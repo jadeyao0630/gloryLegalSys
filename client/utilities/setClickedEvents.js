@@ -103,9 +103,86 @@ $('#popupMenu').find('a').on('click',function(e){
             break;
         case '消息中心':
             $('#notification_list').empty();
-            $.grep(resourceDatas.notifications,noti=>{
-                
+            var notifications=JSON.parse(getGlobalJson("currentUser").notifications);
+            var unreads=JSON.parse(getGlobalJson("currentUser").unread);
+            var data=$.grep(resourceDatas.notifications,noti=>{
+                return notifications.includes(noti.id);
             });
+            // var sortedItems=data.sort(function(a,b){
+            //     return data[a].date>data[b].date;
+            // });
+            var sortedData={};
+            data.forEach(d=>{
+                var date=formatDateTime(new Date(d.date),"yyyy年MM月dd日");
+                if(!sortedData.hasOwnProperty(date)) sortedData[date]=[];
+                sortedData[date].push(d);
+            });
+            $.each(sortedData,(date,values)=>{
+                var title=$('<li data-role="list-divider">'+date+'<span class="ui-li-count">'+values.length+'</span></li>');
+                $('#notification_list').append(title);
+                $.each(values,(index,value)=>{
+                    
+                    var sender="系统消息";
+                    if(value.sender>0) {
+                        sender=$.grep(resourceDatas.users,user=>user.id==value.sender);
+                        if(sender.length>0) sender=sender[0].name;
+                        else sender='未知';
+                    }
+                    var li=$('<li style="display:grid;grid-template-columns: 1fr auto;"></li>');
+
+                    var messageBody=$('<div style="padding:5px 15px;"></div>');
+                    var messageBtn=$('<a href="#" class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-notext btn-icon-red" style="height:100%;padding:0px 5px;"></a>');
+                    //var messageIsRead=$('<a href="#" >标记已读</a>');
+                    var messageTitle=$('<h2>'+value.title+'</h2>');
+                    var messageContent=$('<p>'+value.message+'</p>');
+                    var messageTime=$('<p class="ui-li-aside" style="display:grid;grid-template-columns: auto 1fr;"><strong style="line-height: 24px;margin-left: 5px;">'+formatDateTime(new Date(value.date),"hh:mm a")+'</strong></p>');
+                    var messageRead=$('<input type="checkbox" id="message_checkbox_'+value.id+'" data-mini="true" class="message_isRead" data-index="'+value.id+'" '+(unreads.includes(value.id)?'':'checked')+'>');
+                    var checkboxLable=$('<label for="message_checkbox_'+value.id+'" class="no-check" style="color:'+(unreads.includes(value.id)?'green':'gray')+';">'+(unreads.includes(value.id)?'标记已读':'标记未读')+'</label>')
+                    var messageSender=$('<p><strong>'+sender+'</strong></p>');
+                    messageTime.prepend(messageRead);
+                    messageRead.after(checkboxLable);
+                    messageBody.append(messageSender);
+                    messageBody.append(messageTitle);
+                    messageBody.append(messageContent);
+                    messageBody.append(messageTime);
+                    li.append(messageBody);
+                    li.append(messageBtn);
+                    console.log('changed',messageRead);
+                    messageRead.checkboxradio().checkboxradio( "refresh" );
+                    checkboxLable.trigger('create');
+                    $('#notification_list').append(li);
+                })
+            });
+            $('#notification_list').trigger('create');
+            $('#notification_list').listview().listview('refresh')
+            $('.message_isRead').on('change',function(e){
+                console.log('changed',$(this).prop('checked'));
+                if($(this).prop('checked')){
+                    $(this).parent().find('label').text('标记未读');
+                    $(this).parent().find('label').css({'color':'grey'});
+                    var index=unreads.indexOf($(this).data('index'));
+                    if(index>-1) unreads.splice(index,1);
+                    //unreads
+                }else{
+                    $(this).parent().find('label').text('标记已读');
+                    $(this).parent().find('label').css({'color':'green'});
+                    var index=unreads.indexOf($(this).data('index'));
+                    if(index==-1) unreads.push($(this).data('index'));
+                }
+                var userData=getGlobalJson("currentUser");
+                userData.unread=JSON.stringify(unreads);
+                setGlobalJson("currentUser",userData);
+                
+                $('#notif_num').text(unreads.length);
+                if(unreads.length>0){
+                    $('#notif_num').show();
+                }else{
+                    $('#notif_num').hide();
+                }
+                update('id='+getGlobalJson("currentUser").id,userDbTableName,{unread:userData.unread})
+                //console.log('sortedData',JSON.parse(getGlobalJson("currentUser").unread))
+            })
+            
             goToPage( $(this).attr( "href" ));
             break;
         case '退出':

@@ -101,6 +101,7 @@
     transition: opacity 0.3s;
     z-index: 1000;
     text-shadow: none;
+    max-width: 400px;
 }
 #username{
     text-align: right;
@@ -652,4 +653,29 @@ ui-collapsible.collapsible-listview .ui-btn{
     border-color:           #1362B7 !important;
     color:                  #fff !important;
     text-shadow: 0 0 #1362B7 !important;
+}
+.penalty-bar{
+  position: relative;
+  height: 50px;
+  width:100%;
+  background-color: lightgray;
+  border: 2px solid lightgray;
+}
+.paid-bar{
+  top:0px;
+  position: absolute;
+  height: 50px;
+  text-align: right;
+  background-color: #1362B7;
+  color:white;
+  line-height: 50px;
+  padding-right: 10px;
+  font-weight: 700;
+  text-shadow: none;
+}
+#execute_summary{
+  margin-bottom: 50px;
+}
+#progress_diagram{
+  margin-left:40px;
 }

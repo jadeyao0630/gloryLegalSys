@@ -296,13 +296,13 @@ $.fn.extend({
         if(overlay!=undefined) $(overlay).addClass('popup-hide');
     },
     setTooltips:function(){
-        $(this.get(0)).on('mouseover',(e)=>{
+        $(this.get(0)).on('mouseover vmouseover',(e)=>{
             //console.log("show tooltip");
             //console.log('selectmenucreate',$(this),$(this).get(0).scrollWidth,$(this).get(0).clientWidth);
             $(this).tooltip('show',$(this).data('tooltip'));
           });
           
-          $(this.get(0)).on('mouseleave',(e)=>{
+          $(this.get(0)).on('mouseleave vmouseout',(e)=>{
             $(this).tooltip('hide');
         });
     },
@@ -310,6 +310,7 @@ $.fn.extend({
         //console.log('selectmenucreate',this.get(0).nodeName);
         $(this.get(0)).on('mouseover',(e)=>{
             //console.log('selectmenucreate',$(this),$(this).get(0).scrollWidth,$(this).get(0).clientWidth);
+            //console.log('mouseover',$(this).get(0).scrollWidth , $(this).get(0).clientWidth);
             if ($(this).get(0).scrollWidth > $(this).get(0).clientWidth) {
                 $(this).tooltip('show',$(this).html().replaceAll(spliter||",","</br>"));
             }
@@ -353,10 +354,11 @@ $.fn.extend({
             }else{
                 $('.ui-tooltip').css({'transform':'translateY(-0%)'})
             }
-            
-            //console.log('tooltip',top);
+            var index=$('.ui-panel').css('display')=='none'?1000:$('.ui-tooltip').css('z-index')+1;
+            //console.log('tooltip',top,position.left,$('.ui-panel').css('z-index'),$('.ui-tooltip').css('z-index'));
             $('.ui-tooltip').css({visibility: 'visible',
                 opacity: 1,
+                'z-index':index,
                 left:position.left,
                 top:top+'px'});
         }else{
@@ -679,6 +681,9 @@ function getEventsDetails(item){
     var id;
     var type;
     var key;
+    var fileName;
+    var caseId=item.id;
+    var isTemp=item.isTemp?true:false;
     if(item.hasOwnProperty('updatesId')){//updates
         originalDate=new Date(item.dateUpdated);
         date=formatDateTime(new Date(item.dateUpdated),"MM月dd日 ");
@@ -694,6 +699,7 @@ function getEventsDetails(item){
         id=item[add_evidence_template.settings.idkey];
         type=add_evidence_template.settings.type;
         key=add_evidence_template.settings.idkey;
+        fileName=item.filePath;
         typeName="附件";
     }else if(item.hasOwnProperty('propertyId')){//property
         originalDate=new Date(item.dateOccur);
@@ -712,7 +718,17 @@ function getEventsDetails(item){
         key=add_execute_template.settings.idkey;
         typeName="执行";
     }
-    return {date:date,description:text,id:id,type:type,key:key,isInactived:item.isInactived,originalDate:originalDate,typeName:typeName};
+    return {date:date,
+        description:text,
+        id:id,
+        type:type,
+        key:key,
+        fileName:fileName,
+        caseId:caseId,
+        isTemp:isTemp,
+        isInactived:item.isInactived,
+        originalDate:originalDate,
+        typeName:typeName};
 }
 function getFormatString(template,item){
     var settings=template.settings;

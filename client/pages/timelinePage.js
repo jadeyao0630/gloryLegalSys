@@ -440,7 +440,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                             }))
                             //console.log("caseStatus................."+_data[data_key][sub_key]);
                             var but=new ProgressesButton({
-                                steps:resourceDatas["caseStatus_object"],
+                                steps:resourceDatas["caseStatus_"],
                                 deadSteps:deads,
                                 selected_color:"#4B9DCB",
                                 showLabel:true,
@@ -466,7 +466,7 @@ timelinePage.prototype.setSumList=function(_summary_template,_data,containerId){
                 }else if(data_key==sub_key && data_key=='attachments'){
                     $.each(_data[data_key],(index,attachment)=>{
                         //console.log(getStatusLabel(attachment.caseStatus,resourceDatas["caseStatus_object"]));
-                        attachment.caseStatus=getStatusLabel(attachment.caseStatus,resourceDatas["caseStatus_object"]);
+                        attachment.caseStatus=getStatusLabel(attachment.caseStatus,resourceDatas["caseStatus_"]);
                         //console.log(_summary_template[key].data);
                         var attchmentEventData=getEventsDetails(attachment);
                         var icon=getIconFromTypeName('附件',attachment.filePath);

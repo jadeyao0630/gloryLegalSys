@@ -10,11 +10,58 @@
     <link rel="stylesheet" href="./css/progressDiagram.css">
     <link rel="stylesheet" href="./css/superMultiSelect.css">
     <style>
-        .split-table {
-        margin-top: 10px; /* Adjust as needed */
-        border: 1px solid #ccc; /* Optional border style */
-        width: 100%; /* Optional: Set a specific width */
+        body{
+            overflow-y:hidden;
         }
+        #select-page-button::after {
+            display: none;
+        }
+        #select-page-button.ui-btn-icon-right{
+            padding-right:10px;
+        }
+        .tableWrapper { height: 750px; width: 100%; overflow-y: scroll; overflow-x: hidden;}
+
+            td tr table { padding: 0; margin: 0; }
+            table td {border-right: 1px solid lightgray;max-width: 150px; text-align: center;vertical-align: middle;}
+            table th {border-right: 1px solid lightgray;padding: 0; margin: 0;text-align: center;vertical-align: middle;}
+            tr.focused { background-color: #ddd; }
+            .font12{
+                font-size: 12px;
+            }
+            .font12 label{
+                font-size: 12px;
+            }
+            .font12 input[type=checkbox]{
+                width: 16px;
+                height:16px;
+            }
+            .hide{
+                display:none;
+            }
+            @keyframes glowing-border {
+                0% {
+                box-shadow: 0 0 5px #1362B7;
+                }
+                50% {
+                box-shadow: 0 0 20px #1362B7;
+                }
+                100% {
+                box-shadow: 0 0 5px #1362B7;
+                }
+            }
+            .newTableItem{
+                animation: glowing-border 2s infinite;
+            }
+
+            i.ui-btn-blue  {
+  background-color: #356395; /* Set the background color for the icon */
+  border-radius: 50%; /* Set the border radius to make it round */
+  padding: 5px; /* Adjust padding as needed */
+  margin-right: 10px; /* Add spacing between the icon and text */
+  width: 1em; /* Set the width to the same value as the font size */
+  height: 1em; /* Set the height to the same value as the font size */
+  color:white;
+}
         </style>
     <script src="./js/jquery.js"></script>
     <script src="./js/jquery.mobile-1.4.5.min.js"></script>
@@ -57,27 +104,65 @@
         </table>
       </div>
 <script>
-$(document).on("pagecreate", function() {
-  var $originalTable = $("#original-table");
-  var $newTable = $("<table>").addClass("split-table");
+var case_status=["立案","一审","二审",{name:"执行中",data:["强制执行", "正常执行", "无需执行","再审","监督"]},"结案",];
+var test1=[{id:1,name:"1"},{id:2,name:"2"}]
+var test2=[{id:3,name:"3"},{id:4,name:"4"}]
+var test3=test1.concat(test2);
+test3.push({id:5,name:"5"})
+console.log(test1,test2,test3);
+var but=new ProgressesButton({
+                steps:case_status,
+                deadSteps:["无需执行","再审","监督"],
+                showLabel:true,
+                containerId:'#progress_diagram',
+                currentPosition:3.1,
+                fontSize:15,
+                line_size:2,
+                size:35,
+                width:700,
+                hasShadow:true,
+                isViewMode:true,
+                verticalGap:5,
+                //labelPosition:"bottom",
+                showSubSteps:true,
+                showCounter:true,
+                //eventsData:,
+            });
+/*
+    setFontSize();
+    console.log(formatDateString('2022年04月18日'))
+    $('body').on(main_load_completed_event_name,function(){
+        //console.log(DataList);
+        const intervalId = setInterval(() => {
+            if (_firstPageTableColumns!=undefined) {
+                clearInterval(intervalId);
+                console.log('load table...')
+                $().mloader('hide');
+                //=convertDatas(DataList.casesDb,_firstPageTableColumns);
+                keys=Object.keys(_firstPageTableColumns);
+                var fn_btns='<div data-role="controlgroup" data-type="horizontal" style="min-width:160px;" data-mini="true">'+
+                                '<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onclick=\'fnBtnClickEvent({0})\'>查看</a>'+
+                                '<a href="#casePage" name="fn_btn_edit" class="ui-btn btn-icon-blue btn-tooltip ui-btn-icon-notext ui-icon-edit" data-tooltip="案件编辑修改" data-transition="slidefade" onclick=\'fnBtnClickEvent({0})\'>修改</a>'+
+                                '<a href="#" name="fn_btn_update" class="ui-btn btn-icon-red btn-tooltip ui-btn-icon-notext ui-icon-calendar" data-tooltip="更新案件进展" data-transition="slidefade" onclick=\'fnBtnClickEvent({0})\'>更新</a>'+
+                            '</div>';
+                _firstPageTableColumns.rowButtons.data=fn_btns;
+                _firstPageTableColumns.rowButtons.width=160;
+                ExportData(DataList.casesDb);
 
-  // Clone the header row and add it to the new table
-  var $headerRow = $originalTable.find("thead tr").clone();
-  $newTable.append($("<thead>").append($headerRow));
+                $('#test_table').pagination({
+                    source:DataList.casesDb,
+                    tableTemplate:_firstPageTableColumns,
+                    paginationContainer:$('#table_pagination'),
+                    toggleButton:$('#columntToggle'),
+                    itemsPerPage:10,
+                    setFixHead:true});
+                //$('#test_table').updateSource(DataList.casesDb);
+                //$('#test_table').trigger('create');
+            }
+        }, 100);
 
-  // Clone each row and split the cells into separate tables
-  $originalTable.find("tbody tr").each(function() {
-    var $newRow = $("<tr>");
-    $(this).find("td").each(function() {
-      var $newCell = $("<td>").text($(this).text());
-      $newRow.append($newCell);
     });
-    $newTable.append($("<tbody>").append($newRow));
-  });
-
-  // Replace the original table with the new split table
-  $originalTable.replaceWith($newTable);
-});
+    */
 </script>
 
 

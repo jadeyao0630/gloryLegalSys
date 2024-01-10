@@ -9,9 +9,9 @@ var isHeaderLocked=false;
 var currentData;
 var fancyTable;
 var slidedownOffset=0;
-var tableFunBtns='<div data-role="controlgroup" style="min-width:120px;" data-type="horizontal" data-mini="true">'+
-'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>查看</a>'+
-'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue btn-tooltip" data-icon="edit" data-iconpos="notext" data-tooltip="案件编辑修改" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>修改</button>'+
+var tableFunBtns='<div data-role="controlgroup" style="min-width:60px;" data-type="horizontal" data-mini="true">'+
+//'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>查看</a>'+
+//'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue btn-tooltip" data-icon="edit" data-iconpos="notext" data-tooltip="案件编辑修改" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>修改</button>'+
 '<button name="fn_btn_update" class="btn-icon-red btn-tooltip" data-icon="calendar" data-iconpos="notext" data-tooltip="更新案件进展" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>更新</button>'+
 '</div>';
 //getGlobal("currentId")
@@ -26,9 +26,9 @@ function setFontSize(){
     document.documentElement.style.setProperty('--inputLineHeight', 26 + "px");
     document.documentElement.style.setProperty('--HeaderFooterHeight', 44 + "px");
     slidedownOffset=40;
-    tableFunBtns='<div data-role="controlgroup" style="min-width:160px;" data-type="horizontal" data-mini="true">'+
-    '<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>查看</a>'+
-    '<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue btn-tooltip" data-icon="edit" data-iconpos="notext" data-tooltip="案件编辑修改" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>修改</button>'+
+    tableFunBtns='<div data-role="controlgroup" style="min-width:60px;" data-type="horizontal" data-mini="true">'+
+    //'<a href="#" name="fn_btn_details" class="ui-btn btn-icon-green ui-icon-info ui-btn-icon-notext btn-tooltip" data-tooltip="案件总览" data-transition="slidefade" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>查看</a>'+
+    //'<button href="#casePage" name="fn_btn_edit" class="btn-icon-blue btn-tooltip" data-icon="edit" data-iconpos="notext" data-tooltip="案件编辑修改" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>修改</button>'+
     '<button name="fn_btn_update" class="btn-icon-red btn-tooltip" data-icon="calendar" data-iconpos="notext" data-tooltip="更新案件进展" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick=\'functionBtnsEvent(this,{0})\'>更新</button>'+
     '</div>';
 }
@@ -171,7 +171,6 @@ $('body').on(preload_completed_event_name,function(){
     },{distance:200});
     //$('#case_reg_but_restore').hide();
     
-    caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
     setVisibleColumnToTemplate();
     var tableSettings=getUserTableSettings();
     console.log('tableSettings',tableSettings);
@@ -220,6 +219,7 @@ $('body').on(preload_completed_event_name,function(){
     setTimeout(() => {
         //tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
         //setColumnToggleButton();
+        setPersonCaseSum(currentData);
     }, 500);
     //pageOnTable.setSort($('#pageOneTable-fixed').find('th'));
     //pageOnTable.setSort($('#pageOneTable').find('th'));
@@ -243,15 +243,22 @@ $('body').on(preload_completed_event_name,function(){
     if(getGlobalJson('currentUser').level==1){
         FormTemplate3.template.caseInfo.data.legalAgencies.isDisabled=true;
         FormTemplate3.template.caseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
+        FormTemplate3_instance.template.baseInfo.data.legalAgencies_p.defaultValue=getGlobalJson('currentUser').id;
+        FormTemplate3_instance.template.baseInfo.data.legalAgencies_p.isDisabled=true;
+        FormTemplate3_instance.template.baseInfo.data.typeId_p.isDisabled=true;
+        FormTemplate3_execute.template.baseInfo.data.typeId_p.isDisabled=true;
         progress_form_template.template.legalAgencies_p.isDisabled=true;
         header_filter_template.template.legalAgencies_f.isDisabled=true;
         header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
+        console.log('FormTemplate3.template.caseInfo',FormTemplate3.template.caseInfo);
+        $('#legalAgenciesSum').hide();
         $('.super-auth').hide();
     }else if(getGlobalJson('currentUser').level==adminLevel){
         //$('#case_reg_but_restore').show();
         $('.admin-ui').show();
     }
     
+    caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
     $('.header-filter-btn:contains("复位")').setTooltips();
     $('.header-filter-btn').on('click',function(e){
         switch($(this).text()){
@@ -295,11 +302,20 @@ $('body').on(preload_completed_event_name,function(){
                                     //console.log('数子');
                                     matched=$.grep(matched,(item)=>{
                                         return $.grep($(ele).val(),(v)=>{
-                                            if(parseFloat(v)>2){
-                                                return Math.round(parseFloat(v))==Math.round(parseFloat(item[id]));
-                                            }else{
-                                                return parseFloat(v)==parseFloat(item[id]);
+                                            console.log('JSON.parse',v,item[id])
+                                            var val=item[id];
+                                            try{
+                                                val=JSON.parse(val);
+                                                if(val.constructor!=Array) val.split(',');
+                                                return Math.round(parseFloat(v))==Math.round(parseFloat(val[val.length-1]));
+                                            }catch(e){
+                                                if(parseFloat(v)>2){
+                                                    return Math.round(parseFloat(v))==Math.round(parseFloat(item[id]));
+                                                }else{
+                                                    return parseFloat(v)==parseFloat(item[id]);
+                                                }
                                             }
+                                            
                                             
                                         }).length>0;
                                     });
@@ -376,6 +392,7 @@ $('body').on(preload_completed_event_name,function(){
                     $('#pageOneTable').updateSource(currentData);
                     tb.instance.isTargetToggle=false;
                     
+                    setPersonCaseSum(currentData);
                     //setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
                     if(!isHeaderLocked){
                         form.slideUp();
@@ -446,7 +463,12 @@ $('body').on('caseexcutesChanged',function(e){
             DataList.combinedData[i].paidAmount=paidA;
         }
     });
-    setPersonCaseSum(DataList.combinedData);
+    currentData.forEach((d,i)=>{
+        if(d.id==e.value.id){
+            currentData[i].paidAmount=paidA;
+        }
+    });
+    setPersonCaseSum(currentData);
     update("id="+e.value.id,'caseStatus',{paidAmount:paidA},function(r){
         //console.log(r)
         if(!r.data.success){
@@ -478,11 +500,12 @@ $('body').on('caseStatusChanged',function(e){
                 //pageOnTable.updateTableData(newValue,$('#pageOneTable').find('tr[data-item='+newValue.id+']'));
                 DataList.caseStatus=updateOriginalData(DataList.caseStatus,newValue,'id');
                 DataList.combinedData=updateOriginalData(DataList.combinedData,newValue,'id');
+
                 currentData=updateOriginalData(currentData,newValue,'id');//tools.js
                 //console.log(DataList.caseStatus);
                 //更新页面ui数据显示
                 $('#pageOneTable').updateTableItem(e.value);
-                setPersonCaseSum(DataList.combinedData);
+                setPersonCaseSum(currentData);
                 $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
             }else{
                 $().minfo('show',{title:"提示",message:"更新遇到问题。"+r.data.data.sqlMessage},function(){});
@@ -536,7 +559,7 @@ $('body').on('caseChanged',function(e){
                     $().minfo('show',{title:"提示",message:"保存完成。"},function(){});
                 }
                 console.log("on data changed1",DataList.combinedData,DataList.caseStatus,e);
-                setPersonCaseSum(DataList.combinedData);
+                setPersonCaseSum(currentData);
                 $().mloader('hide');
             }else{
                 console.log(r);
@@ -570,6 +593,7 @@ $('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
 
     $('#legalAgenciesSum-list').empty();
     if(getGlobalJson('currentUser').level>=supervisorLevel){
+        $('#legalAgenciesSum-list').empty();
         $.each(getLegalAngenciesSum(),(name,data)=>{
             var divider=$('<li data-role="list-divider">'+name+'<span class="ui-li-count">'+data.number.length+'</span></li>');
             $('#legalAgenciesSum-list').append(divider);
@@ -602,27 +626,31 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
     });
 });
 function setPersonCaseSum(data){
+    $('#legalAgenciesSum').trigger('collapsibleexpand');
+    if(data==undefined) data=DataList.combinedData;
     var personCaseSum=getPersonCaseSum(data);
     console.log(personCaseSum);
-    $('#footer_info_bar').empty();
-    var info=$(`<label>共计<b>${personCaseSum.caseNum}</b>个案件`+
-        `，群诉<b id="footer_sum_label_group" style="color:#1362B7;">${personCaseSum.caseLabels[3].length}</b>件`+
-        `，300万以上<b id="footer_sum_label_hundred" style="color:orange;">${personCaseSum.caseLabels[1].length+personCaseSum.caseLabels[2].length}</b>件`+
-        ` 包含（1000万以上<b id="footer_sum_label_thousand" style="color:#E25C62;">${personCaseSum.caseLabels[2].length}</b>件）`+
-        `，普通案件<b id="footer_sum_label_normal" style="color:green;">${personCaseSum.caseLabels[0].length}</b>件`+
-        `，本诉金额为 <b id="footer_sum_request">${personCaseSum.rquestAmount.formatMoney(0, "￥")}</b> 万`+
-        `，判决金额为 <b id="footer_sum_penalty">${personCaseSum.penaltyAmount.formatMoney(0, "￥")}</b> 万`+
-        `，已执行金额为 <b id="footer_sum_paid">${personCaseSum.paidAmount.formatMoney(0, "￥")}</b> 万`+
-    `</label>`);
+    $('#panel_sum_info').empty();
+    var info=$(`<li data-role="list-divider" style="border-bottom: 2px solid orangered;">当前表格案件总数<span class="ui-li-count">${personCaseSum.caseNum}</span></li>`+
+        `<li>群诉<b id="footer_sum_label_group" style="color:#1362B7;"> ${personCaseSum.caseLabels[3].length} </b>件</li>`+
+        `<li>重大案件<b id="footer_sum_label_thousand" style="color:#E25C62;"> ${personCaseSum.caseLabels[2].length} </b>件</li>`+
+        `<li>普通案件<b id="footer_sum_label_normal" style="color:green;"> ${personCaseSum.caseLabels[0].length} </b>件</li>`+
+        `<li data-role="list-divider" style="border-bottom: 2px solid orangered;">涉及金额</li>`+
+        `<li>本诉金额为 <b id="footer_sum_request">${personCaseSum.rquestAmount.formatMoney(0, "￥")}</b> 万</li>`+
+        `<li>判决金额为 <b id="footer_sum_penalty">${personCaseSum.penaltyAmount.formatMoney(0, "￥")}</b> 万</li>`+
+        `<li>已执行金额为 <b id="footer_sum_paid">${personCaseSum.paidAmount.formatMoney(0, "￥")}</b> 万</li>`
+    );
     
     
     //setInfoBarPosition();
     //$('#footer_info_bar').setTooltip();
     //$('#footer_info_bar').append(info);
-    $('#footer_info_bar').trigger('create');
+    $('#panel_sum_info').append(info);
+    $('#panel_sum_info').trigger('create');
+    $('#panel_sum_info').listview().listview('refresh')
     
     
-    $(info).setTooltip('，');
+    //$(info).setTooltip('，');
     //console.log('mainFooter',footWidth)
 }
 $(window).on('resize',function() {
@@ -706,7 +734,8 @@ function getLegalAngenciesSum(){
     //var legalAgencies={};
     //var legalAgencies1={};
     var summary={};
-    DataList.casesDb.forEach(item=>{
+    var data=currentData || DataList.combinedData
+    data.forEach(item=>{
         var match=$.grep(resourceDatas.legalAgencies,(d=>d.id==item.legalAgencies));
         if(match.length>0){
             var catelog=match[0].name;
@@ -723,126 +752,6 @@ function getLegalAngenciesSum(){
     });
     return summary;
 }
-/*
-function setColumnToggleButton(){
-    if($('#pageOneTable-columnFilter').length==0){
-        
-        //console.log('tableColumnToggle',$('.table-column-toggle'));
-        tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
-        
-    }
-}
-function syncHeaderCloneWidth(){//同步表格头和身的宽度
-    var columnToggler=$('<i class="fa fa-gear"></i>');
-    var ref_ths=$('#pageOneTable').find('th');
-    var ths=$('#pageOneTable-fixed').find('th');
-    var left=0;
-    $.each(ths,(index,th)=>{
-        var border={};
-        //if(index==index==ths.length-1) border={'text-align':"right"};
-        $(th).css(Object.assign(border,{width:$(ref_ths[index]).outerWidth()+"px",left:left+"px"}));
-        //console.log(index,$(ref_ths[index]).outerWidth());
-        if(index==ths.length-1) {
-            $(th).empty();
-            $(th).removeClass('table-column-toggle');
-            $(th).append(columnToggler);
-            $(th).addClass('table-column-toggle');
-            //console.log('isNormal',($(ref_ths[index]).outerWidth()/window.innerWidth>0.1),$(ref_ths[index]).outerWidth(),window.innerWidth);
-            //resizeTables($(ref_ths[index]).outerWidth()/window.innerWidth>0.1,true);
-        }
-        left+=$(ref_ths[index]).outerWidth();
-    })
-    //var th_column_filter;
-    
-    if($('#pageOneTable-columnFilter').length==0){
-        if(getGlobalJson('currentUser').columns!=undefined && getGlobalJson('currentUser').columns!=null){
-            var user_cols=getGlobalJson('currentUser').columns.split(',');
-            $.each(_firstPageTableColumns,(k,v)=>{
-                v.isHidden=!(user_cols.includes(k)&&v.isFilterable);
-            });
-            $('#pageOneTable').trigger('create');
-            $('#pageOneTable-fixed').trigger('create'); 
-        }
-        //console.log('tableColumnToggle',$('.table-column-toggle'));
-        var columnFilter=tableColumnToggle(_firstPageTableColumns,$('.table-column-toggle'),'pageOneTable');
-        columnFilter.on('columnChanged',function(){
-            $('#pageOneTable').trigger('create');
-            var ref_ths=$('#pageOneTable').find('th');
-            if(ref_ths.length>0){
-                resizeTables($(ref_ths[ref_ths.length-1]).outerWidth()/window.innerWidth>0.14);
-            };
-        })
-        setTimeout(() => {
-            resizeTables();
-        }, 100);
-    }else{
-        
-    }
-    
-    $('#pageOneTable-fixed').trigger('create');    
-    //resizeColumnFilter();
-}
-function resizeTables(isNormal){//按照窗口尺寸调整表格字体尺寸
-    if(window.innerWidth<=1280){
-        //console.log('高度',$('#pageOneTable').find('label'));
-        //$('#pageOneTable').find('label').css({'font-size':"8px"});
-        //$('#pageOneTable').find('td,th').css({'font-size':"8px"});
-        if(isNormal){
-            $('#pageOneTable').removeClass('table-smallFont').removeClass('table-regularFont');
-            $('#pageOneTable-fixed').removeClass('table-smallFont').removeClass('table-regularFont');
-        }else{
-            $('#pageOneTable').removeClass('table-regularFont').addClass('table-smallFont');
-            $('#pageOneTable-fixed').removeClass('table-regularFont').addClass('table-smallFont');
-        //$('#header-filter-container').removeClass('table-regularFont').addClass('table-smallFont');
-        }
-    }else{
-        //console.log('isNormal',isNormal);
-        if(isNormal){
-            $('#pageOneTable').removeClass('table-smallFont').removeClass('table-regularFont');
-            $('#pageOneTable-fixed').removeClass('table-smallFont').removeClass('table-regularFont');
-        }else{
-            $('#pageOneTable').removeClass('table-smallFont').addClass('table-regularFont');
-            $('#pageOneTable-fixed').removeClass('table-smallFont').addClass('table-regularFont');
-        }
-        
-        //$('#header-filter-container').removeClass('table-smallFont').addClass('table-regularFont');
-    }
-    $('#pageOneTable').trigger('create');
-    //$('#pageOneTable-fixed').trigger('create');
-    
-    //syncHeaderCloneWidth();
-    $('#header-filter-container').css({height:$('#pageOneTable-fixed').css('height')});
-    $('#header-filter-container').trigger('create');
-}
-function resizeColumnFilter(){//按照窗口尺寸调整列过滤弹窗字体尺寸
-    
-    if(window.innerWidth<=1280){
-        $('#pageOneTable-columnFilter').removeClass('table-regularFont').addClass('table-smallFont');
-    }else{
-        $('#pageOneTable-columnFilter').removeClass('table-smallFont').addClass('table-regularFont');
-    }
-    $('#pageOneTable-columnFilter').trigger('create');
-}
-function setCheckAllBox(checkboxAll,targetTable){
-    var _this=checkboxAll;
-    
-    $.each($('#'+targetTable).find("input[type=checkbox][name=item_checkbox]"),function(index,checkbox) {
-        //console.log()
-        $(checkbox).on('change', function() {
-            var tr=$('#'+targetTable+' > tbody > tr');
-            $(_this).prop("checked",
-            tr.not(':hidden').length==tr.not(':hidden').find('input[type="checkbox"]:checked').length);
-        
-        })
-    });
-    $(_this).on('change',function() {
-        var tr=$('#'+targetTable+' > tbody > tr');
-        //console.log('change');
-        tr.not(':hidden').find('input[type="checkbox"]').prop( "checked", $(this).prop('checked') );
-
-    });
-}
-*/
 function _createNewCaseForm(template, constainerId){
     
     //console.log("_createNewCaseForm template");

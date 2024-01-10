@@ -82,6 +82,8 @@ const fileTypes={
         tooltip:'PDF文件'
     },
 }
+var progressLabels=[{id:0,name:'立案'},{id:1,name:'一审'},{id:2,name:'二审'},{id:4,name:'正常执行'},{id:3,name:'强制执行'},{id:5,name:'无需执行'},{id:6,name:'结案'},{id:7,name:'再审'},{id:8,name:'监督'}];
+
 var casePersonnelStatus=['无','原告','被告','被执行人','申请执行人','上诉人','原审被告','被上诉人'];
 var position=['无','法务人员','法务管理']
 var deads=["无需执行"]; 
@@ -152,6 +154,23 @@ const caseStatus={//案件状态
   paidAmount:"VARCHAR(255) default '0.00'",//执行金额
   isInactived:"INT(1) default '0' NOT NULL"
 }
+const caseProgresses={//案件状态
+    id:"INT NOT NULL",//案件唯一序列号
+    typeId:"INT NOT NULL",//案件唯一序列号
+    caseNo:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
+    legalAgencies:"INT(11) NOT NULL",//代理法务->legalAgencies*
+    lawFirm:"INT(11) NOT NULL",//代理律所->lawFirms*
+    attorney:"VARCHAR(100) default '无0'",//代理律师->attorneys*
+    trialDate:"timestamp",//一审日期
+    judgmentDate:"timestamp",//二审日期
+    //court:"VARCHAR(255)",//法院->courts
+    legalInstitution:"INT(11) default '0' NOT NULL",//受理机构->legalInstitution*
+    legalCounsel:"varchar(255)",//受理相关人->legalCounsel*
+    //appealAmount:"VARCHAR(255) default '0.00'",//反诉金额
+    //requestAmount:"VARCHAR(255) default '0.00'",//本诉金额
+    penalty:"VARCHAR(255) default '0.00'",//判决金额
+    judgmentSum:"VARCHAR(1000)"
+  }
 const caseUpdates={//案件每个状态点对应的更新
     id:"INT(11) NOT NULL",//案件唯一序列号
     updatesId:"INT NOT NULL default '0',UNIQUE",//案件序号子附件序列号

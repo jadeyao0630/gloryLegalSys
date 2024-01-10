@@ -85,6 +85,7 @@ logingStatus().then(function(e){
                             }
                         }))
                         resourceDatas[k+"_object"]=progresses_object;
+                        resourceDatas[k+"_"]=d;
                     }
                     else if(k=="propertyStatus"){
                         property_status=getKeyValues(d,"label")
@@ -217,6 +218,16 @@ logingStatus().then(function(e){
                 if(!DataList.hasOwnProperty('caseAttachments')) DataList.caseAttachments=[];
                 if(!DataList.hasOwnProperty('caseLinked')) DataList.caseLinked=[];
                 DataList.combinedData=combinedData;
+
+                //console.log('format2NewStatus',format2NewStatus(DataList.caseStatus,'caseStatus','id'));
+                
+                //console.log('format2NewStatus',format2NewStatus(DataList.caseUpdates,'caseUpdates','updatesId'));
+                
+                // console.log('format2NewStatus',format2NewStatus(DataList.caseExcutes,'caseExcutes','excutesId'));
+                
+                // console.log('format2NewStatus',format2NewStatus(DataList.caseProperties,'caseProperties','propertyId'));
+                
+                // console.log('format2NewStatus',format2NewStatus(DataList.caseAttachments,'caseAttachments','evidenceId'));
                 //DataList.combinedData=d.data.casesDb;
                 //setGlobalJson("combinedData",combinedData);
                 //setGlobalJson("datalist",d.data);
@@ -288,7 +299,7 @@ async function logingStatus(){
             //console.log('currentUser',getGlobalJson("currentUser"));
             getCurrentUser({id:getGlobalJson("currentUser").id,pass:getGlobalJson("currentUser").pass,user:getGlobalJson("currentUser").user})
             .then((d)=>{
-                //console.log('getCurrentUser',d.data);
+                console.log('getCurrentUser',d);
                 if(d.data.length>0 && d.data[0].hasOwnProperty('isInactived') && d.data[0].isInactived==0){
                     setGlobalJson("currentUser",d.data[0]);
                     resolve({sucess:true,message:'登录信息确认成功！'});
@@ -317,4 +328,70 @@ function showAutoLogin(message){
         $().minfo('hide');
     });
     
+}
+function format2NewStatus(data,table,matchId){
+    var newData=[];
+    
+    data.forEach((d)=>{
+        //console.log('insertRows',table,d);
+        var val=d.caseStatus;
+        if(val.constructor===String && (val.indexOf('[')>-1 || val.indexOf(',')>-1)){
+
+        }else{
+            //var status=d.caseStatus;
+            //console.log('insertRows',table);
+            if(val<3){
+                val=table.toLowerCase()=='casestatus'?'['+getNewCaseStatus(val).join()+']':val;
+            }else if(val<4){
+                var index=formatIndex(val);
+                val=table.toLowerCase()=='casestatus'?'['+getNewCaseStatus(index.main+index.sub).join()+']':index.main+index.sub;
+            }else{
+                var index=formatIndex(val);
+                val=table.toLowerCase()=='casestatus'?'['+getNewCaseStatus(index.main+2,3+index.sub).join()+']':index.main+2;
+            }
+            d.caseStatus=val;
+            $.each(d,(k,v)=>{
+                if(v==null||v=="null") d[k]='';
+            });
+            newData.push(d)
+            update(matchId+"="+d[matchId],table,{caseStatus:d.caseStatus},(e)=>{
+                console.log('insertRows',e);
+            });
+            update(matchId+"="+d[matchId],table.toLowerCase(),{caseStatus:d.caseStatus},(e)=>{
+                console.log('insertRows',e);
+            });
+        }
+        
+    });
+    
+    // insertRows(table,newData,(e)=>{
+    //     console.log('insertRows',e);
+    // })
+    console.log('insertRows','完成');
+    return newData;
+}
+function getNewCaseStatus(val,subIndex){
+    var status=[];
+    if(subIndex!=undefined){
+        for(var i=0;i<3;i++){
+            status.push(i);
+        }
+        if(subIndex>=3) status.push(subIndex);
+        for(var i=6;i<=val;i++){
+            status.push(i);
+        }
+    }else{
+        if(val == -1){
+            status.push(0);
+        }else if(val == 0){
+            status.push(val);
+        }else{
+            for(var i=0;i<3;i++){
+                status.push(i);
+            }
+            if(val>=3) status.push(val);
+        }
+    }
+    
+    return status;
 }

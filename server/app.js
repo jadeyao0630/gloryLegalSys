@@ -117,6 +117,65 @@ app.get('/downloadLocal', (req, res) => {
     }
   });
 });
+/*
+app.post('/deleteLocal', async (req, res) => {
+  try {
+    if (!req.files || Object.keys(req.files).length === 0) {
+      //return res.status(400).send('No files were uploaded.');
+      res.json({
+        status:400,
+        message:'No files were uploaded.',
+      });
+    }
+    const {file} = request.fileName;
+    const {folder} = request.folder;
+    try {
+      fs.unlinkSync(file);
+      res.json({
+        status:200,
+        message:`Deleted the file under ${file}`,
+        success:true
+      });
+    } catch (err) {
+      res.json({
+        status:500,
+        message:'An error occurred: '+err.message,
+        error:err,
+        success:false
+      });
+    }
+  }catch (error) {
+    res.json({
+      status:500,
+      message:'An error occurred: '+error.message,
+      error:err,
+      success:false
+    });
+  }
+})
+*/
+app.get('/deleteLocal', (req, res) => {
+  const fileName = decodeURIComponent(req.query.fileName);
+  const folder = req.query.folder;
+  const file = path.join(env.UPLOADS_PATH,folder,fileName);
+  try {
+    fs.unlinkSync(file);
+    res.json({
+      status:200,
+      message:`Deleted the file under ${file}`,
+      success:true
+    });
+  } catch (err) {
+    res.json({
+      status:500,
+      message:'An error occurred: '+err.message,
+      error:err,
+      success:false
+    });
+  }
+  
+  
+});
 app.get('/preview', async (req, res) => {
   const fileName = decodeURIComponent(req.query.fileName);
   const folder = req.query.folder;

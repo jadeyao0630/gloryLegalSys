@@ -55,17 +55,19 @@
 
 				
 			<a href="#nav-panel" class="ui-btn tooltip-btn" data-tooltip="更多菜单选项" id="menuBtn" style="margin-top:10px;margin-left:-10px;background: none;border:none;font-size: 20px;"><i class="fa fa-bars text-black menuBtn" ></i></a>
-            <h1 style="font-size: 30px;margin-top:-15px;"><img src="./images/logo.png"  width="40px" height="40px" style="margin:10px 20px -10px 0;"></img>国瑞法务管理系统</h1>
+            <h1 style="font-size: 30px;margin-top:-15px;"><img src="./images/logo.png"  width="40px" height="40px" style="margin:10px 20px -10px 0;"></img>国瑞法务管理系统<span style="font-size: 8px;"> v1.3</span></h1>
             <div data-role="controlgroup" data-type="horizontal" class="ui-btn-right" style="margin-right:10px;margin-top:20px;">
 				<button class="header-btn-search tooltip-btn" data-tooltip="查看更多过滤选项">更多</button>
 				<input type="search" id="header-search-input" placeholder="搜索关键字" data-clear-btn="true" data-wrapper-class="controlgroup-textinput ui-btn ui-corner-all">
 				<a id="username" href="#popupMenu" data-rel="popup" data-transition="slide" class="ui-btn ui-btn-icon-left ui-icon-user btn-icon-blue">登录</a>
 			</div>
+			<div id="notif_num">0</div>
             <div data-role="popup" id="popupMenu" data-theme="a" data-history="false">
                 <ul data-role="listview" data-inset="true" style="min-width:140px;" data-theme="a">
                     <li data-role="list-divider" style="border-bottom: 2px solid orangered;">操作</li>
                     <li><a class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-red ui-icon-power">退出</a></li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-icon-user btn-icon-blue ui-btn-icon-left popup-menu-btns" data-rel="back">个人信息</a></li>
+					<li><a href="#user_notification" class="ui-btn ui-btn-a ui-icon-comment btn-icon-blue ui-btn-icon-left popup-menu-btns" data-rel="back">消息中心</a></li>
 					<li data-role="list-divider" class="admin-ui">用户</li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-user admin-ui" data-rel="back">修改用户</a></li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue ui-icon-plus popup-menu-btns popup-add-user admin-ui" data-rel="back">添加用户</a></li>
@@ -314,6 +316,16 @@
 			
 		</div><!-- /header -->
 		<div class="ui-body-d ui-content" id="preview_container" style="height: 100%;">
+		</div>
+	</div>
+	<div data-role="page" id="user_notification">
+		<div data-role="header" data-position="fixed" data-tap-toggle="false">
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a>
+			<h1 id="preview_title">信息中心</h1>
+			
+		</div><!-- /header -->
+		<div class="ui-body-d ui-content" style="height: 100%;">
+			<ul data-role="listview" id="notification_list" data-inset="true"></ul>
 		</div>
 	</div>
 	<div data-role="page" id="chart_sum_page">

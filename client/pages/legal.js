@@ -257,6 +257,18 @@ $('body').on(preload_completed_event_name,function(){
         //$('#case_reg_but_restore').show();
         $('.admin-ui').show();
     }
+    $('#notif_num').hide();
+    if(getGlobalJson('currentUser').unread!=null||getGlobalJson('currentUser').unread!='null'){
+        try{
+            var unread=JSON.parse(getGlobalJson('currentUser').unread);
+            if(unread.length>0){
+                $('#notif_num').show();
+                $('#notif_num').text(unread.length);
+            }
+        }catch(e){
+
+        }
+    }
     
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
     $('.header-filter-btn:contains("复位")').setTooltips();
@@ -747,7 +759,7 @@ function getLegalAngenciesSum(){
             //legalAgencies[catelog].push(item);
             //legalAgencies1[catelog]+=item.requestAmount;
             summary[catelog]['number'].push(item);
-            summary[catelog]['amount']+=item.requestAmount;
+            summary[catelog]['amount']+=parseFloat(item.requestAmount);
         }
     });
     return summary;

@@ -78,6 +78,7 @@ const basicTableList={
     lawFirms:{tablename:"law_firms",data:law_firms,template:_lawFirms},
     attorneys:{tablename:"attorneys",data:_attorneys,template:attorneys},
     casePersonnelStatus:{tablename:"casePersonnelStatus",template:_casePersonnelStatus},
+    notifications:{tablename:"notifications",template:_notifications},
 }
 const caseTableList={
     //userList:{tablename:"names",template:users},

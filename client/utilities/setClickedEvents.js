@@ -101,6 +101,13 @@ $('#popupMenu').find('a').on('click',function(e){
 
             goToPage( $(this).attr( "href" ));
             break;
+        case '消息中心':
+            $('#notification_list').empty();
+            $.grep(resourceDatas.notifications,noti=>{
+                
+            });
+            goToPage( $(this).attr( "href" ));
+            break;
         case '退出':
             //goToPage( $(this).attr( "href" ));
             setGlobalJson("currentUser",{});
@@ -112,8 +119,9 @@ $('#popupMenu').find('a').on('click',function(e){
 function compareValues(source,target,prefix){
     prefix=prefix||'';
     var isSame=true;
+    if(target==undefined) return false;
     $.each(source,(k,v)=>{
-        console.log(k,k.replace(prefix,""))
+        
         if(target[k.replace(prefix,"")]!=undefined){
             var sourceVal=v.toString();
             var targetVal=target[k.replace(prefix,"")].toString();
@@ -121,6 +129,7 @@ function compareValues(source,target,prefix){
                 if(targetVal!="0000-00-00 00:00:00")
                     targetVal=getDateTime(targetVal);
             }
+            console.log(k.replace(prefix,""),sourceVal,targetVal,sourceVal!=targetVal)
             //getDateTime
             if(sourceVal!=targetVal) {
                 console.log('compareValues',k.replace(prefix,""),sourceVal,targetVal,target[k.replace(prefix,"")].toString());
@@ -146,7 +155,7 @@ $('#progress_point_info').find('[data-role="header"]').find('a[data-rel="back"]'
             console.log('数据不同');
             $().requestDialog({
                 title:'提示',
-                message:'表格内容已修改，是否保存?',
+                message:'信息尚未保存，是否保存当前?',
             },function(go){
                 if(go){
                     $('#progress_point_info').find('[name="save_btn"]').trigger('click')
@@ -239,6 +248,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
             $.each(e.values,(key,val)=>{
                 newData[key.replace("_p","")]=val;
             })
+            e.values.typeId=getGlobal("currentPoint");
             runWaitingTask();
             if(parseInt(getGlobal("currentPoint"))==0) {
                 
@@ -268,8 +278,9 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                 insert('caseProgresses',newData,function(ee){
                     console.log(ee,getGlobal("currentIsAdd"));
                     if(ee.success){
+                        DataList.caseProgresses=updateOriginalDataM(DataList.caseProgresses,newData,['id','typeId']);
                         if(parseInt(getGlobal("currentIsAdd"))==1){
-                            DataList.caseProgresses.push(newData);
+                            
                             
                             var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));//获取节点属性数据
                             
@@ -348,7 +359,12 @@ function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     
     currentForm = progress_point_form;
     data.typeId=typeId;
-    progress_point_form.setValues(data,'_p');
+    var key_num=Object.keys(data).length;
+    if(key_num==2) {
+        progress_point_form.setEmptyValues();
+        progress_point_form.setValueById('typeId_p',data.typeId)
+    }
+    else progress_point_form.setValues(data,'_p');
 
     var updateContainer=$('.updateContainer');
     if(updateContainer.length==0) {
@@ -425,9 +441,9 @@ $('#progress_point_viewer_btn').on('click',function(e){
     var typeId=parseInt($(this).jqmData('point'));
     var progressData=$.grep(matchedProgressStatus,d=>d.typeId==typeId);
     if(progressData.length>0) progressData=progressData[0];
-    else progressData={typeId:typeId}
+    else progressData={typeId:typeId,id:caseId}
     //console.log('pointIndex',$(this).jqmData('pointIndex'));
-    console.log('progress_point_viewer_btn',progressData,typeId);
+    //console.log('progress_point_viewer_btn',progressData,typeId);
     progress_point_editor(typeId,parseInt($(this).jqmData('pointIndex')),typeId==0?matchItems[0]:progressData,getProgressEvents(eventsData,typeId));
 });
 function calcPenaltyAmount(data){
@@ -2169,6 +2185,39 @@ function updateOriginalData(source,newData,matchKey){
         $.each(source,(index,item)=>{
             //console.log(matchKey,item[matchKey],"=="+newData[matchKey]);
             if(item[matchKey]==newData[matchKey]){
+                matchedIndex=index;
+                source[index]=Object.assign(source[index],newData);
+                found=true;
+                return false;
+            }
+        })
+        if(!found) source.push(newData);
+    }else{
+        var keys=Object.keys(newData);
+        $.each(source,(key,item)=>{
+            //console.log(matchKey,item[matchKey],"=="+newData[matchKey]);
+            if(keys.includes(key)){
+                found=true;
+                source[key]=newData[key];
+            }
+        })
+    }
+    
+    output('updateOriginalData',source,newData);
+    return source;
+}
+function updateOriginalDataM(source,newData,matchKeys){
+    var found=false;
+    if(source instanceof Array){
+        $.each(source,(index,item)=>{
+            //console.log(matchKey,item[matchKey],"=="+newData[matchKey]);
+            var result=[];
+            matchKeys.forEach(matchKey=>{
+                if(item[matchKey]==newData[matchKey]){
+                    result.push(true);
+                }
+            })
+            if(result.length==matchKeys.length){
                 matchedIndex=index;
                 source[index]=Object.assign(source[index],newData);
                 found=true;

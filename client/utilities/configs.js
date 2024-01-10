@@ -108,6 +108,16 @@ const _casePersonnelStatus={
     descriptions:"VARCHAR(255)",//案件标签说明
     isInactived:"INT(1) default '0' NOT NULL",
 }
+const _notifications={
+    id:"INT NOT NULL,PRIMARY KEY",//案件标签唯一序列号
+    title:"VARCHAR(255)",//案件标签名
+    message:"VARCHAR(255)",//案件标签说明
+    sender:"INT(1) default '0' NOT NULL",
+    isInactived:"INT(1) default '0' NOT NULL",
+    targetGroup:"VARCHAR(255)",
+    targetPerson:"VARCHAR(255)",
+    isSend:"INT(1) default '0' NOT NULL",
+}
 const columns={//案件主表
     id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
     caseNo:"VARCHAR(255),UNIQUE",//案件编号

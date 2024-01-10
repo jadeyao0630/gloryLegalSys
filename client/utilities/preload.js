@@ -140,6 +140,8 @@ logingStatus().then(function(e){
                         counsel_titles=getKeyValues(d,"label")
                         resourceDatas[k]=counsel_titles;
                         resourceDatas[k+"_"]=d;
+                    }else{
+                        resourceDatas[k]=d;
                     }
                 });
                 var _data={};

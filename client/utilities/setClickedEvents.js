@@ -2400,6 +2400,8 @@ function setNotificationsList(){
             li.append(messageBtn);
             if(getGlobalJson('currentUser').level==adminLevel) editBtn.show();
             else editBtn.hide();
+            if(value.isInactived==1) li.css({color:'grey'});
+            else li.css({color:'#333'});
             editBtn.jqmData("value",value);
             messageBtn.jqmData("value",value);
             console.log('changed',messageRead);

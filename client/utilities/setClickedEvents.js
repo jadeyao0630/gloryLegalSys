@@ -2441,27 +2441,35 @@ function setNotificationsList(){
     })
     $('.message-btn-delete').on('click',function(e){
         var value=$(this).jqmData('value');
-        if(getGlobalJson('currentUser').level==adminLevel){
-            removeCase(value.id,'notifications');
-            var index=resourceDatas.notifications.indexOf(value);
-            if(index>-1) resourceDatas.notifications.splice(index,1);
-            console.log('resourceDatas.notifications',resourceDatas.notifications,value);
-
-        }else{
-            value.isInactived=1;
-            update('id='+value.id,'notifications',{isInactived:1})
-        }
+        var li=$(this).closest('li');
+        $().requestDialog({
+            title:'提示',
+            message:"确认删除此条消息吗？",
+        },function(go){
+            if(go){
+                if(getGlobalJson('currentUser').level==adminLevel){
+                    removeCase(value.id,'notifications');
+                    var index=resourceDatas.notifications.indexOf(value);
+                    if(index>-1) resourceDatas.notifications.splice(index,1);
+                    console.log('resourceDatas.notifications',resourceDatas.notifications,value);
         
-        //var index=resourceDatas.notifications.indexOf(value);
-        //if(index>-1) resourceDatas.notifications.splice(index,1);
-        var userData=getGlobalJson("currentUser");
-        var deleted=JSON.parse(userData.deleted);
-        deleted.push(value.id);
-        userData.deleted=JSON.stringify(deleted);
-        setGlobalJson("currentUser",userData);
-        setUserNotifiications();
-        //console.log(resourceDatas.notifications);
-        $(this).closest('li').hide();
+                }else{
+                    value.isInactived=1;
+                    update('id='+value.id,'notifications',{isInactived:1})
+                }
+                
+                //var index=resourceDatas.notifications.indexOf(value);
+                //if(index>-1) resourceDatas.notifications.splice(index,1);
+                var userData=getGlobalJson("currentUser");
+                var deleted=JSON.parse(userData.deleted);
+                deleted.push(value.id);
+                userData.deleted=JSON.stringify(deleted);
+                setGlobalJson("currentUser",userData);
+                setUserNotifiications();
+                //console.log(resourceDatas.notifications);
+                li.hide();
+            }
+        });
     });
     $('.message_isRead').on('change',function(e){
         console.log('changed',$(this).prop('checked'));

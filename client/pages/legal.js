@@ -737,6 +737,7 @@ function getLegalAngenciesSum(){
     //var legalAgencies1={};
     var summary={};
     var data=currentData || DataList.combinedData
+    console.log('getLegalAngenciesSum',data);
     data.forEach(item=>{
         var match=$.grep(resourceDatas.legalAgencies,(d=>d.id==item.legalAgencies));
         if(match.length>0){

@@ -702,3 +702,6 @@ ui-collapsible.collapsible-listview .ui-btn{
 .no-check.ui-checkbox-on::after{
   display: none;
 }
+.collapsible_li:hover{
+  cursor: pointer;
+}

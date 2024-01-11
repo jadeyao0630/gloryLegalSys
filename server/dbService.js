@@ -1,5 +1,7 @@
-﻿const ftp = require("basic-ftp");
+﻿﻿const ftp = require("basic-ftp");
 const path = require("path");
+const fs = require('fs');
+const Jimp = require('jimp');
 let instance = null;
 
 const mquery = require('./mysqlQuery.js');
@@ -28,10 +30,35 @@ class DbService{
         }
         
     }
+    async uploadImage(rootPath,folder,file,newFileName){
+        try{
+            const response = await new Promise(async(resolve,reject)=>{
+                const extension=file.name.split('.').pop();
+                const _newfilename=newFileName.replace('.'+extension,'')+"_thumb."+extension;
+                const localFilePath = path.join(rootPath,folder, newFileName);
+                await new DbService().uploadFileL(rootPath,folder,file,newFileName).then(async(data)=>{
+                    if(data.success){
+                        const image = await Jimp.read(localFilePath);
+                        image.scaleToFit(200,200, function(err){
+                            if (err) throw err;
+                        })
+                        .write(path.join(rootPath,folder, _newfilename));
+
+                    }
+                    resolve(data)
+                });
+            });
+            return response;
+        }catch (error){
+            console.log(error);
+        }
+    }
     async uploadFileL(rootPath,folder,file,newFileName){
         try{
             const response = await new Promise(async(resolve,reject)=>{
                 var fileName=file.name;
+                const extension=file.name.split('.').pop();
+                const _newfilename=newFileName.replace('.'+extension,'');
                 //const remoteFilePath = path.join(filePath, fileName); // Replace 'filename.jpg' with the desired file name
                 
                 const localFilePath = path.join(rootPath,folder, newFileName); // Save the uploaded file to the 'uploads' directory
@@ -41,13 +68,16 @@ class DbService{
                         reject(new Error(err.message));
                         resolve({
                             status:500,
+                            success:false,
                             message:'Error saving file '+fileName,
                             newFileName:newFileName,
                             error:err
                         });
                     }
+                    
                     resolve({
                         status:200,
+                        success:true,
                         message:'File uploaded successfully '+fileName,
                         newFileName:newFileName,
                     });

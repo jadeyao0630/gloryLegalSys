@@ -2431,8 +2431,9 @@ function setNotificationsList(){
         sortedData[date].push(d);
     });
     $.each(sortedData,(date,values)=>{
-        var title=$('<li data-role="list-divider">'+date+'<span class="ui-li-count">'+values.length+'</span></li>');
+        var title=$('<li class="collapsible_li" data-role="list-divider">'+date+'<span class="ui-li-count">'+values.length+'</span></li>');
         $('#notification_list').append(title);
+        var items=[];
         $.each(values,(index,value)=>{
             
             var sender="系统消息";
@@ -2442,7 +2443,7 @@ function setNotificationsList(){
                 else sender='未知';
             }
             var li=$('<li style="display:grid;grid-template-columns: 1fr auto auto;border-top:1px solid lightgray;"></li>');
-
+            items.push(li);
             var messageBody=$('<div style="padding:5px 15px;"></div>');
             var messageBtn=$('<a href="#" class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-notext btn-icon-red message-btn-delete" style="height:100%;padding:0px 5px;border-bottom:none;border-top:none;border-right:none;"></a>');
             var editBtn=$('<a href="#new_message_page" class="ui-btn ui-btn-inline ui-icon-edit ui-btn-icon-notext btn-icon-green message-btn-edit" style="height:100%;padding:0px 5px;border-bottom:none;border-top:none;border-right:none;"></a>');
@@ -2519,6 +2520,17 @@ function setNotificationsList(){
             checkboxLable.trigger('create');
             $('#notification_list').append(li);
         })
+        title.jqmData('items',items);
+        title.jqmData('collapsed',false);
+        title.on('click',function(e){
+            var _items=$(this).jqmData('items');
+            $(this).jqmData('collapsed',!$(this).jqmData('collapsed'));
+            var collapsed=$(this).jqmData('collapsed');
+            _items.forEach(item=>{
+                if(collapsed) item.hide();
+                else item.show();
+            })
+        });
     });
     $('#notification_list').trigger('create');
     $('#notification_list').listview().listview('refresh')

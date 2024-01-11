@@ -33,7 +33,7 @@ async function deleteFile(folder,fileName){
     });
     return await response;
 }
-async function uploadFiles(folder,files){
+async function uploadFiles(folder,files,hasThumb){
     var results=[];
     $.each(files,(index,file)=>{
         var formData = new FormData();
@@ -41,7 +41,7 @@ async function uploadFiles(folder,files){
         formData.append('folder',folder);
         
         $.ajax({
-          url: "http://"+ip+":"+port+"/uploadLocal",
+          url: "http://"+ip+":"+port+(hasThumb?"/uploadImage":"/uploadLocal"),
           type: 'POST',
           data: formData,
           processData: false,

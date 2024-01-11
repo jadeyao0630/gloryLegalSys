@@ -1119,6 +1119,17 @@ var _summary_template;
           type:"textarea",
           isOptional:false,
         },
+        attachments:{
+          label:"附件:",
+          type:"file",
+          isOptional:true,
+          isMultiple:true,
+          accept:".png,.jpg,.jpeg"
+        },
+        __formLabel:{
+          label:"<span class='optionMark'>*</span> 支持扩展名：jpg. jpeg. png… 单个文件不超过50MB",
+          type:"label",
+        }
       }
     }
     change_rows_page_template={

@@ -1,4 +1,4 @@
-var isRunLocal=true;
+var isRunLocal=false;
 var IPS=['192.168.10.141','192.168.10.68','cn.luyao.site']
 var showDebug=false;
 let ip=isRunLocal?IPS[1]:IPS[0];
@@ -14,7 +14,8 @@ var enableRealDelete=true;
 var enableReadOnlyMode=false;
 var functionButoonPostion="top";
 const mainPage="legal.html";
-var logoSrc='./images/logo.png'
+var logoSrc='./images/logo.png';
+const attachmentFolder='messageAttachments';
 var DataList={};
 var preload_completed_event_name="preloadCompleted";
 var main_load_completed_event_name="mainDataloadCompleted";

@@ -45,6 +45,8 @@ $('#new_message_page').find('[name="send_new_message"]').on('click',function(e){
     var form=$(this).jqmData('form');
     var isEdit=$(this).jqmData('isEdit');
     var messageId=$(this).jqmData('messageId');
+    var attachments=$(this).jqmData('files');
+
     form.getFormValues(function(e){
         console.log(e)
         if(e.success){
@@ -56,32 +58,48 @@ $('#new_message_page').find('[name="send_new_message"]').on('click',function(e){
             e.values.targetGroup="["+e.values.targetGroup+"]";
             e.values.targetPerson="["+e.values.targetPerson+"]";
             if(isEdit){
+                var currentItems=[];
+                //attachment_item
+                var items=$('#new_message_page').find('.attachment_item');
+                if(attachments!=undefined){
+                    
+                    console.log(items,attachments)
+                    $.each(items,(i,item)=>{
+                        currentItems.push("\'"+$(item).jqmData('file')+"\'");
+                    })
+                    var deleteFiles=$.grep(attachments,file=>!currentItems.includes("\'"+file+"\'"));
+                    console.log('deleteFiles',deleteFiles);
+                    $.each(deleteFiles,(i,file)=>{
+                        //var thumb=file.
+                        deleteFile(attachmentFolder,file);
+                        deleteFile(attachmentFolder,getThumbFileName(file));
+                    })
+                    //e.values.attachments='['+JSON.parse(e.values.attachments.replaceAll("'","\"")).concat(currentItems).join(',')+']';
+                }
                 e.values.id=messageId;
-                update("id="+messageId,'notifications',e.values,function(res){
-                    $().mloader("hide");
-                    if(res.data.success){
-                        $().minfo('show',{title:"提示",message:"消息已修改。"},function(){});
-                        resourceDatas.notifications=updateOriginalData(resourceDatas.notifications,e.values,'id');
-                        setUserNotifiications();
-                        setNotificationsList();
-                        history.back();
-                    }else{
-                        $().minfo('show',{title:"提示",message:"发送时出现错误。"},function(){});
-                    }
+                uploadFiles(attachmentFolder,e.values.attachments,true).then(rr=>{
+                    //console.log(r);
+                    var filePaths=[];
+                    $.each(rr,(index,uploadResult)=>{
+                        if(!uploadResult.success){
+                            console.log(uploadResult.fileName+" 上传失败！");
+                            //cango=false;
+                            //$().mloader("hide");
+                        }else{
+                            console.log(uploadResult.fileName+" 上传成功！");
+                            filePaths.push('\''+uploadResult.fileName+'\'');
+                            
+                        }
+                    });
+                    var finalfilePaths=filePaths.concat(currentItems);
+                    e.values.attachments='['+finalfilePaths.join(',')+']';
                     
-                    
-                    console.log(res);
-                });
-                
-            }else{
-                getTheLastIndex('notifications','id').then((r)=>{
-                
-                    e.values.id=r==-1?0:r+1;
-                    pureinsert('notifications',e.values,function(res){
+                    console.log("edit save",e.values);
+                    update("id="+messageId,'notifications',e.values,function(res){
                         $().mloader("hide");
-                        if(res.success){
-                            $().minfo('show',{title:"提示",message:"消息已发送。"},function(){});
-                            resourceDatas.notifications.push(e.values);
+                        if(res.data.success){
+                            $().minfo('show',{title:"提示",message:"消息已修改。"},function(){});
+                            resourceDatas.notifications=updateOriginalData(resourceDatas.notifications,e.values,'id');
                             setUserNotifiications();
                             setNotificationsList();
                             history.back();
@@ -93,6 +111,46 @@ $('#new_message_page').find('[name="send_new_message"]').on('click',function(e){
                         console.log(res);
                     });
                 });
+                
+                
+            }else{
+                uploadFiles(attachmentFolder,e.values.attachments,true).then(rr=>{
+                    //console.log(r);
+                    var filePaths=[];
+                    $.each(rr,(index,uploadResult)=>{
+                        if(!uploadResult.success){
+                            console.log(uploadResult.fileName+" 上传失败！");
+                            //cango=false;
+                            //$().mloader("hide");
+                        }else{
+                            console.log(uploadResult.fileName+" 上传成功！");
+                            filePaths.push('\''+uploadResult.fileName+'\'');
+                            
+                        }
+                    });
+                    e.values.attachments='['+filePaths.join(',')+']';
+                    
+                    getTheLastIndex('notifications','id').then((r)=>{
+                
+                        e.values.id=r==-1?0:r+1;
+                        pureinsert('notifications',e.values,function(res){
+                            $().mloader("hide");
+                            if(res.success){
+                                $().minfo('show',{title:"提示",message:"消息已发送。"},function(){});
+                                resourceDatas.notifications.push(e.values);
+                                setUserNotifiications();
+                                setNotificationsList();
+                                history.back();
+                            }else{
+                                $().minfo('show',{title:"提示",message:"发送时出现错误。"},function(){});
+                            }
+                            
+                            
+                            console.log(res);
+                        });
+                    });
+                });
+                
             }
             
         }
@@ -2349,6 +2407,16 @@ function setUserNotifiications(){
 function getUnreadNum(notifications,isread){
     return $.grep(notifications,id=>!isread.includes(id)).length;
 }
+$('#message_attachments_popup').on( "popupbeforeposition", function() {
+    var image = $( this ).children( "img" ),
+    height = image.height(),
+    width = image.width();
+    // Set height and width attribute of the image
+    $( this ).attr({ "height": height, "width": width });
+    // 68px: 2 * 15px for top/bottom tolerance, 38px for the header.
+    var maxHeight = $( window ).height() - 68 + "px";
+    $( "img.photo", this ).css( "max-height", maxHeight );
+});
 function setNotificationsList(){
     
     $('#notification_list').empty();
@@ -2361,8 +2429,12 @@ function setNotificationsList(){
     // var sortedItems=data.sort(function(a,b){
     //     return data[a].date>data[b].date;
     // });
+    var sortedItems=data.sort(function(a,b){
+        console.log(a,b)
+        return a.date<b.date;
+    });
     var sortedData={};
-    data.forEach(d=>{
+    sortedItems.forEach(d=>{
         var date=formatDateTime(new Date(d.date),"yyyy年MM月dd日");
         if(!sortedData.hasOwnProperty(date)) sortedData[date]=[];
         sortedData[date].push(d);
@@ -2385,6 +2457,7 @@ function setNotificationsList(){
             var editBtn=$('<a href="#new_message_page" class="ui-btn ui-btn-inline ui-icon-edit ui-btn-icon-notext btn-icon-green message-btn-edit" style="height:100%;padding:0px 5px;border-bottom:none;border-top:none;border-right:none;"></a>');
             var messageTitle=$('<h2>'+value.title+'</h2>');
             var messageContent=$('<p>'+value.message.replace(/\n/g, "</br>")+'</p>');
+            var attachmentsContainer=$('<div></div>');
             var messageTime=$('<p class="ui-li-aside" style="display:grid;grid-template-columns: auto 1fr;margin-right:40px;"><strong style="line-height: 24px;margin-left: 5px;">'+formatDateTime(new Date(value.date),"hh:mm a")+'</strong></p>');
             var messageRead=$('<input type="checkbox" id="message_checkbox_'+value.id+'" data-mini="true" class="message_isRead" data-index="'+value.id+'" '+(isreads.includes(value.id)?'checked':'')+'>');
             var checkboxLable=$('<label for="message_checkbox_'+value.id+'" class="no-check" style="color:'+(isreads.includes(value.id)?'gray':'green')+';">'+(isreads.includes(value.id)?'标记未读':'标记已读')+'</label>')
@@ -2394,6 +2467,52 @@ function setNotificationsList(){
             messageBody.append(messageSender);
             messageBody.append(messageTitle);
             messageBody.append(messageContent);
+            try{
+                console.log(value.attachments)
+                var attachments=JSON.parse(value.attachments.replaceAll("'","\""));
+                if(attachments.length>0){
+                    attachments.forEach(attachment=>{
+                        var image=$('<a class="messge_attachments" href="#" data-file="'+attachment+'" data-rel="popup" data-position-to="window" data-transition="fade"><img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+getThumbFileName(attachment)+"&folder="+attachmentFolder+'"></img></a>');
+                        attachmentsContainer.append(image);
+                        image.on('click',function(e){
+                            console.log($(this));
+                            $().mloader("show",{message:"加载中...."});
+                            //var popup=$($(this).attr('href'));
+                            var file=$(this).data('file');
+                            var header = '<div data-role="header"><h2>预览</h2></div>';
+                            var closebtn = '<a href="#" data-rel="back" style="margin-top:18px;margin-right:20px;" class="ui-btn ui-corner-all btn-icon-red ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>';
+                            var img = '<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+file+"&folder="+attachmentFolder+'" class="message_image">';
+                            popup = '<div data-role="popup" id="message_attachments_popup" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
+                            $( header ).appendTo( $( popup ).appendTo( $.mobile.activePage ).popup() ).toolbar().before( closebtn ).after( img );
+                            $( ".message_image", "#message_attachments_popup" ).load(function() {
+                                // Open the popup
+                                setTimeout(() => {
+                                    
+                                    $().mloader("hide");
+                                    $( "#message_attachments_popup" ).popup( "open" );
+                                }, 200);
+                                // Clear the fallback
+                                
+                                clearTimeout( fallback );
+                            });
+                                // Fallback in case the browser doesn't fire a load event
+                            var fallback = setTimeout(function() {
+                                //$().mloader("hide");
+                                $().mloader("hide");
+                                $( "#message_attachments_popup" ).popup( "open" );
+                            }, 100);
+                            
+                        });
+                        
+                    })
+                }
+                
+                
+            }catch(e){
+
+            }
+
+            messageBody.append(attachmentsContainer);
             messageBody.append(messageTime);
             li.append(messageBody);
             li.append(editBtn);
@@ -2426,6 +2545,7 @@ function setNotificationsList(){
         value.targetPerson=JSON.parse(value.targetPerson).join(',');
         value.targetGroup=JSON.parse(value.targetGroup).join(',');
         value.isSystemMessage=value.sender==0;
+        //new_message_template.
         var form= new mform({template:new_message_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
         form.setValues(value);
         $('#new_message_body').append(form.instance);
@@ -2434,7 +2554,63 @@ function setNotificationsList(){
         $('#new_message_page').find('[name="send_new_message"]').jqmData('form',form);
         $('#new_message_page').find('[name="send_new_message"]').jqmData('isEdit',true);
         $('#new_message_page').find('[name="send_new_message"]').jqmData('messageId',$(this).jqmData('value').id);
+        try{
+            console.log(value.attachments)
+            var attachments=JSON.parse(value.attachments.replaceAll("'","\""));
+            if(attachments.length>0){
+                $('#new_message_page').find('[name="send_new_message"]').jqmData('files',attachments);
+                var listview=$('<ul data-role="listview" data-inset="true"></ul>');
+                attachments.forEach(attachment=>{
+                    var li=$('<li class="attachment_item"></li>');
+                    var image=$('<a class="messge_attachments" href="#" data-file="'+attachment+'" data-rel="popup" data-position-to="window" data-transition="fade"><img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+getThumbFileName(attachment)+"&folder="+attachmentFolder+'"></img></a>');
+                    li.append(image);
+                    var delBtn=$('<a href="#" class="ui-icon-delete btn-icon-red"></a>');
+                    li.jqmData('file',attachment);
+                    li.append(delBtn);
+                    listview.append(li);
+                    delBtn.on('click',function(e){
+                        $(this).closest('li').remove();
+                    })
+                    image.on('click',function(e){
+                        console.log($(this));
+                        $().mloader("show",{message:"加载中...."});
+                        //var popup=$($(this).attr('href'));
+                        var file=$(this).data('file');
+                        var header = '<div data-role="header"><h2>预览</h2></div>';
+                        var closebtn = '<a href="#" data-rel="back" style="margin-top:18px;margin-right:20px;" class="ui-btn ui-corner-all btn-icon-red ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>';
+                        var img = '<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+file+"&folder="+attachmentFolder+'" class="message_image">';
+                        popup = '<div data-role="popup" id="message_attachments_popup" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
+                        $( header ).appendTo( $( popup ).appendTo( $.mobile.activePage ).popup() ).toolbar().before( closebtn ).after( img );
+                        $( ".message_image", "#message_attachments_popup" ).load(function() {
+                            // Open the popup
+                            setTimeout(() => {
+                                
+                                $().mloader("hide");
+                                $( "#message_attachments_popup" ).popup( "open" );
+                            }, 200);
+                            // Clear the fallback
+                            
+                            clearTimeout( fallback );
+                        });
+                            // Fallback in case the browser doesn't fire a load event
+                        var fallback = setTimeout(function() {
+                            //$().mloader("hide");
+                            $().mloader("hide");
+                            $( "#message_attachments_popup" ).popup( "open" );
+                        }, 100);
+                        
+                    });
+                    
+                })
+                $('#new_message_body').append(listview);
+                
+                $('#new_message_body').trigger('create');
+            }
+            
+            
+        }catch(e){
 
+        }
         goToPage( $(this).attr( "href" ));
         value.targetPerson=JSON.stringify(value.targetPerson.split(","));
         value.targetGroup=JSON.stringify(value.targetGroup.split(","));
@@ -2447,12 +2623,20 @@ function setNotificationsList(){
             message:"确认删除此条消息吗？",
         },function(go){
             if(go){
+                
                 if(getGlobalJson('currentUser').level==adminLevel){
                     removeCase(value.id,'notifications');
                     var index=resourceDatas.notifications.indexOf(value);
                     if(index>-1) resourceDatas.notifications.splice(index,1);
+                    console.log('delete attachments',value.attachments)
+                    var attachments=JSON.parse(value.attachments.replaceAll("'","\""));
+                    attachments.forEach(file=>{
+                        //var thumb=file.
+                        deleteFile(attachmentFolder,file);
+                        deleteFile(attachmentFolder,getThumbFileName(file));
+                    })
                     console.log('resourceDatas.notifications',resourceDatas.notifications,value);
-        
+                    
                 }else{
                     value.isInactived=1;
                     update('id='+value.id,'notifications',{isInactived:1})
@@ -2467,9 +2651,10 @@ function setNotificationsList(){
                 setGlobalJson("currentUser",userData);
                 setUserNotifiications();
                 //console.log(resourceDatas.notifications);
-                li.hide();
+                li.remove();
             }
         });
+        
     });
     $('.message_isRead').on('change',function(e){
         console.log('changed',$(this).prop('checked'));
@@ -2494,3 +2679,24 @@ function setNotificationsList(){
         //console.log('sortedData',JSON.parse(getGlobalJson("currentUser").unread))
     })
 }
+function getThumbFileName(file){
+    var newFile=file.split(".")
+    newFile[newFile.length-1]="."+newFile[newFile.length-1];
+    newFile.splice(newFile.length-1,0,"_thumb");
+    return newFile.join('');
+}
+$( "#message_attachments_popup" ).on( "popupbeforeposition", function() {
+    var image = $( this ).children( "img" ),
+    height = image.height(),
+    width = image.width();
+    // Set height and width attribute of the image
+    $( this ).attr({ "height": height, "width": width });
+    // 68px: 2 * 15px for top/bottom tolerance, 38px for the header.
+    var maxHeight = $( window ).height() - 68 + "px";
+    $( "img.message_image", this ).css( "max-height", maxHeight );
+
+});
+// Remove the popup after it has been closed to manage DOM size
+$( "#message_attachments_popup" ).on( "popupafterclose", function() {
+    $( this ).remove();
+});

@@ -566,10 +566,14 @@ mform.prototype={
             
         var input=$('<input class="form-original" type="file" name="'+itemId+'" id="'+itemId+'" value=""'+accept+' '+this.setRequired(itemTemplate.isOptional,"此项必须选择")+'>');
         //item_container.append(input);
+        
         var subContainer=$('<div class="form-original"></div>');
         
         if(itemTemplate.isDisabled){
             input.attr("disabled",true);
+        }
+        if(itemTemplate.isMultiple){
+            input.prop("multiple", true);
         }
         subContainer.append(input);
         return subContainer;
@@ -874,6 +878,7 @@ mform.prototype={
                     $(inputs[index]).val(v);
                 })
             }
+        }else if(itemTemplate.type.toLowerCase()=="file"){
         }else{
             element.val(val);
         }

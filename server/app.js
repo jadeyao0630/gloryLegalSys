@@ -221,6 +221,7 @@ app.get('/preview', async (req, res) => {
         //return res.status(400).send('No files were uploaded.');
         res.json({
           status:400,
+          success:false,
           message:'No files were uploaded.',
         });
       }
@@ -229,7 +230,7 @@ app.get('/preview', async (req, res) => {
       const filename=file.name.replace('.'+extension,'');
       const encryptedFileName=encryptMD5(new Date().getTime()+filename)+"."+extension;
       const folder=req.body.folder;
-      const  db= DbService.getDbServiceInstance();
+      const db= DbService.getDbServiceInstance();
       const result = db.uploadFileL(env.UPLOADS_PATH,folder,file,encryptedFileName);
       result
       .then(data => {
@@ -243,8 +244,46 @@ app.get('/preview', async (req, res) => {
       //res.status(500).send('Error handling file upload');
       res.json({
         status:500,
+        success:false,
         message:'Error handling file upload',
-        error:err
+        error:err,
+        requestBody:req.body
+      });
+    }
+  });
+  app.post('/uploadImage', async (req, res) => {
+    try {
+      if (!req.files || Object.keys(req.files).length === 0) {
+        //return res.status(400).send('No files were uploaded.');
+        res.json({
+          status:400,
+          success:false,
+          message:'No files were uploaded.',
+        });
+      }
+      const file = req.files.file;
+      const extension=file.name.split('.').pop();
+      const filename=file.name.replace('.'+extension,'');
+      const encryptedFileName=encryptMD5(new Date().getTime()+filename)+"."+extension;
+      const folder=req.body.folder;
+      const db= DbService.getDbServiceInstance();
+      const result = db.uploadImage(env.UPLOADS_PATH,folder,file,encryptedFileName);
+      result
+      .then(data => {
+        console.log(folder);
+        res.json(data);
+      } )
+      .catch(err => console.log(err));
+      
+    } catch (err) {
+      console.error('Error handling file upload:', err);
+      //res.status(500).send('Error handling file upload');
+      res.json({
+        status:500,
+        success:false,
+        message:'Error handling file upload',
+        error:err,
+        requestBody:req.body
       });
     }
   });

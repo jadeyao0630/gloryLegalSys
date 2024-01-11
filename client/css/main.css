@@ -679,7 +679,7 @@ ui-collapsible.collapsible-listview .ui-btn{
 #progress_diagram{
   margin-left:40px;
 }
-#notif_num{
+.notif_num_counter{
   position: absolute;
   min-width:18px;
   height: 18px;

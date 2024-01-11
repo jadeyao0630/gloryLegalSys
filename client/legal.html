@@ -61,13 +61,13 @@
 				<input type="search" id="header-search-input" placeholder="搜索关键字" data-clear-btn="true" data-wrapper-class="controlgroup-textinput ui-btn ui-corner-all">
 				<a id="username" href="#popupMenu" data-rel="popup" data-transition="slide" class="ui-btn ui-btn-icon-left ui-icon-user btn-icon-blue">登录</a>
 			</div>
-			<div id="notif_num">0</div>
+			<div id="notif_num" class="notif_num_counter notif_num">0</div>
             <div data-role="popup" id="popupMenu" data-theme="a" data-history="false">
                 <ul data-role="listview" data-inset="true" style="min-width:140px;" data-theme="a">
                     <li data-role="list-divider" style="border-bottom: 2px solid orangered;">操作</li>
                     <li><a class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-red ui-icon-power">退出</a></li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-icon-user btn-icon-blue ui-btn-icon-left popup-menu-btns" data-rel="back">个人信息</a></li>
-					<li><a href="#user_notification" class="ui-btn ui-btn-a ui-icon-comment btn-icon-blue ui-btn-icon-left popup-menu-btns" data-rel="back">消息中心</a></li>
+					<li><a href="#user_notification" class="ui-btn ui-btn-a ui-icon-comment btn-icon-green ui-btn-icon-left popup-menu-btns" data-rel="back">消息中心</a><span id="notif_num" class="ui-li-count notif_num">2</span></li>
 					<li data-role="list-divider" class="admin-ui">用户</li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-user admin-ui" data-rel="back">修改用户</a></li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue ui-icon-plus popup-menu-btns popup-add-user admin-ui" data-rel="back">添加用户</a></li>

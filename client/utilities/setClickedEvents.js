@@ -2370,7 +2370,7 @@ function updateOriginalDataM(source,newData,matchKeys){
     return source;
 }
 function setUserNotifiications(){
-    $('#notif_num').hide();
+    $('.notif_num').hide();
     var userData=getGlobalJson('currentUser');
     var isread=[];
     if(userData.isRead!=null||userData.isRead!='null'){
@@ -2397,12 +2397,12 @@ function setUserNotifiications(){
     userData.notifications=JSON.stringify(notifications);
     setGlobalJson('currentUser',userData);
     console.log("unreads",notifications,isread,getUnreadNum(notifications,isread));
-    $('#notif_num').text(getUnreadNum(notifications,isread));
+    $('.notif_num').text(getUnreadNum(notifications,isread));
     if(getUnreadNum(notifications,isread)>0){
-        $('#notif_num').show();
+        $('.notif_num').show();
         
     }else{
-        $('#notif_num').hide();
+        $('.notif_num').hide();
     }
 }
 function getUnreadNum(notifications,isread){
@@ -2448,12 +2448,12 @@ function setNotificationsList(){
             var messageBtn=$('<a href="#" class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-notext btn-icon-red message-btn-delete" style="height:100%;padding:0px 5px;border-bottom:none;border-top:none;border-right:none;"></a>');
             var editBtn=$('<a href="#new_message_page" class="ui-btn ui-btn-inline ui-icon-edit ui-btn-icon-notext btn-icon-green message-btn-edit" style="height:100%;padding:0px 5px;border-bottom:none;border-top:none;border-right:none;"></a>');
             var messageTitle=$('<h2>'+value.title+'</h2>');
-            var messageContent=$('<p>'+value.message.replace(/\n/g, "</br>")+'</p>');
+            var messageContent=$('<p style="font-size:14px;">'+value.message.replace(/\n/g, "</br>")+'</p>');
             var attachmentsContainer=$('<div></div>');
-            var messageTime=$('<p class="ui-li-aside" style="display:grid;grid-template-columns: auto 1fr;margin-right:40px;"><strong style="line-height: 24px;margin-left: 5px;">'+formatDateTime(new Date(value.date),"hh:mm a")+'</strong></p>');
+            var messageTime=$('<p class="ui-li-aside" style="display:grid;grid-template-columns: auto 1fr;margin-right:'+(getGlobalJson('currentUser').level==adminLevel?40:20)+'px;"><strong style="line-height: 24px;margin-left: 5px;font-size:12px;">'+formatDateTime(new Date(value.date),"hh:mm a")+'</strong></p>');
             var messageRead=$('<input type="checkbox" id="message_checkbox_'+value.id+'" data-mini="true" class="message_isRead" data-index="'+value.id+'" '+(isreads.includes(value.id)?'checked':'')+'>');
             var checkboxLable=$('<label for="message_checkbox_'+value.id+'" class="no-check" style="color:'+(isreads.includes(value.id)?'gray':'green')+';">'+(isreads.includes(value.id)?'标记未读':'标记已读')+'</label>')
-            var messageSender=$('<p><strong>'+sender+'</strong></p>');
+            var messageSender=$('<p><strong style="font-size:12px;">'+sender+'</strong></p>');
             messageTime.prepend(messageRead);
             messageRead.after(checkboxLable);
             messageBody.append(messageSender);

@@ -15,11 +15,11 @@ var enableReadOnlyMode=false;
 var functionButoonPostion="top";
 const mainPage="legal.html";
 var logoSrc='./images/logo.png';
+const userDbTableName="names";
 const attachmentFolder='messageAttachments';
 var DataList={};
 var preload_completed_event_name="preloadCompleted";
 var main_load_completed_event_name="mainDataloadCompleted";
-var userDbTableName="names";
 class Message{
     static LOGIN_IS_EMPTY='<p style="color:red;">用户名和密码不能为空</p>';
     static LOGIN_ISNOT_MATCH='<p style="color:red;">用户名和密码不匹配</p>';

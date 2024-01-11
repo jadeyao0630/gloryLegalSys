@@ -2381,8 +2381,9 @@ function setUserNotifiications(){
     var userId=userData.id;
     resourceDatas.notifications.forEach(notification=>{
         if(getGlobalJson('currentUser').level < adminLevel){
+            console.log('userData.deleted',JSON.parse(userData.deleted));
             if((JSON.parse(notification.targetGroup).includes(level)|| JSON.parse(notification.targetPerson).includes(userId)) &&
-            !JSON.parse(userData.deleted).includes(level) && 
+            !JSON.parse(userData.deleted).includes(notification.id) && 
             notification.isInactived==0){
                 notifications.push(notification.id);
             }
@@ -2407,16 +2408,6 @@ function setUserNotifiications(){
 function getUnreadNum(notifications,isread){
     return $.grep(notifications,id=>!isread.includes(id)).length;
 }
-$('#message_attachments_popup').on( "popupbeforeposition", function() {
-    var image = $( this ).children( "img" ),
-    height = image.height(),
-    width = image.width();
-    // Set height and width attribute of the image
-    $( this ).attr({ "height": height, "width": width });
-    // 68px: 2 * 15px for top/bottom tolerance, 38px for the header.
-    var maxHeight = $( window ).height() - 68 + "px";
-    $( "img.photo", this ).css( "max-height", maxHeight );
-});
 function setNotificationsList(){
     
     $('#notification_list').empty();
@@ -2471,7 +2462,7 @@ function setNotificationsList(){
                 console.log(value.attachments)
                 var attachments=JSON.parse(value.attachments.replaceAll("'","\""));
                 if(attachments.length>0){
-                    attachments.forEach(attachment=>{
+                    attachments.forEach((attachment,i)=>{
                         var image=$('<a class="messge_attachments" href="#" data-file="'+attachment+'" data-rel="popup" data-position-to="window" data-transition="fade"><img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+getThumbFileName(attachment)+"&folder="+attachmentFolder+'"></img></a>');
                         attachmentsContainer.append(image);
                         image.on('click',function(e){
@@ -2482,14 +2473,14 @@ function setNotificationsList(){
                             var header = '<div data-role="header"><h2>预览</h2></div>';
                             var closebtn = '<a href="#" data-rel="back" style="margin-top:18px;margin-right:20px;" class="ui-btn ui-corner-all btn-icon-red ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>';
                             var img = '<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+file+"&folder="+attachmentFolder+'" class="message_image">';
-                            popup = '<div data-role="popup" id="message_attachments_popup" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
+                            popup = '<div data-role="popup" class="message_attachment_preview" id="message_attachments_popup_'+i+'" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
                             $( header ).appendTo( $( popup ).appendTo( $.mobile.activePage ).popup() ).toolbar().before( closebtn ).after( img );
-                            $( ".message_image", "#message_attachments_popup" ).load(function() {
+                            $( ".message_image", "#message_attachments_popup_"+i ).load(function() {
                                 // Open the popup
                                 setTimeout(() => {
                                     
                                     $().mloader("hide");
-                                    $( "#message_attachments_popup" ).popup( "open" );
+                                    $( "#message_attachments_popup_"+i ).popup( "open" );
                                 }, 200);
                                 // Clear the fallback
                                 
@@ -2499,7 +2490,7 @@ function setNotificationsList(){
                             var fallback = setTimeout(function() {
                                 //$().mloader("hide");
                                 $().mloader("hide");
-                                $( "#message_attachments_popup" ).popup( "open" );
+                                $( "#message_attachments_popup_"+i ).popup( "open" );
                             }, 100);
                             
                         });
@@ -2560,7 +2551,7 @@ function setNotificationsList(){
             if(attachments.length>0){
                 $('#new_message_page').find('[name="send_new_message"]').jqmData('files',attachments);
                 var listview=$('<ul data-role="listview" data-inset="true"></ul>');
-                attachments.forEach(attachment=>{
+                attachments.forEach((attachment,i)=>{
                     var li=$('<li class="attachment_item"></li>');
                     var image=$('<a class="messge_attachments" href="#" data-file="'+attachment+'" data-rel="popup" data-position-to="window" data-transition="fade"><img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+getThumbFileName(attachment)+"&folder="+attachmentFolder+'"></img></a>');
                     li.append(image);
@@ -2579,14 +2570,14 @@ function setNotificationsList(){
                         var header = '<div data-role="header"><h2>预览</h2></div>';
                         var closebtn = '<a href="#" data-rel="back" style="margin-top:18px;margin-right:20px;" class="ui-btn ui-corner-all btn-icon-red ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>';
                         var img = '<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+file+"&folder="+attachmentFolder+'" class="message_image">';
-                        popup = '<div data-role="popup" id="message_attachments_popup" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
+                        popup = '<div data-role="popup" class="message_attachment_preview" id="message_attachments_popup_edit_'+i+'" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
                         $( header ).appendTo( $( popup ).appendTo( $.mobile.activePage ).popup() ).toolbar().before( closebtn ).after( img );
-                        $( ".message_image", "#message_attachments_popup" ).load(function() {
+                        $( ".message_image", "#message_attachments_popup_edit_"+i ).load(function() {
                             // Open the popup
                             setTimeout(() => {
                                 
                                 $().mloader("hide");
-                                $( "#message_attachments_popup" ).popup( "open" );
+                                $( "#message_attachments_popup_edit_"+i ).popup( "open" );
                             }, 200);
                             // Clear the fallback
                             
@@ -2596,7 +2587,7 @@ function setNotificationsList(){
                         var fallback = setTimeout(function() {
                             //$().mloader("hide");
                             $().mloader("hide");
-                            $( "#message_attachments_popup" ).popup( "open" );
+                            $( "#message_attachments_popup_edit_"+i ).popup( "open" );
                         }, 100);
                         
                     });
@@ -2638,8 +2629,8 @@ function setNotificationsList(){
                     console.log('resourceDatas.notifications',resourceDatas.notifications,value);
                     
                 }else{
-                    value.isInactived=1;
-                    update('id='+value.id,'notifications',{isInactived:1})
+                    //value.isInactived=1;
+                    //update('id='+value.id,'notifications',{isInactived:1})
                 }
                 
                 //var index=resourceDatas.notifications.indexOf(value);
@@ -2650,6 +2641,7 @@ function setNotificationsList(){
                 userData.deleted=JSON.stringify(deleted);
                 setGlobalJson("currentUser",userData);
                 setUserNotifiications();
+                update("id="+userData.id,userDbTableName,{deleted:userData.deleted});
                 //console.log(resourceDatas.notifications);
                 li.remove();
             }
@@ -2676,6 +2668,7 @@ function setNotificationsList(){
         setGlobalJson("currentUser",userData);
         console.log("currentUser",userData);
         setUserNotifiications();
+        update("id="+userData.id,userDbTableName,{isRead:userData.isRead});
         //console.log('sortedData',JSON.parse(getGlobalJson("currentUser").unread))
     })
 }
@@ -2685,7 +2678,7 @@ function getThumbFileName(file){
     newFile.splice(newFile.length-1,0,"_thumb");
     return newFile.join('');
 }
-$( "#message_attachments_popup" ).on( "popupbeforeposition", function() {
+$( ".message_attachment_preview" ).on( "popupbeforeposition", function() {
     var image = $( this ).children( "img" ),
     height = image.height(),
     width = image.width();
@@ -2697,6 +2690,6 @@ $( "#message_attachments_popup" ).on( "popupbeforeposition", function() {
 
 });
 // Remove the popup after it has been closed to manage DOM size
-$( "#message_attachments_popup" ).on( "popupafterclose", function() {
+$( ".message_attachment_preview" ).on( "popupafterclose", function() {
     $( this ).remove();
 });

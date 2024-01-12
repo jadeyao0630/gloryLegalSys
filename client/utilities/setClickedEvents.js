@@ -2474,7 +2474,7 @@ function setNotificationsList(){
                             var header = '<div data-role="header"><h2>预览</h2></div>';
                             var closebtn = '<a href="#" data-rel="back" style="margin-top:18px;margin-right:20px;" class="ui-btn ui-corner-all btn-icon-red ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>';
                             var img = '<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+file+"&folder="+attachmentFolder+'" class="message_image">';
-                            popup = '<div data-role="popup" class="message_attachment_preview" id="message_attachments_popup_'+i+'" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
+                            popup = '<div data-role="popup" class="message_attachment_preview ui-btn ui-corner-all ui-shadow" id="message_attachments_popup_'+i+'" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
                             $( header ).appendTo( $( popup ).appendTo( $.mobile.activePage ).popup() ).toolbar().before( closebtn ).after( img );
                             $( ".message_image", "#message_attachments_popup_"+i ).load(function() {
                                 // Open the popup
@@ -2482,7 +2482,7 @@ function setNotificationsList(){
                                     
                                     $().mloader("hide");
                                     $( "#message_attachments_popup_"+i ).popup( "open" );
-                                }, 200);
+                                }, 100);
                                 // Clear the fallback
                                 
                                 clearTimeout( fallback );
@@ -2492,7 +2492,7 @@ function setNotificationsList(){
                                 //$().mloader("hide");
                                 $().mloader("hide");
                                 $( "#message_attachments_popup_"+i ).popup( "open" );
-                            }, 100);
+                            }, 1000);
                             
                         });
                         
@@ -2582,7 +2582,7 @@ function setNotificationsList(){
                         var header = '<div data-role="header"><h2>预览</h2></div>';
                         var closebtn = '<a href="#" data-rel="back" style="margin-top:18px;margin-right:20px;" class="ui-btn ui-corner-all btn-icon-red ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>';
                         var img = '<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+file+"&folder="+attachmentFolder+'" class="message_image">';
-                        popup = '<div data-role="popup" class="message_attachment_preview" id="message_attachments_popup_edit_'+i+'" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
+                        popup = '<div data-role="popup" class="message_attachment_preview ui-btn ui-corner-all ui-shadow" id="message_attachments_popup_edit_'+i+'" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
                         $( header ).appendTo( $( popup ).appendTo( $.mobile.activePage ).popup() ).toolbar().before( closebtn ).after( img );
                         $( ".message_image", "#message_attachments_popup_edit_"+i ).load(function() {
                             // Open the popup
@@ -2590,7 +2590,7 @@ function setNotificationsList(){
                                 
                                 $().mloader("hide");
                                 $( "#message_attachments_popup_edit_"+i ).popup( "open" );
-                            }, 200);
+                            }, 100);
                             // Clear the fallback
                             
                             clearTimeout( fallback );
@@ -2600,7 +2600,7 @@ function setNotificationsList(){
                             //$().mloader("hide");
                             $().mloader("hide");
                             $( "#message_attachments_popup_edit_"+i ).popup( "open" );
-                        }, 100);
+                        }, 1000);
                         
                     });
                     

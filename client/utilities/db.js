@@ -65,6 +65,34 @@ async function uploadFiles(folder,files,hasThumb){
         }, 100);
     });
 }
+async function broadcast(data,type,res){
+    await fetch("http://"+ip+":"+port+"/boradcast",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ data:data,type:type})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success){
+            console.log(data.id);
+        }else{
+            console.log(data.error);
+        }
+        if(res!=undefined)res(data);
+    });
+}
+async function removeMessage(id,data,res){
+    await fetch("http://"+ip+":"+port+"/deleteMessage",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({data:data, id:id})
+    })
+    .then(response => response.json())
+    .then(data => {
+        //console.log(data.error);
+        if(res!=undefined)res(data);
+    });
+}
 async function getCaseLatestIndex(){
     var latestId=-1;
     var query="SELECT * FROM cases ORDER BY id DESC LIMIT 1"

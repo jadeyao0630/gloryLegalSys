@@ -562,7 +562,7 @@ $.fn.extend({
     setTdElement:function(template,rowData,key,columnVisibility){
         var td;
         if(template[key].type=='supermulticombobox'||template[key].type=='supermultiinput'){
-            console.log('rowData[key]',$(this).jqmData('textOverflow'),rowData[key]);
+            //console.log('rowData[key]',$(this).jqmData('textOverflow'),rowData[key]);
             if($(this).jqmData('textOverflow')) {
                 if(rowData[key].constructor==Array){
                     rowData[key]=rowData[key].join(",");

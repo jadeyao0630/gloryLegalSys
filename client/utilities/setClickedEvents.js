@@ -52,6 +52,7 @@ $('#new_message_page').find('[name="send_new_message"]').on('click',function(e){
         if(e.success){
             $().mloader("show",{message:"提交中...."});
             e.values.sender=e.values.isSystemMessage?0:getGlobalJson("currentUser").id;
+            e.values.lastEditor=getGlobalJson("currentUser").id;
             delete e.values.isSystemMessage;
             e.values.date=getDateTime();
             e.values.message=e.values.message.replaceAll('"','\'');
@@ -96,13 +97,11 @@ $('#new_message_page').find('[name="send_new_message"]').on('click',function(e){
                     e.values.attachments='['+finalfilePaths.join(',')+']';
                     
                     console.log("edit save",e.values);
-                    update("id="+messageId,'notifications',e.values,function(res){
+                    broadcast(e.values,'edit',function(res){
                         $().mloader("hide");
-                        if(res.data.success){
+                        if(res.success){
                             $().minfo('show',{title:"提示",message:"消息已修改。"},function(){});
-                            resourceDatas.notifications=updateOriginalData(resourceDatas.notifications,e.values,'id');
-                            setUserNotifiications();
-                            setNotificationsList();
+                            
                             history.back();
                         }else{
                             $().minfo('show',{title:"提示",message:"发送时出现错误。"},function(){});
@@ -134,13 +133,11 @@ $('#new_message_page').find('[name="send_new_message"]').on('click',function(e){
                     getTheLastIndex('notifications','id').then((r)=>{
                 
                         e.values.id=r==-1?0:r+1;
-                        pureinsert('notifications',e.values,function(res){
+                        broadcast(e.values,'add',function(res){
                             $().mloader("hide");
                             if(res.success){
                                 $().minfo('show',{title:"提示",message:"消息已发送。"},function(){});
-                                resourceDatas.notifications.push(e.values);
-                                setUserNotifiications();
-                                setNotificationsList();
+
                                 history.back();
                             }else{
                                 $().minfo('show',{title:"提示",message:"发送时出现错误。"},function(){});
@@ -2443,7 +2440,7 @@ function setNotificationsList(){
                 if(sender.length>0) sender=sender[0].name;
                 else sender='未知';
             }
-            var li=$('<li style="display:grid;grid-template-columns: 1fr auto auto;border-top:1px solid lightgray;"></li>');
+            var li=$('<li data-index="'+value.id+'" style="display:grid;grid-template-columns: 1fr auto auto;border-top:1px solid lightgray;"></li>');
             items.push(li);
             var messageBody=$('<div style="padding:5px 15px;"></div>');
             var messageBtn=$('<a href="#" class="ui-btn ui-btn-inline ui-icon-delete ui-btn-icon-notext btn-icon-red message-btn-delete" style="height:100%;padding:0px 5px;border-bottom:none;border-top:none;border-right:none;"></a>');
@@ -2452,11 +2449,11 @@ function setNotificationsList(){
             var messageContent=$('<p style="font-size:14px;">'+value.message.replace(/\n/g, "</br>")+'</p>');
             var attachmentsContainer=$('<div></div>');
             var messageTime=$('<p class="ui-li-aside" style="display:grid;grid-template-columns: auto 1fr;margin-right:'+(getGlobalJson('currentUser').level==adminLevel?40:20)+'px;"><strong style="line-height: 24px;margin-left: 5px;font-size:12px;">'+formatDateTime(new Date(value.date),"hh:mm a")+'</strong></p>');
-            var messageRead=$('<input type="checkbox" id="message_checkbox_'+value.id+'" data-mini="true" class="message_isRead" data-index="'+value.id+'" '+(isreads.includes(value.id)?'checked':'')+'>');
+            var messageRead=$('<a href="#" style="margin-top:0px;padding:3px 5px;color:'+(isreads.includes(value.id)?'gray':'green')+';" class="ui-btn ui-btn-inline ui-corner-all message_isRead" id="message_checkbox_'+value.id+'" data-mini="true" data-index="'+value.id+'">'+(isreads.includes(value.id)?'标记未读':'标记已读')+'</a>');
             var checkboxLable=$('<label for="message_checkbox_'+value.id+'" class="no-check" style="color:'+(isreads.includes(value.id)?'gray':'green')+';">'+(isreads.includes(value.id)?'标记未读':'标记已读')+'</label>')
             var messageSender=$('<p><strong style="font-size:12px;">'+sender+'</strong></p>');
             messageTime.prepend(messageRead);
-            messageRead.after(checkboxLable);
+            //messageRead.after(checkboxLable);
             messageBody.append(messageSender);
             messageBody.append(messageTitle);
             messageBody.append(messageContent);
@@ -2510,14 +2507,17 @@ function setNotificationsList(){
             li.append(messageBody);
             li.append(editBtn);
             li.append(messageBtn);
+            li.on('click',function(e){
+                $(this).removeClass('newItem');
+            })
             if(getGlobalJson('currentUser').level==adminLevel) editBtn.show();
             else editBtn.hide();
             if(value.isInactived==1) li.css({color:'grey'});
             else li.css({color:'#333'});
             editBtn.jqmData("value",value);
             messageBtn.jqmData("value",value);
-            console.log('changed',messageRead);
-            messageRead.checkboxradio().checkboxradio( "refresh" );
+            //console.log('changed',messageRead);
+            //messageRead.checkboxradio().checkboxradio( "refresh" );
             checkboxLable.trigger('create');
             $('#notification_list').append(li);
         })
@@ -2629,9 +2629,10 @@ function setNotificationsList(){
             if(go){
                 
                 if(getGlobalJson('currentUser').level==adminLevel){
-                    removeCase(value.id,'notifications');
-                    var index=resourceDatas.notifications.indexOf(value);
-                    if(index>-1) resourceDatas.notifications.splice(index,1);
+                    removeMessage(value.id,value,function(e){
+                        console.log(e);
+                    });
+                    
                     console.log('delete attachments',value.attachments)
                     var attachments=JSON.parse(value.attachments.replaceAll("'","\""));
                     attachments.forEach(file=>{
@@ -2661,18 +2662,18 @@ function setNotificationsList(){
         });
         
     });
-    $('.message_isRead').on('change',function(e){
+    $('.message_isRead').on('click',function(e){
         console.log('changed',$(this).prop('checked'));
-        
-        if($(this).prop('checked')){
-            $(this).parent().find('label').text('标记未读');
-            $(this).parent().find('label').css({'color':'grey'});
+        e.preventDefault();
+        if($(this).text()=='标记已读'){
+            $(this).text('标记未读');
+            $(this).css({'color':'grey'});
             var index=isreads.indexOf($(this).data('index'));
             if(index==-1) isreads.push($(this).data('index'));
             //unreads
         }else{
-            $(this).parent().find('label').text('标记已读');
-            $(this).parent().find('label').css({'color':'green'});
+            $(this).text('标记已读');
+            $(this).css({'color':'green'});
             var index=isreads.indexOf($(this).data('index'));
             if(index>-1) isreads.splice(index,1);
         }

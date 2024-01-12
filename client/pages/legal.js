@@ -116,6 +116,7 @@ function export2Excel(fileName,data,tag){
         $().mloader('hide');
     },200);
 }
+var socket;
 var watinglist={};
 $('body').on(main_load_completed_event_name,function(){
     
@@ -133,6 +134,48 @@ $('body').on(main_load_completed_event_name,function(){
             //$('#pageOneTable').trigger('create');
             $().mloader("hide");
             $('#mainFooter').show();
+            
+            socket = io("http://"+ip+":"+port);
+            socket.on('connect', () => {
+                console.log('已连接到服务器');
+                // 向服务器发送消息
+                //socket.emit('message', 'Hello, Server!');
+              });
+              socket.on('message', function(data) {
+                
+                if(data.type=="delete"){
+                    //var index=resourceDatas.notifications.indexOf(data.data);
+                    //if(index>-1) resourceDatas.notifications.splice(index,1);
+                    resourceDatas.notifications=$.grep(resourceDatas.notifications,noti=>noti.id!=data.data.id);
+                    console.error(data,resourceDatas.notifications)
+                }else{
+                    resourceDatas.notifications=updateOriginalData(resourceDatas.notifications,data.data,'id');
+                    
+                    //if(data.type=="add"){
+                        if(data.data.lastEditor!=getGlobalJson("currentUser").id){
+                            var sender="系统";
+                            if(data.data.sender>0) {
+                                sender=$.grep(resourceDatas.users,user=>user.id==data.data.sender);
+                                if(sender.length>0) sender=sender[0].name;
+                                else sender='未知';
+                            }
+                            var message=`您收到一条来自 ${sender} 的消息，请查看您的消息中心。`;
+                            if(data.type=="edit") message=`${sender} 修改了主题【${data.data.title}】的消息，请前往消息中心查看变更的消息。`;
+                            $('#notification_panel').text(message);
+                            $('#notification_panel').css({left:'-250px','z-index':1100})
+                            $('#notification_panel').animate({left:'10px'},1000);
+                            setTimeout(() => {
+                                $('#notification_panel').animate({left:'-300px'},1000);
+                            }, 10000);
+                            //newItem
+                        }
+                        
+                    //}
+                }
+                setUserNotifiications();
+                setNotificationsList();
+                $('li[data-index="'+data.data.id+'"]','#user_notification').addClass('newItem');
+              });
         }
         $.each($('.tooltip-btn'),(index,btn)=>{
             $(btn).setTooltips();
@@ -148,6 +191,7 @@ $('body').on(preload_completed_event_name,function(){
     databaseBatchForm();
     //console.log('resourceDatas',getGlobalJson('resourceDatas'));
     var tb=$('.header-btn-search').togglebuttonicon(form,function(e,isbefore){
+        
         if(e){
             if(isbefore){
                 form.slideDown();
@@ -418,6 +462,10 @@ $('body').on(preload_completed_event_name,function(){
     });
     
 })
+$('#notification_panel').on('click',function(e){
+    $(this).animate({left:'-300px'},1000);
+    goToPage( '#user_notification');
+})
 $('#main-body').on('scroll',function(e){
     $("#pageOneTable").jqmData('fixedHead').css({'left':$("#main-body").scrollLeft()*-1})
 })
@@ -587,7 +635,12 @@ $(window).resize(function(e){
     //resizeTables();
     //resizeColumnFilter();
 });
-
+$( "#nav-panel" ).on( "panelbeforeopen", function( event, ui ) {
+    //console.log($('#panel_sum_info').children().length)
+    if($('#panel_sum_info').children().length==0){
+        setPersonCaseSum(currentData);
+    }
+} );
 $('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
     //console.log('expand');
     //console.log(getLegalAngenciesSum());
@@ -627,7 +680,6 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
     });
 });
 function setPersonCaseSum(data){
-    $('#legalAgenciesSum').trigger('collapsibleexpand');
     if(data==undefined) data=DataList.combinedData;
     var personCaseSum=getPersonCaseSum(data);
     console.log(personCaseSum);
@@ -650,6 +702,7 @@ function setPersonCaseSum(data){
     $('#panel_sum_info').trigger('create');
     $('#panel_sum_info').listview().listview('refresh')
     
+    $('#legalAgenciesSum').trigger('collapsibleexpand');
     
     //$(info).setTooltip('，');
     //console.log('mainFooter',footWidth)

@@ -87,9 +87,10 @@ app.use(cors(corsOptions)).use((req,res,next)=>{
     res.setHeader('Access-Control-Allow-Origin',"*");
     next();
 });
-
+var _socket;
 io.on('connection', (socket) => {
   console.log('a user connected');
+  _socket=socket;
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
@@ -108,7 +109,35 @@ app.use(fileUpload({
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+app.post('/boradcast',(request,response) => {
+  //console.log("request.body "+request.header('Content-Type'));
+  const {data} = request.body;
+  const {type} = request.body;
+  const  db= DbService.getDbServiceInstance();
+  const result = db.insertRow('notifications',data);
+  result
+  .then(d => {
+    if(d.success)
+      io.emit('message', {data:data,type:type});
+    response.json(d);
 
+  })
+  .catch(err => console.log(err));
+});
+app.post('/deleteMessage',(request,response) => {
+  //console.log("request.body "+request.header('Content-Type'));
+  const {id} = request.body;
+  const {data} = request.body;
+  const  db= DbService.getDbServiceInstance();
+  const result = db.removeRow(id,'notifications');
+  result
+  .then(d => {
+    if(d.success)
+      io.emit('message', {data:data,type:'delete'});
+    response.json(d)
+  } )
+  .catch(err => console.log(err));
+});
 app.get('/fetch-docx', (req, res) => {
   const fileName = decodeURIComponent(req.query.fileName);
   const folder = req.query.folder;

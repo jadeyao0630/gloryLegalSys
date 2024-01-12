@@ -423,7 +423,7 @@ class DbService{
             
             //console.log("typeof: "+(typeof response));
             return {
-                success : response.length>0,
+                success : response.affectedRows>0,
                 data: JSON.stringify(response[0])
             };
         }catch(error){

@@ -93,7 +93,7 @@ $('#new_message_page').find('[name="send_new_message"]').on('click',function(e){
                             
                         }
                     });
-                    var finalfilePaths=filePaths.concat(currentItems);
+                    var finalfilePaths=currentItems.concat(filePaths);
                     e.values.attachments='['+finalfilePaths.join(',')+']';
                     
                     console.log("edit save",e.values);
@@ -556,6 +556,9 @@ function getSortedUpdateEvents(source){
     })
     return dateSortItems;
 }
+$('#main').on('click',function(e){
+    $('#notification_panel').animate({left:'-300px'},1000);
+})
 $('#progress_point_viewer_btn').on('click',function(e){
     var caseId=getGlobal("currentId");
     var matchItems=DataList.combinedData.filter((item) =>item.id == caseId);

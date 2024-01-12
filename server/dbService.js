@@ -71,6 +71,7 @@ class DbService{
                             success:false,
                             message:'Error saving file '+fileName,
                             newFileName:newFileName,
+                            originalFileName:fileName,
                             error:err
                         });
                     }
@@ -80,6 +81,7 @@ class DbService{
                         success:true,
                         message:'File uploaded successfully '+fileName,
                         newFileName:newFileName,
+                        originalFileName:fileName,
                     });
                     
                 });

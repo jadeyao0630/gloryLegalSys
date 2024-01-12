@@ -160,13 +160,8 @@ $('body').on(main_load_completed_event_name,function(){
                                 else sender='未知';
                             }
                             var message=`您收到一条来自 ${sender} 的消息，请查看您的消息中心。`;
-                            if(data.type=="edit") message=`${sender} 修改了主题【${data.data.title}】的消息，请前往消息中心查看变更的消息。`;
-                            $('#notification_panel').text(message);
-                            $('#notification_panel').css({left:'-250px','z-index':1100})
-                            $('#notification_panel').animate({left:'10px'},1000);
-                            setTimeout(() => {
-                                $('#notification_panel').animate({left:'-300px'},1000);
-                            }, 10000);
+                            if(data.type=="edit") message=`${sender} 修改了主题【${data.data.title}】的内容，请前往消息中心查看变更。`;
+                            showNotifyPanel(message);
                             //newItem
                         }
                         
@@ -176,6 +171,11 @@ $('body').on(main_load_completed_event_name,function(){
                 setNotificationsList();
                 $('li[data-index="'+data.data.id+'"]','#user_notification').addClass('newItem');
               });
+        }
+        var unread=parseInt($('div.notif_num').text());
+        //console.error('unread',unread,$('.notif_num').text());
+        if(unread>0){
+            showNotifyPanel(`您有 ${unread} 条消息还未阅读。`);
         }
         $.each($('.tooltip-btn'),(index,btn)=>{
             $(btn).setTooltips();
@@ -464,6 +464,7 @@ $('body').on(preload_completed_event_name,function(){
 })
 $('#notification_panel').on('click',function(e){
     $(this).animate({left:'-300px'},1000);
+    setNotificationsList();
     goToPage( '#user_notification');
 })
 $('#main-body').on('scroll',function(e){
@@ -821,4 +822,12 @@ function _createNewCaseForm(template, constainerId){
 
 
     return main_form;
+}
+function showNotifyPanel(message){
+    $('#notification_panel').text(message);
+    $('#notification_panel').css({left:'-250px','z-index':1100})
+    $('#notification_panel').animate({left:'10px'},1000);
+    setTimeout(() => {
+        $('#notification_panel').animate({left:'-300px'},1000);
+    }, 10000);
 }

@@ -54,6 +54,7 @@ $('#new_message_page').find('[name="send_new_message"]').on('click',function(e){
             e.values.sender=e.values.isSystemMessage?0:getGlobalJson("currentUser").id;
             delete e.values.isSystemMessage;
             e.values.date=getDateTime();
+            e.values.message=e.values.message.replaceAll('"','\'');
             e.values.isInactived=e.values.isInactived?1:0;
             e.values.targetGroup="["+e.values.targetGroup+"]";
             e.values.targetPerson="["+e.values.targetPerson+"]";

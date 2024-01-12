@@ -5,6 +5,16 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const $ = require("jquery");
 
+const http = require('http');
+const socketIo = require('socket.io');
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
 const bodyParser = require('body-parser');
 const formidable = require('formidable');
 //const busboy = require('busboy');
@@ -77,6 +87,17 @@ app.use(cors(corsOptions)).use((req,res,next)=>{
     res.setHeader('Access-Control-Allow-Origin',"*");
     next();
 });
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+  socket.on('disconnect', () => {
+    console.log('user disconnected');
+  });
+  socket.on('message', (msg) => {
+    console.log('message: ' + msg);
+  });
+});
+
 app.use(fileUpload({
     createParentPath: true,
     defParamCharset: "utf8" // 添加utf8编码
@@ -622,4 +643,4 @@ app.post('/restoreItem',(request,response) => {
     .catch(err => console.log(err));
 });
 
-app.listen(process.env.PORT, () => console.log('app is runing at port: '+process.env.PORT,'mysql host: '+process.env.HOST))
+server.listen(process.env.PORT, () => console.log('app is runing at port: '+process.env.PORT,'mysql host: '+process.env.HOST))

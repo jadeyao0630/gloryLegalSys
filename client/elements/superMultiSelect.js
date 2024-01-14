@@ -13,7 +13,7 @@ $.fn.extend({
         var ele=selectButton.find('span').not('.ui-li-count');
         ele.setTooltip();
         //点击后打开一个popup菜单
-        var header=$('<div class="ui-header ui-bar-inherit"><h3 class="ui-title">'+placeholder+'</h3><a href="#" class="ui-btn ui-corner-all ui-btn-left ui-btn-icon-notext ui-icon-delete" role="button" data-rel="back"></a></div>')
+        var header=$('<div class="ui-header ui-bar-inherit"><h3 class="ui-title">'+placeholder+'</h3><a href="#" class="ui-btn ui-corner-all ui-btn-right ui-btn-icon-notext ui-icon-check btn-icon-green" role="button" data-rel="back"></a></div>')
         
         var selectPopupMenu=$('<div data-role="popup" id="'+id+'-popup" style="min-width:120px;padding:0px;" data-theme="a">');
         var listbox=$('<div id="'+id+'-listbox" class="ui-selectmenu ui-popup ui-body-inherit ui-overlay-shadow ui-corner-all"></div>');
@@ -59,7 +59,7 @@ $.fn.extend({
         var ele=selectButton.find('span').not('.ui-li-count');
         ele.setTooltip();
         //点击后打开一个popup菜单
-        var header=$('<div class="ui-header ui-bar-inherit"><h3 class="ui-title">'+placeholder+'</h3><a href="#" class="ui-btn ui-corner-all ui-btn-left ui-btn-icon-notext ui-icon-delete" role="button" data-rel="back"></a></div>')
+        var header=$('<div class="ui-header ui-bar-inherit"><h3 class="ui-title">'+placeholder+'</h3><a href="#" class="ui-btn ui-corner-all ui-btn-right ui-btn-icon-notext ui-icon-check btn-icon-green" role="button" data-rel="back"></a></div>')
         var selectPopupMenu=$('<div data-role="popup" id="'+id+'-popup" style="min-width:120px;padding:0px;" data-theme="a">');
         var listbox=$('<div id="'+id+'-listbox" class="ui-selectmenu ui-popup ui-body-inherit ui-overlay-shadow ui-corner-all"></div>');
         //popup主体菜单

@@ -93,6 +93,7 @@ $.fn.updateListView=function(args){
                             uploadFiles(data.id,e.values.filePath).then(rr=>{
                                 //console.log(r);
                                 var filePaths=[];
+                                var ofilePaths=[];
                                 $.each(rr,(index,uploadResult)=>{
                                     if(!uploadResult.success){
                                         console.log(uploadResult.fileName+" 上传失败！");
@@ -101,11 +102,12 @@ $.fn.updateListView=function(args){
                                     }else{
                                         console.log(uploadResult.fileName+" 上传成功！");
                                         filePaths.push(uploadResult.fileName);
+                                        ofilePaths.push(uploadResult.originFileName);
                                         
                                     }
                                 });
                                 e.values.filePath=filePaths.join(',');
-                                
+                                e.values.originalFileName=ofilePaths.join(',');
                                 
                                 
                                 if(!tempFile.hasOwnProperty(data.id)) tempFile[data.id]=[];

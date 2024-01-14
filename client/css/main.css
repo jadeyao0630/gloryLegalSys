@@ -707,7 +707,7 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 #notification_panel{
   padding:10px;
-  max-width: 250px;
+  max-width: 350px;
   min-width: 100px;
   min-height: 50px;
   background-color: orangered;
@@ -716,9 +716,9 @@ ui-collapsible.collapsible-listview .ui-btn{
   border-radius: .3125em;
   filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5));
   position: fixed;
-  top:30px;
-  left:-300px;
-  transform:translate(0%,0%);
+  top:-90px;
+  left:50%;
+  transform:translate(-50%,0%);
   z-index: 1100;
   text-shadow: none;
 }
@@ -727,4 +727,20 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 .message_isRead:focus{
   box-shadow: none !important;
+}
+.message_attachment_preview{
+  padding:0px;
+}
+.imagePreview_btn{
+  position: absolute;
+  height: 100%;
+  width: 80px;
+}
+.imagePreview_btn_right{
+  transform:translate(0%,0%);
+  right:0;
+  z-index: 1500;
+}
+.imagePreview_btn:hover{
+  background-color: rgba(255, 255, 255, 0.3);
 }

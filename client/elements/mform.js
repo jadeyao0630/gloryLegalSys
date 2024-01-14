@@ -71,13 +71,25 @@ mform.prototype={
         $.mobile.document
             .on("selectmenucreate", '.multiSelect', function (event) {
                 //console.error('selectmenucreate1');
-            }).on( "pagecontainerbeforeshow", function( event, data ) {
+                // var selectmenu = $( event.target ),
+                //     list = $( "#" + selectmenu.attr( "id" ) + "-menu" );
+                //     list.listview().listview('refresh');
+                //     list.trigger('create'); 
                 
-                
-                var closeBtn=$(data.toPage).find('.ui-header .ui-icon-delete');
-                //console.error('selectmenucreate2',closeBtn);
-                console.log('pagecontainerbeforeshow',data.toPage,closeBtn);
+                var selectmenu = $( event.target ),
+                list = $( "#" + selectmenu.attr( "id" ) + "-listbox-popup" );
+                var closeBtn=$(list).find('.ui-header .ui-icon-delete');
                 closeBtn.removeClass('ui-icon-delete').addClass('ui-icon-check').addClass('btn-icon-green').removeClass('ui-btn-left').addClass('ui-btn-right');
+            }).on( "pagecontainerbeforeshow", function( event, data ) {
+                var _this=$(this);
+                setTimeout(() => {
+                    $(_this).trigger('create');
+                    var closeBtn=$(data.toPage).find('.ui-header .ui-icon-delete');
+                    //console.error('selectmenucreate2',closeBtn);
+                    console.log('pagecontainerbeforeshow',data.toPage,closeBtn);
+                    closeBtn.removeClass('ui-icon-delete').addClass('ui-icon-check').addClass('btn-icon-green').removeClass('ui-btn-left').addClass('ui-btn-right');
+                    
+                }, 1000);
             }),
         
         $.mobile.document
@@ -103,11 +115,9 @@ mform.prototype={
                         .before( form )
                         .jqmData( "filter-form", form ) ;
                     form.jqmData( "listview", list );
-                    list.jqmData('theme','a');
                     
                     //list.listview( "refresh" );
                 }
-                selectmenu.jqmData('theme','a');
                 var listbox=$( "#" + selectmenu.attr( "id" ) + "-listbox" );
                 listbox.addClass('filterable-select-listbox');
                 list.addClass('filterable-select-option');

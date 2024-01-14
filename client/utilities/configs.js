@@ -1,4 +1,4 @@
-var isRunLocal=true;//https://socket.io/get-started/chat/
+var isRunLocal=false;//https://socket.io/get-started/chat/
 var IPS=['192.168.10.141','192.168.10.68','cn.luyao.site']
 var showDebug=false;
 let ip=isRunLocal?IPS[1]:IPS[0];
@@ -150,7 +150,7 @@ const columns={//案件主表
 const caseStatus={//案件状态
   id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号
   caseNo:"VARCHAR(255) NOT NULL,UNIQUE",//案件编号
-  caseStatus:"VARCHAR(100) default '0.0'",//案件状态->caseStatus*
+  caseStatus:"VARCHAR(100) default '[]'",//案件状态->caseStatus*
   legalAgencies:"INT(11) NOT NULL",//代理法务->legalAgencies*
   lawFirm:"INT(11) NOT NULL",//代理律所->lawFirms*
   attorney:"VARCHAR(100) default '无0'",//代理律师->attorneys*

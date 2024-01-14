@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国瑞法务管理系统</title>
+    <link rel="shortcut icon" href="./favicon.ico">
+    <link rel="stylesheet" href="./css/jquery.mobile-1.4.5.min.css" />
+	<link rel="stylesheet" href="./css/all.css" /><!--fontawesome-->
+	<link rel="stylesheet" href="./css/main.css" />
+	<link rel="stylesheet" href="./css/form.css" />
+	<link rel="stylesheet" href="./css/popup.css" />
+	<link rel="stylesheet" href="./css/color.css" />
+	<link rel="stylesheet" href="./css/progressDiagram.css" />
+	<link rel="stylesheet" href="./css/superMultiSelect.css" />
+    <script src="./js/jquery.js"></script>
+	<script src="./js/jquery.mobile-1.4.5.min.js"></script>
+	
+	
+	<script src="./utilities/configs.js"></script>
+    <script type="text/javascript" src="./utilities/tools.js"></script>
+	<script type="text/javascript" src="./elements/superMultiSelect.js"></script>
+	<script type="text/javascript" src="./elements/progressChartMain.js"></script>
+	<script type="text/javascript" src="./elements/updatelist.js"></script>
+</head>
+<body>
+    <div id="panel_sum_info"></div>
+    <script>
+        setGlobalJson("currentUser",{id:4,pass:'upt6ifF/Ne45Tpwal7yu+A==',user:'jadeyao',name:"yaolu"})
+        //console.log(getGlobalJson("currentUser").name);
+    </script>
+	<script type="text/javascript" src="./utilities/resourceData.js"></script>
+	<script type="text/javascript" src="./utilities/db.js"></script>
+	<script type="text/javascript" src="./utilities/preload.js"></script>
+	<script type="text/javascript" src="./utilities/templates.js"></script>
+
+    <script>
+        var watinglist={};
+        $('body').on(main_load_completed_event_name,function(){
+            watinglist['main']=true;
+    
+            const intervalId = setInterval(() => {
+                console.log('waiting....',watinglist)
+                if (watinglist.hasOwnProperty('settings')) {
+                    clearInterval(intervalId);
+                    setPersonCaseSum();
+                    $().mloader("hide");
+                }
+            });
+        });
+        $('body').on(preload_completed_event_name,function(){
+
+            watinglist['settings']=true;
+        });
+        function getLegalAngenciesSum(){
+            //var legalAgencies={};
+            //var legalAgencies1={};
+            var summary={};
+            var data=currentData || DataList.combinedData
+            console.log('getLegalAngenciesSum',data);
+            data.forEach(item=>{
+                var match=$.grep(resourceDatas.legalAgencies,(d=>d.id==item.legalAgencies));
+                if(match.length>0){
+                    var catelog=match[0].name;
+                    //if(!legalAgencies.hasOwnProperty(catelog)) legalAgencies[catelog]=[];
+                    //if(!legalAgencies1.hasOwnProperty(catelog)) legalAgencies1[catelog]=0.0;
+                    if(!summary.hasOwnProperty(catelog)) summary[catelog]={};
+                    if(!summary[catelog].hasOwnProperty('number')) summary[catelog]['number']=[];
+                    if(!summary[catelog].hasOwnProperty('amount')) summary[catelog]['amount']=0.0;
+                    //legalAgencies[catelog].push(item);
+                    //legalAgencies1[catelog]+=item.requestAmount;
+                    summary[catelog]['number'].push(item);
+                    summary[catelog]['amount']+=parseFloat(item.requestAmount);
+                }
+            });
+            return summary;
+        }
+        function getPersonCaseSum(data){
+            var sum={
+                caseNum:data.length,
+                caseLabels:{
+                    0:[],
+                    1:[],
+                    2:[],
+                    3:[]
+                },
+                rquestAmount:0,
+                penaltyAmount:0,
+                paidAmount:0
+            }
+            data.forEach(d=>{
+                //findValue
+                /*
+                var label=resourceDatas.caseLabels_.findValue(d.caseLabel,'id','label');
+                if(label!=undefined){
+                    if(!sum.caseLabels.hasOwnProperty(label)) sum.caseLabels[label]=[];
+                    sum.caseLabels[label].push(d.id);
+                }
+                */
+                sum.caseLabels[d.caseLabel].push(d.id);
+                sum.rquestAmount+=parseFloat(d.requestAmount);
+                sum.penaltyAmount+=parseFloat(d.penalty);
+                sum.paidAmount+=parseFloat(d.paidAmount);
+            });
+            console.log(sum);
+            return sum;
+        }
+        function setPersonCaseSum(data){
+            if(data==undefined) data=DataList.combinedData;
+            var personCaseSum=getPersonCaseSum(data);
+            console.log(personCaseSum);
+            $('#panel_sum_info').empty();
+            var info=$(`<div data-role="list-divider" style="">当前表格案件总数<span >${personCaseSum.caseNum}</span></div>`+
+                `<div>群诉<b id="footer_sum_label_group" style="color:#1362B7;"> ${personCaseSum.caseLabels[3].length} </b>件</div>`+
+                `<div>重大案件<b id="footer_sum_label_thousand" style="color:#E25C62;"> ${personCaseSum.caseLabels[2].length} </b>件</div>`+
+                `<div>普通案件<b id="footer_sum_label_normal" style="color:green;"> ${personCaseSum.caseLabels[0].length} </b>件</div>`+
+                `<div data-role="list-divider" style="">涉及金额</div>`+
+                `<div>本诉金额为 <b id="footer_sum_request">${personCaseSum.rquestAmount.formatMoney(0, "￥")}</b> 万</div>`+
+                `<div>判决金额为 <b id="footer_sum_penalty">${personCaseSum.penaltyAmount.formatMoney(0, "￥")}</b> 万</div>`+
+                `<div>已执行金额为 <b id="footer_sum_paid">${personCaseSum.paidAmount.formatMoney(0, "￥")}</b> 万</div>`
+            );
+            
+            
+            //setInfoBarPosition();
+            //$('#footer_info_bar').setTooltip();
+            //$('#footer_info_bar').append(info);
+            $('#panel_sum_info').append(info);
+            $('#panel_sum_info').trigger('create');
+            
+            
+            //$(info).setTooltip('，');
+            //console.log('mainFooter',footWidth)
+        }
+    </script>
+</body>
+</html>

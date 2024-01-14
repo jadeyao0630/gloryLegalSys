@@ -251,13 +251,14 @@ function compareValues(source,target,prefix){
     $.each(source,(k,v)=>{
         
         if(target[k.replace(prefix,"")]!=undefined){
+            v=v||"";
             var sourceVal=v.toString();
             var targetVal=target[k.replace(prefix,"")].toString();
             if(k.replace(prefix,"")=="judgmentDate" || k.replace(prefix,"")=="trialDate"){
                 if(targetVal!="0000-00-00 00:00:00")
                     targetVal=getDateTime(targetVal);
             }
-            console.log(k.replace(prefix,""),sourceVal,targetVal,sourceVal!=targetVal)
+            console.log(k.replace(prefix,""),sourceVal,targetVal,sourceVal==targetVal)
             //getDateTime
             if(sourceVal!=targetVal) {
                 console.log('compareValues',k.replace(prefix,""),sourceVal,targetVal,target[k.replace(prefix,"")].toString());
@@ -266,6 +267,8 @@ function compareValues(source,target,prefix){
             }
         }
     });
+    console.log(source,target)
+    if(isSame) isSame=Object.keys(source).length<=Object.keys(target).length;
     console.log('compareValues',waitingList,isSame)
     if(isSame && Object.keys(waitingList).length>0) {isSame=false;}
     return isSame;
@@ -366,11 +369,12 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
     var form=$(this).jqmData('form');
     var events=$(this).jqmData('events');
     form.getFormValues(function(e){
+
+        console.log('compareValues',getGlobal("currentPoint"),e.values,form.currentData);
         if(compareValues(e.values,form.currentData,"_p")){
             $().minfo('show',{title:"提示",message:"您还没有修改过任何数据。不需要保存。"},function(){});
             return;
         }
-        console.log(e);
         var newData={};
         if(e.success){
             $.each(e.values,(key,val)=>{
@@ -487,10 +491,15 @@ function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     
     currentForm = progress_point_form;
     data.typeId=typeId;
-    var key_num=Object.keys(data).length;
-    if(key_num==2) {
+    //var key_num=Object.keys(data).length;
+    console.log('progress_point_editor',data)
+    if(isAdd) {
         progress_point_form.setEmptyValues();
         progress_point_form.setValueById('typeId_p',data.typeId)
+        progress_point_form.setValueById('caseNo_p',data.caseNo)
+        progress_point_form.setValueById('legalAgencies_p',data.legalAgencies)
+        progress_point_form.setValueById('legalInstitution_p',data.legalInstitution)
+        progress_point_form.setValueById('legalCounsel_p',data.legalCounsel)
     }
     else progress_point_form.setValues(data,'_p');
 
@@ -556,9 +565,7 @@ function getSortedUpdateEvents(source){
     })
     return dateSortItems;
 }
-$('#main').on('click',function(e){
-    $('#notification_panel').animate({left:'-300px'},1000);
-})
+
 $('#progress_point_viewer_btn').on('click',function(e){
     var caseId=getGlobal("currentId");
     var matchItems=DataList.combinedData.filter((item) =>item.id == caseId);
@@ -750,7 +757,7 @@ function functionBtnsEvent(but,index){
                                 li.append(a);
                                 $('#progress_point_popupMenu_add_list').append(li);
                                 a.on('click',function(ee){
-                                    console.log('eventsData',eventsData);
+                                    console.log('eventsData',eventsData,label.id,);
                                     var updatesdata=getProgressEvents(eventsData,label.id);
                                     progress_point_editor(label.id,e.index,matchItems[0],updatesdata,true);
                                     //$('#progress_diagram').trigger({type:'moveNext',sourceData:label,sourceIndex:e.index,eventsData:updatesdata});
@@ -2465,24 +2472,98 @@ function setNotificationsList(){
                 var attachments=JSON.parse(value.attachments.replaceAll("'","\""));
                 if(attachments.length>0){
                     attachments.forEach((attachment,i)=>{
-                        var image=$('<a class="messge_attachments" href="#" data-file="'+attachment+'" data-rel="popup" data-position-to="window" data-transition="fade"><img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+getThumbFileName(attachment)+"&folder="+attachmentFolder+'"></img></a>');
-                        attachmentsContainer.append(image);
-                        image.on('click',function(e){
+                        var _image=$('<a class="messge_attachments" href="#" data-index='+i+' data-file="'+attachment+'" data-rel="popup" data-position-to="window" data-transition="fade"><img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+getThumbFileName(attachment)+"&folder="+attachmentFolder+'"></img></a>');
+                        attachmentsContainer.append(_image);
+                        _image.on('click',function(e){
                             console.log($(this));
                             $().mloader("show",{message:"加载中...."});
+                            //var preItem=(i-1>-1?attachments[i-1]:undefined);
                             //var popup=$($(this).attr('href'));
                             var file=$(this).data('file');
                             var header = '<div data-role="header"><h2>预览</h2></div>';
                             var closebtn = '<a href="#" data-rel="back" style="margin-top:18px;margin-right:20px;" class="ui-btn ui-corner-all btn-icon-red ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>';
-                            var img = '<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+file+"&folder="+attachmentFolder+'" class="message_image">';
-                            popup = '<div data-role="popup" class="message_attachment_preview ui-btn ui-corner-all ui-shadow" id="message_attachments_popup_'+i+'" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
-                            $( header ).appendTo( $( popup ).appendTo( $.mobile.activePage ).popup() ).toolbar().before( closebtn ).after( img );
+                            var imageBtns=$('<div></div>')
+                            var img = $('<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+file+"&folder="+attachmentFolder+'" class="message_image">');
+                            var rightBtn,leftBtn;
+                            leftBtn=$('<div data-index='+i+' class="imagePreview_btn"></div>')
+                            rightBtn=$('<div data-index='+i+' class="imagePreview_btn imagePreview_btn_right"></div>')
+                            popup = $('<div data-role="popup" class="message_attachment_preview ui-btn ui-corner-all ui-shadow" id="message_attachments_popup_'+i+'" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>');
+                            leftBtn.jqmData('image',img);
+                            rightBtn.jqmData('image',img);
+                            leftBtn.jqmData('btn',rightBtn);
+                            rightBtn.jqmData('btn',leftBtn);
+                            $( header ).appendTo( $( popup ).appendTo( $.mobile.activePage ).popup() ).toolbar().before( closebtn ).after( $(imageBtns) );
+                            $(imageBtns).append($(leftBtn));
+                            $(imageBtns).append($(rightBtn));
+                            $(imageBtns).append($(img));
+                            popup.on( "popupbeforeposition", function() {
+                                console.log('popupbeforeposition')
+                                var image = $( this ).find( "img" ),
+                                height = image.height(),
+                                width = image.width();
+                                
+                                
+                                // Set height and width attribute of the image
+                                $( this ).attr({ "height": height, "width": width });
+                                // 68px: 2 * 15px for top/bottom tolerance, 38px for the header.
+                                var maxHeight = $( window ).height() - 68 + "px";
+                                $( "img.message_image", this ).css( "max-height", maxHeight );
+                            
+                            });
+                            // Remove the popup after it has been closed to manage DOM size
+                            popup.on( "popupafterclose", function() {
+                                $( this ).remove();
+                            });
+                            leftBtn.on('click',function(e){
+                                var currentIndex=$(this).data('index');
+                                //$( "#message_attachments_popup_"+i ).prop( "id", "message_attachments_popup_"+(currentIndex-1));
+                                var image=$(this).jqmData('image');
+                                var btn=$(this).jqmData('btn');
+                                if(currentIndex-1>-1){
+                                    $(this).data('index',currentIndex-1);
+                                    $(btn).data('index',currentIndex-1);
+                                    console.log($(this).data('index'),$(btn).data('index'));
+                                    image.prop('src',"http://"+ip+":"+port+"/downloadLocal?fileName="+attachments[currentIndex-1]+"&folder="+attachmentFolder);
+                                    //popup.popup('close');
+                                    //attachmentsContainer.find('a[data-index="'+(currentIndex-1)+'"]').trigger('click');
+                                    $().mloader("show",{message:"加载中...."});
+                                    setTimeout(() => {
+                                        repositionPopupToCenter(popup);
+                                        $().mloader("hide");
+                                    }, 100);
+                                }
+                            })
+                            rightBtn.on('click',function(e){
+                                var currentIndex=$(this).data('index');
+                                var image=$(this).jqmData('image');
+                                var btn=$(this).jqmData('btn');
+                                
+                                console.log(currentIndex,$(btn).data('index'));
+                                if(currentIndex+1<attachments.length){
+                                    $(this).data('index',currentIndex+1);
+                                    //$( "#message_attachments_popup_"+i ).prop( "id", "message_attachments_popup_"+(currentIndex+1));
+                                    $(btn).data('index',currentIndex+1);
+                                    image.prop('src',"http://"+ip+":"+port+"/downloadLocal?fileName="+attachments[currentIndex+1]+"&folder="+attachmentFolder);
+                                    //popup.popup('close');
+                                    //attachmentsContainer.find('a[data-index="'+(currentIndex+1)+'"]').trigger('click');
+                                    $().mloader("show",{message:"加载中...."});
+                                    setTimeout(() => {
+                                        repositionPopupToCenter(popup);
+                                        $().mloader("hide");
+                                    }, 100);
+                                    
+                                }
+                            })
                             $( ".message_image", "#message_attachments_popup_"+i ).load(function() {
                                 // Open the popup
+                                console.log('message_image load');
+                               // $( "#message_attachments_popup_"+i ).popup();
+                                
                                 setTimeout(() => {
                                     
                                     $().mloader("hide");
                                     $( "#message_attachments_popup_"+i ).popup( "open" );
+                                    //repositionPopupToCenter($( "#message_attachments_popup_"+i ));
                                 }, 100);
                                 // Clear the fallback
                                 
@@ -2494,6 +2575,9 @@ function setNotificationsList(){
                                 $().mloader("hide");
                                 $( "#message_attachments_popup_"+i ).popup( "open" );
                             }, 1000);
+                            $(popup).on('resize',function(e){
+                                console.log('popup size changed')
+                            })
                             
                         });
                         
@@ -2585,9 +2669,78 @@ function setNotificationsList(){
                         var file=$(this).data('file');
                         var header = '<div data-role="header"><h2>预览</h2></div>';
                         var closebtn = '<a href="#" data-rel="back" style="margin-top:18px;margin-right:20px;" class="ui-btn ui-corner-all btn-icon-red ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>';
-                        var img = '<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+file+"&folder="+attachmentFolder+'" class="message_image">';
-                        popup = '<div data-role="popup" class="message_attachment_preview ui-btn ui-corner-all ui-shadow" id="message_attachments_popup_edit_'+i+'" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>';
-                        $( header ).appendTo( $( popup ).appendTo( $.mobile.activePage ).popup() ).toolbar().before( closebtn ).after( img );
+                        var imageBtns=$('<div></div>')
+                        var img = $('<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+file+"&folder="+attachmentFolder+'" class="message_image">');
+                            var rightBtn,leftBtn;
+                            leftBtn=$('<div data-index='+i+' class="imagePreview_btn"></div>')
+                            rightBtn=$('<div data-index='+i+' class="imagePreview_btn imagePreview_btn_right"></div>')
+                            popup = $('<div data-role="popup" class="message_attachment_preview ui-btn ui-corner-all ui-shadow" id="message_attachments_popup_edit_'+i+'" data-theme="none" data-overlay-theme="b" data-corners="false" data-tolerance="15"></div>');
+                            leftBtn.jqmData('image',img);
+                            rightBtn.jqmData('image',img);
+                            leftBtn.jqmData('btn',rightBtn);
+                            rightBtn.jqmData('btn',leftBtn);
+                            $( header ).appendTo( $( popup ).appendTo( $.mobile.activePage ).popup() ).toolbar().before( closebtn ).after( $(imageBtns) );
+                            $(imageBtns).append($(leftBtn));
+                            $(imageBtns).append($(rightBtn));
+                            $(imageBtns).append($(img));
+                            popup.on( "popupbeforeposition", function() {
+                                console.log('popupbeforeposition')
+                                var image = $( this ).find( "img" ),
+                                height = image.height(),
+                                width = image.width();
+                                
+                                
+                                // Set height and width attribute of the image
+                                $( this ).attr({ "height": height, "width": width });
+                                // 68px: 2 * 15px for top/bottom tolerance, 38px for the header.
+                                var maxHeight = $( window ).height() - 68 + "px";
+                                $( "img.message_image", this ).css( "max-height", maxHeight );
+                            
+                            });
+                            // Remove the popup after it has been closed to manage DOM size
+                            popup.on( "popupafterclose", function() {
+                                $( this ).remove();
+                            });
+                            leftBtn.on('click',function(e){
+                                var currentIndex=$(this).data('index');
+                                //$( "#message_attachments_popup_"+i ).prop( "id", "message_attachments_popup_"+(currentIndex-1));
+                                var image=$(this).jqmData('image');
+                                var btn=$(this).jqmData('btn');
+                                if(currentIndex-1>-1){
+                                    $(this).data('index',currentIndex-1);
+                                    $(btn).data('index',currentIndex-1);
+                                    console.log($(this).data('index'),$(btn).data('index'));
+                                    image.prop('src',"http://"+ip+":"+port+"/downloadLocal?fileName="+attachments[currentIndex-1]+"&folder="+attachmentFolder);
+                                    //popup.popup('close');
+                                    //attachmentsContainer.find('a[data-index="'+(currentIndex-1)+'"]').trigger('click');
+                                    $().mloader("show",{message:"加载中...."});
+                                    setTimeout(() => {
+                                        repositionPopupToCenter(popup);
+                                        $().mloader("hide");
+                                    }, 100);
+                                }
+                            })
+                            rightBtn.on('click',function(e){
+                                var currentIndex=$(this).data('index');
+                                var image=$(this).jqmData('image');
+                                var btn=$(this).jqmData('btn');
+                                
+                                console.log(currentIndex,$(btn).data('index'));
+                                if(currentIndex+1<attachments.length){
+                                    $(this).data('index',currentIndex+1);
+                                    //$( "#message_attachments_popup_"+i ).prop( "id", "message_attachments_popup_"+(currentIndex+1));
+                                    $(btn).data('index',currentIndex+1);
+                                    image.prop('src',"http://"+ip+":"+port+"/downloadLocal?fileName="+attachments[currentIndex+1]+"&folder="+attachmentFolder);
+                                    //popup.popup('close');
+                                    //attachmentsContainer.find('a[data-index="'+(currentIndex+1)+'"]').trigger('click');
+                                    $().mloader("show",{message:"加载中...."});
+                                    setTimeout(() => {
+                                        repositionPopupToCenter(popup);
+                                        $().mloader("hide");
+                                    }, 100);
+                                    
+                                }
+                            })
                         $( ".message_image", "#message_attachments_popup_edit_"+i ).load(function() {
                             // Open the popup
                             setTimeout(() => {
@@ -2696,9 +2849,12 @@ function getThumbFileName(file){
     return newFile.join('');
 }
 $( ".message_attachment_preview" ).on( "popupbeforeposition", function() {
-    var image = $( this ).children( "img" ),
+    console.log('popupbeforeposition')
+    var image = $( this ).find( "img" ),
     height = image.height(),
     width = image.width();
+    
+    
     // Set height and width attribute of the image
     $( this ).attr({ "height": height, "width": width });
     // 68px: 2 * 15px for top/bottom tolerance, 38px for the header.
@@ -2710,3 +2866,9 @@ $( ".message_attachment_preview" ).on( "popupbeforeposition", function() {
 $( ".message_attachment_preview" ).on( "popupafterclose", function() {
     $( this ).remove();
 });
+function repositionPopupToCenter(popup) {
+    popup.popup("reposition", {
+      positionTo: "window",
+      transition: "fade"
+    });
+  }

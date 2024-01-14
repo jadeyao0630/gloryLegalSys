@@ -48,11 +48,11 @@ async function uploadFiles(folder,files,hasThumb){
           contentType: false,
           success: function(response) {
             console.log(response);
-            results.push({success:true,fileName:response.newFileName});
+            results.push({success:true,fileName:response.newFileName,originFileName:response.originalFileName});
           },
           error: function(xhr, status, error) {
             console.error('Error uploading file:', error);
-            results.push({success:false,fileName:response.newFileName,error:error});
+            results.push({success:false,fileName:response.newFileName,originFileName:response.originalFileName,error:error});
           }
         });
     })

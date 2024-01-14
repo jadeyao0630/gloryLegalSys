@@ -12,7 +12,7 @@ var caseRelatedParty={
     "公司":corporate_companies,
     "个人":corporate_partners
 }
-var casePersonnel={}
+var casePersonnel={"公司":[],"个人":[]}
 var auth_levels=["一般","主管","管理员"];
 var legalAffairs=["无","贺璐璐","李俊峰","王培斯"];
 var legal_agencies=[

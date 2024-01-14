@@ -462,11 +462,6 @@ $('body').on(preload_completed_event_name,function(){
     });
     
 })
-$('#notification_panel').on('click',function(e){
-    $(this).animate({left:'-300px'},1000);
-    setNotificationsList();
-    goToPage( '#user_notification');
-})
 $('#main-body').on('scroll',function(e){
     $("#pageOneTable").jqmData('fixedHead').css({'left':$("#main-body").scrollLeft()*-1})
 })
@@ -823,11 +818,19 @@ function _createNewCaseForm(template, constainerId){
 
     return main_form;
 }
+$('#main').on('click',function(e){
+    $('#notification_panel').animate({top:'-'+($('#notification_panel').height()+40)+'px'},1000);
+})
+$('#notification_panel').on('click',function(e){
+    $(this).animate({top:'-'+($('#notification_panel').height()+40)+'px'},1000);
+    setNotificationsList();
+    goToPage( '#user_notification');
+})
 function showNotifyPanel(message){
     $('#notification_panel').text(message);
-    $('#notification_panel').css({left:'-250px','z-index':1100})
-    $('#notification_panel').animate({left:'10px'},1000);
+    $('#notification_panel').css({top:'-'+($('#notification_panel').height()+40)+'px','z-index':1100,'line-height':$('#notification_panel').height()+"px"})
+    $('#notification_panel').animate({top:'10px'},1000);
     setTimeout(() => {
-        $('#notification_panel').animate({left:'-300px'},1000);
+        $('#notification_panel').animate({top:'-'+($('#notification_panel').height()+40)+'px'},1000);
     }, 10000);
 }

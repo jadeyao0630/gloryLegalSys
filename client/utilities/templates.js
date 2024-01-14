@@ -74,7 +74,7 @@ var _summary_template;
                         placeholder:"对方当事人",
                         label:"对方当事人:",
                         type:"supermultiinput",
-                        isFilterable:true,
+                        isFilterable:false,
                         isOptional:false,
                     },
                     caseCatelog:{

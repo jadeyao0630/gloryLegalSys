@@ -254,7 +254,7 @@ function compareValues(source,target,prefix){
             v=v||"";
             var sourceVal=v.toString();
             var targetVal=target[k.replace(prefix,"")].toString();
-            if(k.replace(prefix,"")=="judgmentDate" || k.replace(prefix,"")=="trialDate"){
+            if(k.replace(prefix,"")=="judgmentDate" || k.replace(prefix,"")=="trialDate" || k.replace(prefix,"")== "caseDate"){
                 if(targetVal!="0000-00-00 00:00:00")
                     targetVal=getDateTime(targetVal);
             }
@@ -284,20 +284,28 @@ $('#progress_point_info').find('[data-role="header"]').find('a[data-rel="back"]'
             history.back();
         }else{
             console.log('数据不同');
-            $().requestDialog({
-                title:'提示',
-                message:'信息尚未保存，是否保存当前?',
-            },function(go){
-                if(go){
-                    $('#progress_point_info').find('[name="save_btn"]').trigger('click')
-                }else{
-                    //restoreTempData();
-                    waitingList={};
-                }
-                setTimeout(() => {
-                    history.back();
-                }, 200);
-            });
+            
+                $().requestDialog({
+                    title:'提示',
+                    message:'信息尚未保存，是否保存当前?',
+                },function(go){
+                    if(go){
+                        if(e.success){
+                        $('#progress_point_info').find('[name="save_btn"]').trigger('click')
+                        
+                    setTimeout(() => {
+                        history.back();
+                    }, 200);
+                    }
+                    }else{
+                        //restoreTempData();
+                        waitingList={};
+                        
+                    setTimeout(() => {
+                        history.back();
+                    }, 200);
+                    }
+                });
         }
     })
 })

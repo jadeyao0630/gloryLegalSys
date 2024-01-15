@@ -2466,6 +2466,8 @@ function setNotificationsList(){
             var messageTitle=$('<h2>'+value.title+'</h2>');
             var messageContent=$('<p style="font-size:14px;">'+value.message.replace(/\n/g, "</br>")+'</p>');
             var attachmentsContainer=$('<div></div>');
+            var _attachmentsContainer=$('<div></div>');
+            attachmentsContainer.append(_attachmentsContainer);
             var messageTime=$('<p class="ui-li-aside" style="display:grid;grid-template-columns: auto 1fr;margin-right:'+(getGlobalJson('currentUser').level==adminLevel?40:20)+'px;"><strong style="line-height: 24px;margin-left: 5px;font-size:12px;">'+formatDateTime(new Date(value.date),"hh:mm a")+'</strong></p>');
             var messageRead=$('<a href="#" style="margin-top:0px;padding:3px 5px;color:'+(isreads.includes(value.id)?'gray':'green')+';" class="ui-btn ui-btn-inline ui-corner-all message_isRead" id="message_checkbox_'+value.id+'" data-mini="true" data-index="'+value.id+'">'+(isreads.includes(value.id)?'标记未读':'标记已读')+'</a>');
             var checkboxLable=$('<label for="message_checkbox_'+value.id+'" class="no-check" style="color:'+(isreads.includes(value.id)?'gray':'green')+';">'+(isreads.includes(value.id)?'标记未读':'标记已读')+'</label>')
@@ -2475,13 +2477,32 @@ function setNotificationsList(){
             messageBody.append(messageSender);
             messageBody.append(messageTitle);
             messageBody.append(messageContent);
+            var imgLoaded=[];
+
             try{
                 console.log(value.attachments)
                 var attachments=JSON.parse(value.attachments.replaceAll("'","\""));
+                
                 if(attachments.length>0){
+                    attachmentsContainer.append($('<div class="fa fa-spinner fa-spin" style="font-size: 12px;color:steelblue;vertical-align:middle;"></div><span class="loading_message"> 附件加载中...</span>'));
+                    var imageloading=setInterval(() => {
+                        if(imgLoaded.length==attachments.length){
+                            clearInterval(imageloading);
+                            attachmentsContainer.find('.fa-spinner').remove();
+                            attachmentsContainer.find('.loading_message').remove();
+                        }
+                        
+                    }, 100);
                     attachments.forEach((attachment,i)=>{
-                        var _image=$('<a class="messge_attachments" href="#" data-index='+i+' data-file="'+attachment+'" data-rel="popup" data-position-to="window" data-transition="fade"><img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+getThumbFileName(attachment)+"&folder="+attachmentFolder+'"></img></a>');
-                        attachmentsContainer.append(_image);
+                        var _image=$('<a class="messge_attachments" href="#" data-index='+i+' data-file="'+attachment+'" data-rel="popup" data-position-to="window" data-transition="fade"></a>');
+                        var _image_pic=$('<img src="'+"http://"+ip+":"+port+"/downloadLocal?fileName="+getThumbFileName(attachment)+"&folder="+attachmentFolder+'"></img>')
+                        _image_pic.load(function(){
+                            //console.log('_image_pic loaded');
+                            imgLoaded.push(true);
+                            
+                        })
+                        _image.append(_image_pic);
+                        _attachmentsContainer.append(_image);
                         _image.on('click',function(e){
                             console.log($(this));
                             $().mloader("show",{message:"加载中...."});
@@ -2530,15 +2551,12 @@ function setNotificationsList(){
                                 if(currentIndex-1>-1){
                                     $(this).data('index',currentIndex-1);
                                     $(btn).data('index',currentIndex-1);
-                                    console.log($(this).data('index'),$(btn).data('index'));
+                                    //console.log($(this).data('index'),$(btn).data('index'));
                                     image.prop('src',"http://"+ip+":"+port+"/downloadLocal?fileName="+attachments[currentIndex-1]+"&folder="+attachmentFolder);
                                     //popup.popup('close');
                                     //attachmentsContainer.find('a[data-index="'+(currentIndex-1)+'"]').trigger('click');
                                     $().mloader("show",{message:"加载中...."});
-                                    setTimeout(() => {
-                                        repositionPopupToCenter(popup);
-                                        $().mloader("hide");
-                                    }, 100);
+                                    
                                 }
                             })
                             rightBtn.on('click',function(e){
@@ -2555,10 +2573,7 @@ function setNotificationsList(){
                                     //popup.popup('close');
                                     //attachmentsContainer.find('a[data-index="'+(currentIndex+1)+'"]').trigger('click');
                                     $().mloader("show",{message:"加载中...."});
-                                    setTimeout(() => {
-                                        repositionPopupToCenter(popup);
-                                        $().mloader("hide");
-                                    }, 100);
+                                    
                                     
                                 }
                             })
@@ -2568,10 +2583,14 @@ function setNotificationsList(){
                                // $( "#message_attachments_popup_"+i ).popup();
                                 
                                 setTimeout(() => {
-                                    
+                                    console.log('message_image load1');
                                     $().mloader("hide");
                                     $( "#message_attachments_popup_"+i ).popup( "open" );
                                     //repositionPopupToCenter($( "#message_attachments_popup_"+i ));
+                                    setTimeout(() => {
+                                        repositionPopupToCenter(popup);
+                                        $().mloader("hide");
+                                    }, 100);
                                 }, 100);
                                 // Clear the fallback
                                 
@@ -2579,9 +2598,14 @@ function setNotificationsList(){
                             });
                                 // Fallback in case the browser doesn't fire a load event
                             var fallback = setTimeout(function() {
-                                //$().mloader("hide");
+                                console.log('message_image load1');
                                 $().mloader("hide");
                                 $( "#message_attachments_popup_"+i ).popup( "open" );
+                                //repositionPopupToCenter($( "#message_attachments_popup_"+i ));
+                                setTimeout(() => {
+                                    repositionPopupToCenter(popup);
+                                    $().mloader("hide");
+                                }, 100);
                             }, 1000);
                             $(popup).on('resize',function(e){
                                 console.log('popup size changed')
@@ -2594,7 +2618,6 @@ function setNotificationsList(){
                 
                 
             }catch(e){
-
             }
 
             messageBody.append(attachmentsContainer);
@@ -2755,7 +2778,7 @@ function setNotificationsList(){
                                 
                                 $().mloader("hide");
                                 $( "#message_attachments_popup_edit_"+i ).popup( "open" );
-                            }, 100);
+                            }, 500);
                             // Clear the fallback
                             
                             clearTimeout( fallback );
@@ -2875,6 +2898,7 @@ $( ".message_attachment_preview" ).on( "popupafterclose", function() {
     $( this ).remove();
 });
 function repositionPopupToCenter(popup) {
+    console.log('repositionPopupToCenter');
     popup.popup("reposition", {
       positionTo: "window",
       transition: "fade"

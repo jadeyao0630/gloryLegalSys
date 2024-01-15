@@ -227,6 +227,52 @@ $('#popupMenu').find('a').on('click',function(e){
                 
             });
             break;
+        case '用户登录记录':
+            $('#loginInfo_title_body').empty();
+            var login_info_form= new mform({template:loginInfo_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
+            $('#loginInfo_title_body').append(login_info_form.instance);
+            
+            $('#loginInfo_title_body').trigger('create');
+            var searchBtn=login_info_form.instance.find('.btn-login-search');
+            searchBtn.jqmData('form',login_info_form);
+            searchBtn.on('click',function(e){
+                var form=$(this).jqmData('form');
+                form.getFormValues(function(e){
+                    if(e.success){
+                        console.log(e.values)
+                        e.values.loginInfo_users="-1,"+e.values.loginInfo_users
+                        var dateRange=e.values.loginInfo_dateRange.split(',');
+                        var whereDate;
+                        if(dateRange.length==2){
+                            var from=new Date(dateRange[0]+" 00:00:00");
+                            var to=new Date(dateRange[1]+" 23:59:59");
+                            //console.log(from.toISOString,to)
+                            if((from instanceof Date && !isNaN(from)) && (to instanceof Date && !isNaN(from))){
+                                whereDate = ' AND lastLogin between '+from.getTime()+" AND "+to.getTime()
+                            }
+                        }
+                        console.log(whereDate);
+                        selectQuery('loginLogs',`id IN (${e.values.loginInfo_users})${whereDate||''}`,"lastLogin DESC").then(e=>{
+                            console.log(e);
+                            var newOrder={};
+                            e.forEach(log=>{
+                                if(log.id!=-1){
+                                    var key=log.name+"_"+log.id;
+                                    if(!newOrder.hasOwnProperty(key)){
+                                        newOrder[key]=[];
+                                    }
+                                    newOrder[key].push(log);
+                                }
+                                
+                            })
+                            console.log(newOrder);
+                            setLoginList(newOrder);
+                        });
+                    }
+                })
+            })
+            goToPage( $(this).attr( "href" ));
+            break;
         case '数据库管理':
 
             goToPage( $(this).attr( "href" ));
@@ -244,6 +290,38 @@ $('#popupMenu').find('a').on('click',function(e){
     }
     
 })
+function setLoginList(data){
+    var listview=$('<ul data-role="listview" data-inset="true"></ul>');
+    $('#loginInfo_title_body').append(listview);
+    $.each(data,(key,values)=>{
+        var name_id=key.split("_");
+        var title=$('<li class="collapsible_li" data-role="list-divider" data-index="'+key+'">'+name_id[0]+" ["+name_id[1]+']</li>');
+        var counter=$('<span class="ui-li-count"></span>');
+        listview.append(title);
+        var count=0;
+        values.forEach(value=>{
+            var li=$('<li data-key="'+key+'"></li>');
+            if(value.isLogout==0) count++;
+            var state=$('<span style="margin-right:10px;">'+(value.isLogout==0?'<i class="fa fa-sign-in-alt text-green" /> 登录':'<i class="fa fa-sign-out-alt text-red" /> 登出')+'</span>')
+            var time=$('<span>'+formatDateTime(new Date(value.lastLogin),"yyyy年MM月dd日 hh:mm:ss a")+'</span>')
+            li.append(state);
+            li.append(time);
+            listview.append(li);
+        })
+        counter.text(count)
+        title.append(counter);
+        title.jqmData('collapsed',false);
+        title.on('click',function(e){
+            var _items=listview.find('[data-key="'+$(this).data('index')+'"]');
+            $(this).jqmData('collapsed',!$(this).jqmData('collapsed'));
+            var collapsed=$(this).jqmData('collapsed');
+            if(collapsed) _items.hide();
+            else _items.show();
+        })
+    })
+    listview.listview().listview('refresh');
+    $('#loginInfo_title_body').trigger('create');
+}
 function compareValues(source,target,prefix){
     prefix=prefix||'';
     var isSame=true;

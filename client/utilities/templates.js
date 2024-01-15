@@ -1525,17 +1525,65 @@ var _summary_template;
                   },
                   isInactived_a:{
                       placeholder:"禁用账户",
-                      label:"是否禁用此账户",
+                      label:"禁用此账户：",
                       type:"radio",
                       data:["否","是"],
                       isOptional:true,
                       isAdminOnly:true
                   },
+                  recordLoginHistory:{
+                      placeholder:"记录账户登录日志",
+                      label:"保存登录日志：",
+                      type:"radio",
+                      data:["否","是"],
+                      isOptional:true,
+                      isAdminOnly:true
+                  }
               }
               
           },
         }
       };
+  loginInfo_template={
+    settings:{
+      hasLabel:true,
+      hasPlaceHolder:true,
+      labelPosition:"left",
+      templateColumn:"33% 33% 34%",
+      isCollapsibleGrouping:false,
+      gridStyle:{'row-gap':"3px"},
+      labelStyle:{'text-align': 'right','padding-right':"15px",'min-width':'60px'},
+      isMini:true,
+      itemHeight:15,
+    },
+    template:{
+      loginInfo_users:{
+          label:"用户:",
+          type:"multicombobox",
+          isOptional:true,
+          //data:addEmptyValueToArray(resourceDatas.caseLabels,'无'),
+          data:resourceDatas.users,
+          valueKey:'id',
+          displayFormat:'{name}'
+      },
+      loginInfo_dateRange:{
+          label:"日期范围:",
+          type:"textrange",
+          subType:"date",
+          isOptional:true,
+          
+          span:'2/3'
+      },
+      custom:{
+        type:"custom",
+        data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
+        '<a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-search btn-icon-green ui-btn-icon-left btn-login-search">查询</a>'+
+        '</div>',
+        
+        span:'3/4'
+    },
+    }
+  };
   header_filter_template={
     settings:{
       hasLabel:true,

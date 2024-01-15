@@ -72,6 +72,7 @@
 					<li data-role="list-divider" class="admin-ui">用户</li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-user admin-ui" data-rel="back">修改用户</a></li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue ui-icon-plus popup-menu-btns popup-add-user admin-ui" data-rel="back">添加用户</a></li>
+					<li><a href="#loginInfoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-red ui-icon-clock popup-menu-btns admin-ui" data-rel="back">用户登录记录</a></li>
 					<li data-role="list-divider" class="admin-ui">数据库</li>
 					<li><a href="#databasePage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-gear admin-ui" data-rel="back">数据库管理</a></li>
                 </ul>
@@ -336,6 +337,15 @@
 			<button name="send_new_message" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green">发送</button>
 		</div><!-- /header -->
 		<div class="ui-body-d ui-content" id="new_message_body" style="height: 100%;padding:10px;">
+			
+		</div>
+	</div>
+	<div data-role="page" id="loginInfoPage">
+		<div data-role="header" data-position="fixed" data-tap-toggle="false">
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a>
+			<h1 id="loginInfo_title">用户登录信息</h1>
+		</div><!-- /header -->
+		<div class="ui-body-d ui-content" id="loginInfo_title_body" style="height: 100%;padding:10px;">
 			
 		</div>
 	</div>

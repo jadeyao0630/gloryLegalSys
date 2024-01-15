@@ -142,6 +142,23 @@ async function getRecordLatestIndex(table,key,where){
     });
     return latestId;
 }
+async function selectQuery(table,where,orderBy){
+    orderBy=orderBy!=undefined?" ORDER BY "+orderBy:'';
+    var where=where!=undefined?" WHERE "+where:"";
+    var query="SELECT * FROM "+table+where+orderBy
+    const response = new Promise(async(resolve,reject)=>{
+        await fetch("http://"+ip+":"+port+"/select",{
+            headers:headers,
+            method: 'POST',
+            body: JSON.stringify({ query: query})
+        })
+        .then(res => res.json())
+        .then(data => {
+            resolve(data['data']);
+        }).catch(err => console.log(err));
+    });
+    return await response;
+}
 async function getCasesData(res){
     var _data=undefined;
     var query="SELECT * FROM cases ORDER BY id ASC"

@@ -14,7 +14,6 @@ const io = socketIo(server, {
     methods: ["GET", "POST"]
   }
 });
-
 const bodyParser = require('body-parser');
 const formidable = require('formidable');
 //const busboy = require('busboy');
@@ -73,9 +72,21 @@ function decrypt(data, keyS, ivS) {
   const decrypted = cipher.toString(CryptoJS.enc.Utf8) // 返回的是加密之前的原始数据->字符串类型
   return decrypted
 }
-
+var clients={};
 const DbService = require('./dbService');
 
+const db= DbService.getDbServiceInstance();
+    const result = db.insert('loginLogs',{
+      id:-1,
+      lastLogin:new Date().getTime(),
+      name:'system',
+      isLogout:0
+    });
+    result
+    .then(d => {
+      console.log(d);
+    } )
+    .catch(err => console.log(err));
 var corsOptions = {
     origin: '*',
     credentials:true,
@@ -93,15 +104,41 @@ io.on('connection', (socket) => {
   console.log('a user connected');
   _socket=socket;
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    console.log('user disconnected',socket.id);
+    if(clients.hasOwnProperty(socket.id)){
+      var data=clients[socket.id];
+      const db= DbService.getDbServiceInstance();
+      const result = db.insert('loginLogs',{
+        id:data.id,
+        lastLogin:new Date().getTime(),
+        name:data.name,
+        isLogout:1
+      });
+      result
+      .then(d => {
+        console.log(d);
+        delete clients[socket.id];
+      } )
+      .catch(err => console.log(err));
+    }
+    
   });
   socket.on('message', (data) => {
-    console.log('message: ' + data);
-    const db= DbService.getDbServiceInstance();
-    const result = db.updateUser('id='+data.id,{loginCounter:(data.loginCounter+1)});
-    result
-    .then(d => console.log(d) )
-    .catch(err => console.log(err));
+    console.log('user login message: ',data,socket.id,data.recordLoginHistory==1);
+    if(data.recordLoginHistory==1){
+      clients[socket.id]=data;
+      const db= DbService.getDbServiceInstance();
+      const result = db.insert('loginLogs',{
+        id:data.id,
+        lastLogin:new Date().getTime(),
+        name:data.name,
+        isLogout:0
+      });
+      result
+      .then(d => console.log(d) )
+      .catch(err => console.log(err));
+    }
+    
   });
 });
 

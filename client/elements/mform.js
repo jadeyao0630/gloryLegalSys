@@ -80,16 +80,17 @@ mform.prototype={
                 list = $( "#" + selectmenu.attr( "id" ) + "-listbox-popup" );
                 var closeBtn=$(list).find('.ui-header .ui-icon-delete');
                 closeBtn.removeClass('ui-icon-delete').addClass('ui-icon-check').addClass('btn-icon-green').removeClass('ui-btn-left').addClass('ui-btn-right');
+
+                $('body').trigger('create');
             }).on( "pagecontainerbeforeshow", function( event, data ) {
                 var _this=$(this);
-                setTimeout(() => {
-                    $(_this).trigger('create');
-                    var closeBtn=$(data.toPage).find('.ui-header .ui-icon-delete');
+                //console.log('pagecontainerbeforeshow',_this);
+                $(_this).trigger('create');
+                var closeBtn=$(data.toPage).find('.ui-header .ui-icon-delete');
                     //console.error('selectmenucreate2',closeBtn);
-                    console.log('pagecontainerbeforeshow',data.toPage,closeBtn);
-                    closeBtn.removeClass('ui-icon-delete').addClass('ui-icon-check').addClass('btn-icon-green').removeClass('ui-btn-left').addClass('ui-btn-right');
+                    //console.log('pagecontainerbeforeshow',data.toPage,closeBtn);
+                closeBtn.removeClass('ui-icon-delete').addClass('ui-icon-check').addClass('btn-icon-green').removeClass('ui-btn-left').addClass('ui-btn-right');
                     
-                }, 1000);
             }),
         
         $.mobile.document
@@ -1004,13 +1005,13 @@ mform.prototype={
         $.each(template,(key,itemTemplate)=>{
             if(itemTemplate.data!=undefined && itemTemplate.type==undefined){
                 $.each(itemTemplate.data,(subKey,subItemTemplate)=>{
-                    if(subKey=="__formLabel") return;
+                    if(subKey=="__formLabel" || subKey=="custom") return;
                     var value=_this.getValeById(subKey,subItemTemplate);
                     if(value==null) unSuccess.push(subKey);
                     values[subKey]=value;
                 });
             }else{
-                if(key=="__formLabel") return;
+                if(key=="__formLabel" || key=="custom") return;
                 var value=_this.getValeById(key,itemTemplate);
                 if(value==null) unSuccess.push(key);
                 values[key]=value;

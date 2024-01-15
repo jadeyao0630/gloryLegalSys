@@ -89,13 +89,19 @@ app.use(cors(corsOptions)).use((req,res,next)=>{
 });
 var _socket;
 io.on('connection', (socket) => {
+
   console.log('a user connected');
   _socket=socket;
   socket.on('disconnect', () => {
     console.log('user disconnected');
   });
-  socket.on('message', (msg) => {
-    console.log('message: ' + msg);
+  socket.on('message', (data) => {
+    console.log('message: ' + data);
+    const db= DbService.getDbServiceInstance();
+    const result = db.updateUser('id='+data.id,{loginCounter:(data.loginCounter+1)});
+    result
+    .then(d => console.log(d) )
+    .catch(err => console.log(err));
   });
 });
 

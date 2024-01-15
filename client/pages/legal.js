@@ -139,7 +139,7 @@ $('body').on(main_load_completed_event_name,function(){
             socket.on('connect', () => {
                 console.log('已连接到服务器');
                 // 向服务器发送消息
-                //socket.emit('message', 'Hello, Server!');
+                socket.emit('message', getGlobalJson('currentUser'));
               });
               socket.on('message', function(data) {
                 

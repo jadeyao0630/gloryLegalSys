@@ -202,13 +202,26 @@ logingStatus().then(function(e){
             getBasic(caseTableList,[]).then(d=>{
                 output('caseTableList completed: ',d.data);
                 //console.log(d.data);
+                var _excutes={}
+                d.data.caseExcutes.forEach((data)=>{
+                    //console.log('caseExcutes',data)
+                    if(!_excutes.hasOwnProperty(data.id)) _excutes[data.id]=0.0;
+                    _excutes[data.id]+=Number(data.exexuteAmount);
+                })
                 
+                console.log(_excutes)
                 var combinedData=[];
                 d.data.casesDb.forEach((data)=>{
                     var matchedData=d.data.caseStatus.filter(sta => sta.id==data.id);
+                    
                     //console.log(matchedData);
                     if(matchedData.length>0){
+                        var excuteAmount=0.0
+                        if(_excutes.hasOwnProperty(data.id)){
+                            excuteAmount=_excutes[data.id]
+                        }
                         combinedData.push(Object.assign(data,matchedData[0]));
+                        
                     }
                 });
                 

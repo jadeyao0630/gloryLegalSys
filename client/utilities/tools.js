@@ -378,7 +378,7 @@ $.fn.extend({
             tooltip.html(html==undefined?$(this).text():html);
 
             $('body').append(tooltip);
-            console.log('tooltip',$(this).offsetParent());
+            console.log('tooltip',$(this).offsetParent(),$(this).offset());
             var position=$(this).offset();
             var thisWidth=$('.ui-tooltip').width();
             if(thisWidth+position.left>screen.width) position.left=screen.width-thisWidth-10;

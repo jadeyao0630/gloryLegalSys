@@ -618,6 +618,8 @@ ui-collapsible.collapsible-listview .ui-btn{
   }
   #nav-panel .ui-panel-inner{
     padding:0;
+    overflow-y: scroll;
+    height:100%;
   }
   #menuBtn:focus {
     box-shadow: none; /* Disable the box shadow on active state */
@@ -743,4 +745,7 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 .imagePreview_btn:hover{
   background-color: rgba(255, 255, 255, 0.3);
+}
+.ui-count-no-border{
+  border-style: none;
 }

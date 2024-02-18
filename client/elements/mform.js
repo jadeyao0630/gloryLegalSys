@@ -157,8 +157,8 @@ mform.prototype={
                     //e.preventDefault();
                     //history.back();
                 //})
-                data.toPage.find('a.ui-icon-delete').on('click',function(e){
-                    //console.log('pagecontainerhide',$(data.toPage).find('input[data-type="search"]').val());
+                data.toPage.find('a.ui-icon-check').on('click',function(e){
+                    console.log('pagecontainerhide',$(data.toPage).find('input[data-type="search"]'),$(data.toPage));
                     if ( pageIsSelectmenuDialog( data.toPage ) ) {
                         $(data.toPage).find('input[data-type="search"]').val('');
                         $(data.toPage).find('input[data-type="search"]').trigger('keyup');
@@ -567,9 +567,10 @@ mform.prototype={
             if(itemTemplate.isDisabled){
                 radio_container.attr("disabled",true);
             }
+            
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(radio_container);
-            radio_container.find('input[type="radio"]').checkboxradio().checkboxradio('refresh');
+            //radio_container.find('input[type="radio"]').checkboxradio().checkboxradio('refresh');
             return subContainer;
     },
     generateFileInput:function(itemId,itemTemplate){

@@ -129,6 +129,7 @@ $('body').on(main_load_completed_event_name,function(){
             clearInterval(intervalId);
             
             currentData=DataList.combinedData;
+            console.log('DataList.combinedData',DataList.combinedData)
             $('#pageOneTable').updateSource(DataList.combinedData);
             
             //$('#pageOneTable').trigger('create');
@@ -647,18 +648,40 @@ $('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
         $.each(getLegalAngenciesSum(),(name,data)=>{
             var divider=$('<li data-role="list-divider">'+name+'<span class="ui-li-count">'+data.number.length+'</span></li>');
             $('#legalAgenciesSum-list').append(divider);
-            var li=$('<li></li>');
-            var btn=$('<a href="#"></a>');
-            var p=$('<p>'+data.amount.formatMoney(0, "￥")+'万</p>');
-            var title=$('<h2>涉及金额</h2>');
-            $(li).append(btn);
-            $(btn).prepend(title);
-            $(btn).append(p);
-            $('#legalAgenciesSum-list').append(li);
-            $(btn).jqmData('index',data.number)
-            btn.on('click',function(e){
-                console.log($(this).jqmData('index'));
-            })
+            //console.log(data);
+            
+            if(data.projects!=undefined ){
+                projectNames=Object.keys(data.projects)
+                //console.log(projectNames);
+                projectNames.forEach(pname=>{
+                    const projectName = resourceDatas.projects_.filter(p=>p.id===Number(pname))
+                    console.log(pname,projectName)
+                    if(projectName.length>0){
+                        
+                        //console.log(projectName[0].name)
+                        var li=$('<li>'+projectName[0].name+'</li>');
+                        var count=$('<span class="ui-li-count ui-count-no-border">'+data.projects[pname].length+'</span>')
+                        li.append(count)
+                        $('#legalAgenciesSum-list').append(li);
+                        
+                    }
+                    
+                })
+                
+            }
+            
+            // var btn=$('<a href="#"></a>');
+            // var p=$('<p>'+data.amount.formatMoney(0, "￥")+'万</p>');
+            // var title=$('<h2>涉及金额</h2>');
+            // $(li).append(btn);
+            // $(btn).prepend(title);
+            // $(btn).append(p);
+           
+            
+            // $(btn).jqmData('index',data.number)
+            // btn.on('click',function(e){
+            //     console.log($(this).jqmData('index'));
+            // })
         })
         $('#legalAgenciesSum-list').listview( "refresh" );
         $('#legalAgenciesSum').trigger('create');
@@ -796,12 +819,24 @@ function getLegalAngenciesSum(){
             if(!summary.hasOwnProperty(catelog)) summary[catelog]={};
             if(!summary[catelog].hasOwnProperty('number')) summary[catelog]['number']=[];
             if(!summary[catelog].hasOwnProperty('amount')) summary[catelog]['amount']=0.0;
+            
+            if(!summary[catelog].hasOwnProperty('projects')) {
+                summary[catelog]['projects']={};
+            }
+            if(!summary[catelog]['projects'].hasOwnProperty(item.caseProject)) {
+                summary[catelog]['projects'][item.caseProject]=[];
+            }
+            
+            summary[catelog]['projects'][item.caseProject].push(item)
+            
+            
             //legalAgencies[catelog].push(item);
             //legalAgencies1[catelog]+=item.requestAmount;
             summary[catelog]['number'].push(item);
             summary[catelog]['amount']+=parseFloat(item.requestAmount);
         }
     });
+    console.log(summary)
     return summary;
 }
 function _createNewCaseForm(template, constainerId){

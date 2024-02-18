@@ -89,7 +89,7 @@ var _summary_template;
                     caseType:{
                         placeholder:"案件类型",
                         label:"案件类型:",
-                        type:"radio",
+                        type:"combobox",
                         isOptional:false,
                         data:resourceDatas.caseTypes_,
                         valueKey:'id',
@@ -183,7 +183,6 @@ var _summary_template;
                         defaultValue:0.0,
                         table:'caseStatus'
                     },
-                   
                     legalAgencies:{
                       placeholder:"代理法务",
                       label:"代理法务:",
@@ -300,7 +299,7 @@ var _summary_template;
                   caseType_p:{
                       placeholder:"案件类型",
                       label:"案件类型:",
-                      type:"radio",
+                      type:"combobox",
                       isOptional:false,
                       data:resourceDatas.caseTypes_,
                       valueKey:'id',
@@ -671,6 +670,16 @@ var _summary_template;
         penalty:{
           label:"判决金额(万)",
           type:"label", isFilterable:true,
+          displayFormat:'{}',
+          sortable:{
+            type:'number',
+            isASC:true,
+            id:'penalty',
+          },
+      },
+      paidAmount:{
+        label:"执行金额(万)",
+        type:"label", isFilterable:true,
           displayFormat:'{}',
           sortable:{
             type:'number',
@@ -1352,7 +1361,7 @@ var _summary_template;
                       type:"text",
                       isOptional:false,
                   },
-                  cutom:{
+                  custom:{
                     type:"custom",
                     data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
                     '<a class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left database-reset tooltip-btn">复位</a>'+
@@ -1382,7 +1391,7 @@ var _summary_template;
                     type:"textarea",
                     isOptional:false,
                 },
-                cutom:{
+                custom:{
                   type:"custom",
                   data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
                   '<a class="ui-btn ui-corner-all ui-shadow ui-icon-delete btn-icon-red ui-btn-icon-left database-insert-reset">复位</a>'+
@@ -1696,7 +1705,7 @@ var _summary_template;
         
         span:'2/3'
     },
-      cutom:{
+      custom:{
         type:"custom",
         data:'<div data-role="controlgroup" data-type="horizontal" style="text-align:right;" data-mini="true">'+
         '<a href="#" class="ui-btn ui-corner-all ui-shadow ui-icon-search btn-icon-green ui-btn-icon-left header-filter-btn">查询</a>'+

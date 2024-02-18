@@ -271,7 +271,14 @@
 				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green progress_popup_add_form_submit">提交</a></div>
 			</fieldset>
 		</div>
-		
+		<div data-role="popup" id="progress_popup_edit" data-theme="a" style="z-index: 1200;padding: 20px;">
+			<h3 id="progress_popup_edit_title">test</h3>
+			<form id="progress_popup_edit_form"></form>
+			<fieldset class="ui-grid-a">
+				<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a></div>
+				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green progress_popup_edit_form_submit">提交</a></div>
+			</fieldset>
+		</div>
 	</div>
     <div data-role="page" id="progress_details_info" >
 		<div data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -282,14 +289,7 @@
 		<div class="ui-body-d ui-content">
 			<ul data-role="listview" data-inset="true" data-theme="a" data-divider-theme="b" id="progress_details_info_body"></ul>
 		</div>
-		<div data-role="popup" id="progress_popup_edit" data-theme="a" style="z-index: 1100;padding: 20px;">
-			<h3 id="progress_popup_edit_title">test</h3>
-			<form id="progress_popup_edit_form"></form>
-			<fieldset class="ui-grid-a">
-				<div class="ui-block-a"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-back btn-icon-blue" data-rel="back">返回</a></div>
-				<div class="ui-block-b"><a href="#" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-right ui-btn-b ui-icon-check btn-icon-green progress_popup_edit_form_submit">提交</a></div>
-			</fieldset>
-		</div>
+		
 	</div>
 	<div data-role="page" id="infoPage" >
 		<div data-role="header" data-position="fixed" data-tap-toggle="false">

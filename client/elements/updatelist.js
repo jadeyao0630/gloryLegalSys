@@ -65,8 +65,11 @@ $.fn.updateListView=function(args){
                 if(e.success){
                     $('#progress_point_popup_add').popup('close');
                     $().mloader("show",{message:"提交中...."});
-
-                    e.values.caseNo=data.caseNo;
+                    $.each(e.values,(k,v)=>{
+                        e.values[k.replace('_p','')]=v
+                        if(k.replace('_p','')!=k) delete e.values[k]
+                    })
+                    e.values.caseNo=data.caseNo!==null && data.caseNo!=='null'?data.caseNo:e.values.caseNo;
                     e.values.id=data.id;
                     e.values.isInactived=0;
                     e.values.caseStatus=data.caseStatus;
@@ -340,6 +343,7 @@ $.fn.updateListViewData=function(data){
                 break;
             case '编辑':
                 //console.log(data.id,data.type,data.key,typeName)
+                console.log('编辑');
                 var itemData=getDataById(DataList[data.type],data.key,data.id);
                 console.log('generateUpdateInfoList',itemData,$(_this).jqmData('label'));
                 var form,data,caption;
@@ -355,6 +359,7 @@ $.fn.updateListViewData=function(data){
                         form= new mform({template:add_execute_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
                         data={table:data.type,idkey:'excutesId',dateKey:'dateExecuted',data:itemData};
                         caption="修改执行";
+                        break;
                     case 'caseProperties':
                         console.log("财产");
                         form= new mform({template:add_property_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
@@ -400,16 +405,18 @@ $.fn.updateListViewData=function(data){
                             })
                             newData[data.dateKey]=getDateTime();
                             newData[data.idkey]=data.data[data.idkey];
-                
+                            console.log('newData',newData)
                             waitingList[data.key+data.id]=function(){
                                 update("id="+data.data.id+" AND "+data.idkey+"="+data.data[data.idkey],
                                     data.table,
                                     vals.join(),async function(r){
                                     DataList[data.table]=updateOriginalData(DataList[data.table],newData,data.idkey);
+                                    console.log('caseExcutes',data.table,DataList[data.table],newData)
                                     if(data.table=='caseExcutes'){
                                         newData.id=data.data.id;
                                         //DataList.caseExcutes=updateOriginalData(DataList[data.table],newData,data.idkey);
                                         fireDataChnaged("caseexcutesChanged",task.newData,"update");
+                                        //$('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
                                         updatePenaltyPaidSummary($('#execute_summary'));
                                     }
                                 })

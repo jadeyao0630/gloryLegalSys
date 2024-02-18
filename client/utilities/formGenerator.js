@@ -12,8 +12,12 @@ function databaseBatchForm(data){
             if(e.success){
                 $().mloader("show",{message:"提交中...."});
                 e.values.id=0;
-                var tableName=combineDB[e.values.dbName].tablename;
-
+                var _dbname=databasePage_form.template.databseBatch.data.dbName.data[e.values.dbName]
+                console.log('_dbname',_dbname)
+                var tableName=combineDB[_dbname].tablename;
+                var keys=Object.keys(combineDB[_dbname].template)
+                e.values.targetId=keys[e.values.targetId]
+                e.values.matchId=keys[e.values.matchId]
                 var range0=e.values["matchRange"].split(',')[0];
                 var range1=e.values["matchRange"].split(',')[1];
                 var rangeStr=range0==range1?"="+range0:(" BETWEEN \""+range0+"\" AND \""+range1+"\"");

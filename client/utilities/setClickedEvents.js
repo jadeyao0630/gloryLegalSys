@@ -239,10 +239,16 @@ $('#popupMenu').find('a').on('click',function(e){
                 var form=$(this).jqmData('form');
                 form.getFormValues(function(e){
                     if(e.success){
-                        console.log(e.values)
-                        e.values.loginInfo_users="-1,"+e.values.loginInfo_users
+                        console.log("user:",e.values)
+                        
                         var dateRange=e.values.loginInfo_dateRange.split(',');
                         var whereDate;
+                        var whereUser;
+                        if(e.values.loginInfo_users==undefined||e.values.loginInfo_users.length==0){
+                            whereUser="";
+                        }else{
+                            whereUser='id IN (-1,'+e.values.loginInfo_users+')';
+                        }
                         if(dateRange.length==2){
                             var from=new Date(dateRange[0]+" 00:00:00");
                             var to=new Date(dateRange[1]+" 23:59:59");
@@ -251,10 +257,13 @@ $('#popupMenu').find('a').on('click',function(e){
                                 whereDate = ' AND lastLogin between '+from.getTime()+" AND "+to.getTime()
                             }
                         }
-                        console.log(whereDate);
-                        selectQuery('loginLogs',`id IN (${e.values.loginInfo_users})${whereDate||''}`,"lastLogin DESC").then(e=>{
+                        console.log(`${whereUser}${whereDate||''}`);
+                        $().mloader("show",{message:"查询中...."});
+                        selectQuery('loginLogs',`${whereUser}${whereDate||''}`,"lastLogin DESC").then(e=>{
                             console.log(e);
+                            if (e==undefined) return;
                             var newOrder={};
+                            var systemReboot=[];
                             e.forEach(log=>{
                                 if(log.id!=-1){
                                     var key=log.name+"_"+log.id;
@@ -262,11 +271,15 @@ $('#popupMenu').find('a').on('click',function(e){
                                         newOrder[key]=[];
                                     }
                                     newOrder[key].push(log);
+                                }else{
+                                    systemReboot.push(log);
                                 }
                                 
                             })
-                            console.log(newOrder);
-                            setLoginList(newOrder);
+                            //console.log(newOrder,systemReboot);
+                            setLoginList(newOrder,systemReboot);
+                            
+                            $().mloader("hide");
                         });
                     }
                 })
@@ -290,23 +303,57 @@ $('#popupMenu').find('a').on('click',function(e){
     }
     
 })
-function setLoginList(data){
-    var listview=$('<ul data-role="listview" data-inset="true"></ul>');
+function setLoginList(data,systemReboot){
+    $('#loginInfo_title_body').find('ul[data-role="listview"]').remove();
+    var listview=$('<ul data-role="listview" data-inset="true"><li>无数据</li></ul>');
     $('#loginInfo_title_body').append(listview);
+    if(Object.keys(data).length>0) listview.empty();
     $.each(data,(key,values)=>{
         var name_id=key.split("_");
         var title=$('<li class="collapsible_li" data-role="list-divider" data-index="'+key+'">'+name_id[0]+" ["+name_id[1]+']</li>');
         var counter=$('<span class="ui-li-count"></span>');
         listview.append(title);
         var count=0;
+        var logout_data;
         values.forEach(value=>{
-            var li=$('<li data-key="'+key+'"></li>');
-            if(value.isLogout==0) count++;
-            var state=$('<span style="margin-right:10px;">'+(value.isLogout==0?'<i class="fa fa-sign-in-alt text-green" /> 登录':'<i class="fa fa-sign-out-alt text-red" /> 登出')+'</span>')
-            var time=$('<span>'+formatDateTime(new Date(value.lastLogin),"yyyy年MM月dd日 hh:mm:ss a")+'</span>')
-            li.append(state);
-            li.append(time);
-            listview.append(li);
+            if(value.isLogout==1){
+                count++;
+                logout_data=value;
+            }else{
+                var li=$('<li data-key="'+key+'"></li>');
+                var state=$('<span style="margin-right:10px;">'+(value.isLogout==0?'<i class="fa fa-sign-in-alt text-green" /> 登录':'<i class="fa fa-sign-out-alt text-red" /> 登出')+'</span>')
+                var time=$('<span>'+formatDateTime(new Date(value.lastLogin),"yyyy年MM月dd日 hh:mm:ss a")+'</span>')
+                li.append(state);
+                li.append(time);
+                if(logout_data!=undefined){
+                    state=$('<span style="margin-right:10px;margin-left:10px;">'+(logout_data.isLogout==0?'<i class="fa fa-sign-in-alt text-green" /> 登录':'<i class="fa fa-sign-out-alt text-red" /> 登出')+'</span>')
+                    time=$('<span>'+formatDateTime(new Date(logout_data.lastLogin),"yyyy年MM月dd日 hh:mm:ss a")+'</span>')
+                    li.append(state);
+                    li.append(time);
+                    var type_time=' 秒';
+                    var diff_num=Math.abs(logout_data.lastLogin-value.lastLogin)/1000;
+                    if (diff_num>60) {diff_num=diff_num/60;type_time=' 分钟';}
+                    if (diff_num>60) {diff_num=diff_num/60;type_time=' 小时';}
+                    var diff=$('<span style="margin-left:10px;">在线时常 '+Math.round(diff_num)+type_time+'</span>')
+                    
+                    li.append(diff);
+                }else{
+                    if(systemReboot.length>0){
+                        var reboot_time=$.grep(systemReboot,sys=>{
+                            //console.log(value.lastLogin,sys.lastLogin,Math.abs(value.lastLogin-sys.lastLogin));
+                            return Math.abs(value.lastLogin-sys.lastLogin)<3000;
+                        });
+                        if(reboot_time.length>0){
+                            var reboot=$('<span style="margin-left:10px;"><i class="fa fa-redo-alt text-blue" /> 系统在 '+formatDateTime(new Date(reboot_time[0].lastLogin),"yyyy年MM月dd日 hh:mm:ss a")+' 重启了</span>')
+                            li.append(reboot);
+                        }
+                    }
+                    
+                }
+                listview.append(li);
+                logout_data=undefined;
+            }
+            
         })
         counter.text(count)
         title.append(counter);
@@ -683,9 +730,11 @@ function calcPaidAmount(data){
     data.forEach(excute=>{
         paidSum+=parseFloat(excute.exexuteAmount);
     });
+    console.log('paidSum',paidSum);
     return paidSum;
 }
 function calcPenaltyPaidSum(penalty,paid){
+    console.log('paid',paid);
     return {penalty:calcPenaltyAmount(penalty),paid:calcPaidAmount(paid)}
 }
 function generatePenaltyPaidSummary(container,penaltyPaidSum){
@@ -713,6 +762,7 @@ function updatePenaltyPaidSummary(container,caseId){
     caseId=caseId||parseInt(getGlobal("currentId"));
     var matchedExcutes=DataList.caseExcutes.filter((d)=>d.id==caseId&& (d.isInactived==0 || getGlobalJson('currentUser').level==adminLevel));
     var matchedProgressStatus=DataList.caseProgresses.filter((d)=>d.id==caseId);
+    console.log('updatePenaltyPaidSummary',matchedExcutes,matchedProgressStatus)
     generatePenaltyPaidSummary(container,calcPenaltyPaidSum(matchedProgressStatus,matchedExcutes));
 }
 

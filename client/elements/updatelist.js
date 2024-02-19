@@ -415,7 +415,7 @@ $.fn.updateListViewData=function(data){
                                     if(data.table=='caseExcutes'){
                                         newData.id=data.data.id;
                                         //DataList.caseExcutes=updateOriginalData(DataList[data.table],newData,data.idkey);
-                                        fireDataChnaged("caseexcutesChanged",task.newData,"update");
+                                        fireDataChnaged("caseexcutesChanged",{id:newData.id,paidAmount:newData.exexuteAmount},"update");
                                         //$('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
                                         updatePenaltyPaidSummary($('#execute_summary'));
                                     }

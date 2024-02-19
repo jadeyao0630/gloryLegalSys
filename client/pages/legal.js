@@ -499,6 +499,7 @@ $('body').on('caseexcutesChanged',function(e){
         }
     })
     $('#progress').find('#paidAmount_p').val(paidA);
+    
     DataList.caseStatus.forEach((d,i)=>{
         if(d.id==e.value.id){
             DataList.caseStatus[i].paidAmount=paidA;
@@ -514,6 +515,8 @@ $('body').on('caseexcutesChanged',function(e){
             currentData[i].paidAmount=paidA;
         }
     });
+    console.log('updateTableItem',e.value)
+    $('#pageOneTable').updateTableItem(e.value);
     setPersonCaseSum(currentData);
     update("id="+e.value.id,'caseStatus',{paidAmount:paidA},function(r){
         //console.log(r)

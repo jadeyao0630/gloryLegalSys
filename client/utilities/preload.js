@@ -208,6 +208,12 @@ logingStatus().then(function(e){
                     if(!_excutes.hasOwnProperty(data.id)) _excutes[data.id]=0.0;
                     _excutes[data.id]+=Number(data.exexuteAmount);
                 })
+                var _legalFees={}
+                d.data.caseProgresses.forEach((data)=>{
+                    //console.log('caseExcutes',data)
+                    if(!_legalFees.hasOwnProperty(data.id)) _legalFees[data.id]=0.0;
+                    _legalFees[data.id]+=Number(data.legalFee);
+                })
                 
                 console.log(_excutes)
                 var combinedData=[];
@@ -217,10 +223,14 @@ logingStatus().then(function(e){
                     //console.log(matchedData);
                     if(matchedData.length>0){
                         var excuteAmount=0.0
+                        var legalFee=0.0
                         if(_excutes.hasOwnProperty(data.id)){
                             excuteAmount=_excutes[data.id]
                         }
-                        combinedData.push(Object.assign(data,matchedData[0]));
+                        if(_legalFees.hasOwnProperty(data.id)){
+                            legalFee=_legalFees[data.id]
+                        }
+                        combinedData.push(Object.assign(data,matchedData[0],{legalFee:legalFee}));
                         
                     }
                 });

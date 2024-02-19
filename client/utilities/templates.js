@@ -503,25 +503,6 @@ var _summary_template;
                   valueKey:'id',
                   displayFormat:'{name}',
               },
-              lawFirm_p:{
-                  type:"combobox",
-                  data:resourceDatas.lawFirms_,
-                  valueKey:'id',
-                  displayFormat:'{name}',
-                  label:"代理律所：",
-                  isOptional:true,
-              },
-              attorney_p:{
-                  type:"multicombobox",
-                  data:resourceDatas.attorneys,
-                  label:"代理律师：",
-                  isOptional:true,
-                  valueKey:'id',
-                  matchKey:"name",
-                  //table:'caseStatus',
-                  displayFormat:'{name} {contact}',
-                  defaultValue:'无0'
-              },
               penalty_p:{
                   type:"text",
                   label:"判决金额(万)：",
@@ -534,6 +515,37 @@ var _summary_template;
                   isOptional:true,
               },
               
+              }},
+              legalInfo:{
+                label:"律所信息",
+                data:{
+
+                  lawFirm_p:{
+                    type:"combobox",
+                    data:resourceDatas.lawFirms_,
+                    valueKey:'id',
+                    displayFormat:'{name}',
+                    label:"代理律所：",
+                    isOptional:true,
+                },
+                attorney_p:{
+                    type:"multicombobox",
+                    data:resourceDatas.attorneys,
+                    label:"代理律师：",
+                    isOptional:true,
+                    valueKey:'id',
+                    matchKey:"name",
+                    //table:'caseStatus',
+                    displayFormat:'{name} {contact}',
+                    defaultValue:'无0'
+                },
+                legalFee_p:{
+                  type:"text",
+                    label:"费用（元）：",
+                    isOptional:true,
+                    defaultValue:'0'
+                },
+                
               }
           }
       }
@@ -684,7 +696,18 @@ var _summary_template;
           sortable:{
             type:'number',
             isASC:true,
-            id:'penalty',
+            id:'paidAmount',
+          },
+      },
+      
+      legalFee:{
+        type:"label",
+          label:"费用(元)",
+          isFilterable:true,
+          sortable:{
+            type:'number',
+            isASC:true,
+            id:'legalFee',
           },
       },
         /*

@@ -129,6 +129,11 @@ $('body').on(main_load_completed_event_name,function(){
             clearInterval(intervalId);
             
             currentData=DataList.combinedData;
+            if(hideInactiveAgentCase) {
+                const agencies=resourceDatas.legalAgencies.map(agent=>agent.id)
+                DataList.combinedData=DataList.combinedData.filter(data=> agencies.includes(data.legalAgencies))
+            }
+
             console.log('DataList.combinedData',DataList.combinedData)
             $('#pageOneTable').updateSource(DataList.combinedData);
             

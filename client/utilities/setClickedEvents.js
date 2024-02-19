@@ -581,12 +581,27 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                             $().mloader("hide");
                             $().minfo('show',{title:"提示",message:"更新成功。"},function(){});
                             updatePenaltyPaidSummary($('#execute_summary'));
-                            console.log("更新成功",newData.typeId,formatMainEventData(newData));
+                            console.log("更新成功",newData.typeId,newData,formatMainEventData(newData));
                             $('#progress_diagram').trigger({type:'updateMainEvent',targetIndex:parseInt(getGlobal("currentIndex")),
                                 mainEventData:formatMainEventData(newData)});
                             
                             form.setValues(newData);
                         }
+                        const matchProgressData=DataList.caseProgresses.filter(item=>item.id===newData.id)
+                        
+                        var _legalFee=0.0
+                        if(matchProgressData.length>0){
+                            matchProgressData.forEach(data=>{
+                                if(Number(data.typeId)===Number(newData.typeId)){
+                                    _legalFee+=Number(newData.legalFee)
+                                }else{
+                                    _legalFee+=(data.legalFee===null || data.legalFee==='null'?0:Number(data.legalFee))
+                                }
+                                
+                            })
+                        }
+                        console.log('matchProgressData',_legalFee,matchProgressData,newData)
+                        $('#pageOneTable').updateTableItem({legalFee:_legalFee,id:newData.id});
                     }else{
                         $().mloader("hide");
                         $().minfo('show',{title:"错误",message:ee.error});

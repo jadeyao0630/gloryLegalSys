@@ -541,7 +541,7 @@ var _summary_template;
                 },
                 legalFee_p:{
                   type:"text",
-                    label:"费用（元）：",
+                    label:"费用（万）：",
                     isOptional:true,
                     defaultValue:'0'
                 },
@@ -702,7 +702,7 @@ var _summary_template;
       
       legalFee:{
         type:"label",
-          label:"费用(元)",
+          label:"律师费(万)",
           isFilterable:true,
           sortable:{
             type:'number',

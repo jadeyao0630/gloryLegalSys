@@ -301,7 +301,8 @@ $('body').on(preload_completed_event_name,function(){
         header_filter_template.template.legalAgencies_f.isDisabled=true;
         header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
         console.log('FormTemplate3.template.caseInfo',FormTemplate3.template.caseInfo);
-        $('#legalAgenciesSum').hide();
+        //$('#legalAgenciesSum').hide();
+        $('#legalAgenciesSum').find('a.ui-collapsible-heading-toggle').text('项目信息')
         $('.super-auth').hide();
     }else if(getGlobalJson('currentUser').level==adminLevel){
         //$('#case_reg_but_restore').show();
@@ -649,13 +650,15 @@ $( "#nav-panel" ).on( "panelbeforeopen", function( event, ui ) {
 $('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
     //console.log('expand');
     //console.log(getLegalAngenciesSum());
-
+    // if(getGlobalJson('currentUser').level<supervisorLevel){
+    //     $('#legalAgenciesSum-list').jqmData('inset',false)
+    // }
     $('#legalAgenciesSum-list').empty();
-    if(getGlobalJson('currentUser').level>=supervisorLevel){
-        $('#legalAgenciesSum-list').empty();
+    //if(getGlobalJson('currentUser').level>=supervisorLevel){
+        //$('#legalAgenciesSum-list').empty();
         $.each(getLegalAngenciesSum(),(name,data)=>{
             var divider=$('<li data-role="list-divider">'+name+'<span class="ui-li-count">'+data.number.length+'</span></li>');
-            $('#legalAgenciesSum-list').append(divider);
+            if(getGlobalJson('currentUser').level>=supervisorLevel){$('#legalAgenciesSum-list').append(divider);}
             //console.log(data);
             
             if(data.projects!=undefined ){
@@ -693,7 +696,7 @@ $('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
         })
         $('#legalAgenciesSum-list').listview( "refresh" );
         $('#legalAgenciesSum').trigger('create');
-    }
+    //}
     
     
     //$('#legalAgenciesSum-list') 

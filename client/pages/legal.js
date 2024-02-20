@@ -128,12 +128,15 @@ $('body').on(main_load_completed_event_name,function(){
         if (watinglist.hasOwnProperty('settings')) {
             clearInterval(intervalId);
             
-            currentData=DataList.combinedData;
             if(hideInactiveAgentCase) {
-                const agencies=resourceDatas.legalAgencies.map(agent=>agent.id)
+                const agencies=resourceDatas.legalAgencies.map(agent=>{
+                    console.log(agent.name,agent.isInactived)
+                    if(agent.isInactived==0) return agent.id
+                })
                 DataList.combinedData=DataList.combinedData.filter(data=> agencies.includes(data.legalAgencies))
             }
 
+            currentData=DataList.combinedData;
             console.log('DataList.combinedData',DataList.combinedData)
             $('#pageOneTable').updateSource(DataList.combinedData);
             

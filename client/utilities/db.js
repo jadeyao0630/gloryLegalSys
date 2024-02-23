@@ -143,8 +143,8 @@ async function getRecordLatestIndex(table,key,where){
     return latestId;
 }
 async function selectQuery(table,where,orderBy){
-    orderBy=orderBy!=undefined?" ORDER BY "+orderBy:'';
-    var where=where!=undefined?" WHERE "+where:"";
+    orderBy=orderBy!=undefined && orderBy.length>0?" ORDER BY "+orderBy:'';
+    var where=where!=undefined && where.length>0?" WHERE "+where:"";
     var query="SELECT * FROM "+table+where+orderBy
     const response = new Promise(async(resolve,reject)=>{
         await fetch("http://"+ip+":"+port+"/select",{

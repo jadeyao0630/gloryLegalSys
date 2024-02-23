@@ -261,7 +261,11 @@ $('#popupMenu').find('a').on('click',function(e){
                         $().mloader("show",{message:"查询中...."});
                         selectQuery('loginLogs',`${whereUser}${whereDate||''}`,"lastLogin DESC").then(e=>{
                             console.log(e);
-                            if (e==undefined) return;
+                            if (e==undefined) {
+                                $('#loginInfo_title_body').find('ul[data-role="listview"]').remove();
+                                $().mloader("hide");
+                                return;
+                            }
                             var newOrder={};
                             var systemReboot=[];
                             e.forEach(log=>{

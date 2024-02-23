@@ -128,12 +128,14 @@ $('body').on(main_load_completed_event_name,function(){
         if (watinglist.hasOwnProperty('settings')) {
             clearInterval(intervalId);
             
-            currentData=DataList.combinedData;
             if(hideInactiveAgentCase) {
-                const agencies=resourceDatas.legalAgencies.map(agent=>agent.id)
+                const agencies=resourceDatas.legalAgencies.map(agent=>{
+                    if(agent.isInactived==0) return agent.id
+                })
                 DataList.combinedData=DataList.combinedData.filter(data=> agencies.includes(data.legalAgencies))
             }
 
+            currentData=DataList.combinedData;
             console.log('DataList.combinedData',DataList.combinedData)
             $('#pageOneTable').updateSource(DataList.combinedData);
             
@@ -442,6 +444,7 @@ $('body').on(preload_completed_event_name,function(){
                     //pageOnTable.addTableData(matched);
                     //pageOnTable.sortColumn(matched,pageOnTable.currentSort);
                     $('#pageOneTable').updateSource(currentData);
+                    $('#pageOneTable').gotoPage(0);
                     tb.instance.isTargetToggle=false;
                     
                     setPersonCaseSum(currentData);

@@ -590,22 +590,24 @@ $.fn.extend({
                }
             }
         }
-        if($(this).jqmData('textOverflow')) {
-            td.addClass('textOverflow');
-            td.find('label').addClass('textOverflow');
-            td.css({
+        if(td!==undefined){
+            if($(this).jqmData('textOverflow')) {
+                td.addClass('textOverflow');
+                td.find('label').addClass('textOverflow');
+                td.css({
 
-            })
+                })
+            }
+            if(template[key].isFixed){ 
+                td.addClass('fixedColumn');
+            }
+            if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
+                if(td!=undefined) td.hide();
+            }else{
+                if(td!=undefined) td.show();
+            }
+            td.find('label').setTooltip();
         }
-        if(template[key].isFixed){ 
-            td.addClass('fixedColumn');
-        }
-        if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
-            if(td!=undefined) td.hide();
-        }else{
-            if(td!=undefined) td.show();
-        }
-        td.find('label').setTooltip();
         return td;
     },
     setRowsPrePage:function(num){

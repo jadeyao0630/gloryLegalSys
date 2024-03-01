@@ -2000,6 +2000,7 @@ function saveMainForm(form,isAddPage){
                 e.values['penalty']='0.00';
                 e.values['paidAmount']='0.00';
                 e.values['caseStatus']=[0];
+                e.values['legalFee']='0.00';
                 //e.values['lawFirm']=0;
                 //e.values['attorney']='无0';
                 //e.values['FirstInstance']='0000-00-00 00:00:00';

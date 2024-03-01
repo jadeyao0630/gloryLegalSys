@@ -680,6 +680,12 @@ $('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
                         var count=$('<span class="ui-li-count ui-count-no-border">'+data.projects[pname].length+'</span>')
                         div_btn.append(count)
                         li.append(div_btn)
+                        const currentLeftPanelFilter=getGlobalJson('currentLeftPanelFilter')
+                        if(currentLeftPanelFilter!==undefined && 
+                            currentLeftPanelFilter.legalAgency===data.legalAgenciesId && 
+                            currentLeftPanelFilter.project===Number(pname)){
+                                $(div_btn).addClass('leftPanel-actived')
+                        }
                         div_btn.on('click',function(e){
                             $('#legalAgenciesSum-list').find('.leftPanel-item').removeClass('leftPanel-actived')
                             var matched=DataList.combinedData

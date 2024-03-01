@@ -195,6 +195,7 @@ $('body').on(preload_completed_event_name,function(){
     watinglist['settings']=true;
     setFontSize();
     
+    setGlobalJson('currentLeftPanelFilter',undefined)
 
     databaseBatchForm();
     //console.log('resourceDatas',getGlobalJson('resourceDatas'));
@@ -673,9 +674,41 @@ $('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
                     if(projectName.length>0){
                         
                         //console.log(projectName[0].name)
-                        var li=$('<li>'+projectName[0].name+'</li>');
+                        var li=$('<li></li>');
+                        var div_btn=$(`<div class="leftPanel-item" data-legalAgency="${data.legalAgenciesId}" data-project="${pname}">`+projectName[0].name+'</div>')
+                        //var a_btn=$('<a herf="#">'+projectName[0].name+'</a>');
                         var count=$('<span class="ui-li-count ui-count-no-border">'+data.projects[pname].length+'</span>')
-                        li.append(count)
+                        div_btn.append(count)
+                        li.append(div_btn)
+                        div_btn.on('click',function(e){
+                            $('#legalAgenciesSum-list').find('.leftPanel-item').removeClass('leftPanel-actived')
+                            var matched=DataList.combinedData
+                            const currentLeftPanelFilter=getGlobalJson('currentLeftPanelFilter')
+                            if(currentLeftPanelFilter!==undefined && 
+                                currentLeftPanelFilter.legalAgency===data.legalAgenciesId && 
+                                currentLeftPanelFilter.project===Number(pname)){
+                                
+                                setGlobalJson('currentLeftPanelFilter',undefined)
+                                
+
+                            }else{
+                                matched=$.grep(matched,(item)=>{
+                                    return item.legalAgencies===data.legalAgenciesId && item.caseProject===Number(pname)
+                                })
+                                setGlobalJson('currentLeftPanelFilter',{legalAgency:data.legalAgenciesId,project:Number(pname)})
+                                $(this).addClass('leftPanel-actived')
+                                //$(this).find('span').addClass('leftPanel-actived')
+                            }
+                            // matched=$.grep(matched,(item)=>{
+                            //     return item.legalAgencies===data.legalAgenciesId && item.caseProject===Number(pname)
+                            // })
+                            console.log('matched',matched,data.legalAgenciesId,pname);
+                            //currentData=matched;
+                            //pageOnTable.addTableData(matched);
+                            //pageOnTable.sortColumn(matched,pageOnTable.currentSort);
+                            $('#pageOneTable').updateSource(matched);
+                            $('#pageOneTable').gotoPage(0);
+                        })
                         $('#legalAgenciesSum-list').append(li);
                         
                     }
@@ -843,6 +876,7 @@ function getLegalAngenciesSum(){
             
             summary[catelog]['projects'][item.caseProject].push(item)
             
+            summary[catelog]['legalAgenciesId']=item.legalAgencies;
             
             //legalAgencies[catelog].push(item);
             //legalAgencies1[catelog]+=item.requestAmount;

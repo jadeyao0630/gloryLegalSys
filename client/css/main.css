@@ -749,3 +749,12 @@ ui-collapsible.collapsible-listview .ui-btn{
 .ui-count-no-border{
   border-style: none;
 }
+
+.leftPanel-item{
+  cursor: pointer;
+}
+.leftPanel-actived{
+  font-weight: 700;
+  color:#1362B7;
+  text-shadow: none;
+}

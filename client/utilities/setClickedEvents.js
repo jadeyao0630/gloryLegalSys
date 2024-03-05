@@ -261,7 +261,11 @@ $('#popupMenu').find('a').on('click',function(e){
                         $().mloader("show",{message:"查询中...."});
                         selectQuery('loginLogs',`${whereUser}${whereDate||''}`,"lastLogin DESC").then(e=>{
                             console.log(e);
-                            if (e==undefined) return;
+                            if (e==undefined) {
+                                $('#loginInfo_title_body').find('ul[data-role="listview"]').remove();
+                                $().mloader("hide");
+                                return;
+                            }
                             var newOrder={};
                             var systemReboot=[];
                             e.forEach(log=>{
@@ -1996,6 +2000,7 @@ function saveMainForm(form,isAddPage){
                 e.values['penalty']='0.00';
                 e.values['paidAmount']='0.00';
                 e.values['caseStatus']=[0];
+                e.values['legalFee']='0.00';
                 //e.values['lawFirm']=0;
                 //e.values['attorney']='无0';
                 //e.values['FirstInstance']='0000-00-00 00:00:00';

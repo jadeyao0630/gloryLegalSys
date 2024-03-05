@@ -410,15 +410,18 @@ $.fn.extend({
         var template=$(this).jqmData('tableTemplate');
         var nextPageSart=($(this).jqmData('currentPage')+1)*$(this).jqmData('itemsPerPage');
         var checkboxAll=$($(this).jqmData('fixedHead')!=null?$(this).jqmData('fixedHead'):$(this)).find('.reg-checkbox-all');
-        checkboxAll.prop('checked',false);
-        checkboxAll.trigger('change');
+        
         var columnVisibility=_this.jqmData('columnVisibility');
         var tbody=$(this).find('tbody');
         var checked=$(this).find('.reg-checkbox:checked');
         var deletedId=[];
+        checkboxAll.prop('checked',false);
+        checkboxAll.trigger('change');
+        console.log("checked id",$(checked));
         if(isColorRemove){
             
             $.each(checked,(index,checkbox)=>{
+                console.log("id",$(checkbox).jqmData('item'));
                 $(checkbox).closest('tr').addClass('inactived-row');
                 var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
                 $(this).jqmData('source')[itemIndex].isInactived=1;
@@ -431,7 +434,6 @@ $.fn.extend({
             var removedRows=[];
             var addedRows=[];
             $.each(checked,(index,checkbox)=>{
-                console.log($(checkbox).jqmData('item'));
                 removedRows.push($(checkbox).closest('tr'));
                 //var itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
                 //$(this).jqmData('currentData').splice(itemIndex,1);
@@ -590,22 +592,24 @@ $.fn.extend({
                }
             }
         }
-        if($(this).jqmData('textOverflow')) {
-            td.addClass('textOverflow');
-            td.find('label').addClass('textOverflow');
-            td.css({
+        if(td!==undefined){
+            if($(this).jqmData('textOverflow')) {
+                td.addClass('textOverflow');
+                td.find('label').addClass('textOverflow');
+                td.css({
 
-            })
+                })
+            }
+            if(template[key].isFixed){ 
+                td.addClass('fixedColumn');
+            }
+            if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
+                if(td!=undefined) td.hide();
+            }else{
+                if(td!=undefined) td.show();
+            }
+            td.find('label').setTooltip();
         }
-        if(template[key].isFixed){ 
-            td.addClass('fixedColumn');
-        }
-        if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
-            if(td!=undefined) td.hide();
-        }else{
-            if(td!=undefined) td.show();
-        }
-        td.find('label').setTooltip();
         return td;
     },
     setRowsPrePage:function(num){

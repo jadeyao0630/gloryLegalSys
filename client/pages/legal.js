@@ -48,19 +48,22 @@ function exportExcel () {
     $('#export_excel_popup_form').empty();
     $('#export_excel_popup_form').append(form.instance);
     $('#export_excel_popup_form').trigger('create');
+    form.setValueById('columns',Object.keys($('#pageOneTable').jqmData('columnVisibility')).filter(key => $('#pageOneTable').jqmData('columnVisibility')[key]));
     //console.log(JSON.stringify(data));
     $('#export_excel_popup_form_submit').jqmData('form',form);
     $('#export_excel_popup').trigger('create');
     $('#export_excel_popup').popup().popup('open');
     //export2Excel('pageOneTable',);
-    
+
+
     $('#export_excel_popup_form_submit').off();
     $('#export_excel_popup_form_submit').on('click',function(e){
         $(this).jqmData('form').getFormValues(function(e){
             if(e.success){
+                console.log("export_excel_popup_form_submit",e.values);
                 var filename=e.values.exportFileName;
                 if(filename==undefined || filename.length==0) filename='export_'+formatDateTime(new Date(),"yyyy年MM月dd日")+".xlsx";
-                var data=$('#pageOneTable').generateDataForExport()
+                var data=$('#pageOneTable').generateDataForExport(e.values.columns)
                 console.log('exportExcel',data);
                 if(e.values.exportType!=0){//is Selected Only
 
@@ -138,10 +141,7 @@ $('body').on(main_load_completed_event_name,function(){
             
             if(hideInactiveAgentCase) {
                 const agencies=resourceDatas.legalAgencies.map(agent=>{
-<<<<<<< HEAD
                     console.log(agent.name,agent.isInactived)
-=======
->>>>>>> acf27625403a74ef0f4106e7ac57d2731ba7f757
                     if(agent.isInactived==0) return agent.id
                 })
                 DataList.combinedData=DataList.combinedData.filter(data=> agencies.includes(data.legalAgencies))

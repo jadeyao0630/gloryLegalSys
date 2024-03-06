@@ -84,7 +84,7 @@ mform.prototype={
                 $('body').trigger('create');
             }).on( "pagecontainerbeforeshow", function( event, data ) {
                 var _this=$(this);
-                //console.log('pagecontainerbeforeshow',_this);
+                console.log('pagecontainerbeforeshow',_this);
                 $(_this).trigger('create');
                 var closeBtn=$(data.toPage).find('.ui-header .ui-icon-delete');
                     //console.error('selectmenucreate2',closeBtn);
@@ -286,6 +286,9 @@ mform.prototype={
                     break;
                 case "file":
                     item_container.append(_this.generateFileInput(key,form_item_template));
+                    break;
+                case "checkgroup":
+                    item_container.append(_this.generateCheckgroup(key,form_item_template));
                     break;
                 case "combobox":
                     item_container.append(_this.generateComboBoxItem(key,form_item_template));
@@ -573,6 +576,36 @@ mform.prototype={
             //radio_container.find('input[type="radio"]').checkboxradio().checkboxradio('refresh');
             return subContainer;
     },
+    generateCheckgroup:function(itemId,itemTemplate){
+            
+        var fieldset=$('<fieldset data-role="controlgroup" data-type="horizontal" id="'+itemId+'" style="border-radius: 0;"></fieldset>');
+        
+        var subContainer=$('<div class="form-original"></div>');
+        if(itemTemplate.data){
+            itemTemplate.data.forEach((value,index)=>{
+                //if(displayFormat)
+                //console.log('generateCheckgroup',value);
+                var id=(itemTemplate.valueKey?value[itemTemplate.valueKey]:index);
+                var label=value;
+                if(itemTemplate.hasOwnProperty('displayFormat')){
+                    label=itemTemplate.displayFormat;
+                    $.each(value,(k,v)=>{
+                        label=label.replace("{"+k+"}",v);
+                    })
+                }
+                //console.log('generateCheckgroup',label);
+                var input = $('<input type="checkbox" name="'+id+'" id="'+id+'" class="controlGroup-checkbox">');
+                var label = $('<label for="'+id+'" class="controlGroup-checkbox">'+label+'</label>');
+                fieldset.append(input);
+                fieldset.append(label);
+            })
+        }
+        if(itemTemplate.isDisabled){
+            fieldset.attr("disabled",true);
+        }
+        subContainer.append(fieldset);
+        return subContainer;
+    },
     generateFileInput:function(itemId,itemTemplate){
         var accept=itemTemplate.accept?' accept="'+itemTemplate.accept+'"':'';
             
@@ -814,6 +847,17 @@ mform.prototype={
             element.setSuperMultiInputValues(val);
         }else if(itemTemplate.type.toLowerCase()=="checkbox"){
             element.prop('checked',val);
+        }else if(itemTemplate.type.toLowerCase()=="checkgroup"){
+            if(val.constructor == String) {
+                if(val.indexOf(',')>-1)
+                    val=val.split(',');
+                else
+                    val=[val];
+            }
+            console.log('checkgroup',val);
+            $.each(element.find('input'),(index,input)=>{
+                result.push($(input).prop('checked',val.includes($(input).attr('id'))));
+            });
         }else if(itemTemplate.type.toLowerCase()=="combobox"){
             if (val==null) val=-1;
             if(val.constructor ==String){
@@ -917,6 +961,13 @@ mform.prototype={
             return values.join();
         }else if(itemTemplate.type.toLowerCase()=="checkbox"){
             return element.prop('checked');
+        }else if(itemTemplate.type.toLowerCase()=="checkgroup"){
+            var result=[];
+            $.each(element.find('input:checked'),(index,input)=>{
+                result.push($(input).attr('id'));
+            });
+            //console.log('generateCheckgroup',result);
+            return result;
         }else if(itemTemplate.type.toLowerCase()=="combobox"){
             var selected=element.find('option:selected');
             console.log('combobox',id,selected.val());

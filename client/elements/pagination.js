@@ -974,7 +974,7 @@ $.fn.extend({
         //headResizeObserver.observe(_Header.get( 0 ));
         
     },
-    generateDataForExport:function(isVisibleColumn){
+    generateDataForExport:function(selectedColumn){
         //if(slected)\
         var _this=this;
         var template=$(this).jqmData('tableTemplate');
@@ -986,7 +986,7 @@ $.fn.extend({
         $.each(datas,(index,data)=>{
             var rowData={};
             keys.forEach(key=>{
-                if(data.hasOwnProperty(key) && (!isVisibleColumn ||(isVisibleColumn && columnVisibility[key]))){
+                if(data.hasOwnProperty(key) && (selectedColumn.length>0?selectedColumn.includes(key):columnVisibility[key])){
                     var column_label=template[key].label;
                     var value=data[key];
                     

@@ -200,7 +200,7 @@ logingStatus().then(function(e){
             console.log('获取案件数据。。')
             //console.log('caseTableList',caseTableList)
             getBasic(caseTableList,[]).then(d=>{
-                output('caseTableList completed: ',d.data);
+                
                 //console.log(d.data);
                 var _excutes={}
                 d.data.caseExcutes.forEach((data)=>{
@@ -219,8 +219,8 @@ logingStatus().then(function(e){
                 var combinedData=[];
                 d.data.casesDb.forEach((data)=>{
                     var matchedData=d.data.caseStatus.filter(sta => sta.id==data.id);
-                    
-                    //console.log(matchedData);
+                    var matchedProgressData_frist=d.data.caseProgresses.filter(sta => sta.id==data.id && sta.typeId==1);
+                    var matchedProgressData_second=d.data.caseProgresses.filter(sta => sta.id==data.id && sta.typeId==2);
                     if(matchedData.length>0){
                         var excuteAmount=0.0
                         var legalFee=0.0
@@ -230,8 +230,28 @@ logingStatus().then(function(e){
                         if(_legalFees.hasOwnProperty(data.id)){
                             legalFee=_legalFees[data.id]
                         }
-                        combinedData.push(Object.assign(data,matchedData[0],{legalFee:legalFee}));
+                        var progress_data={legalFee:legalFee,
+                            firstTrialDate:'0000-00-00 00:00:00',firstJudgmentDate:'0000-00-00 00:00:00',firstPenalty:0.0,firstJudgmentSum:'',firstLegalInstitution:-1,
+                            secondTrialDate:'0000-00-00 00:00:00',secondJudgmentDate:'0000-00-00 00:00:00',secondPenalty:0.0,secondJudgmentSum:'',secondLegalInstitution:-1,
+                        }
+                        if(matchedProgressData_frist.length>0){
+                            progress_data.firstTrialDate=matchedProgressData_frist[0].trialDate;
+                            progress_data.firstJudgmentDate=matchedProgressData_frist[0].judgmentDate;
+                            progress_data.firstPenalty=matchedProgressData_frist[0].penalty;
+                            progress_data.firstJudgmentSum=matchedProgressData_frist[0].judgmentSum;
+                            progress_data.firstLegalInstitution=matchedProgressData_frist[0].legalInstitution;
+                        }
+                        if(matchedProgressData_second.length>0){
+                            progress_data.secondTrialDate=matchedProgressData_second[0].trialDate;
+                            progress_data.secondJudgmentDate=matchedProgressData_second[0].judgmentDate;
+                            progress_data.secondPenalty=matchedProgressData_second[0].penalty;
+                            progress_data.secondJudgmentSum=matchedProgressData_second[0].judgmentSum;
+                            progress_data.secondLegalInstitution=matchedProgressData_second[0].legalInstitution;
+                        }
                         
+                        
+                        combinedData.push(Object.assign(data,matchedData[0],progress_data));
+                        console.log(Object.assign(data,matchedData[0],progress_data));
                     }
                 });
                 
@@ -257,7 +277,7 @@ logingStatus().then(function(e){
                 //setGlobalJson("combinedData",combinedData);
                 //setGlobalJson("datalist",d.data);
                 //console.log("setGlobalJson datalist: ",getGlobalJson("datalist"));
-            
+                output('caseTableList completed: ',DataList);
                 result.push(true);
                 $('body').trigger(main_load_completed_event_name);
             });

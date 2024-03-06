@@ -748,6 +748,20 @@ var _summary_template;
             isASC:true,
             id:'caseDate',
           }},
+          lastUpdate:{label:"更新日期",
+            type:"date", dateFormat:'yyyy年MM月dd日', isFilterable:true,
+            defaultValue:'尚未设定',
+            sortable:{
+              type:'date',
+              isASC:true,
+              id:'lastUpdate',
+            }},
+            caseLawsuitRequest:{label:"本诉请求",
+          type:"label", isFilterable:true,},
+          caseCounterclaimRequest:{label:"反诉请求",
+        type:"label", isFilterable:true,},
+            caseSum:{label:"案件摘要",
+          type:"label", isFilterable:true,},
         rowButtons:{
             label:"操作",
             type:"buttons",
@@ -1221,6 +1235,14 @@ var _summary_template;
           placeholder:"文件名",
           type:"text",
           isOptional:true,
+        },
+        columns:{
+          label:"需要的表头",
+          type:"multicombobox",
+          //data:
+          
+          valueKey:'key',
+          displayFormat:'{label}',
         },
         __formLabel:{
           label:"<span class='optionMark'>*</span> 文件名选填，默认文件名为当天日期 'export_yyyy年MM月dd日.xlsx'。",

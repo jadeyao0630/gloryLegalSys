@@ -344,7 +344,7 @@ $.fn.extend({
         select.on('change',function () {
             $("#"+id).setSuperLabel(displayFormat,true);
         });
-        checkbox.checkboxradio().checkboxradio( "refresh" );;
+        //checkbox.checkboxradio().checkboxradio( "refresh" );;
         controlgroup.trigger('create');
         return controlgroup;
     },

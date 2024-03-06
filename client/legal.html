@@ -75,6 +75,8 @@
 					<li><a href="#loginInfoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-red ui-icon-clock popup-menu-btns admin-ui" data-rel="back">用户登录记录</a></li>
 					<li data-role="list-divider" class="admin-ui">数据库</li>
 					<li><a href="#databasePage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-gear admin-ui" data-rel="back">数据库管理</a></li>
+					<li data-role="list-divider" class="admin-ui">库管理</li>
+					<li><a href="#databaseResourcesPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue btn-icon-edit ui-icon-gear popup-menu-btns popup-edit-gear admin-ui" data-rel="back">管理现有库</a></li>
                 </ul>
             </div>
             
@@ -87,7 +89,7 @@
                 <table id="pageOneTable-fixed" data-role="table" class="ui-responsive table-stroke"></table>
             </div>
         </div>
-        <div data-role="footer"  data-position="fixed" id="mainFooter">
+        <div data-role="footer"  data-position="fixed" id="mainFooter" data-tap-toggle="false">
 				<div style="display:grid;grid-template-columns: auto 1fr auto;">
 					<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
 						<a href="#casePage" id="case_reg_but_add" data-tooltip="新增案件" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn tooltip-btn">新增</a>

@@ -517,11 +517,14 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
             $.each(e.values,(key,val)=>{
                 newData[key.replace("_p","")]=val;
             })
+            
+            var currentDateTime=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
             e.values.typeId=getGlobal("currentPoint");
             runWaitingTask();
             if(parseInt(getGlobal("currentPoint"))==0) {
                 
-                newData["caseCreateDate"]=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
+                newData["caseCreateDate"]=currentDateTime;
+                newData["lastUpdate"]=currentDateTime;
                 console.log('save data',e);
                 //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
                 if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
@@ -543,10 +546,12 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                 }
             }else{
                 newData.id=parseInt(getGlobal("currentId"));
-                $().mloader("show",{message:"提交中...."});
+                $().mloader("show",{message:"保存中...."});
                 insert('caseProgresses',newData,function(ee){
                     console.log(ee,getGlobal("currentIsAdd"));
                     if(ee.success){
+                        var isDone=false;
+                        var isSuccessed=false;
                         DataList.caseProgresses=updateOriginalDataM(DataList.caseProgresses,newData,['id','typeId']);
                         if(parseInt(getGlobal("currentIsAdd"))==1){
                             
@@ -562,9 +567,11 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                             }
                             update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
                                 $().mloader("hide");
+                                isDone=true;
                                 if(eee.data.success){
                                     DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify($('#progress_diagram').jqmData('status'))},'id');
-                                    $().minfo('show',{title:"提示",message:"保存成功。"},function(){});
+                                    //$().minfo('show',{title:"提示",message:"保存成功。"},function(){});
+                                    isSuccessed=true;
                                     form.setValues(newData);
                                     
                                 }else{
@@ -583,7 +590,9 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                             })
                             //DataList.caseProgresses=updateOriginalData(DataList.caseProgresses,newData,'id');
                             $().mloader("hide");
-                            $().minfo('show',{title:"提示",message:"更新成功。"},function(){});
+                            //$().minfo('show',{title:"提示",message:"更新成功。"},function(){});
+                            isDone=true;
+                            isSuccessed=true;
                             updatePenaltyPaidSummary($('#execute_summary'));
                             console.log("更新成功",newData.typeId,newData,formatMainEventData(newData));
                             $('#progress_diagram').trigger({type:'updateMainEvent',targetIndex:parseInt(getGlobal("currentIndex")),
@@ -591,21 +600,42 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                             
                             form.setValues(newData);
                         }
-                        const matchProgressData=DataList.caseProgresses.filter(item=>item.id===newData.id)
+
+                        const intervalId = setInterval(() => {
+                            if (isDone) {
+                                clearInterval(intervalId);
+                                if(isSuccessed){
+                                    const matchProgressData=DataList.caseProgresses.filter(item=>item.id===newData.id)
                         
-                        var _legalFee=0.0
-                        if(matchProgressData.length>0){
-                            matchProgressData.forEach(data=>{
-                                if(Number(data.typeId)===Number(newData.typeId)){
-                                    _legalFee+=Number(newData.legalFee)
-                                }else{
-                                    _legalFee+=(data.legalFee===null || data.legalFee==='null'?0:Number(data.legalFee))
+                                    var _legalFee=0.0
+                                    if(matchProgressData.length>0){
+                                        matchProgressData.forEach(data=>{
+                                            if(Number(data.typeId)===Number(newData.typeId)){
+                                                _legalFee+=Number(newData.legalFee)
+                                            }else{
+                                                _legalFee+=(data.legalFee===null || data.legalFee==='null'?0:Number(data.legalFee))
+                                            }
+                                            
+                                        })
+                                    }
+                                    console.log('matchProgressData',_legalFee,matchProgressData,newData)
+                                    $('#pageOneTable').updateTableItem({legalFee:_legalFee,id:newData.id});
+                                    //更新更新信息
+                                    const matchCaseData=DataList.combinedData.filter(item=>item.id===newData.id)
+                                    if(matchCaseData.length>0){
+                                        const caseData=matchCaseData[0];
+                                        caseData.caseApplicant=getGlobalJson("currentUser").id;
+                                        caseData.lastUpdate=currentDateTime;
+                                        caseData.caseDate=formatDateTimeStr2Mysql(caseData.caseDate);
+                                        caseData.caseCreateDate=formatDateTimeStr2Mysql(caseData.caseCreateDate);
+                                        fireDataChnaged("caseChanged",caseData,"update");
+                                    }
                                 }
                                 
-                            })
-                        }
-                        console.log('matchProgressData',_legalFee,matchProgressData,newData)
-                        $('#pageOneTable').updateTableItem({legalFee:_legalFee,id:newData.id});
+                            }
+                        }, 100);
+                        
+                        
                     }else{
                         $().mloader("hide");
                         $().minfo('show',{title:"错误",message:ee.error});
@@ -958,115 +988,7 @@ function runWaitingTask(){
         task();
     });
     waitingList={};
-    /*
-    waitingTasks.forEach((task)=>{
-        if(task.type=='update'){
-            update(task.where,
-                task.table,
-                task.value,async function(r){
-                DataList[task.tableData.table]=updateOriginalData(DataList[task.tableData.table],task.newData,task.tableData.idkey);
-                if(task.tableData.table=='caseExcutes'){
-                    task.newData.id=task.tableData.data.id;
-                    //DataList.caseExcutes=updateOriginalData(DataList[data.table],newData,data.idkey);
-                    fireDataChnaged("caseexcutesChanged",task.newData,"update");
-                    updatePenaltyPaidSummary($('#execute_summary'));
-                }
-            })
-        }else if(task.type=="pureinsert"){
-            if(fileName!=undefined) task.newData.filePath=fileName;
-            pureinsert(task.table,task.value,(r)=>{
-                console.log('insert result',task.table,r);
-                //添加新提交的数据到缓存
-                DataList[task.table].push(task.newData);
-                //更新当前视图事件列表
-                //console.log(getSortedUpdateEvents(),$('#progress_point_info_body'));
-                //generateUpdateInfoList($('#progress_point_info_body'),getSortedUpdateEvents());
-                //更新节点视图计数器
-                
-                //更新节点图
-                if(task.table=='caseExcutes'){
-                    //DataList.caseExcutes=updateOriginalData(DataList.caseExcutes,newData,data.idkey);
-                    fireDataChnaged("caseexcutesChanged",task.newData,"add");
-                }
-                var canGo=true;
-                if(parseInt(getGlobal("currentIsAdd"))==1) {
-                    canGo=false;
-                    currentForm.getFormValues(function(e){
-                        console.log(e);
-                        var newData={};
-                        $.each(task.newData,(key,val)=>{
-                            newData[key.replace("_p","")]=val;
-                        })
-                        
-                        newData.id=parseInt(getGlobal("currentId"));
-                        if(e.success){
-
-                            //type:insert,table:"caseProgresses",value:newData
-
-                            insert('caseProgresses',newData,function(ee){
-                                console.log(ee,getGlobal("currentIsAdd"));
-                                if(ee.success){
-                                    
-                                        DataList.caseProgresses.push(newData);
-                                        
-                                        var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));//获取节点属性数据
-                                        
-                                        if(matched.length>0){
-                                            $('#progress_diagram').trigger({type:'moveNext',sourceData:matched[0],sourceIndex:parseInt(getGlobal("currentIndex")),
-                                                        eventsData:currentEvents,
-                                                        mainEventData:formatMainEventData(newData)});
-                                            $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
-                                            canGo=true;
-                                        }
-                                        //type:update,table:"caseStatus",where:'id='+newData.id,value:{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))}
-                                        update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
-                                            
-                                            if(eee.data.success){
-                                                DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify($('#progress_diagram').jqmData('status'))},'id');
-                                                $().minfo('show',{title:"提示",message:"保存成功。"},function(){});
-                                            }else{
-                                                $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
-                                            }
-                                            $().mloader("hide");
-                                        });
-                                    
-                                    
-                                }else{
-                                    $().mloader("hide");
-                                    $().minfo('show',{title:"错误",message:ee.error});
-                                }
-                            })
-                        
-                        }
-                    });
-                }
-                //console.log('getUpdateEvents',getUpdateEvents())
-                setTimeout(() => {
-                    const intervalId = setInterval(() => {
-                        if (canGo) {
-                            clearInterval(intervalId);
-                            $('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
-                            updatePenaltyPaidSummary($('#execute_summary'));
-                        }
-                    }, 100);
-                }, 100);
-            });
-            //history.back();
-        }else if(task.type=='inactiveItem'){
-
-            inactiveItem(task.where,task.table,function(r){
-
-            });
-        }else if(task.type=='restoreItem'){
-
-            restoreItem(task.where,task.table,function(r){
-                
-            });
-        }
-        
-    })
-    waitingTasks=[];
-    */
+    
 }
 //节点添加保存
 //$('.progress_popup_add_form_submit').on('click', _updateSubmitEvent)
@@ -1236,7 +1158,8 @@ $('.case_reg_but').on('click',async function(e){
         var caseCause1={};
         var project={};
         var project1={};
-        DataList.casesDb.forEach(item=>{
+        var dataSource=currentData || DataList.casesDb
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.caseCauses_,(d=>d.id==item.caseCause));
             if(match.length>0){
                 var catelog=match[0].label;
@@ -1290,12 +1213,13 @@ $('.chart-btn').on('click',function(e){
     console.log('chart-btn');
     $('.chart-btn').removeClass('listview-item-active');
     $(this).addClass('listview-item-active');
+    var dataSource=currentData || DataList.casesDb
     if($(this).text()=="纠纷"){
         $('#chart_sum_p').children().hide();
         $('#chart_sum_all').show();
         var caseCause={};
         var caseCause1={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.caseCauses_,(d=>d.id==item.caseCause));
             if(match.length>0){
                 var catelog=match[0].label;
@@ -1325,7 +1249,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var project={};
         var project1={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var matchp=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject));
             if(matchp.length>0){
                 var catelog=matchp[0].name;
@@ -1357,7 +1281,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.caseLabels_,(d=>d.id==item.caseLabel));
             if(match.length>0){
                 var catelog=match[0].label;
@@ -1389,7 +1313,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseStatus>=0 && item.caseStatus<3));
             if(match.length>0){
                 var catelog=match[0].name;
@@ -1422,7 +1346,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseStatus>=3 && item.caseStatus<4));
             if(match.length>0){
                 var catelog=match[0].name;
@@ -1455,7 +1379,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseLabel==2));
             if(match.length>0){
                 var catelog=match[0].name;
@@ -1485,7 +1409,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseLabel==3));
             if(match.length>0){
                 var catelog=match[0].name;
@@ -1516,7 +1440,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.legalAgencies,(d=>d.id==item.legalAgencies));
             if(match.length>0){
                 var catelog=match[0].name;

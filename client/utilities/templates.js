@@ -748,6 +748,14 @@ var _summary_template;
             isASC:true,
             id:'caseDate',
           }},
+          // lastUpdate:{label:"更新日期",
+          //   type:"date", dateFormat:'yyyy年MM月dd日', isFilterable:true,
+          //   defaultValue:'尚未设定',
+          //   sortable:{
+          //     type:'date',
+          //     isASC:true,
+          //     id:'lastUpdate',
+          //   }},
         rowButtons:{
             label:"操作",
             type:"buttons",

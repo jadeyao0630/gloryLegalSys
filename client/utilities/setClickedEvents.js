@@ -958,115 +958,7 @@ function runWaitingTask(){
         task();
     });
     waitingList={};
-    /*
-    waitingTasks.forEach((task)=>{
-        if(task.type=='update'){
-            update(task.where,
-                task.table,
-                task.value,async function(r){
-                DataList[task.tableData.table]=updateOriginalData(DataList[task.tableData.table],task.newData,task.tableData.idkey);
-                if(task.tableData.table=='caseExcutes'){
-                    task.newData.id=task.tableData.data.id;
-                    //DataList.caseExcutes=updateOriginalData(DataList[data.table],newData,data.idkey);
-                    fireDataChnaged("caseexcutesChanged",task.newData,"update");
-                    updatePenaltyPaidSummary($('#execute_summary'));
-                }
-            })
-        }else if(task.type=="pureinsert"){
-            if(fileName!=undefined) task.newData.filePath=fileName;
-            pureinsert(task.table,task.value,(r)=>{
-                console.log('insert result',task.table,r);
-                //添加新提交的数据到缓存
-                DataList[task.table].push(task.newData);
-                //更新当前视图事件列表
-                //console.log(getSortedUpdateEvents(),$('#progress_point_info_body'));
-                //generateUpdateInfoList($('#progress_point_info_body'),getSortedUpdateEvents());
-                //更新节点视图计数器
-                
-                //更新节点图
-                if(task.table=='caseExcutes'){
-                    //DataList.caseExcutes=updateOriginalData(DataList.caseExcutes,newData,data.idkey);
-                    fireDataChnaged("caseexcutesChanged",task.newData,"add");
-                }
-                var canGo=true;
-                if(parseInt(getGlobal("currentIsAdd"))==1) {
-                    canGo=false;
-                    currentForm.getFormValues(function(e){
-                        console.log(e);
-                        var newData={};
-                        $.each(task.newData,(key,val)=>{
-                            newData[key.replace("_p","")]=val;
-                        })
-                        
-                        newData.id=parseInt(getGlobal("currentId"));
-                        if(e.success){
-
-                            //type:insert,table:"caseProgresses",value:newData
-
-                            insert('caseProgresses',newData,function(ee){
-                                console.log(ee,getGlobal("currentIsAdd"));
-                                if(ee.success){
-                                    
-                                        DataList.caseProgresses.push(newData);
-                                        
-                                        var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));//获取节点属性数据
-                                        
-                                        if(matched.length>0){
-                                            $('#progress_diagram').trigger({type:'moveNext',sourceData:matched[0],sourceIndex:parseInt(getGlobal("currentIndex")),
-                                                        eventsData:currentEvents,
-                                                        mainEventData:formatMainEventData(newData)});
-                                            $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
-                                            canGo=true;
-                                        }
-                                        //type:update,table:"caseStatus",where:'id='+newData.id,value:{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))}
-                                        update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
-                                            
-                                            if(eee.data.success){
-                                                DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify($('#progress_diagram').jqmData('status'))},'id');
-                                                $().minfo('show',{title:"提示",message:"保存成功。"},function(){});
-                                            }else{
-                                                $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
-                                            }
-                                            $().mloader("hide");
-                                        });
-                                    
-                                    
-                                }else{
-                                    $().mloader("hide");
-                                    $().minfo('show',{title:"错误",message:ee.error});
-                                }
-                            })
-                        
-                        }
-                    });
-                }
-                //console.log('getUpdateEvents',getUpdateEvents())
-                setTimeout(() => {
-                    const intervalId = setInterval(() => {
-                        if (canGo) {
-                            clearInterval(intervalId);
-                            $('#progress_diagram').trigger({type:'updateIndicator',eventsData:getUpdateEvents()})
-                            updatePenaltyPaidSummary($('#execute_summary'));
-                        }
-                    }, 100);
-                }, 100);
-            });
-            //history.back();
-        }else if(task.type=='inactiveItem'){
-
-            inactiveItem(task.where,task.table,function(r){
-
-            });
-        }else if(task.type=='restoreItem'){
-
-            restoreItem(task.where,task.table,function(r){
-                
-            });
-        }
-        
-    })
-    waitingTasks=[];
-    */
+    
 }
 //节点添加保存
 //$('.progress_popup_add_form_submit').on('click', _updateSubmitEvent)
@@ -1236,6 +1128,7 @@ $('.case_reg_but').on('click',async function(e){
         var caseCause1={};
         var project={};
         var project1={};
+        var dataSource=currentData || DataList.casesDb
         dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.caseCauses_,(d=>d.id==item.caseCause));
             if(match.length>0){

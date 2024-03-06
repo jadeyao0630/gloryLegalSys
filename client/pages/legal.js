@@ -34,6 +34,14 @@ function setFontSize(){
 }
 
 function exportExcel () {
+    console.log({id,checkallbox,rowButtons,...rest}=_firstPageTableColumns);
+    var columns=[]
+    $.each(_firstPageTableColumns,(key,value)=>{
+        if(key!='id' && key!='checkallbox' && key!='rowButtons'){
+            columns.push({key:key,label:value.label})
+        }
+    })
+    export_excel_template.template.columns.data=columns;
     var form= new mform({template:export_excel_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
 
     $('#export_excel_popup_title').text("导出设置");

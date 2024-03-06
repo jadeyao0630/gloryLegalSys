@@ -152,6 +152,8 @@ const columns={//案件主表
     caseApplicant:"varchar(255) NOT NULL",//申请人
     caseCreateDate:"datetime NOT NULL",//申请日期
     isReadOnly:"bool NOT NULL",//文档只读
+    legalFee:"decimal(65,4)",//文档只读
+    lastUpdate:"datetime",//文档只读
 }
 const caseStatus={//案件状态
   id:"INT NOT NULL,PRIMARY KEY",//案件唯一序列号

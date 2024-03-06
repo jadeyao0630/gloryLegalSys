@@ -517,11 +517,14 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
             $.each(e.values,(key,val)=>{
                 newData[key.replace("_p","")]=val;
             })
+            
+            var currentDateTime=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
             e.values.typeId=getGlobal("currentPoint");
             runWaitingTask();
             if(parseInt(getGlobal("currentPoint"))==0) {
                 
-                newData["caseCreateDate"]=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
+                newData["caseCreateDate"]=currentDateTime;
+                newData["lastUpdate"]=currentDateTime;
                 console.log('save data',e);
                 //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
                 if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
@@ -543,10 +546,12 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                 }
             }else{
                 newData.id=parseInt(getGlobal("currentId"));
-                $().mloader("show",{message:"提交中...."});
+                $().mloader("show",{message:"保存中...."});
                 insert('caseProgresses',newData,function(ee){
                     console.log(ee,getGlobal("currentIsAdd"));
                     if(ee.success){
+                        var isDone=false;
+                        var isSuccessed=false;
                         DataList.caseProgresses=updateOriginalDataM(DataList.caseProgresses,newData,['id','typeId']);
                         if(parseInt(getGlobal("currentIsAdd"))==1){
                             
@@ -562,9 +567,11 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                             }
                             update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
                                 $().mloader("hide");
+                                isDone=true;
                                 if(eee.data.success){
                                     DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify($('#progress_diagram').jqmData('status'))},'id');
-                                    $().minfo('show',{title:"提示",message:"保存成功。"},function(){});
+                                    //$().minfo('show',{title:"提示",message:"保存成功。"},function(){});
+                                    isSuccessed=true;
                                     form.setValues(newData);
                                     
                                 }else{
@@ -583,7 +590,9 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                             })
                             //DataList.caseProgresses=updateOriginalData(DataList.caseProgresses,newData,'id');
                             $().mloader("hide");
-                            $().minfo('show',{title:"提示",message:"更新成功。"},function(){});
+                            //$().minfo('show',{title:"提示",message:"更新成功。"},function(){});
+                            isDone=true;
+                            isSuccessed=true;
                             updatePenaltyPaidSummary($('#execute_summary'));
                             console.log("更新成功",newData.typeId,newData,formatMainEventData(newData));
                             $('#progress_diagram').trigger({type:'updateMainEvent',targetIndex:parseInt(getGlobal("currentIndex")),
@@ -591,21 +600,42 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                             
                             form.setValues(newData);
                         }
-                        const matchProgressData=DataList.caseProgresses.filter(item=>item.id===newData.id)
+
+                        const intervalId = setInterval(() => {
+                            if (isDone) {
+                                clearInterval(intervalId);
+                                if(isSuccessed){
+                                    const matchProgressData=DataList.caseProgresses.filter(item=>item.id===newData.id)
                         
-                        var _legalFee=0.0
-                        if(matchProgressData.length>0){
-                            matchProgressData.forEach(data=>{
-                                if(Number(data.typeId)===Number(newData.typeId)){
-                                    _legalFee+=Number(newData.legalFee)
-                                }else{
-                                    _legalFee+=(data.legalFee===null || data.legalFee==='null'?0:Number(data.legalFee))
+                                    var _legalFee=0.0
+                                    if(matchProgressData.length>0){
+                                        matchProgressData.forEach(data=>{
+                                            if(Number(data.typeId)===Number(newData.typeId)){
+                                                _legalFee+=Number(newData.legalFee)
+                                            }else{
+                                                _legalFee+=(data.legalFee===null || data.legalFee==='null'?0:Number(data.legalFee))
+                                            }
+                                            
+                                        })
+                                    }
+                                    console.log('matchProgressData',_legalFee,matchProgressData,newData)
+                                    $('#pageOneTable').updateTableItem({legalFee:_legalFee,id:newData.id});
+                                    //更新更新信息
+                                    const matchCaseData=DataList.combinedData.filter(item=>item.id===newData.id)
+                                    if(matchCaseData.length>0){
+                                        const caseData=matchCaseData[0];
+                                        caseData.caseApplicant=getGlobalJson("currentUser").id;
+                                        caseData.lastUpdate=currentDateTime;
+                                        caseData.caseDate=formatDateTimeStr2Mysql(caseData.caseDate);
+                                        caseData.caseCreateDate=formatDateTimeStr2Mysql(caseData.caseCreateDate);
+                                        fireDataChnaged("caseChanged",caseData,"update");
+                                    }
                                 }
                                 
-                            })
-                        }
-                        console.log('matchProgressData',_legalFee,matchProgressData,newData)
-                        $('#pageOneTable').updateTableItem({legalFee:_legalFee,id:newData.id});
+                            }
+                        }, 100);
+                        
+                        
                     }else{
                         $().mloader("hide");
                         $().minfo('show',{title:"错误",message:ee.error});

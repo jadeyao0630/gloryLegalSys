@@ -688,7 +688,7 @@ $('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
                         }
                         div_btn.on('click',function(e){
                             $('#legalAgenciesSum-list').find('.leftPanel-item').removeClass('leftPanel-actived')
-                            var matched=DataList.combinedData
+                            var matched=currentData || DataList.combinedData
                             const currentLeftPanelFilter=getGlobalJson('currentLeftPanelFilter')
                             if(currentLeftPanelFilter!==undefined && 
                                 currentLeftPanelFilter.legalAgency===data.legalAgenciesId && 

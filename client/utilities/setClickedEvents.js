@@ -1236,7 +1236,7 @@ $('.case_reg_but').on('click',async function(e){
         var caseCause1={};
         var project={};
         var project1={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.caseCauses_,(d=>d.id==item.caseCause));
             if(match.length>0){
                 var catelog=match[0].label;
@@ -1290,12 +1290,13 @@ $('.chart-btn').on('click',function(e){
     console.log('chart-btn');
     $('.chart-btn').removeClass('listview-item-active');
     $(this).addClass('listview-item-active');
+    var dataSource=currentData || DataList.casesDb
     if($(this).text()=="纠纷"){
         $('#chart_sum_p').children().hide();
         $('#chart_sum_all').show();
         var caseCause={};
         var caseCause1={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.caseCauses_,(d=>d.id==item.caseCause));
             if(match.length>0){
                 var catelog=match[0].label;
@@ -1325,7 +1326,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var project={};
         var project1={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var matchp=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject));
             if(matchp.length>0){
                 var catelog=matchp[0].name;
@@ -1357,7 +1358,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.caseLabels_,(d=>d.id==item.caseLabel));
             if(match.length>0){
                 var catelog=match[0].label;
@@ -1389,7 +1390,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseStatus>=0 && item.caseStatus<3));
             if(match.length>0){
                 var catelog=match[0].name;
@@ -1422,7 +1423,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseStatus>=3 && item.caseStatus<4));
             if(match.length>0){
                 var catelog=match[0].name;
@@ -1455,7 +1456,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseLabel==2));
             if(match.length>0){
                 var catelog=match[0].name;
@@ -1485,7 +1486,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseLabel==3));
             if(match.length>0){
                 var catelog=match[0].name;
@@ -1516,7 +1517,7 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
-        DataList.casesDb.forEach(item=>{
+        dataSource.forEach(item=>{
             var match=$.grep(resourceDatas.legalAgencies,(d=>d.id==item.legalAgencies));
             if(match.length>0){
                 var catelog=match[0].name;

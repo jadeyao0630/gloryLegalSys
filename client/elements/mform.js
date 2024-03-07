@@ -578,7 +578,7 @@ mform.prototype={
     },
     generateCheckgroup:function(itemId,itemTemplate){
             
-        var fieldset=$('<fieldset data-role="controlgroup" data-type="horizontal" id="'+itemId+'" style="border-radius: 0;"></fieldset>');
+        var fieldset=$('<fieldset class="form-controlgroup" data-role="controlgroup" data-type="horizontal" id="'+itemId+'" style="border-radius: 0;"></fieldset>');
         
         var subContainer=$('<div class="form-original"></div>');
         if(itemTemplate.data){

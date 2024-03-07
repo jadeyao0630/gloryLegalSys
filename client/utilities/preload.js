@@ -231,8 +231,8 @@ logingStatus().then(function(e){
                             legalFee=_legalFees[data.id]
                         }
                         var progress_data={legalFee:legalFee,
-                            firstTrialDate:'0000-00-00 00:00:00',firstJudgmentDate:'0000-00-00 00:00:00',firstPenalty:0.0,firstJudgmentSum:'',firstLegalInstitution:-1,
-                            secondTrialDate:'0000-00-00 00:00:00',secondJudgmentDate:'0000-00-00 00:00:00',secondPenalty:0.0,secondJudgmentSum:'',secondLegalInstitution:-1,
+                            firstTrialDate:'0000-00-00 00:00:00',firstJudgmentDate:'0000-00-00 00:00:00',firstPenalty:0.0,firstJudgmentSum:'',firstLegalInstitution:-1,firstLegalCounsel:"无0",
+                            secondTrialDate:'0000-00-00 00:00:00',secondJudgmentDate:'0000-00-00 00:00:00',secondPenalty:0.0,secondJudgmentSum:'',secondLegalInstitution:-1,secondLegalCounsel:"无0",
                         }
                         if(matchedProgressData_frist.length>0){
                             progress_data.firstTrialDate=matchedProgressData_frist[0].trialDate;
@@ -240,6 +240,7 @@ logingStatus().then(function(e){
                             progress_data.firstPenalty=matchedProgressData_frist[0].penalty;
                             progress_data.firstJudgmentSum=matchedProgressData_frist[0].judgmentSum;
                             progress_data.firstLegalInstitution=matchedProgressData_frist[0].legalInstitution;
+                            progress_data.firstLegalCounsel=matchedProgressData_frist[0].legalCounsel;
                         }
                         if(matchedProgressData_second.length>0){
                             progress_data.secondTrialDate=matchedProgressData_second[0].trialDate;
@@ -247,6 +248,7 @@ logingStatus().then(function(e){
                             progress_data.secondPenalty=matchedProgressData_second[0].penalty;
                             progress_data.secondJudgmentSum=matchedProgressData_second[0].judgmentSum;
                             progress_data.secondLegalInstitution=matchedProgressData_second[0].legalInstitution;
+                            progress_data.secondLegalCounsel=matchedProgressData_second[0].legalCounsel;
                         }
                         
                         

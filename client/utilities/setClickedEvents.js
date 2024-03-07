@@ -438,35 +438,35 @@ $('#progress_point_info').find('[data-role="header"]').find('a[data-rel="back"]'
         }
     })
 })
-var isFirstTimeBack=true;
-var scrollSpeed=1000;
-$(window).on('popstate', function(event) {
-    //event.preventDefault();
-    if(event.originalEvent.state!=null){
-        //console.log("pop",'back',sessionStorage.getItem('scrollPosition'));
-        //sessionStorage.setItem('scrollPosition', );
-        if(isFirstTimeBack){
-            $("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, scrollSpeed);
-            isFirstTimeBack=false;
-            scrollSpeed=0;
-        }else{
+// var isFirstTimeBack=true;
+// var scrollSpeed=1000;
+// $(window).on('popstate', function(event) {
+//     //event.preventDefault();
+//     // if(event.originalEvent.state!=null){
+//     //     //console.log("pop",'back',sessionStorage.getItem('scrollPosition'));
+//     //     //sessionStorage.setItem('scrollPosition', );
+//     //     if(isFirstTimeBack){
+//     //         $("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, scrollSpeed);
+//     //         isFirstTimeBack=false;
+//     //         scrollSpeed=0;
+//     //     }else{
 
-            $("html, body").scrollTop(sessionStorage.getItem('scrollPosition'));
-        }
-        //console.log('currentPage',getGlobal('currentPage'))
-        //$("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, 100);
-    }else{
-        if(getGlobal('currentPage')!="#timeline")
-            sessionStorage.setItem('scrollPosition', $("html, body").scrollTop());
-        else{
+//     //         $("html, body").scrollTop(sessionStorage.getItem('scrollPosition'));
+//     //     }
+//     //     //console.log('currentPage',getGlobal('currentPage'))
+//     //     //$("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, 100);
+//     // }else{
+//     //     if(getGlobal('currentPage')!="#timeline")
+//     //         sessionStorage.setItem('scrollPosition', $("html, body").scrollTop());
+//     //     else{
 
-            isFirstTimeBack=true;
-            scrollSpeed=0;
-        }
-        //console.log("pop",sessionStorage.getItem('scrollPosition'));
-    }
+//     //         isFirstTimeBack=true;
+//     //         scrollSpeed=0;
+//     //     }
+//     //     //console.log("pop",sessionStorage.getItem('scrollPosition'));
+//     // }
     
-});
+// });
 var currentProgress={};
 
 function showTooltip(self){

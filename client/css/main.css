@@ -758,12 +758,14 @@ ui-collapsible.collapsible-listview .ui-btn{
   color:#1362B7;
   text-shadow: none;
 }
-.controlGroup-checkbox:checked{
-  border-color: black;
-}
-.ui-controlgroup-controls .ui-checkbox{
+.form-controlgroup .ui-checkbox{
   padding: 1px;
 }
-.ui-controlgroup-controls .ui-checkbox .controlGroup-checkbox{
+.form-controlgroup .ui-checkbox .controlGroup-checkbox{
   border-width: 1px;
+}
+
+.popup-columnFilter{
+  max-height: 500px;
+  overflow-y:scroll;
 }

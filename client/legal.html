@@ -48,9 +48,9 @@
 	<script type="text/javascript" src="./elements/progressChartMain.js"></script>
 	<script type="text/javascript" src="./elements/updatelist.js"></script>
 </head>
-<body>
+<body style="overflow: hidden;">
     <!-- 主页面 -->
-    <div data-role="page" id="main" style="overflow-y: hidden;overflow-x: auto;">
+    <div data-role="page" id="main" style="overflow-y: hidden;overflow-x: hidden;">
 		<span class="ui-tooltip"></span>
         <div data-role="header" id="main-header" data-position="fixed" data-tap-toggle="false">
 
@@ -82,7 +82,7 @@
             
             
         </div>
-        <div id="main-body" class="ui-body-d ui-content" style="overflow-y: hidden;overflow-x: auto;">
+        <div id="main-body" class="ui-body-d ui-content" style="overflow-y: auto;overflow-x: auto;">
             <table id="pageOneTable" data-role="table" class="ui-responsive table-stroke" data-input="#header-search-input"></table>
             <table id="table-fixed-column" data-role="table" class="ui-responsive table-stroke"></table>
             <div id="header-filter-container" class="header-filter-container">
@@ -370,7 +370,7 @@
 						<li><a href="#" class="chart-btn" data-rel="back">重大案件</a></li>
 						<li><a href="#" class="chart-btn" data-rel="back">群诉案件</a></li>
 						<li><a href="#" class="chart-btn super-auth" data-rel="back">法务统计</a></li>
-						<li><a href="#" class="chart-btn" data-rel="back">全部</a></li>
+						<li><a href="#" class="chart-btn" data-rel="back">全部(不受主表影响)</a></li>
 					</ul>
 			</div>
 		</div><!-- /header -->

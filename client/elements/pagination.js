@@ -812,9 +812,9 @@ $.fn.extend({
             var hiddenList={};
             _this.jqmData('columnVisibility',{});
             var duration=500;
-            var filterPopup=$('<div data-role="popup" id="'+$(_this).attr('id')+'-columnFilter" data-theme="a" class="ui-corner-all"></div>');
+            var filterPopup=$('<div data-role="popup" id="'+$(_this).attr('id')+'-columnFilter" data-theme="a" class="ui-corner-all popup-columnFilter"></div>');
             //$(that).append($(settings.toggleButton));
-            $(this).parent().append(filterPopup);
+            $("html, body").append(filterPopup);
             $(toggleButton).on('click',function(e){
                 $(filterPopup).popup('open');
                 $(filterPopup).popup('reposition',{x:e.pageX,y:e.pageY});
@@ -823,8 +823,8 @@ $.fn.extend({
             
             var filterForm=$('<form></form>');
             var filterFielset=$('<fieldset data-role="controlgroup" style="margin:0px;"></fieldset>');
-            filterForm.append(filterFielset);
-            filterPopup.append(filterForm);
+            //filterForm.append(filterFielset);
+            filterPopup.append(filterFielset);
             
             
             filterPopup.popup({
@@ -845,6 +845,7 @@ $.fn.extend({
                     filterFielset.append(input);
                     filterFielset.append(label);
                     input.on("click",function(e){
+                        console.log('clicked')
                         //console.log( $('td[name="'+input.prop('name')+'"]'));
                         _this.setAvailableColumn(input,duration);
                         saveChangedToUser(_this);

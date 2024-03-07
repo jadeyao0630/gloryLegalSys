@@ -200,6 +200,7 @@ $('body').on(main_load_completed_event_name,function(){
         $.each($('.tooltip-btn'),(index,btn)=>{
             $(btn).setTooltips();
         });
+        $('#main-body').css({'max-height':$(window).height()-130})
     }, 100);
 });
 $('body').on(preload_completed_event_name,function(){
@@ -488,6 +489,7 @@ $('body').on(preload_completed_event_name,function(){
 $('#main-body').on('scroll',function(e){
     $("#pageOneTable").jqmData('fixedHead').css({'left':$("#main-body").scrollLeft()*-1})
 })
+
 $('body').on('userDataChanged',function(e){
     console.log('userDataChanged b',getGlobalJson("currentUser"),e);
     setGlobalJson("currentUser",updateOriginalData(getGlobalJson("currentUser"),e.value,'id'));
@@ -763,6 +765,9 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
         }
     });
 });
+window.addEventListener('resize',function(){
+    $('#main-body').css({'max-height':$(window).height()-130})
+})
 function setPersonCaseSum(data){
     if(data==undefined) data=DataList.combinedData;
     var personCaseSum=getPersonCaseSum(data);

@@ -253,7 +253,7 @@ logingStatus().then(function(e){
                         
                         
                         combinedData.push(Object.assign(data,matchedData[0],progress_data));
-                        console.log(Object.assign(data,matchedData[0],progress_data));
+                        //console.log(Object.assign(data,matchedData[0],progress_data));
                     }
                 });
                 

@@ -81,7 +81,7 @@ $.fn.progressChart = function(options){
         point.append(indicator);
         
         var mainInfo=$('<ul data-role="listview" data-inset="true" class="main-info-panel"></ul>');
-        mainInfo.css({'top':(settings.size+20)+"px",width:(settings.distance-40)+"px"});
+        mainInfo.css({'top':(settings.size+20)+"px",width:(settings.distance-40)+"px","max-height":190,"overflow-y": "scroll"});
 
         point.append(mainInfo);
         if(settings.status.hasOwnProperty(index)) {
@@ -131,11 +131,11 @@ $.fn.progressChart = function(options){
                         console.log(l,element[l],(l=="date" && element[l]=='1999年11月30日'))
                         content='暂无'
                     }
-                    var li=$('<li class="listview-item">'+content+'</li>');
+                    var li=$('<li class="listview-item" style="word-wrap: break-word;overflow-wrap: break-word;hyphens: auto;white-space: normal;">'+content+'</li>');
                     
                     if(l=="title") {
                         //li.css({'font-weight':700})
-                        li=$('<li data-role="list-divider">'+content+'</li>');
+                        li=$('<li data-role="list-divider" style="position:sticky;top:0;z-index:1000;">'+content+'</li>');
                     }
                     listview.append(li);
                     li.setTooltip(";");

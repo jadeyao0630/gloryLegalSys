@@ -47,6 +47,9 @@ function getSuperMultValue(template,data,isMultiInput){
     });
     return multiValues;
 }
+function compareDate(source,target){
+    return new Date(target=="0000-00-00 00:00:00"?"1900-01-01 00:00:00":target)>new Date(source=="0000-00-00 00:00:00"?"1900-01-01 00:00:00":source);
+}
 function getValueIfHaveDataRef(template,data){
     
     if(template.hasOwnProperty('data') && template.data!=undefined){
@@ -80,19 +83,48 @@ function getValueIfHaveDataRef(template,data){
             return val;
         }else{
             var _data;
+            if(data.constructor == String && template.isMultipleValue) {
+                data=data.split(',');
+                }
             if(template.hasOwnProperty('matchKey')){
-                refData=$.grep(refData,d=>d[template.matchKey]==data);
+                refData=$.grep(refData,d=>template.isMultipleValue?data.includes(d[template.matchKey].toString()):d[template.matchKey]==data);
             }else{
                 refData=[refData[data]];
             }
-            if(template.hasOwnProperty('valueKey')){
-                if(refData.length>0) _data = refData[0][template.valueKey];
-            }else{
-                if(refData.length>0) _data = refData[0];
+            if(refData.length>0){
+                if(template.isMultipleValue){
+                    console.log("table item",data,refData);
+            
+                    var temp_data=[];
+                    if(template.hasOwnProperty('valueKey')){
+                        $.each(refData,(i,v)=>{
+                            console.log(i,v);
+                            if(v.hasOwnProperty(template.valueKey)) {
+                                var val=v[template.valueKey];
+                                if(template.hasOwnProperty('displayFormat')){
+                                    val=template.displayFormat.replace('{}',val);
+                                }
+                                temp_data.push(val)
+                            };
+                        })
+                    }else{
+                        temp_data = refData;
+                    }
+                    _data=temp_data.join(",")
+                }else{
+                    if(template.hasOwnProperty('valueKey')){
+                        _data = refData[0][template.valueKey];
+                    }else{
+                        _data = refData[0];
+                    }
+                    if(template.hasOwnProperty('displayFormat')){
+                        _data=template.displayFormat.replace('{}',_data);
+                    }
+                }
             }
-            if(template.hasOwnProperty('displayFormat')){
-                _data=template.displayFormat.replace('{}',_data);
-            }
+            
+            
+            
             return _data;
         }
         
@@ -241,6 +273,10 @@ $.fn.extend({
             if(template[k].type=='checkbox'){
                 th=$('<th name="'+k+'"" style="text-align: center;vertical-align: middle;"></th>');
                 th.append($('<input class="reg-checkbox-all" style="left:0px;" type="checkbox" data-mini="true" name="item_checkbox">'));
+            }
+            if(template[k].isFixed){ 
+                th.addClass('fixedColumn');
+                if(k=='rowButtons') th.addClass('fixed-right');
             }
             if(template[k].isHidden) th.hide();
             theadtr.append(th);
@@ -499,10 +535,13 @@ $.fn.extend({
     animationsControl:function(){
         var _this=this;
         if(_this.jqmData('updateTask')!=undefined) clearTimeout(_this.jqmData('updateTask')); 
-        _this.jqmData('currentAnimations').forEach(animation=>{
-            $(animation).stop();
-            _this.removeAnimationFromPool(animation);
-        })
+        if(_this.jqmData('currentAnimations')!=undefined){
+            _this.jqmData('currentAnimations').forEach(animation=>{
+                $(animation).stop();
+                _this.removeAnimationFromPool(animation);
+            })
+        }
+        
         _this.jqmData('currentAnimations',[]);
     },
     itemRowAnimation:function(tr,slide,duration,callback){
@@ -602,6 +641,7 @@ $.fn.extend({
             }
             if(template[key].isFixed){ 
                 td.addClass('fixedColumn');
+                if(key=='rowButtons') td.addClass('fixed-right');
             }
             if(!columnVisibility.hasOwnProperty(key) || !columnVisibility[key]){
                 if(td!=undefined) td.hide();
@@ -654,6 +694,7 @@ $.fn.extend({
                 
                 $(ths[index]).data('tooltip',"按"+$(ths[index]).text()+"排序");
                 $(ths[index]).setTooltips();
+                $(ths[index]).off('click');
                 $(ths[index]).on('click',function(e){
                     
                     //$().mloader("show",{message:"排序中...."});
@@ -910,50 +951,50 @@ $.fn.extend({
             
         }else if (columnData.type=='date') {
             if(!columnData.isASC){
-                data=data.sort(function(a,b){return new Date(b[columnData.id])>new Date(a[columnData.id])});
-                source=source.sort(function(a,b){return new Date(b[columnData.id])>new Date(a[columnData.id])});
+                data=data.sort(function(a,b){return compareDate(a[columnData.id],b[columnData.id]);});
+                source=source.sort(function(a,b){return compareDate(a[columnData.id],b[columnData.id]);});
             }else{
-                data=data.sort(function(a,b){return new Date(a[columnData.id])>new Date(b[columnData.id])});
-                source=source.sort(function(a,b){return new Date(b[columnData.id])>new Date(a[columnData.id])});
+                data=data.sort(function(a,b){return compareDate(b[columnData.id],a[columnData.id]);});
+                source=source.sort(function(a,b){return compareDate(b[columnData.id],a[columnData.id]);});
             }
         }
         $(this).jqmData('currentData',data);
         $(this).jqmData('source',source);
 
-        console.log(columnData,data);
+        console.log("sortColumn",columnData,data,source,new Date('0000-00-00 00:00:00'));
         $(this).updateTable();
     },
     setFixedHead:function(container) {
         var _this=this;
-        const resizeObserver = new ResizeObserver(entries => {
-            for (let entry of entries) {
-                var clones=$(entry.target).jqmData('clone');
-                clones.forEach(clone=>{
+        // const resizeObserver = new ResizeObserver(entries => {
+        //     for (let entry of entries) {
+        //         var clones=$(entry.target).jqmData('clone');
+        //         clones.forEach(clone=>{
 
-                    $(clone).css('width',$(entry.target).width());
-                    $(clone).css('min-width',$(entry.target).width());
-                })
-            }
-        });
-        //console.log('thead',table.find('thead'));
-        var _Header=$(this).find('thead').clone();
-        var _table_fixed=$('<table data-role="table" class="ui-responsive table-stroke fixed-header" style="margin: 0px 0px;text-shadow: none;width: 100%;position: fixed;z-index:100;"></table>');
-        //_Header.css({'background': '#262626',color:'white'})
-        _Header.css({'background': 'white'})
-        _table_fixed.append(_Header);
-        _table_fixed.trigger('create');
-        //_table_fixed.hide();
-        if(container!=undefined) {
-            $(container).append(_table_fixed);
-            $(container).trigger('create');
-        }else{
+        //             $(clone).css('width',$(entry.target).width());
+        //             $(clone).css('min-width',$(entry.target).width());
+        //         })
+        //     }
+        // });
+        // //console.log('thead',table.find('thead'));
+        // var _Header=$(this).find('thead').clone();
+        // var _table_fixed=$('<table data-role="table" class="ui-responsive table-stroke fixed-header" style="margin: 0px 0px;text-shadow: none;width: 100%;position: fixed;z-index:100;"></table>');
+        // //_Header.css({'background': '#262626',color:'white'})
+        // _Header.css({'background': 'white'})
+        // _table_fixed.append(_Header);
+        // _table_fixed.trigger('create');
+        // //_table_fixed.hide();
+        // if(container!=undefined) {
+        //     $(container).append(_table_fixed);
+        //     $(container).trigger('create');
+        // }else{
 
-            $(this).parent().prepend(_table_fixed);
-            $(this).parent().trigger('create');
-        }
-        var _ths=_table_fixed.find('thead').find('th');
-        $.each( $(this).find('thead').find('th'),(index,th)=>{
-            $(th).jqmData('clone',[_ths[index]]);
+        //     $(this).parent().prepend(_table_fixed);
+        //     $(this).parent().trigger('create');
+        // }
+        var _ths=$(this).find('thead').find('th');
+        $.each( _ths,(index,th)=>{
+            //$(th).jqmData('clone',[_ths[index]]);
             if(index==_ths.length-1) {
                 var columnToggler=$('<i class="fa fa-gear" data-tooltip="筛选列"></i>');
                 $(_ths[index]).empty();
@@ -966,9 +1007,9 @@ $.fn.extend({
                 //console.log('isNormal',($(ref_ths[index]).outerWidth()/window.innerWidth>0.1),$(ref_ths[index]).outerWidth(),window.innerWidth);
                 //resizeTables($(ref_ths[index]).outerWidth()/window.innerWidth>0.1,true);
             }
-            resizeObserver.observe(th);
+            //resizeObserver.observe(th);
         });
-        $(this).jqmData('fixedHead',_table_fixed);
+        $(this).jqmData('fixedHead',$(this));
         
         $(this).setCheckboxes();
         $(this).setSort();

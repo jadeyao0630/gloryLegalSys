@@ -136,6 +136,7 @@ $('body').on(main_load_completed_event_name,function(){
     console.error('main_load_completed_event_name','complate.........');
     const intervalId = setInterval(() => {
         console.log('waiting....',watinglist)
+        
         if (watinglist.hasOwnProperty('settings')) {
             clearInterval(intervalId);
             
@@ -200,7 +201,7 @@ $('body').on(main_load_completed_event_name,function(){
         $.each($('.tooltip-btn'),(index,btn)=>{
             $(btn).setTooltips();
         });
-        $('#main-body').css({'max-height':$(window).height()-130})
+        setTableMaxHeight();
     }, 100);
 });
 $('body').on(preload_completed_event_name,function(){
@@ -220,15 +221,15 @@ $('body').on(preload_completed_event_name,function(){
                 $('.header-btn-search').text('收起');
                 //form.animate({'height':"200px"});
                 $('#pageOneTable').animate({'margin-top':145+slidedownOffset+"px"})
-                $('#table-fixed-column').animate({'top':83+145+slidedownOffset+"px"})
+                //$('#table-fixed-column').animate({'top':83+145+slidedownOffset+"px"})
             }
         }else{
             //$('#header-filter-container').empty();
             if(isbefore){
                 form.slideUp();
                 $('.header-btn-search').text('更多');
-                $('#pageOneTable').animate({'margin-top':"0px"})
-                $('#table-fixed-column').animate({'top':83+"px"})
+                $('#pageOneTable').animate({'margin-top':"-2px"})
+                //$('#table-fixed-column').animate({'top':83+"px"})
                 isHeaderLocked=false;
                 $('.header-filter-btn.ui-icon-lock.btn-icon-green').removeClass('btn-icon-green');
                 
@@ -250,8 +251,15 @@ $('body').on(preload_completed_event_name,function(){
 	});
     */
    
-    
+    var legalcounsels=Object.keys(resourceDatas.legalCounsels).map(key => resourceDatas.legalCounsels[key]);
+    var _legalcounsels=[];
+    legalcounsels.forEach(item=>{
+        _legalcounsels=_legalcounsels.concat(item);
+    })
     _firstPageTableColumns.rowButtons.data=tableFunBtns;
+    _firstPageTableColumns.firstLegalCounsel.data = _legalcounsels;
+    _firstPageTableColumns.secondLegalCounsel.data = _legalcounsels;
+    console.log("resourceDatas.legalCounsels",_legalcounsels);
     $("#pageOneTable").pagination({
         //source:DataList.casesDb,
         tableTemplate:_firstPageTableColumns,
@@ -486,8 +494,21 @@ $('body').on(preload_completed_event_name,function(){
     });
     
 })
+var fixedColumnPosition={};
 $('#main-body').on('scroll',function(e){
     $("#pageOneTable").jqmData('fixedHead').css({'left':$("#main-body").scrollLeft()*-1})
+    //$("#pageOneTable").find('.fixedColumn').css({'left':$("#main-body").scrollLeft()*-1})
+    // $.each($("#pageOneTable").find('.fixedColumn'),(index,column)=>{
+    //     //console.log($(column).attr('name'),column.getBoundingClientRect().left);
+    //     var name=$(column).attr('name');
+    //     if(!fixedColumnPosition.hasOwnProperty(name)){
+    //         fixedColumnPosition[name]=column.getBoundingClientRect()
+    //     }
+    //     var offset=$(column).prop('tagName')=="TH"?$("#main-body").scrollLeft():0;
+    //     if($(column).hasClass('fixed-right')) $(column).css({"right":$(column).prop('tagName')=="TH"?$("#main-body").scrollLeft():0})
+    //     else $(column).css({"left":$(column).prop('tagName')=="TH"?$("#main-body").scrollLeft():fixedColumnPosition[name].left})
+    // });
+
 })
 
 $('body').on('userDataChanged',function(e){
@@ -766,8 +787,12 @@ $.mobile.document.one( "filterablecreate", "#pageOneTable", function() {
     });
 });
 window.addEventListener('resize',function(){
-    $('#main-body').css({'max-height':$(window).height()-130})
-})
+    setTableMaxHeight();
+})  
+function setTableMaxHeight(){
+    $('.ui-content').css({'max-height':$(window).height()-83});
+    $('#main-body').css({'max-height':$(window).height()-130});
+}
 function setPersonCaseSum(data){
     if(data==undefined) data=DataList.combinedData;
     var personCaseSum=getPersonCaseSum(data);

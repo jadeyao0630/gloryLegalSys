@@ -371,9 +371,11 @@ ui-collapsible.collapsible-listview .ui-btn{
 
 /* 主表格 */
 #pageOneTable{
-    margin: 0px 0px 0px 0px;
+    margin: -2px 0px 0px 0px;
     width:100%;
     overflow: hidden;
+    border-top: 2px solid orangered;
+
 }
 .textOverflow{
     white-space: nowrap; 
@@ -387,6 +389,15 @@ ui-collapsible.collapsible-listview .ui-btn{
     min-width: 25px;
     border-right: 1px solid rgba(0,0,0,.05);
 }
+#pageOneTable thead{
+  
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+#pageOneTable thead tr{
+  position: sticky;
+  top:0;
+  z-index: 1000;
+}
 #pageOneTable thead tr th{
     text-align: center;
     vertical-align: middle;
@@ -395,7 +406,9 @@ ui-collapsible.collapsible-listview .ui-btn{
     text-overflow: ellipsis;
     border-right: 1px solid rgba(0,0,0,.05);
     min-width: 25px;
- 
+    position: relative;
+    background: white;
+    color:#333;
 }
 #table-fixed-column{
     position: fixed;
@@ -417,6 +430,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     border-bottom:1px solid rgba(0,0,0,.05);
 }
 #pageOneTable-fixed{
+  display: none;
     margin: 0px 0px;
     color:#333;
     text-shadow: none;
@@ -769,3 +783,29 @@ ui-collapsible.collapsible-listview .ui-btn{
   max-height: 500px;
   overflow-y:scroll;
 }
+.ui-dialog{
+  max-height: 100%;
+  overflow: scroll;
+}
+body .ui-content{
+  overflow-y: scroll;
+  max-height: 100%;
+}
+/*
+.fixedColumn.fixed-right{
+  position: sticky;
+  right:0;
+  z-index: 1001;
+}
+.fixedColumn{
+  position: sticky;
+  left:0;
+  z-index: 1001;
+}
+
+th.fixedColumn{
+  position: fixed;
+  right:0;
+  z-index: 1001;
+}
+*/

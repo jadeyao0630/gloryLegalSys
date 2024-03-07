@@ -580,7 +580,37 @@ class DbService{
             }
         }
     }
+    async execute(query){
+        var error_mesg;
+        try{
+            var query;
+            const response = await new Promise((resolve,reject)=>{
 
+                mquery(query, (err,result)=>{
+                    if (err) {
+                        reject(new Error(err.message));
+                        error_mesg=err;
+                    }
+
+                        resolve(result);
+                    
+                    //console.log(result);
+                });
+            });
+            
+            //console.log("typeof: "+(typeof response));
+            return {
+                data: response,
+                query:query,
+                success:true
+            };
+        }catch(error){
+            console.log(error);
+            return{
+                data:error_mesg,success:false,state:'error'
+            }
+        }
+    }
     //#region 功能
     async login(name, pass){
         try{

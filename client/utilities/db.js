@@ -423,6 +423,15 @@ async function update(where,table,data,res){
         if(res!=undefined)res(data);
     });
 }
+
+async function execute(query){
+    return await fetch("http://"+ip+":"+port+"/execute",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ query:query})
+    }).then(response => response.json());
+}
+
 async function createTable(table,template,res){
     await fetch("http://"+ip+":"+port+"/createTable",{
         headers:{

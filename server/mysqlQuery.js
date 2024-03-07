@@ -10,7 +10,7 @@ dotenv.config({
 });
 var pool = mysql.createPool({
     host: env.HOST,
-    user:env.USER,
+    user:env.HOST==='192.168.10.241'||env.HOST==='192.168.10.242'?'glory':env.USER,
     password:env.PASSWORD,
     database:env.DATABASE,
     port:env.DB_PORT,

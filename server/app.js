@@ -27,10 +27,11 @@ const _ftp = require('ftp');
 
 const path = require('path');
 const { env } = process;
+console.log('env.NODE_ENV',process.env.NODE_ENV)
 dotenv.config({
     path: path.resolve(
         __dirname,
-        `./env.${env.NODE_ENV ? env.NODE_ENV : "local"}`
+        `./env.${env.NODE_ENV ? env.NODE_ENV : "home"}`
       ),
 });
 
@@ -713,6 +714,16 @@ app.post('/restoreItem',(request,response) => {
     result
     .then(data => response.json({data:data}) )
     .catch(err => console.log(err));
+});
+
+app.post('/execute',(request,response) => {
+  //console.log("request.body "+request.header('Content-Type'));
+  const {query} = request.body;
+  const  db= DbService.getDbServiceInstance();
+  const result = db.execute(query);
+  result
+  .then(data => response.json({data:data}) )
+  .catch(err => console.log(err));
 });
 
 server.listen(process.env.PORT, () => console.log('app is runing at port: '+process.env.PORT,'mysql host: '+process.env.HOST))

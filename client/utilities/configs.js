@@ -1,11 +1,11 @@
 var isRunLocal=true;//https://socket.io/get-started/chat/
 var IPS=[
-    {ip:'192.168.10.141',port:5555},
+    {ip:'192.168.10.241',port:5555},
     {ip:'192.168.10.68',port:5555},
     {ip:'192.168.10.68',port:5556},
     {ip:'cn.luyao.site',port:5568}]
 var showDebug=false;
-const serverSelection=IPS[1]
+const serverSelection=IPS[0]
 let ip=serverSelection.ip;
 let port=serverSelection.port;
 var auth_code='1234';

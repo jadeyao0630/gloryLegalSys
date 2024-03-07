@@ -1215,8 +1215,18 @@ $('.case_reg_but').on('click',async function(e){
         $().requestDialog({content:select,message:"请选择要分配的法务"},function(isYes,selt){
             if(isYes){
                 //$().mloader('show',{message:"读取中..."});
-                console.log($(selt).find('option:selected').val())
-            
+                //console.log("currentSelectedCases:",currentSelectedCases,$(selt).find('option:selected').val(),currentData.filter(item=>currentSelectedCases.includes(item.id)))
+                var where=[];
+                currentSelectedCases.forEach(id=>{
+                    var newData={id:id,legalAgencies:Number($(selt).find('option:selected').val())};
+                    DataList.combinedData=updateOriginalData(DataList.combinedData,newData,"id");
+                    DataList.casesDb=updateOriginalData(DataList.casesDb,newData,"id");
+                    $('#pageOneTable').updateTableItem(newData);
+                    where.push('id = '+id);
+                })
+                var query="UPDATE caseStatus SET legalAgencies = "+$(selt).find('option:selected').val()+" WHERE "+where.join(' OR ');
+                execute(query).then(r=>console.log(r));
+                //console.log("currentSelectedCases:",DataList.combinedData,query);
                 
             }
             

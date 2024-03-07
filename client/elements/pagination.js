@@ -139,11 +139,11 @@ function checkChanged(self){
     console.log($(self).jqmData('table'));
     var table=$(self).jqmData('table');
     var checkboxAll=$($(table).jqmData('fixedHead')!=null?$(table).jqmData('fixedHead'):$(table)).find('.reg-checkbox-all');
-    $.each($(table).find("input[type=checkbox][name=item_checkbox]"),function(index,checkbox) {
-                var tr=$(table).find('tbody > tr');
-                $(checkboxAll).prop("checked",
-                    tr.not(':hidden').length==tr.not(':hidden').find('input[type="checkbox"]:checked').length);
-    });
+    // $.each($(table).find("input[type=checkbox][name=item_checkbox]"),function(index,checkbox) {
+    //             var tr=$(table).find('tbody > tr');
+    //             $(checkboxAll).prop("checked",
+    //                 tr.not(':hidden').length==tr.not(':hidden').find('input[type="checkbox"]:checked').length);
+    // });
     if($(self).prop('checked')) {
         console.log($(self).jqmData('item'));
         currentSelectedCases.push($(self).jqmData('item').id)
@@ -151,6 +151,12 @@ function checkChanged(self){
     }else{
         currentSelectedCases=currentSelectedCases.filter(id=>id!=$(self).jqmData('item').id)
     }
+    
+    var tr=$(table).find('tbody > tr');
+    $(checkboxAll).prop("checked",
+        //tr.not(':hidden').length==tr.not(':hidden').find('input[type="checkbox"]:checked').length
+        currentSelectedCases.length==$(table).jqmData('currentData').length
+    );
 }
 function getTdHtml(template,data,id){
     var td=$('<td name="'+id+'"" style="text-align: center;vertical-align: middle;"></td>');
@@ -216,6 +222,7 @@ $.fn.extend({
         _this.jqmData('enableFixedColumn',true);
         _this.jqmData('updateTask',undefined);
         _this.jqmData('currentAnimations',[]);
+        _this.jqmData('currentSelected',[]);
         
         if(arg!=undefined){
             $.each(arg,(k,v)=>{
@@ -304,7 +311,12 @@ $.fn.extend({
         var checkboxAll=$($(this).jqmData('fixedHead')!=null?$(this).jqmData('fixedHead'):$(this)).find('.reg-checkbox-all');
         $(checkboxAll).on('change',function() {
             var tr=$(_this).find('tbody > tr');
-            //console.log('change');
+            console.log('checkboxAll change');
+            if($(this).prop('checked')){
+                currentSelectedCases=_this.jqmData('currentData').map(item => item.id);
+            }else{
+                currentSelectedCases=[];
+            }
             tr.not(':hidden').find('input[type="checkbox"]').prop( "checked", $(this).prop('checked') );
 
         });
@@ -425,23 +437,39 @@ $.fn.extend({
 
     },
     restoreTableItem:function(callback){
+        var _this=this;
         var checkboxAll=$($(this).jqmData('fixedHead')!=null?$(this).jqmData('fixedHead'):$(this)).find('.reg-checkbox-all');
-        checkboxAll.prop('checked',false);
+        
         var checked=$(this).find('.reg-checkbox:checked');
-        checkboxAll.trigger('change');
+        
         var deletedId=[];
-        $.each(checked,(index,checkbox)=>{
-            $(checkbox).closest('tr').removeClass('inactived-row');
-            var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
-            $(this).jqmData('source')[itemIndex].isInactived=0;
-            itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
-            $(this).jqmData('currentData')[itemIndex].isInactived=0;
-            deletedId.push($(checkbox).jqmData('item').id);
-            $(checkbox).prop('checked',false);
-        });
+        // $.each(checked,(index,checkbox)=>{
+        //     $(checkbox).closest('tr').removeClass('inactived-row');
+        //     var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
+        //     $(this).jqmData('source')[itemIndex].isInactived=0;
+        //     itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
+        //     $(this).jqmData('currentData')[itemIndex].isInactived=0;
+        //     deletedId.push($(checkbox).jqmData('item').id);
+        //     $(checkbox).prop('checked',false);
+        // });
+        currentSelectedCases.forEach((selected)=>{
+            //console.log("removeTableItem",selected);
+            var selectedTr=$(_this).find('tr[data-item="'+selected+'"]');
+            selectedTr.removeClass('inactived-row');
+            var sourceSelected=$(_this).jqmData('source').filter(data=>data.id==selected);
+            if(sourceSelected.length>0) sourceSelected[0].isInactived=0;
+            //$(_this).jqmData('currentData')[selected].isInactived=1;
+            var currentDataSelected=$(_this).jqmData('currentData').filter(data=>data.id==selected);
+            if(currentDataSelected.length>0) currentDataSelected[0].isInactived=0;
+            selectedTr.find('.reg-checkbox:checked').prop('checked',false);
+            deletedId.push(selected);
+        })
         const intervalId = setInterval(() => {
-            if (deletedId.length==checked.length) {
+            if (deletedId.length==currentSelectedCases.length) {
                 clearInterval(intervalId);
+                checkboxAll.prop('checked',false);
+                checkboxAll.trigger('change');
+                currentSelectedCases=[];
                 if(callback!=undefined) callback(deletedId);
                 
             }
@@ -458,38 +486,71 @@ $.fn.extend({
         var tbody=$(this).find('tbody');
         var checked=$(this).find('.reg-checkbox:checked');
         var deletedId=[];
-        checkboxAll.prop('checked',false);
-        checkboxAll.trigger('change');
-        console.log("checked id",$(checked));
-        if(isColorRemove){
+        //checkboxAll.prop('checked',false);
+        //checkboxAll.trigger('change');
+        console.log("checked id",$(checked),currentSelectedCases);
+        //currentSelectedCases=[];
+        if(isColorRemove){//管理员账号，不需要删除动画
             
-            $.each(checked,(index,checkbox)=>{
-                console.log("id",$(checkbox).jqmData('item'));
-                $(checkbox).closest('tr').addClass('inactived-row');
-                var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
-                $(this).jqmData('source')[itemIndex].isInactived=1;
-                itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
-                $(this).jqmData('currentData')[itemIndex].isInactived=1;
-                deletedId.push($(checkbox).jqmData('item').id);
-                $(checkbox).prop('checked',false);
-            });
+            // $.each(checked,(index,checkbox)=>{
+            //     console.log("id",$(checkbox).jqmData('item'));
+            //     $(checkbox).closest('tr').addClass('inactived-row');
+            //     var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
+            //     $(this).jqmData('source')[itemIndex].isInactived=1;
+            //     itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
+            //     $(this).jqmData('currentData')[itemIndex].isInactived=1;
+            //     deletedId.push($(checkbox).jqmData('item').id);
+            //     $(checkbox).prop('checked',false);
+            // });
+            currentSelectedCases.forEach((selected)=>{
+                //console.log("removeTableItem",selected);
+                var selectedTr=$(_this).find('tr[data-item="'+selected+'"]');
+                selectedTr.addClass('inactived-row');
+                var sourceSelected=$(_this).jqmData('source').filter(data=>data.id==selected);
+                if(sourceSelected.length>0) sourceSelected[0].isInactived=1;
+                //$(_this).jqmData('currentData')[selected].isInactived=1;
+                var currentDataSelected=$(_this).jqmData('currentData').filter(data=>data.id==selected);
+                if(currentDataSelected.length>0) currentDataSelected[0].isInactived=1;
+                selectedTr.find('.reg-checkbox:checked').prop('checked',false);
+                deletedId.push(selected);
+            })
         }else{
             var removedRows=[];
             var addedRows=[];
-            $.each(checked,(index,checkbox)=>{
-                removedRows.push($(checkbox).closest('tr'));
-                //var itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
-                //$(this).jqmData('currentData').splice(itemIndex,1);
-                var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
-                $(this).jqmData('source').splice(itemIndex,1);
-                itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
-                $(this).jqmData('currentData').splice(itemIndex,1);
-                deletedId.push($(checkbox).jqmData('item').id);
-                $(checkbox).prop('checked',false);
-            });
-            _this.rebuiltPageIndicator();
+            // $.each(checked,(index,checkbox)=>{
+            //     removedRows.push($(checkbox).closest('tr'));
+            //     //var itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
+            //     //$(this).jqmData('currentData').splice(itemIndex,1);
+            //     var itemIndex=$(this).jqmData('source').indexOf($(checkbox).jqmData('item'));
+            //     $(this).jqmData('source').splice(itemIndex,1);
+            //     itemIndex=$(this).jqmData('currentData').indexOf($(checkbox).jqmData('item'));
+            //     $(this).jqmData('currentData').splice(itemIndex,1);
+            //     deletedId.push($(checkbox).jqmData('item').id);
+            //     $(checkbox).prop('checked',false);
+            // });
+            var source=$(_this).jqmData('source');
+            var currentData=$(_this).jqmData('currentData');
+            currentSelectedCases.forEach((selected)=>{
+                //console.log("removeTableItem",selected);
+                var selectedTr=$(_this).find('tr[data-item="'+selected+'"]');
+                if(selectedTr.length>0) removedRows.push(selectedTr);
+
+                source=source.filter(data=>data.id!=selected);
+                currentData=currentData.filter(data=>data.id!=selected);
+
+                selectedTr.find('.reg-checkbox:checked').prop('checked',false);
+                deletedId.push(selected);
+                
+            })
+            
+            var preNumItem=currentSelectedCases.filter(index=>index<nextPageSart);
+            for(var i=nextPageSart.length;i<nextPageSart+preNumItem.length;i++){
+                deletedId.push(currentData[i].id);
+            }
+            console.log(preNumItem,deletedId)
             if (nextPageSart<$(this).jqmData('currentData').length){
-                for(var i=nextPageSart;i<nextPageSart+checked.length;i++){
+                var nextNumItem=currentSelectedCases.filter(index=>index>nextPageSart+$(this).jqmData('itemsPerPage'));
+                for(var i=nextPageSart;i<nextPageSart+preNumItem.length+checked.length;i++){
                 
                     var tr=$('<tr></tr>');
                     var row=$(this).jqmData('currentData')[i];
@@ -500,9 +561,12 @@ $.fn.extend({
                     addedRows.push(tr);
                 }
             }
-            
+            $(_this).jqmData('source',source);
+            $(_this).jqmData('currentData',currentData);
+            _this.rebuiltPageIndicator();
             //console.log('removeTableItem',removedRows,addedItems);
             removedRows.forEach((row,index)=>{
+                var id=$(row).jqmData("item");
                 _this.itemRowAnimation(row,'slideout',800,function(res){
                     if(!res){
                         if(addedRows.length>0 && addedRows.length>index){
@@ -513,6 +577,8 @@ $.fn.extend({
 
                             setTimeout(() => {
                                 _this.itemRowAnimation(newItem,'slidein',500,function(res){
+                                    console.log("removedRows:",id);
+                                    //deletedId.push(id);
                                 });
                                 
                             }, 100);
@@ -525,8 +591,12 @@ $.fn.extend({
         }
         
         const intervalId = setInterval(() => {
-            if (deletedId.length==checked.length) {
+            if (deletedId.length==currentSelectedCases.length) {
                 clearInterval(intervalId);
+                checkboxAll.prop('checked',false);
+                checkboxAll.trigger('change');
+                currentSelectedCases=[];
+                console.log("deletedId",deletedId);
                 if(callback!=undefined) callback(deletedId);
                 
             }

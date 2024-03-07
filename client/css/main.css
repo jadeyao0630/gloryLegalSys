@@ -355,6 +355,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     padding: 0px 0px;
     z-index: 102;
     height:auto;
+    border-bottom: 2px solid orangered;
   }
   .header-filter-container-div{
     background: white;
@@ -374,7 +375,6 @@ ui-collapsible.collapsible-listview .ui-btn{
     margin: -2px 0px 0px 0px;
     width:100%;
     overflow: hidden;
-    border-top: 2px solid orangered;
 
 }
 .textOverflow{
@@ -390,12 +390,21 @@ ui-collapsible.collapsible-listview .ui-btn{
     border-right: 1px solid rgba(0,0,0,.05);
 }
 #pageOneTable thead{
-  
   border-bottom: 1px solid rgba(0,0,0,.05);
+  
 }
 #pageOneTable thead tr{
+  
+  
   position: sticky;
   top:0;
+  z-index: 1000;
+}
+#pageOneTable.slideDown thead tr{
+  
+  
+  position: sticky;
+  top:186.8px;
   z-index: 1000;
 }
 #pageOneTable thead tr th{

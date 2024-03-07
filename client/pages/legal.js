@@ -220,7 +220,10 @@ $('body').on(preload_completed_event_name,function(){
                 form.slideDown();
                 $('.header-btn-search').text('收起');
                 //form.animate({'height':"200px"});
-                $('#pageOneTable').animate({'margin-top':145+slidedownOffset+"px"})
+                //$('#pageOneTable').addClass('slideDown');
+                $('#pageOneTable').animate({'margin-top':145+slidedownOffset+"px"},()=>{
+                    $('#pageOneTable').addClass('slideDown');
+                })
                 //$('#table-fixed-column').animate({'top':83+145+slidedownOffset+"px"})
             }
         }else{
@@ -228,7 +231,10 @@ $('body').on(preload_completed_event_name,function(){
             if(isbefore){
                 form.slideUp();
                 $('.header-btn-search').text('更多');
-                $('#pageOneTable').animate({'margin-top':"-2px"})
+                
+                $('#pageOneTable').removeClass('slideDown');
+                $('#pageOneTable').animate({'margin-top':"-2px"},()=>{
+                })
                 //$('#table-fixed-column').animate({'top':83+"px"})
                 isHeaderLocked=false;
                 $('.header-filter-btn.ui-icon-lock.btn-icon-green').removeClass('btn-icon-green');

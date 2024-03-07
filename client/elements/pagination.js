@@ -144,7 +144,13 @@ function checkChanged(self){
                 $(checkboxAll).prop("checked",
                     tr.not(':hidden').length==tr.not(':hidden').find('input[type="checkbox"]:checked').length);
     });
-    //if(!$(self).prop('checked')) $($(self).jqmData('checkboxAll')).prop('checked',false);
+    if($(self).prop('checked')) {
+        console.log($(self).jqmData('item'));
+        currentSelectedCases.push($(self).jqmData('item').id)
+        //$($(self).jqmData('checkboxAll')).prop('checked',false);
+    }else{
+        currentSelectedCases=currentSelectedCases.filter(id=>id!=$(self).jqmData('item').id)
+    }
 }
 function getTdHtml(template,data,id){
     var td=$('<td name="'+id+'"" style="text-align: center;vertical-align: middle;"></td>');
@@ -172,7 +178,8 @@ function getTdHtml(template,data,id){
             ele=$('<label>'+date+'</label>');
             break;
         case "checkbox":
-            ele=$('<input class="reg-checkbox" style="left:0px;" type="checkbox" data-mini="true" onclick="checkChanged(this)" name="item_checkbox" data-item='+data+'>');
+            ele=$('<input class="reg-checkbox" style="left:0px;" type="checkbox" data-mini="true" onchange="checkChanged(this)" name="item_checkbox" data-item='+data+'>');
+            ele.prop("checked",currentSelectedCases.includes(data.id));
             ele.jqmData('item',data)
             break;
         case "buttons":

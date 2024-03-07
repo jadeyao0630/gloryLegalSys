@@ -1274,24 +1274,25 @@ var _summary_template;
         isCollapsibleGrouping:false,
       },
       template:{
-        exportFileName:{
-          label:"文件名:",
-          placeholder:"文件名",
-          type:"text",
-          isOptional:true,
-        },
+        
         columns:{
-          label:"需要的表头",
+          label:"选择表头",
           type:"checkgroup",
           //data:
           isOptional:true,
           valueKey:'key',
           displayFormat:'{label}',
         },
+        exportFileName:{
+          label:"文件名:",
+          placeholder:"文件名",
+          type:"text",
+          isOptional:true,
+        },
         __formLabel:{
           label:"<span class='optionMark'>*</span> 文件名选填，默认文件名为当天日期 'export_yyyy年MM月dd日.xlsx'。",
           type:"label",
-        }
+        },
       }
     }
     export_chart_template={

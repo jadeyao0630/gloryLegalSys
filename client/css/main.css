@@ -777,6 +777,7 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 .form-controlgroup .ui-checkbox .controlGroup-checkbox{
   border-width: 1px;
+  text-align: center;
 }
 
 .popup-columnFilter{

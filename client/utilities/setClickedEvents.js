@@ -2,7 +2,7 @@ var lockeventListener=[];
 var isAddPage=false;
 var excutePoint=3;
 var titleBarDisplayFormat="{caseNo} [{id}]";
-
+var currentSelectedCases=[];
 var currentForm,currentEvents;
 $('.popup-add-table').on('click',function(e){
     //createBasicDatabase();
@@ -1194,6 +1194,33 @@ $('.case_reg_but').on('click',async function(e){
         //setChartPage({data:chartCaseCause,caption:'案件纠纷数量比例',type:"pie3d"},{data:chartCaseCause1,caption:'案件纠纷涉及金额',type:"bar2d"},);
         //$('#chart_sum').trigger('create')
         goToPage( $(this).attr( "href" ));
+    }
+    else if(this.id=="case_assign"){
+        var _this=this;
+        var select=$('<select id="user_edit_select" data-native-menu="true" class="filterSelect"></select>');
+        $.each(resourceDatas['legalAgencies'],(index,user)=>{
+            console.log(user);
+            if(user.name!=="无"){
+                var option=$('<option value="'+(user.id)+'">'+user.name+'</option>');
+                if(user.isInactived.constructor == String) user.isInactived=parseInt(user.isInactived);
+                if(user.isInactived){
+                    option.addClass('item-inActived');
+                }
+                select.append(option);
+            }
+            
+        });
+        //select.selectmenu().selectmenu('refresh', true);
+        select.trigger('create');
+        $().requestDialog({content:select,message:"请选择要分配的法务"},function(isYes,selt){
+            if(isYes){
+                //$().mloader('show',{message:"读取中..."});
+                console.log($(selt).find('option:selected').val())
+            
+                
+            }
+            
+        });
     }
 })
 

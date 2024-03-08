@@ -933,8 +933,8 @@ $.fn.extend({
         
     },
     setTableStripe:function(isEnabled){
-        if(isEnabled) $(this).addClass('table-stripe');
-        else $(this).removeClass('table-stripe');
+        if(isEnabled) $(this).addClass('tableStripe');
+        else $(this).removeClass('tableStripe');
         $(this).trigger('create');
     },
     setColumnToggle:function(){
@@ -1064,16 +1064,14 @@ $.fn.extend({
     },
     setFixedHead:function(container) {
         var _this=this;
-        // const resizeObserver = new ResizeObserver(entries => {
-        //     for (let entry of entries) {
-        //         var clones=$(entry.target).jqmData('clone');
-        //         clones.forEach(clone=>{
-
-        //             $(clone).css('width',$(entry.target).width());
-        //             $(clone).css('min-width',$(entry.target).width());
-        //         })
-        //     }
-        // });
+        const resizeObserver = new ResizeObserver(entries => {
+            for (let entry of entries) {
+                //var clones=$(entry.target).jqmData('clone');
+                var name=$(entry.target).attr('name');
+                fixedColumnPosition[name]=entry.target.getBoundingClientRect()
+                
+            }
+        });
         // //console.log('thead',table.find('thead'));
         // var _Header=$(this).find('thead').clone();
         // var _table_fixed=$('<table data-role="table" class="ui-responsive table-stroke fixed-header" style="margin: 0px 0px;text-shadow: none;width: 100%;position: fixed;z-index:100;"></table>');
@@ -1105,7 +1103,7 @@ $.fn.extend({
                 //console.log('isNormal',($(ref_ths[index]).outerWidth()/window.innerWidth>0.1),$(ref_ths[index]).outerWidth(),window.innerWidth);
                 //resizeTables($(ref_ths[index]).outerWidth()/window.innerWidth>0.1,true);
             }
-            //resizeObserver.observe(th);
+            resizeObserver.observe(th);
         });
         $(this).jqmData('fixedHead',$(this));
         

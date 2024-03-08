@@ -221,11 +221,14 @@ $('body').on(preload_completed_event_name,function(){
                 $('.header-btn-search').text('收起');
                 //form.animate({'height':"200px"});
                 //$('#pageOneTable').addClass('slideDown');
+                $('#pageOneTable').find('thead tr th').css({'border-top':'2px solid orangered'})
                 $('#pageOneTable').animate({'margin-top':145+slidedownOffset+"px"},()=>{
                     //$('#pageOneTable').addClass('slideDown');
                     
                 })
-                $('#pageOneTable').find('thead tr').animate({'top':(186.8-$("#main-body").scrollLeft())+'px'})
+                $('#pageOneTable').find('thead tr th').animate({'top':(186.8-$("#main-body").scrollLeft())+'px'},()=>{
+                    
+                })
                 //$('#table-fixed-column').animate({'top':83+145+slidedownOffset+"px"})
             }
         }else{
@@ -235,7 +238,10 @@ $('body').on(preload_completed_event_name,function(){
                 $('.header-btn-search').text('更多');
                 
                 //$('#pageOneTable').removeClass('slideDown');
-                $('#pageOneTable').find('thead tr').animate({'top':'0'})
+                $('#pageOneTable').find('thead tr th').animate({'top':'0'},()=>{
+                    
+                    $('#pageOneTable').find('thead tr th').css({'border-top':'0px solid orangered'})
+                })
                 $('#pageOneTable').animate({'margin-top':"-2px"},()=>{
 
                 })
@@ -483,8 +489,15 @@ $('body').on(preload_completed_event_name,function(){
                     //setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
                     if(!isHeaderLocked){
                         form.slideUp();
-                        $('#pageOneTable').find('thead tr').animate({'top':'0'})
-                        $('#pageOneTable').animate({'margin-top':"0px"})
+                        //$('#pageOneTable').removeClass('slideDown');
+                        $('#pageOneTable').find('thead tr th').animate({'top':'0'},()=>{
+                    
+                            $('#pageOneTable').find('thead tr th').css({'border-top':'0px solid orangered'})
+                        })
+                        $('#pageOneTable').animate({'margin-top':"-2px"},()=>{
+
+                            
+                        })
                         $('.header-btn-search').text('更多');
                         $('#pageOneTable').trigger('create');
                     }
@@ -507,18 +520,18 @@ $('body').on(preload_completed_event_name,function(){
 })
 var fixedColumnPosition={};
 $('#main-body').on('scroll',function(e){
-    $("#pageOneTable").jqmData('fixedHead').css({'left':$("#main-body").scrollLeft()*-1})
+    //$("#pageOneTable").jqmData('fixedHead').css({'left':$("#main-body").scrollLeft()*-1})
     //$("#pageOneTable").find('.fixedColumn').css({'left':$("#main-body").scrollLeft()*-1})
-    // $.each($("#pageOneTable").find('.fixedColumn'),(index,column)=>{
-    //     //console.log($(column).attr('name'),column.getBoundingClientRect().left);
-    //     var name=$(column).attr('name');
-    //     if(!fixedColumnPosition.hasOwnProperty(name)){
-    //         fixedColumnPosition[name]=column.getBoundingClientRect()
-    //     }
-    //     var offset=$(column).prop('tagName')=="TH"?$("#main-body").scrollLeft():0;
-    //     if($(column).hasClass('fixed-right')) $(column).css({"right":$(column).prop('tagName')=="TH"?$("#main-body").scrollLeft():0})
-    //     else $(column).css({"left":$(column).prop('tagName')=="TH"?$("#main-body").scrollLeft():fixedColumnPosition[name].left})
-    // });
+    $.each($("#pageOneTable").find('.fixedColumn'),(index,column)=>{
+        //console.log($(column).attr('name'),column.getBoundingClientRect().left);
+        var name=$(column).attr('name');
+        // if(!fixedColumnPosition.hasOwnProperty(name)){
+        //     fixedColumnPosition[name]=column.getBoundingClientRect()
+        // }
+        // var offset=$(column).prop('tagName')=="TH"?$("#main-body").scrollLeft():0;
+        if($(column).hasClass('fixed-right')) $(column).css({"right":0})
+        else $(column).css({"left":fixedColumnPosition[name].left})
+    });
 
 })
 
@@ -686,11 +699,6 @@ $(window).on('saving',function(e){
 $(window).on('hidepopup',function(e){
     $().mloader('hide');
 })
-$(window).resize(function(e){
-    //console.log('高度',window.innerHeight,'宽度',window.innerWidth)
-    //resizeTables();
-    //resizeColumnFilter();
-});
 $( "#nav-panel" ).on( "panelbeforeopen", function( event, ui ) {
     //console.log($('#panel_sum_info').children().length)
     if($('#panel_sum_info').children().length==0){
@@ -803,6 +811,19 @@ window.addEventListener('resize',function(){
 function setTableMaxHeight(){
     $('.ui-content').css({'max-height':$(window).height()-83});
     $('#main-body').css({'max-height':$(window).height()-130});
+    // setTimeout(() => {
+    //     $.each($("#pageOneTable").find('th.fixedColumn'),(index,column)=>{
+    //         //console.log($(column).attr('name'),column.getBoundingClientRect().left);
+    //         var name=$(column).attr('name');
+    //         if(!fixedColumnPosition.hasOwnProperty(name)){
+    //             fixedColumnPosition[name]=column.getBoundingClientRect()
+    //         }
+    //         // var offset=$(column).prop('tagName')=="TH"?$("#main-body").scrollLeft():0;
+    //         //if($(column).hasClass('fixed-right')) $(column).css({"right":0})
+    //         //else $(column).css({"left":fixedColumnPosition[name].left})
+    //     });
+    // }, 1000);
+    
 }
 function setPersonCaseSum(data){
     if(data==undefined) data=DataList.combinedData;

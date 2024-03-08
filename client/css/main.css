@@ -355,7 +355,6 @@ ui-collapsible.collapsible-listview .ui-btn{
     padding: 0px 0px;
     z-index: 102;
     height:auto;
-    border-bottom: 2px solid orangered;
   }
   .header-filter-container-div{
     background: white;
@@ -375,6 +374,8 @@ ui-collapsible.collapsible-listview .ui-btn{
     margin: -2px 0px 0px 0px;
     width:100%;
     overflow: hidden;
+    border-spacing: 0;
+    position: relative;
 
 }
 .textOverflow{
@@ -388,25 +389,25 @@ ui-collapsible.collapsible-listview .ui-btn{
     max-width: 160px;
     min-width: 25px;
     border-right: 1px solid rgba(0,0,0,.05);
+    padding:.2rem .5rem;
+}
+#pageOneTable tbody tr td label{
+  margin:0;
 }
 #pageOneTable thead{
   
-  
 }
 #pageOneTable thead tr{
-  background-color: rgba(0,0,0,.05);
-  border-top: 2px solid orangered;
-  position: sticky;
-  top:0;
-  z-index: 1000;
+  
+  z-index: 100;
 }
 #pageOneTable.slideDown thead tr{
-  
-  border-top: none;
-  position: sticky;
-  z-index: 1000;
+
+  z-index: 100;
 }
 #pageOneTable thead tr th{
+  top:0;
+  position: sticky;
     text-align: center;
     vertical-align: middle;
     white-space: nowrap; 
@@ -414,10 +415,16 @@ ui-collapsible.collapsible-listview .ui-btn{
     text-overflow: ellipsis;
     border-right: 1px solid rgba(0,0,0,.05);
     min-width: 25px;
-    position: relative;
     background: white;
     color:#333;
+    padding:.5rem .5rem;
 }
+#pageOneTable thead tr th.fixedColumn{
+  z-index: 102;
+  
+  
+}
+
 #table-fixed-column{
     position: fixed;
     z-index:1100;
@@ -616,8 +623,23 @@ ui-collapsible.collapsible-listview .ui-btn{
   #pageOneTableselect-page::after{
     display:none;
   }
-  .table-stripe tbody tr:nth-child(2n+1):not(.inactived-row){
+  /*.table-stripe tbody tr:nth-child(2n+1):not(.inactived-row){
     background-color: rgba(255, 255, 255, 0.974);
+  }*/
+  .tableStripe tbody tr:nth-child(odd):not(.inactived-row) {
+    background-color: #f2f2f2; /* Your desired color */
+  }
+  .tableStripe tbody tr:nth-child(odd):not(.inactived-row) td.fixedColumn{
+    background-color: #f2f2f2; /* Your desired color */
+  }
+  .tableStripe tbody tr:nth-child(even):not(.inactived-row) {
+    background-color: white; /* Your desired color */
+  }
+  .tableStripe tbody tr:nth-child(even):not(.inactived-row) td.fixedColumn{
+    background-color: white; /* Your desired color */
+  }
+  .tableStripe tbody tr.inactived-row td.fixedColumn{
+    background-color: gray; /* Your desired color */
   }
   .address-book{
     
@@ -800,17 +822,18 @@ body .ui-content{
   overflow-y: scroll;
   max-height: 100%;
 }
-/*
-.fixedColumn.fixed-right{
-  position: sticky;
-  right:0;
-  z-index: 1001;
-}
+
 .fixedColumn{
   position: sticky;
-  left:0;
-  z-index: 1001;
+  z-index: 101;
 }
+.fixedColumn.fixed-right{
+  right:0;
+  
+  border-left: 1px solid rgba(0,0,0,.05);
+}
+/*
+
 
 th.fixedColumn{
   position: fixed;

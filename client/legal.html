@@ -83,8 +83,8 @@
             
         </div>
         <div id="main-body" class="ui-body-d ui-content" style="overflow-y: auto;overflow-x: auto;">
-            <table id="pageOneTable" class="ui-responsive table-stroke" data-input="#header-search-input"></table>
-            <!--<table id="table-fixed-column" data-role="table" class="ui-responsive table-stroke"></table>-->
+            <table id="pageOneTable" data-role="table" class="ui-responsive table-stroke" data-input="#header-search-input"></table>
+            <table id="table-fixed-column" data-role="table" class="ui-responsive table-stroke"></table>
             <div id="header-filter-container" class="header-filter-container">
                 <table id="pageOneTable-fixed" data-role="table" class="ui-responsive table-stroke"></table>
             </div>
@@ -96,7 +96,7 @@
 						<a href="#" id="case_reg_but_remove" data-tooltip="删除选的案件" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but footerBtn tooltip-btn">删除</a>
 						<a href="#" id="case_reg_but_restore" data-tooltip="恢复删除的案件" class="ui-btn ui-btn-icon-left ui-icon-recycle btn-icon-blue case_reg_but admin-ui tooltip-btn">还原</a>
 						<!--<input type="text" id="num-rows-page" style="max-width:60px;" placeholder="每页行数" data-wrapper-class="controlgroup-textinput ui-btn">-->
-						<a href="#" id="case_assign" data-tooltip="分配所选案件给指定法务" class="ui-btn ui-btn-icon-left ui-icon-user btn-icon-green case_reg_but admin-ui tooltip-btn">分配</a>
+						<a href="#" id="case_assign" data-tooltip="分配所选案件给指定法务" class="ui-btn ui-btn-icon-left ui-icon-user btn-icon-green case_reg_but super-ui tooltip-btn">分配</a>
 					</div>
 					<div id="pagination_container" style="position: absolute;transform: translateX(-50%);left: 50%;margin-top: 3px;"><a id="submit_rows_page" href="#" data-tooltip="修改表格相关设置" class="ui-btn ui-icon-grid btn-icon-wendyblue footerBtn case_reg_but ui-btn-icon-notext tooltip-btn" onclick="setRowsPrePageEvent()">表格设置</a></div>
 					<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-right ui-footer-btns">

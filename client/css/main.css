@@ -396,6 +396,7 @@ ui-collapsible.collapsible-listview .ui-btn{
 }
 #pageOneTable thead{
   
+
 }
 #pageOneTable thead tr{
   
@@ -445,7 +446,7 @@ ui-collapsible.collapsible-listview .ui-btn{
     border-bottom:1px solid rgba(0,0,0,.05);
 }
 #pageOneTable-fixed{
-  display: none;
+  
     margin: 0px 0px;
     color:#333;
     text-shadow: none;

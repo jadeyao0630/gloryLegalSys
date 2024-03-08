@@ -84,7 +84,7 @@ function setRowsPrePageEvent(){
     form.setValueById('rowsNumber',$('#pageOneTable').jqmData('itemsPerPage'));
     console.log('runAnimation',$('#pageOneTable').jqmData('runAnimation'));
     form.setValueById('tableAnimations',$('#pageOneTable').jqmData('runAnimation')?'0':'1');
-    form.setValueById('tableStrip',$('#pageOneTable').hasClass('table-stripe')?'0':'1');
+    form.setValueById('tableStrip',$('#pageOneTable').hasClass('tableStripe')?'0':'1');
     form.setValueById('tableTextOverflow',$('#pageOneTable').jqmData('textOverflow')?'1':'0');
     console.log('tableSettings',$('#pageOneTable').jqmData('textOverflow'));
     $('#export_excel_popup_form').trigger('create');
@@ -226,7 +226,7 @@ $('body').on(preload_completed_event_name,function(){
                     //$('#pageOneTable').addClass('slideDown');
                     
                 })
-                $('#pageOneTable').find('thead tr th').animate({'top':(186.8-$("#main-body").scrollLeft())+'px'},()=>{
+                $('#pageOneTable').find('thead tr th').animate({'top':(186.8-$("#main-body").scrollTop())+'px'},()=>{
                     
                 })
                 //$('#table-fixed-column').animate({'top':83+145+slidedownOffset+"px"})
@@ -330,6 +330,7 @@ $('body').on(preload_completed_event_name,function(){
 
     //按权限设置可查看类型和元素
     $('.admin-ui').hide();
+    $('.super-ui').hide();
     if(getGlobalJson('currentUser').level==1){
         FormTemplate3.template.caseInfo.data.legalAgencies.isDisabled=true;
         FormTemplate3.template.caseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
@@ -347,6 +348,9 @@ $('body').on(preload_completed_event_name,function(){
     }else if(getGlobalJson('currentUser').level==adminLevel){
         //$('#case_reg_but_restore').show();
         $('.admin-ui').show();
+        $('.super-ui').show();
+    }else if(getGlobalJson('currentUser').level==supervisorLevel){
+        $('.super-ui').show();
     }
     setUserNotifiications();
     
@@ -520,7 +524,7 @@ $('body').on(preload_completed_event_name,function(){
 })
 var fixedColumnPosition={};
 $('#main-body').on('scroll',function(e){
-    //$("#pageOneTable").jqmData('fixedHead').css({'left':$("#main-body").scrollLeft()*-1})
+    //$("#pageOneTable").jqmData('thead').css({'left':$("#main-body").scrollLeft()*-1})
     //$("#pageOneTable").find('.fixedColumn').css({'left':$("#main-body").scrollLeft()*-1})
     $.each($("#pageOneTable").find('.fixedColumn'),(index,column)=>{
         //console.log($(column).attr('name'),column.getBoundingClientRect().left);

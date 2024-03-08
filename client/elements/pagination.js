@@ -480,6 +480,7 @@ $.fn.extend({
         var _this=this;
         var template=$(this).jqmData('tableTemplate');
         var nextPageSart=($(this).jqmData('currentPage')+1)*$(this).jqmData('itemsPerPage');
+        var currentPageSart=($(this).jqmData('currentPage'))*$(this).jqmData('itemsPerPage');
         var checkboxAll=$($(this).jqmData('fixedHead')!=null?$(this).jqmData('fixedHead'):$(this)).find('.reg-checkbox-all');
         
         var columnVisibility=_this.jqmData('columnVisibility');
@@ -530,9 +531,11 @@ $.fn.extend({
             // });
             var source=$(_this).jqmData('source');
             var currentData=$(_this).jqmData('currentData');
-            var preNumItem=currentSelectedCases.filter(index=>index<nextPageSart);
-            var nextNumItem=currentSelectedCases.filter(index=>index>=nextPageSart);
-            currentSelectedCases.forEach((selected)=>{
+            
+            var preNumItem=currentSelectedCases.filter(index=>currentData.indexOf(currentData.find(data=>data.id==index))<currentPageSart);
+            var nextNumItem=currentSelectedCases.filter(index=>currentData.indexOf(currentData.find(data=>data.id==index))>=currentPageSart);
+            console.log(currentPageSart,currentSelectedCases,preNumItem,nextNumItem)
+            nextNumItem.forEach((selected)=>{
                 //console.log("removeTableItem",selected);
                 var selectedTr=$(_this).find('tr[data-item="'+selected+'"]');
                 if(selectedTr.length>0) removedRows.push(selectedTr);
@@ -546,16 +549,32 @@ $.fn.extend({
             })
             
             
-            for(var i=nextPageSart.length;i<nextPageSart+preNumItem.length;i++){
-                deletedId.push(currentData[i].id);
+            for(var i=0;i<preNumItem.length;i++){
+                var selectedTr=$(_this).find('tr[data-item="'+currentData[currentPageSart+i].id+'"]');
+                if(selectedTr.length>0) removedRows.push(selectedTr);
+                //deletedId.push(currentData[currentPageSart+i].id);
+                console.log(currentData[i].id,selectedTr);
             }
-            console.log(preNumItem,deletedId)
-            if (nextPageSart<$(this).jqmData('currentData').length){
+
+            preNumItem.forEach((selected)=>{
+                //console.log("removeTableItem",selected);
+                //var selectedTr=$(_this).find('tr[data-item="'+selected+'"]');
+                //if(selectedTr.length>0) removedRows.push(selectedTr);
+
+                source=source.filter(data=>data.id!=selected);
+                currentData=currentData.filter(data=>data.id!=selected);
+
+                //selectedTr.find('.reg-checkbox:checked').prop('checked',false);
+                deletedId.push(selected);
+                
+            })
+            console.log(removedRows,currentData,deletedId)
+            if (nextPageSart<currentData.length){
                 
                 for(var i=nextPageSart;i<nextPageSart+preNumItem.length+checked.length;i++){
                 
                     var tr=$('<tr></tr>');
-                    var row=$(this).jqmData('currentData')[i];
+                    var row=$(_this).jqmData('currentData')[i];
                     keys.forEach(k=>{
                         tr.append(_this.setTdElement(template,row,k,columnVisibility));
                         
@@ -579,7 +598,7 @@ $.fn.extend({
 
                             setTimeout(() => {
                                 _this.itemRowAnimation(newItem,'slidein',500,function(res){
-                                    console.log("removedRows:",id);
+                                    //console.log("removedRows:",id);
                                     //deletedId.push(id);
                                 });
                                 

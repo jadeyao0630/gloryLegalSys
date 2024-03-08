@@ -1224,6 +1224,7 @@ $('.case_reg_but').on('click',async function(e){
                     $('#pageOneTable').updateTableItem(newData);
                     where.push('id = '+id);
                 })
+                $('#pageOneTable').find('[class^=reg-checkbox]').prop('checked',false);
                 var query="UPDATE caseStatus SET legalAgencies = "+$(selt).find('option:selected').val()+" WHERE "+where.join(' OR ');
                 execute(query).then(r=>console.log(r));
                 //console.log("currentSelectedCases:",DataList.combinedData,query);

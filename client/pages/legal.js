@@ -483,6 +483,7 @@ $('body').on(preload_completed_event_name,function(){
                     //setCheckAllBox($('.reg-checkbox-all'),'pageOneTable');
                     if(!isHeaderLocked){
                         form.slideUp();
+                        $('#pageOneTable').find('thead tr').animate({'top':'0'})
                         $('#pageOneTable').animate({'margin-top':"0px"})
                         $('.header-btn-search').text('更多');
                         $('#pageOneTable').trigger('create');

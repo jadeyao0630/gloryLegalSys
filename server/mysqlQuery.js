@@ -8,6 +8,7 @@ dotenv.config({
         `./env.${env.NODE_ENV ? env.NODE_ENV : "local"}`
       ),
 });
+console.log(env.HOST,env.USER)
 var pool = mysql.createPool({
     host: env.HOST,
     user:env.HOST==='192.168.10.241'||env.HOST==='192.168.10.242'?'glory':env.USER,

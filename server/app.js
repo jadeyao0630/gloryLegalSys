@@ -2,8 +2,16 @@ const express = require('express');
 const app = express();
 const fileUpload = require('express-fileupload');
 const cors = require('cors');
-const dotenv = require('dotenv');
-const $ = require("jquery");
+//const dotenv = require('dotenv');
+const path = require('path');
+const { env } = process;
+require('dotenv').config({
+  path: path.resolve(
+      __dirname,
+      `./env.${env.NODE_ENV ? env.NODE_ENV : "local"}`
+    ),
+});
+//const $ = require("jquery");
 
 const http = require('http');
 const socketIo = require('socket.io');
@@ -25,16 +33,13 @@ const _ftp = require('ftp');
 
 //var iconv = require('iconv-lite');
 
-const path = require('path');
-const { env } = process;
-console.log('env.NODE_ENV',process.env.NODE_ENV)
-dotenv.config({
-    path: path.resolve(
-        __dirname,
-        `./env.${env.NODE_ENV ? env.NODE_ENV : "home"}`
-      ),
-});
 
+
+console.log(env)
+console.log(path.resolve(
+  __dirname,
+  `./env.${env.NODE_ENV ? env.NODE_ENV : "local"}`
+))
 const CryptoJS = require('crypto-js')
 
 const keyStr = 'it@glory.com'
@@ -726,4 +731,4 @@ app.post('/execute',(request,response) => {
   .catch(err => console.log(err));
 });
 
-server.listen(process.env.PORT, () => console.log('app is runing at port: '+process.env.PORT,'mysql host: '+process.env.HOST))
+server.listen(env.PORT, () => console.log('app is runing at port: '+env.PORT,'mysql host: '+env.HOST))

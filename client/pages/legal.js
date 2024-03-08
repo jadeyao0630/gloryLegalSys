@@ -222,8 +222,10 @@ $('body').on(preload_completed_event_name,function(){
                 //form.animate({'height':"200px"});
                 //$('#pageOneTable').addClass('slideDown');
                 $('#pageOneTable').animate({'margin-top':145+slidedownOffset+"px"},()=>{
-                    $('#pageOneTable').addClass('slideDown');
+                    //$('#pageOneTable').addClass('slideDown');
+                    
                 })
+                $('#pageOneTable').find('thead tr').animate({'top':(186.8-$("#main-body").scrollLeft())+'px'})
                 //$('#table-fixed-column').animate({'top':83+145+slidedownOffset+"px"})
             }
         }else{
@@ -232,8 +234,10 @@ $('body').on(preload_completed_event_name,function(){
                 form.slideUp();
                 $('.header-btn-search').text('更多');
                 
-                $('#pageOneTable').removeClass('slideDown');
+                //$('#pageOneTable').removeClass('slideDown');
+                $('#pageOneTable').find('thead tr').animate({'top':'0'})
                 $('#pageOneTable').animate({'margin-top':"-2px"},()=>{
+
                 })
                 //$('#table-fixed-column').animate({'top':83+"px"})
                 isHeaderLocked=false;

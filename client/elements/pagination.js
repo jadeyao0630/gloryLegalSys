@@ -530,6 +530,8 @@ $.fn.extend({
             // });
             var source=$(_this).jqmData('source');
             var currentData=$(_this).jqmData('currentData');
+            var preNumItem=currentSelectedCases.filter(index=>index<nextPageSart);
+            var nextNumItem=currentSelectedCases.filter(index=>index>=nextPageSart);
             currentSelectedCases.forEach((selected)=>{
                 //console.log("removeTableItem",selected);
                 var selectedTr=$(_this).find('tr[data-item="'+selected+'"]');
@@ -543,13 +545,13 @@ $.fn.extend({
                 
             })
             
-            var preNumItem=currentSelectedCases.filter(index=>index<nextPageSart);
+            
             for(var i=nextPageSart.length;i<nextPageSart+preNumItem.length;i++){
                 deletedId.push(currentData[i].id);
             }
             console.log(preNumItem,deletedId)
             if (nextPageSart<$(this).jqmData('currentData').length){
-                var nextNumItem=currentSelectedCases.filter(index=>index>nextPageSart+$(this).jqmData('itemsPerPage'));
+                
                 for(var i=nextPageSart;i<nextPageSart+preNumItem.length+checked.length;i++){
                 
                     var tr=$('<tr></tr>');

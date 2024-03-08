@@ -390,21 +390,20 @@ ui-collapsible.collapsible-listview .ui-btn{
     border-right: 1px solid rgba(0,0,0,.05);
 }
 #pageOneTable thead{
-  border-bottom: 1px solid rgba(0,0,0,.05);
+  
   
 }
 #pageOneTable thead tr{
-  
-  
+  background-color: rgba(0,0,0,.05);
+  border-top: 2px solid orangered;
   position: sticky;
   top:0;
   z-index: 1000;
 }
 #pageOneTable.slideDown thead tr{
   
-  
+  border-top: none;
   position: sticky;
-  top:186.8px;
   z-index: 1000;
 }
 #pageOneTable thead tr th{

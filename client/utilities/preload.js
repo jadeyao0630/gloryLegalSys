@@ -210,6 +210,30 @@ logingStatus().then(function(e){
                 
                 //console.log(d.data);
                 var _excutes={}
+                var updates=d.data.caseExcutes.concat(d.data.caseUpdates,d.data.caseProperties,d.data.caseAttachments)
+                var _updates={}
+                updates.forEach(update=>{
+                    var date;
+                    if(update.hasOwnProperty('dateUpdated')){
+                        date=update.dateUpdated
+                    }else if(update.hasOwnProperty('dateExecuted')){
+                        date=update.dateExecuted
+                    }else if(update.hasOwnProperty('dateUploaded')){
+                        date=update.dateUploaded
+                    }
+                    if(date!=undefined){
+                        var timestamp=formatDateTime(new Date(date),'yyyyMMdd');
+                        if(!_updates.hasOwnProperty(timestamp)){
+                            _updates[timestamp]=[];
+                        }
+                        _updates[timestamp].push(update);
+                    }
+                })
+                //_updates = Object.entries(_updates).sort((a, b) => b[1] - a[1]);
+                // const sortedKeys = Object.keys(obj).sort((a, b) => b.localeCompare(a));
+
+                // // 创建一个新的Map对象，保持排序
+                // const sortedMap = new Map(sortedKeys.map(key => [key, obj[key]]));
                 d.data.caseExcutes.forEach((data)=>{
                     //console.log('caseExcutes',data)
                     if(!_excutes.hasOwnProperty(data.id)) _excutes[data.id]=0.0;
@@ -272,6 +296,7 @@ logingStatus().then(function(e){
                 if(!DataList.hasOwnProperty('caseAttachments')) DataList.caseAttachments=[];
                 if(!DataList.hasOwnProperty('caseLinked')) DataList.caseLinked=[];
                 DataList.combinedData=combinedData;
+                DataList.updates=_updates;
 
                 //console.log('format2NewStatus',format2NewStatus(DataList.caseStatus,'caseStatus','id'));
                 

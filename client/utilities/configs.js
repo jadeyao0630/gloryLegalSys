@@ -14,6 +14,7 @@ var supervisorLevel=2;
 const keyStr = 'it@glory.com'
 const ivStr = 'it@glory.com'
 const APP_TITLE='国瑞法务管理系统';
+const VERSION="v1.4";
 var enableConsoleLog=true;
 var enableRealDelete=true;
 var enableReadOnlyMode=false;

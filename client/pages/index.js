@@ -12,6 +12,7 @@ const addBut = document.getElementById("addBut");
 const nameInput = document.getElementById("user");
 const passInput = document.getElementById("password");
 $('#loadingLogo').attr('src',logoSrc);
+document.title=APP_TITLE;
 $('#loginForm').find('h1').text(APP_TITLE);
 //console.log(getGlobalJson("currentUser"),getGlobalJson("currentUser").name!=undefined);
 try{

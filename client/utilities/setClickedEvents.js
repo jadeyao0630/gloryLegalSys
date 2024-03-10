@@ -291,7 +291,11 @@ $('#popupMenu').find('a').on('click',function(e){
             goToPage( $(this).attr( "href" ));
             break;
         case '数据库管理':
+            goToPage( $(this).attr( "href" ));
+            break;
+        case '管理现有库':
 
+            databases($('#resourcesDatabasePage').find('.ui-content'));
             goToPage( $(this).attr( "href" ));
             break;
         case '消息中心':
@@ -497,6 +501,13 @@ function formatMainEventData(d){
     var date=d.judgmentDate!="0000-00-00 00:00:00"?formatDateTime(new Date(d.judgmentDate),'yyyy年MM月dd日'):d.judgmentDate;
     return {index:d.typeId,date:date,caseNo:d.caseNo,legalInstitution:legalInstitution,sum:d.judgmentSum,title:title};
 }
+
+$('.resourcesDatabase_but').on('click',function(e){
+    e.preventDefault();
+    if($(this).attr( "href" )=="#") return;
+    var cango=resourceDBDetails($('#resourcesDatabaseDetailsPage'), $(e.target));
+    if(cango) goToPage( $(this).attr( "href" ));
+})
 //节点修改保存按钮事件
 $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
     

@@ -84,7 +84,7 @@ mform.prototype={
                 $('body').trigger('create');
             }).on( "pagecontainerbeforeshow", function( event, data ) {
                 var _this=$(this);
-                console.log('pagecontainerbeforeshow',_this);
+                //console.log('pagecontainerbeforeshow',_this);
                 $(_this).trigger('create');
                 var closeBtn=$(data.toPage).find('.ui-header .ui-icon-delete');
                     //console.error('selectmenucreate2',closeBtn);
@@ -313,6 +313,7 @@ mform.prototype={
             if(!_this.opt.isAdmin && rowTemplate[key].isAdminOnly){
                 //console.log('mform 1',key,_this.opt.isAdmin,rowTemplate[key].isAdminOnly)
                 item_container.addClass('admin-ui');
+                item_container.hide();
                 //item_container.trigger('create')
             }   
         }

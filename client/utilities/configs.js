@@ -1,11 +1,11 @@
 var isRunLocal=true;//https://socket.io/get-started/chat/
-var IPS=[
-    {ip:'192.168.10.241',port:5555},
-    {ip:'192.168.10.68',port:5555},
-    {ip:'192.168.10.68',port:5556},
-    {ip:'cn.luyao.site',port:5568}]
+var IPS={
+    home:{ip:'192.168.10.241',port:5555},
+    glory:{ip:'192.168.10.68',port:5555},
+    test:{ip:'192.168.10.68',port:5556},
+    remote:{ip:'cn.luyao.site',port:5568}}
 var showDebug=false;
-const serverSelection=IPS[0]
+const serverSelection=IPS.home
 let ip=serverSelection.ip;
 let port=serverSelection.port;
 var auth_code='1234';
@@ -281,11 +281,13 @@ const caseCauses={//案由
     id:"INT NOT NULL,PRIMARY KEY",//案由唯一序列号
     label:"VARCHAR(255)",//案由名
     descriptions:"VARCHAR(255)",//案由名说明
+    isInactived:"bool default '0'",//是否标为禁用
 }
 const caseReason={//案发原因
     id:"INT NOT NULL,PRIMARY KEY",//案发原因唯一序列号
     label:"VARCHAR(255)",//案发原因类型
     descriptions:"VARCHAR(255)",//案发原因类型说明
+    isInactived:"bool default '0'",//是否标为禁用
 }
 const _propertyStatus={//资产状态
     id:"INT NOT NULL,PRIMARY KEY",//资产状态唯一序列号
@@ -332,6 +334,7 @@ const legalInstitution={//受理机构
     name:"VARCHAR(255)",//受理机构名称
     contact:"VARCHAR(255)",//受理机构联系方式
     address:"VARCHAR(255)",//受理机构地址
+    region:"VARCHAR(255)",//受理机构区域
     descriptions:"VARCHAR(255)",//受理机构说明
     isInactived:"bool default '0'",//是否标为禁用
 }
@@ -363,6 +366,43 @@ const attorneys={//代理律师列表
     contact:"VARCHAR(255)",//代理律师联系方式
     lawFirm:"INT NOT NULL default '-1'",//代理律师所属机构
     descriptions:"VARCHAR(255)",//代理律师说明
+    rating:"INT NOT NULL default 0",//代理律师评分
+    expertise:"VARCHAR(255) default 0",//代理律师专长
+    fee:"decimal(64,2) default 0.0",//代理律师费用
     isInactived:"bool default '0'",//是否标为禁用
 }
+const expertises={//代理律师专长
+    id:"INT NOT NULL,PRIMARY KEY",//代理律师专长唯一序列号
+    name:"VARCHAR(255)",//代理律师专长名称
+    descriptions:"VARCHAR(255)",//代理律师专长说明
+}
 
+
+// 用户名
+// u_igso6mtg
+// 密码
+// vlzj4hwi
+// 服务器地址
+// calendar.dingtalk.com
+
+
+// ALTER TABLE case_causes
+// ADD isInactived INT(1) default '0' NOT NULL;
+
+// ALTER TABLE case_reasons
+// ADD isInactived INT(1) default '0' NOT NULL;
+
+
+
+// ALTER TABLE attorneys
+// ADD fee decimal(64,2) default '0.0' AFTER descriptions;
+// ALTER TABLE attorneys
+// ADD expertise VARCHAR(255) default '-1' AFTER descriptions;
+// ALTER TABLE attorneys
+// ADD rating INT(11) default '0' AFTER descriptions;
+
+// CREATE TABLE expertises (
+//     id INT PRIMARY KEY,
+//     label VARCHAR(255) NOT NULL, 
+//     descriptions VARCHAR(255)
+// );

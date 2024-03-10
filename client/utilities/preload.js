@@ -104,13 +104,13 @@ logingStatus().then(function(e){
                     }
                     else if(k=="corporateCompanies"){
                         corporate_companies=getKeyValues(d,"name")
-                        resourceDatas[k]=corporate_companies;
+                        resourceDatas[k]=d;
                         
                         casePersonnel["公司"]=d;
                     }
                     else if(k=="corporatePartners"){
                         corporate_partners=getKeyValues(d,"name")
-                        resourceDatas[k]=corporate_partners;
+                        resourceDatas[k]=d;
                         
                         casePersonnel["个人"]=d;
                     }
@@ -139,6 +139,10 @@ logingStatus().then(function(e){
                     else if(k=="counselTitles"){
                         counsel_titles=getKeyValues(d,"label")
                         resourceDatas[k]=counsel_titles;
+                        resourceDatas[k+"_"]=d;
+                    }else if(k=="attorneys"){
+                        resourceDatas[k+"_"]=d;
+                    }else if(k=="legalCounsels"){
                         resourceDatas[k+"_"]=d;
                     }else{
                         resourceDatas[k]=d;

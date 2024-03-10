@@ -1269,7 +1269,7 @@ var _summary_template;
         hasLabel:true,
         hasPlaceHolder:true,
         labelPosition:"left",
-        width:'550px',
+        width:'650px',
         textareaHeight:90,
         isCollapsibleGrouping:false,
       },

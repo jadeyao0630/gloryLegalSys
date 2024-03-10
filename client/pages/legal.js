@@ -202,6 +202,7 @@ $('body').on(main_load_completed_event_name,function(){
             $(btn).setTooltips();
         });
         setTableMaxHeight();
+        
     }, 100);
 });
 $('body').on(preload_completed_event_name,function(){

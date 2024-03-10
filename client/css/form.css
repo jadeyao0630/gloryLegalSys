@@ -109,3 +109,8 @@ padding:5px 10px;
   background:gray;
   text-shadow: none;
 }
+.actived-row{
+  color:white;
+  background:#1362B7;
+  text-shadow: none;
+}

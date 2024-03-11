@@ -329,6 +329,8 @@ function stringFormatResources(parent){
     $.each(resourceDatas.string_format_,(index,value)=>{
         template.template[value.id]={label:value.descriptions,type:'text'}
         formData[value.id]=value.displayFormat;
+        formData['displayFormat']=value.displayFormat;
+        formData['id']=value.id;
     })
     
     console.log(template,$(parent))

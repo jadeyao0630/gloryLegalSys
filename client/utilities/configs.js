@@ -23,6 +23,7 @@ var functionButoonPostion="top";
 const mainPage="legal.html";
 var logoSrc='./images/logo.png';
 const userDbTableName="names";
+const tableSeperator=";";
 const attachmentFolder='messageAttachments';
 var DataList={};
 var preload_completed_event_name="preloadCompleted";

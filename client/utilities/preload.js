@@ -209,84 +209,7 @@ logingStatus().then(function(e){
             getBasic(caseTableList,[]).then(d=>{
                 
                 //console.log(d.data);
-                var _excutes={}
-                var updates=d.data.caseExcutes.concat(d.data.caseUpdates,d.data.caseProperties,d.data.caseAttachments)
-                var _updates={}
-                updates.forEach(update=>{
-                    var date;
-                    if(update.hasOwnProperty('dateUpdated')){
-                        date=update.dateUpdated
-                    }else if(update.hasOwnProperty('dateExecuted')){
-                        date=update.dateExecuted
-                    }else if(update.hasOwnProperty('dateUploaded')){
-                        date=update.dateUploaded
-                    }
-                    if(date!=undefined){
-                        var timestamp=formatDateTime(new Date(date),'yyyyMMdd');
-                        if(!_updates.hasOwnProperty(timestamp)){
-                            _updates[timestamp]=[];
-                        }
-                        _updates[timestamp].push(update);
-                    }
-                })
-                //_updates = Object.entries(_updates).sort((a, b) => b[1] - a[1]);
-                // const sortedKeys = Object.keys(obj).sort((a, b) => b.localeCompare(a));
-
-                // // 创建一个新的Map对象，保持排序
-                // const sortedMap = new Map(sortedKeys.map(key => [key, obj[key]]));
-                d.data.caseExcutes.forEach((data)=>{
-                    //console.log('caseExcutes',data)
-                    if(!_excutes.hasOwnProperty(data.id)) _excutes[data.id]=0.0;
-                    _excutes[data.id]+=Number(data.exexuteAmount);
-                })
-                var _legalFees={}
-                d.data.caseProgresses.forEach((data)=>{
-                    //console.log('caseExcutes',data)
-                    if(!_legalFees.hasOwnProperty(data.id)) _legalFees[data.id]=0.0;
-                    _legalFees[data.id]+=Number(data.legalFee);
-                })
                 
-                console.log(_excutes)
-                var combinedData=[];
-                d.data.casesDb.forEach((data)=>{
-                    var matchedData=d.data.caseStatus.filter(sta => sta.id==data.id);
-                    var matchedProgressData_frist=d.data.caseProgresses.filter(sta => sta.id==data.id && sta.typeId==1);
-                    var matchedProgressData_second=d.data.caseProgresses.filter(sta => sta.id==data.id && sta.typeId==2);
-                    if(matchedData.length>0){
-                        var excuteAmount=0.0
-                        var legalFee=0.0
-                        if(_excutes.hasOwnProperty(data.id)){
-                            excuteAmount=_excutes[data.id]
-                        }
-                        if(_legalFees.hasOwnProperty(data.id)){
-                            legalFee=_legalFees[data.id]
-                        }
-                        var progress_data={legalFee:legalFee,
-                            firstTrialDate:'0000-00-00 00:00:00',firstJudgmentDate:'0000-00-00 00:00:00',firstPenalty:0.0,firstJudgmentSum:'',firstLegalInstitution:-1,firstLegalCounsel:"无0",
-                            secondTrialDate:'0000-00-00 00:00:00',secondJudgmentDate:'0000-00-00 00:00:00',secondPenalty:0.0,secondJudgmentSum:'',secondLegalInstitution:-1,secondLegalCounsel:"无0",
-                        }
-                        if(matchedProgressData_frist.length>0){
-                            progress_data.firstTrialDate=matchedProgressData_frist[0].trialDate;
-                            progress_data.firstJudgmentDate=matchedProgressData_frist[0].judgmentDate;
-                            progress_data.firstPenalty=matchedProgressData_frist[0].penalty;
-                            progress_data.firstJudgmentSum=matchedProgressData_frist[0].judgmentSum;
-                            progress_data.firstLegalInstitution=matchedProgressData_frist[0].legalInstitution;
-                            progress_data.firstLegalCounsel=matchedProgressData_frist[0].legalCounsel;
-                        }
-                        if(matchedProgressData_second.length>0){
-                            progress_data.secondTrialDate=matchedProgressData_second[0].trialDate;
-                            progress_data.secondJudgmentDate=matchedProgressData_second[0].judgmentDate;
-                            progress_data.secondPenalty=matchedProgressData_second[0].penalty;
-                            progress_data.secondJudgmentSum=matchedProgressData_second[0].judgmentSum;
-                            progress_data.secondLegalInstitution=matchedProgressData_second[0].legalInstitution;
-                            progress_data.secondLegalCounsel=matchedProgressData_second[0].legalCounsel;
-                        }
-                        
-                        
-                        combinedData.push(Object.assign(data,matchedData[0],progress_data));
-                        //console.log(Object.assign(data,matchedData[0],progress_data));
-                    }
-                });
                 
                 //console.log(combinedData);
                 DataList=d.data;
@@ -295,8 +218,8 @@ logingStatus().then(function(e){
                 if(!DataList.hasOwnProperty('caseProperties')) DataList.caseProperties=[];
                 if(!DataList.hasOwnProperty('caseAttachments')) DataList.caseAttachments=[];
                 if(!DataList.hasOwnProperty('caseLinked')) DataList.caseLinked=[];
-                DataList.combinedData=combinedData;
-                DataList.updates=_updates;
+                //DataList.combinedData=combinedData;
+                //DataList.updates=sortedUpdates;
 
                 //console.log('format2NewStatus',format2NewStatus(DataList.caseStatus,'caseStatus','id'));
                 
@@ -473,4 +396,15 @@ function getNewCaseStatus(val,subIndex){
     }
     
     return status;
+}
+function getDateValue(data){
+    var date;
+    if(data.hasOwnProperty('dateUpdated')){
+        date=data.dateUpdated
+    }else if(data.hasOwnProperty('dateExecuted')){
+        date=data.dateExecuted
+    }else if(data.hasOwnProperty('dateUploaded')){
+        date=data.dateUploaded
+    }
+    return date;
 }

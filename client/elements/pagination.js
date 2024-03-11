@@ -81,11 +81,18 @@ function getValueIfHaveDataRef(template,data){
             
             if(val==undefined) val='未开始流程';
             return val;
-        }else{
+        }
+        else{
             var _data;
-            if(data.constructor == String && template.isMultipleValue) {
-                data=data.split(',');
-                }
+            if(template.isMultipleValue) {
+                
+                if(data.constructor == String)
+                    data=data.split(',');
+                // else if(data.constructor == Array){
+                //     console.log('data.constructor',data,data.join(','))
+                //     data=data.join(',');
+                // }
+            }
             if(template.hasOwnProperty('matchKey')){
                 refData=$.grep(refData,d=>template.isMultipleValue?data.includes(d[template.matchKey].toString()):d[template.matchKey]==data);
             }else{
@@ -110,7 +117,7 @@ function getValueIfHaveDataRef(template,data){
                     }else{
                         temp_data = refData;
                     }
-                    _data=temp_data.join(",")
+                    _data=temp_data.join(tableSeperator)
                 }else{
                     if(template.hasOwnProperty('valueKey')){
                         _data = refData[0][template.valueKey];
@@ -131,6 +138,14 @@ function getValueIfHaveDataRef(template,data){
     }else {
         if(template.hasOwnProperty('displayFormat')){
             data=template.displayFormat.replace('{}',data);
+        }
+        if(template.isMultipleValue && template.type=='list'){
+            if(data.constructor == Array){
+                data = data.map(d=>template.hasOwnProperty('valueKey')?d[template.valueKey]:d);
+                
+                console.log('constructor',data)
+                data=data.join(tableSeperator);
+            }
         }
         return data;
     }
@@ -700,21 +715,23 @@ $.fn.extend({
     },
     setTdElement:function(template,rowData,key,columnVisibility){
         var td;
-        if(template[key].type=='supermulticombobox'||template[key].type=='supermultiinput'){
+        if(template[key].type=='supermulticombobox'||template[key].type=='supermultiinput' || template[key].isMultipleValue){
             //console.log('rowData[key]',$(this).jqmData('textOverflow'),rowData[key]);
-            if($(this).jqmData('textOverflow')) {
-                if(rowData[key].constructor==Array){
-                    rowData[key]=rowData[key].join(",");
-                }else if(rowData[key].constructor==String){
-                    rowData[key]=rowData[key].replaceAll("<br/>",",");
+            if(rowData[key]!=undefined){
+                if($(this).jqmData('textOverflow')) {
+                    if(rowData[key].constructor==Array){
+                        rowData[key]=rowData[key].join(tableSeperator);
+                    }else if(rowData[key].constructor==String){
+                        rowData[key]=rowData[key].replaceAll("<br/>",tableSeperator);
+                    }
+                }else{
+                    if(rowData[key].constructor==Array){
+                        rowData[key]=rowData[key].join("<br/>");
+                    }else if(rowData[key].constructor==String){
+                        rowData[key]=rowData[key].replaceAll(tableSeperator,"<br/>");
+                    }
+                    
                 }
-            }else{
-                if(rowData[key].constructor==Array){
-                    rowData[key]=rowData[key].join("<br/>");
-                }else if(rowData[key].constructor==String){
-                    rowData[key]=rowData[key].replaceAll(",","<br/>");
-                }
-                
             }
         }
         if(rowData.hasOwnProperty(key)){

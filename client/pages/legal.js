@@ -140,14 +140,8 @@ $('body').on(main_load_completed_event_name,function(){
         if (watinglist.hasOwnProperty('settings')) {
             clearInterval(intervalId);
             
-            if(hideInactiveAgentCase) {
-                const agencies=resourceDatas.legalAgencies.map(agent=>{
-                    console.log(agent.name,agent.isInactived)
-                    if(agent.isInactived==0) return agent.id
-                })
-                DataList.combinedData=DataList.combinedData.filter(data=> agencies.includes(data.legalAgencies))
-            }
-
+            
+            InitialCombinedData();
             currentData=DataList.combinedData;
             console.log('DataList.combinedData',DataList.combinedData)
             $('#pageOneTable').updateSource(DataList.combinedData);
@@ -728,7 +722,7 @@ $('#legalAgenciesSum').on( "collapsibleexpand", function( event, ui ) {
                 //console.log(projectNames);
                 projectNames.forEach(pname=>{
                     const projectName = resourceDatas.projects_.filter(p=>p.id===Number(pname))
-                    console.log(pname,projectName)
+                    //console.log(pname,projectName)
                     if(projectName.length>0){
                         
                         //console.log(projectName[0].name)
@@ -1000,4 +994,127 @@ function showNotifyPanel(message){
     setTimeout(() => {
         $('#notification_panel').animate({top:'-'+($('#notification_panel').height()+40)+'px'},1000);
     }, 10000);
+}
+function InitialCombinedData(){
+    
+    var _excutes={}
+    var updates=DataList.caseExcutes.concat(DataList.caseUpdates,DataList.caseProperties,DataList.caseAttachments)
+    var _updates={}
+    updates.forEach(update=>{
+        if(!_updates.hasOwnProperty(update.id)){
+            _updates[update.id]=[];
+        }
+        var format='';
+        var date=update;
+        if(update.hasOwnProperty('updatesId')){
+            date=update.dateUpdated;
+            format=add_update_template.settings.displayFormat;
+            $.each(update,(key,val)=>{
+                format=format.replace(`{${key}}`,val)
+            })
+        }
+        else if(update.hasOwnProperty('excutesId')){
+            date=update.dateExecuted;
+            format=add_execute_template.settings.displayFormat;
+            $.each(update,(key,val)=>{
+                format=format.replace(`{${key}}`,val)
+            })
+        }
+        else if(update.hasOwnProperty('propertyId')){
+            date=update.dateUpdated;
+            format=add_property_template.settings.displayFormat;
+            $.each(update,(key,val)=>{
+                format=format.replace(`{${key}}`,val)
+            })
+        }
+        else if(update.hasOwnProperty('evidenceId')){
+            date=update.dateUploaded;
+            format=add_evidence_template.settings.displayFormat;
+            $.each(update,(key,val)=>{
+                format=format.replace(`{${key}}`,val)
+            })
+        }
+        update['summary']=formatDateTime(new Date(date),'yyyy年MM月dd日')+" "+format;
+        _updates[update.id].push(update);
+    })
+    const sortedKeys = Object.keys(_updates).sort((a, b) => b - a );
+    
+    // 创建一个新的对象，按照排序后的键来填充
+    var sortedUpdates = {};
+    sortedKeys.forEach(key => {
+        //console.log('sortedKeys',key);
+        sortedUpdates[key] = _updates[key].sort((a,b)=>{
+            var dateA=getDateValue(a);
+            var dateB=getDateValue(b);
+            return new Date(dateB).getTime() - new Date(dateA).getTime()
+        });
+    });
+
+    //_updates = Object.entries(_updates).sort((a, b) => b[1] - a[1]);
+    // const sortedKeys = Object.keys(obj).sort((a, b) => b.localeCompare(a));
+
+    // // 创建一个新的Map对象，保持排序
+    // const sortedMap = new Map(sortedKeys.map(key => [key, obj[key]]));
+    DataList.caseExcutes.forEach((data)=>{
+        //console.log('caseExcutes',data)
+        if(!_excutes.hasOwnProperty(data.id)) _excutes[data.id]=0.0;
+        _excutes[data.id]+=Number(data.exexuteAmount);
+    })
+    var _legalFees={}
+    DataList.caseProgresses.forEach((data)=>{
+        //console.log('caseExcutes',data)
+        if(!_legalFees.hasOwnProperty(data.id)) _legalFees[data.id]=0.0;
+        _legalFees[data.id]+=Number(data.legalFee);
+    })
+    
+    console.log(_excutes)
+    var combinedData=[];
+    DataList.casesDb.forEach((data)=>{
+        var matchedData=DataList.caseStatus.filter(sta => sta.id==data.id);
+        var matchedProgressData_frist=DataList.caseProgresses.filter(sta => sta.id==data.id && sta.typeId==1);
+        var matchedProgressData_second=DataList.caseProgresses.filter(sta => sta.id==data.id && sta.typeId==2);
+        var matchedUpdates=sortedUpdates.hasOwnProperty(data.id)?sortedUpdates[data.id]:[];
+        if(matchedData.length>0){
+            var excuteAmount=0.0
+            var legalFee=0.0
+            if(_excutes.hasOwnProperty(data.id)){
+                excuteAmount=_excutes[data.id]
+            }
+            if(_legalFees.hasOwnProperty(data.id)){
+                legalFee=_legalFees[data.id]
+            }
+            var progress_data={legalFee:legalFee,
+                firstTrialDate:'0000-00-00 00:00:00',firstJudgmentDate:'0000-00-00 00:00:00',firstPenalty:0.0,firstJudgmentSum:'',firstLegalInstitution:-1,firstLegalCounsel:"无0",
+                secondTrialDate:'0000-00-00 00:00:00',secondJudgmentDate:'0000-00-00 00:00:00',secondPenalty:0.0,secondJudgmentSum:'',secondLegalInstitution:-1,secondLegalCounsel:"无0",
+            }
+            if(matchedProgressData_frist.length>0){
+                progress_data.firstTrialDate=matchedProgressData_frist[0].trialDate;
+                progress_data.firstJudgmentDate=matchedProgressData_frist[0].judgmentDate;
+                progress_data.firstPenalty=matchedProgressData_frist[0].penalty;
+                progress_data.firstJudgmentSum=matchedProgressData_frist[0].judgmentSum;
+                progress_data.firstLegalInstitution=matchedProgressData_frist[0].legalInstitution;
+                progress_data.firstLegalCounsel=matchedProgressData_frist[0].legalCounsel;
+            }
+            if(matchedProgressData_second.length>0){
+                progress_data.secondTrialDate=matchedProgressData_second[0].trialDate;
+                progress_data.secondJudgmentDate=matchedProgressData_second[0].judgmentDate;
+                progress_data.secondPenalty=matchedProgressData_second[0].penalty;
+                progress_data.secondJudgmentSum=matchedProgressData_second[0].judgmentSum;
+                progress_data.secondLegalInstitution=matchedProgressData_second[0].legalInstitution;
+                progress_data.secondLegalCounsel=matchedProgressData_second[0].legalCounsel;
+            }
+            
+            
+            combinedData.push(Object.assign(data,matchedData[0],progress_data,{updates:matchedUpdates}));
+            //console.log(Object.assign(data,matchedData[0],progress_data));
+        }
+    });
+    DataList.combinedData=combinedData;
+    if(hideInactiveAgentCase) {
+        const agencies=resourceDatas.legalAgencies.map(agent=>{
+            //console.log(agent.name,agent.isInactived)
+            if(agent.isInactived==0) return agent.id
+        })
+        DataList.combinedData=DataList.combinedData.filter(data=> agencies.includes(data.legalAgencies))
+    }
 }

@@ -11,6 +11,11 @@ var list_proerty;
 var list_evidence;
 var list_executed;
 var _summary_template;
+var add_update_template;
+var add_execute_template;
+var add_property_template;
+var add_evidence_template;
+
   $('body').on(preload_completed_event_name,function(data){
     console.log(preload_completed_event_name);
     FormTemplate3={
@@ -806,6 +811,12 @@ var _summary_template;
             type:"label",
             valueKey:'name',
             matchKey:'id',isFilterable:true,},
+          updates:{label:"更新列表",
+            isMultipleValue:true,
+            type:"list",
+            valueKey:'summary',
+            //matchKey:'id', 
+            isFilterable:true,isHidden:true},
           rowButtons:{
             label:"操作",
             type:"buttons",

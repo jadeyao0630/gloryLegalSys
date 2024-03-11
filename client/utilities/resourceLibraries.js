@@ -1,4 +1,4 @@
-function databases(parent){
+function resourceLibraries(parent){
     console.log('parent',parent);
     $(parent).css({'max-height':'100%'});
     $('.show-hasInactived').hide();

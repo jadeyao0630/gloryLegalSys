@@ -69,14 +69,14 @@
                     <li><a class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-red ui-icon-power">退出</a></li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-icon-user btn-icon-blue ui-btn-icon-left popup-menu-btns" data-rel="back">个人信息</a></li>
 					<li><a href="#user_notification" class="ui-btn ui-btn-a ui-icon-comment btn-icon-green ui-btn-icon-left popup-menu-btns" data-rel="back">消息中心</a><span id="notif_num" class="ui-li-count notif_num">2</span></li>
-					<li data-role="list-divider" class="admin-ui">用户</li>
+					<li data-role="list-divider" class="admin-ui manageUsers">用户</li>
 					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-user admin-ui" data-rel="back">修改用户</a></li>
-					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue ui-icon-plus popup-menu-btns popup-add-user admin-ui" data-rel="back">添加用户</a></li>
+					<li><a href="#infoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue ui-icon-plus popup-menu-btns popup-add-user admin-ui manageUsers" data-rel="back">添加用户</a></li>
 					<li><a href="#loginInfoPage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-red ui-icon-clock popup-menu-btns admin-ui" data-rel="back">用户登录记录</a></li>
 					<li data-role="list-divider" class="admin-ui">数据库</li>
 					<li><a href="#databasePage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-gear admin-ui" data-rel="back">数据库管理</a></li>
-					<li data-role="list-divider" class="super-ui">库管理</li>
-					<li><a href="#resourcesDatabasePage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue btn-icon-edit ui-icon-gear popup-menu-btns popup-edit-gear super-ui" data-rel="back">管理现有库</a></li>
+					<li data-role="list-divider" class="super-ui manageLibraries">库管理</li>
+					<li><a href="#resourcesDatabasePage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue btn-icon-edit ui-icon-gear popup-menu-btns popup-edit-gear super-ui manageLibraries" data-rel="back">管理现有库</a></li>
                 </ul>
             </div>
             
@@ -93,10 +93,10 @@
 				<div style="display:grid;grid-template-columns: auto 1fr auto;">
 					<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-left ui-footer-btns">
 						<a href="#casePage" id="case_reg_but_add" data-tooltip="新增案件" class="ui-btn ui-btn-icon-left ui-icon-plus btn-icon-green case_reg_but footerBtn tooltip-btn">新增</a>
-						<a href="#" id="case_reg_but_remove" data-tooltip="删除选的案件" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but footerBtn tooltip-btn">删除</a>
-						<a href="#" id="case_reg_but_restore" data-tooltip="恢复删除的案件" class="ui-btn ui-btn-icon-left ui-icon-recycle btn-icon-blue case_reg_but admin-ui tooltip-btn">还原</a>
+						<a href="#" id="case_reg_but_remove" data-tooltip="删除选的案件" class="ui-btn ui-btn-icon-left ui-icon-delete btn-icon-red case_reg_but footerBtn disabled-ItemInactived ui-disabled tooltip-btn">删除</a>
+						<a href="#" id="case_reg_but_restore" data-tooltip="恢复删除的案件" class="ui-btn ui-btn-icon-left ui-icon-recycle btn-icon-blue case_reg_but admin-ui disabled-ItemInactived ui-disabled tooltip-btn">还原</a>
 						<!--<input type="text" id="num-rows-page" style="max-width:60px;" placeholder="每页行数" data-wrapper-class="controlgroup-textinput ui-btn">-->
-						<a href="#" id="case_assign" data-tooltip="分配所选案件给指定法务" class="ui-btn ui-btn-icon-left ui-icon-user btn-icon-green case_reg_but super-ui tooltip-btn">分配</a>
+						<a href="#" id="case_assign" data-tooltip="分配所选案件给指定法务" class="ui-btn ui-btn-icon-left ui-icon-user btn-icon-green case_reg_but super-ui disabled-ItemInactived ui-disabled tooltip-btn assignCases">分配</a>
 					</div>
 					<div id="pagination_container" style="position: absolute;transform: translateX(-50%);left: 50%;margin-top: 3px;"><a id="submit_rows_page" href="#" data-tooltip="修改表格相关设置" class="ui-btn ui-icon-grid btn-icon-wendyblue footerBtn case_reg_but ui-btn-icon-notext tooltip-btn" onclick="setRowsPrePageEvent()">表格设置</a></div>
 					<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-right ui-footer-btns">
@@ -431,7 +431,7 @@
 	<script type="text/javascript" src="./utilities/preload.js"></script>
 	<script type="text/javascript" src="./utilities/templates.js"></script>
 	<script type="text/javascript" src="./utilities/formGenerator.js"></script>
-	<script type="text/javascript" src="./utilities/databases.js"></script>
+	<script type="text/javascript" src="./utilities/resourceLibraries.js"></script>
     <script type="text/javascript" src="./pages/timelinePage.js"></script>
 	<script src="./js/FusionCharts.js"></script>
   	<script src="./js/fusioncharts.charts.js"></script>

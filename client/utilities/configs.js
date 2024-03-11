@@ -5,7 +5,7 @@ var IPS={
     test:{ip:'192.168.10.68',port:5556},
     remote:{ip:'cn.luyao.site',port:5568}}
 var showDebug=false;
-const serverSelection=IPS.test
+const serverSelection=IPS.home
 let ip=serverSelection.ip;
 let port=serverSelection.port;
 var auth_code='1234';
@@ -33,6 +33,11 @@ class Message{
     static LOGIN_ISNOT_MATCH='<p style="color:red;">用户名和密码不匹配</p>';
     static LOGIN_WELCOME_F='<p style="color:red;">欢迎{0}回来</p>';
     static PROGRESS_DELETE_WARNING_F='确定删除此流程点[{0}]后已存在其它流程点吗？';
+}
+class AuthCatalogues{
+    static ASSIGN_CASES='assignCases';
+    static MANAGE_LIBRARIES='manageLibraries';
+    static MANAGE_USERS='manageUsers';
 }
 const fileTypes={
     'jpeg':{
@@ -404,6 +409,15 @@ const expertises={//代理律师专长
 // ADD rating INT(11) default '0' AFTER descriptions;
 
 // CREATE TABLE expertises (
+//     id INT PRIMARY KEY,
+//     name VARCHAR(255) NOT NULL, 
+//     descriptions VARCHAR(255)
+// );
+
+// ALTER TABLE names
+// ADD authCatalogues VARCHAR(255);
+
+// CREATE TABLE auth_catalogues (
 //     id INT PRIMARY KEY,
 //     name VARCHAR(255) NOT NULL, 
 //     descriptions VARCHAR(255)

@@ -323,29 +323,7 @@ $('body').on(preload_completed_event_name,function(){
     //在过滤表格后同步表格头和身的宽度
 
     //按权限设置可查看类型和元素
-    $('.admin-ui').hide();
-    $('.super-ui').hide();
-    if(getGlobalJson('currentUser').level==1){
-        FormTemplate3.template.caseInfo.data.legalAgencies.isDisabled=true;
-        FormTemplate3.template.caseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
-        FormTemplate3_instance.template.baseInfo.data.legalAgencies_p.defaultValue=getGlobalJson('currentUser').id;
-        FormTemplate3_instance.template.baseInfo.data.legalAgencies_p.isDisabled=true;
-        FormTemplate3_instance.template.baseInfo.data.typeId_p.isDisabled=true;
-        FormTemplate3_execute.template.baseInfo.data.typeId_p.isDisabled=true;
-        progress_form_template.template.legalAgencies_p.isDisabled=true;
-        header_filter_template.template.legalAgencies_f.isDisabled=true;
-        header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
-        console.log('FormTemplate3.template.caseInfo',FormTemplate3.template.caseInfo);
-        //$('#legalAgenciesSum').hide();
-        $('#legalAgenciesSum').find('a.ui-collapsible-heading-toggle').text('项目信息')
-        $('.super-auth').hide();
-    }else if(getGlobalJson('currentUser').level==adminLevel){
-        //$('#case_reg_but_restore').show();
-        $('.admin-ui').show();
-        $('.super-ui').show();
-    }else if(getGlobalJson('currentUser').level==supervisorLevel){
-        $('.super-ui').show();
-    }
+    setUserAuth();
     setUserNotifiications();
     
     caseForm=_createNewCaseForm(FormTemplate3,"case_reg_page");
@@ -1116,5 +1094,39 @@ function InitialCombinedData(){
             if(agent.isInactived==0) return agent.id
         })
         DataList.combinedData=DataList.combinedData.filter(data=> agencies.includes(data.legalAgencies))
+    }
+}
+function setUserAuth(){
+    $('.admin-ui').hide();
+    $('.super-ui').hide();
+    if(getGlobalJson('currentUser').level==1){
+        FormTemplate3.template.caseInfo.data.legalAgencies.isDisabled=true;
+        FormTemplate3.template.caseInfo.data.legalAgencies.defaultValue=getGlobalJson('currentUser').id;
+        FormTemplate3_instance.template.baseInfo.data.legalAgencies_p.defaultValue=getGlobalJson('currentUser').id;
+        FormTemplate3_instance.template.baseInfo.data.legalAgencies_p.isDisabled=true;
+        FormTemplate3_instance.template.baseInfo.data.typeId_p.isDisabled=true;
+        FormTemplate3_execute.template.baseInfo.data.typeId_p.isDisabled=true;
+        progress_form_template.template.legalAgencies_p.isDisabled=true;
+        header_filter_template.template.legalAgencies_f.isDisabled=true;
+        header_filter_template.template.legalAgencies_f.defaultValue=getGlobalJson('currentUser').id;
+        console.log('FormTemplate3.template.caseInfo',FormTemplate3.template.caseInfo);
+        //$('#legalAgenciesSum').hide();
+        $('#legalAgenciesSum').find('a.ui-collapsible-heading-toggle').text('项目信息')
+        $('.super-auth').hide();
+    }else if(getGlobalJson('currentUser').level==adminLevel){
+        //$('#case_reg_but_restore').show();
+        $('.admin-ui').show();
+        $('.super-ui').show();
+    }else if(getGlobalJson('currentUser').level==supervisorLevel){
+        $('.super-ui').show();
+    }
+    if(getGlobalJson('currentUser').authCatalogues!=undefined && getGlobalJson('currentUser').authCatalogues!=null){
+        var autoCatalogues=getGlobalJson('currentUser').authCatalogues.split(',');
+        
+        
+        autoCatalogues.forEach(catalogue=>{
+            console.log('currentUser',getGlobalJson('currentUser'),$('.'+catalogue));
+            $('.'+catalogue).show();
+        })
     }
 }

@@ -295,7 +295,7 @@ $('#popupMenu').find('a').on('click',function(e){
             break;
         case '管理现有库':
 
-            databases($('#resourcesDatabasePage').find('.ui-content'));
+            resourceLibraries($('#resourcesDatabasePage').find('.ui-content'));
             goToPage( $(this).attr( "href" ));
             break;
         case '消息中心':

@@ -143,7 +143,7 @@ function getValueIfHaveDataRef(template,data){
             if(data.constructor == Array){
                 data = data.map(d=>template.hasOwnProperty('valueKey')?d[template.valueKey]:d);
                 
-                console.log('constructor',data)
+                //console.log('constructor',data)
                 data=data.join(tableSeperator);
             }
         }
@@ -151,7 +151,7 @@ function getValueIfHaveDataRef(template,data){
     }
 }
 function checkChanged(self){
-    console.log($(self).jqmData('table'));
+    //console.log($(self).jqmData('table'));
     var table=$(self).jqmData('table');
     var checkboxAll=$($(table).jqmData('fixedHead')!=null?$(table).jqmData('fixedHead'):$(table)).find('.reg-checkbox-all');
     // $.each($(table).find("input[type=checkbox][name=item_checkbox]"),function(index,checkbox) {
@@ -172,6 +172,8 @@ function checkChanged(self){
         //tr.not(':hidden').length==tr.not(':hidden').find('input[type="checkbox"]:checked').length
         currentSelectedCases.length==$(table).jqmData('currentData').length
     );
+    if(currentSelectedCases.length>0) $('.case_reg_but.disabled-ItemInactived').removeClass('ui-disabled');
+    else $('.case_reg_but.disabled-ItemInactived').addClass('ui-disabled');
 }
 function getTdHtml(template,data,id){
     var td=$('<td name="'+id+'"" style="text-align: center;vertical-align: middle;"></td>');
@@ -333,7 +335,8 @@ $.fn.extend({
                 currentSelectedCases=[];
             }
             tr.not(':hidden').find('input[type="checkbox"]').prop( "checked", $(this).prop('checked') );
-
+            if(currentSelectedCases.length>0) $('.case_reg_but.disabled-ItemInactived').removeClass('ui-disabled');
+            else $('.case_reg_but.disabled-ItemInactived').addClass('ui-disabled');
         });
     
     },
@@ -381,6 +384,9 @@ $.fn.extend({
         if(_this.jqmData('currentPage')>0){
             _this.jqmData('currentPage',_this.jqmData('currentPage')-1);
             _this.updateTable();
+            var scrollLeft=$('#main-body').scrollLeft();
+            $('#main-body').scrollLeft(0);
+            //$('#main-body').scrollLeft(scrollLeft);
         }
     },
     nextPage:function(){
@@ -388,11 +394,20 @@ $.fn.extend({
         if(_this.jqmData('currentPage')<_this.jqmData('maxPage')-1){
             _this.jqmData('currentPage',_this.jqmData('currentPage')+1);
             _this.updateTable();
+            var scrollLeft=$('#main-body').scrollLeft();
+            //$('#main-body').scrollLeft(1);
+            $('#main-body').scrollLeft(0);
+            //$('#main-body').scrollLeft(scrollLeft);
+            
         }
     },
     gotoPage:function(pageNum,isNewItem){
+        var scrollLeft=$('#main-body').scrollLeft();
         $(this).jqmData('currentPage',pageNum);
         $(this).updateTable(isNewItem);
+        //$('#main-body').scrollLeft(1);
+        $('#main-body').scrollLeft(0);
+            //$('#main-body').scrollLeft(scrollLeft);
     },
     searchTable:function(searchStr){
         //console.log('searchTable',searchStr);

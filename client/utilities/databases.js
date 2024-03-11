@@ -213,14 +213,15 @@ function resourceDBDetails(parent,target){
     var main_form= new mform({template:template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
     var form=main_form.instance;
     
+    //const popup_form = document.getElementById(constainerId);
+    $(parent).find('.ui-content').append(form);
+    $(parent).find('.ui-content').trigger('create');
+    
     if(data!=undefined) main_form.setValues(data)
     else{
         main_form.setValueById("id",data.id)
         main_form.setValueById("fee",0.0)
     }
-    //const popup_form = document.getElementById(constainerId);
-    $(parent).find('.ui-content').append(form);
-
     // columns.forEach(column=>{
     //     if(column=='id' && isAdd){
             
@@ -229,7 +230,7 @@ function resourceDBDetails(parent,target){
     //         console.log(column=='id',getGlobalJson('currentUser').level!=adminLevel)
     //         $(parent).find('.ui-content').append(formItem(
     //             column,
-    //             template,
+    //             template.template,
     //             data?data[column]:undefined,
     //             column=='id' && getGlobalJson('currentUser').level!=adminLevel));
     //     }
@@ -269,9 +270,9 @@ function formItem(id,template,value,isDisabled){
     var labelItem=$('<label for="'+id+'">'+label+(template[id].isOptional?'':'<span class="optionMark">*</span>')+'</label>');
     formItemContainer.append(labelItem);
     var item;
-    if(type=="label"){
+    if(type=="text"||type=="textarea"){
         item=$('<input type="text" name="'+id+'" id="'+id+'" placeholder="'+label+'" value="'+(value!=undefined?value:'')+'">');
-    }else if(type=="bool"){
+    }else if(type=="radio"){
         var item=$('<fieldset data-role="controlgroup" data-type="horizontal"></fieldset>')
         if(template[id].data){
             template[id].data.forEach((d,i)=>{

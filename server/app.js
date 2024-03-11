@@ -130,8 +130,8 @@ io.on('connection', (socket) => {
     
   });
   socket.on('message', (data) => {
-    console.log('user login message: ',data,socket.id,data.recordLoginHistory==1);
-    if(data.recordLoginHistory==1){
+    console.log('user login message: ',data,socket.id);
+    if(data!=null && data.recordLoginHistory==1){
       clients[socket.id]=data;
       const db= DbService.getDbServiceInstance();
       const result = db.insert('loginLogs',{

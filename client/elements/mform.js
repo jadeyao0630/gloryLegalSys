@@ -575,6 +575,7 @@ mform.prototype={
             var subContainer=$('<div class="form-original"></div>');
             subContainer.append(radio_container);
             //radio_container.find('input[type="radio"]').checkboxradio().checkboxradio('refresh');
+            //subContainer.trigger('create');
             return subContainer;
     },
     generateCheckgroup:function(itemId,itemTemplate){
@@ -703,9 +704,9 @@ mform.prototype={
                 $($.grep($(this).find('option'),option=>$(option).text()==="无")).prop('selected',false);;
             }
         });
-        selectItem.trigger('create');
+        //selectItem.trigger('create');
         //selectItem.selectmenu().selectmenu('refresh')
-        subContainer.trigger('create');
+        //subContainer.trigger('create');
         return subContainer;
         function setOptionItem(index,data,itemTemplate,key){
             key=key||'';

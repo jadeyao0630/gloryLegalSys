@@ -1563,6 +1563,14 @@ var add_evidence_template;
                       displayFormat:'{descriptions}',
                       isAdminOnly:true
                   },
+                  authCatalogues:{
+                    label:"选择子权限",
+                    type:"checkgroup",
+                    data:resourceDatas.auth_catalogues,
+                    isOptional:true,
+                    valueKey:'id',
+                    displayFormat:'{name}',
+                  },
               }
               
           },
@@ -1648,7 +1656,15 @@ var add_evidence_template;
                       data:["否","是"],
                       isOptional:true,
                       isAdminOnly:true
-                  }
+                  },
+                  authCatalogues:{
+                    label:"选择子权限",
+                    type:"checkgroup",
+                    data:resourceDatas.auth_catalogues_,
+                    isOptional:true,
+                    valueKey:'name',
+                    displayFormat:'{descriptions}',
+                  },
               }
               
           },

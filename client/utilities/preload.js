@@ -147,6 +147,10 @@ logingStatus().then(function(e){
                         resourceDatas[k+"_"]=d;
                     }else if(k=="legalCounsels"){
                         resourceDatas[k+"_"]=d;
+                    }else if(k=="auth_catalogues"){
+                        resourceDatas[k+"_"]=d;
+                    }else if(k=="string_format"){
+                        resourceDatas[k+"_"]=d;
                     }else{
                         resourceDatas[k]=d;
                     }

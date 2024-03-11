@@ -80,6 +80,8 @@ const basicTableList={
     casePersonnelStatus:{tablename:"casePersonnelStatus",template:_casePersonnelStatus},
     notifications:{tablename:"notifications",template:_notifications},
     expertises:{tablename:"expertises",template:expertises},
+    auth_catalogues:{tablename:"auth_catalogues",template:auth_catalogues},
+    string_format:{tablename:"string_format",template:string_format},
 }
 const caseTableList={
     //userList:{tablename:"names",template:users},

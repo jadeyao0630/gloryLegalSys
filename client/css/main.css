@@ -833,6 +833,10 @@ body .ui-content{
   
   border-left: 1px solid rgba(0,0,0,.05);
 }
+.pagination-maxItem{
+  line-height: 39px;
+  margin-left: 5px;
+}
 /*
 
 

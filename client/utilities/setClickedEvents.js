@@ -293,9 +293,14 @@ $('#popupMenu').find('a').on('click',function(e){
         case '数据库管理':
             goToPage( $(this).attr( "href" ));
             break;
-        case '管理现有库':
+        case '现有资源库':
 
             resourceLibraries($('#resourcesDatabasePage').find('.ui-content'));
+            goToPage( $(this).attr( "href" ));
+            break;
+        case '字符库':
+
+            stringFormatResources($('#stringFormatesDatabasePage').find('.ui-content'));
             goToPage( $(this).attr( "href" ));
             break;
         case '消息中心':

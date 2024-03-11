@@ -383,7 +383,16 @@ const expertises={//代理律师专长
     name:"VARCHAR(255)",//代理律师专长名称
     descriptions:"VARCHAR(255)",//代理律师专长说明
 }
-
+const auth_catalogues={//代理律师专长
+    id:"INT NOT NULL,PRIMARY KEY",//代理律师专长唯一序列号
+    name:"VARCHAR(255)",//代理律师专长名称
+    descriptions:"VARCHAR(255)",//代理律师专长说明
+}
+const string_format={
+    id: 'VARCHAR(255) NOT NULL,PRIMARY KEY',
+    displayFormat:'VARCHAR(1000)',
+    descriptions:"VARCHAR(255)",//代理律师专长说明
+}
 
 // 用户名
 // u_igso6mtg
@@ -422,3 +431,10 @@ const expertises={//代理律师专长
 //     name VARCHAR(255) NOT NULL, 
 //     descriptions VARCHAR(255)
 // );
+
+// CREATE TABLE `glory`.`string_format`( 
+//     `id` VARCHAR(255) NOT NULL , 
+//     `displayFormat` VARCHAR(1000), 
+//     descriptions VARCHAR(255),
+//     PRIMARY KEY (`id`)
+//   )

@@ -986,28 +986,28 @@ function InitialCombinedData(){
         var date=update;
         if(update.hasOwnProperty('updatesId')){
             date=update.dateUpdated;
-            format=add_update_template.settings.displayFormat;
+            format=resourceDatas.string_format_.find(f=>f.id=='caseUpdates').displayFormat;
             $.each(update,(key,val)=>{
                 format=format.replace(`{${key}}`,val)
             })
         }
         else if(update.hasOwnProperty('excutesId')){
             date=update.dateExecuted;
-            format=add_execute_template.settings.displayFormat;
+            format=resourceDatas.string_format_.find(f=>f.id=='caseExcutes').displayFormat;
             $.each(update,(key,val)=>{
                 format=format.replace(`{${key}}`,val)
             })
         }
         else if(update.hasOwnProperty('propertyId')){
             date=update.dateUpdated;
-            format=add_property_template.settings.displayFormat;
+            format=resourceDatas.string_format_.find(f=>f.id=='caseProperties').displayFormat;
             $.each(update,(key,val)=>{
                 format=format.replace(`{${key}}`,val)
             })
         }
         else if(update.hasOwnProperty('evidenceId')){
             date=update.dateUploaded;
-            format=add_evidence_template.settings.displayFormat;
+            format=resourceDatas.string_format_.find(f=>f.id=='caseAttachments').displayFormat;
             $.each(update,(key,val)=>{
                 format=format.replace(`{${key}}`,val)
             })

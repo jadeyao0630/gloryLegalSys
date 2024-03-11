@@ -311,3 +311,50 @@ function formItem(id,template,value,isDisabled){
     
     return formItemContainer;
 }
+
+function stringFormatResources(parent){
+    $(parent).empty();
+    var template={
+        settings:{
+            hasLabel:true,
+            hasPlaceHolder:true,
+            labelPosition:"left",
+            isCollapsibleGrouping:false,
+          },
+          template:{
+          }
+    }
+    console.log(resourceDatas.string_format_,$(parent).find('.stringFormatsDBDetails-save-btn'))
+    var formData={};
+    $.each(resourceDatas.string_format_,(index,value)=>{
+        template.template[value.id]={label:value.descriptions,type:'text'}
+        formData[value.id]=value.displayFormat;
+    })
+    
+    console.log(template,$(parent))
+    var main_form= new mform({template:template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
+    var form=main_form.instance;
+    
+    //const popup_form = document.getElementById(constainerId);
+    $(parent).append(form);
+    $(parent).trigger('create');
+    if(formData!=undefined) main_form.setValues(formData);
+    $('#stringFormatesDatabasePage').find('.stringFormatsDBDetails-save-btn').off('click');
+    $('#stringFormatesDatabasePage').find('.stringFormatsDBDetails-save-btn').on('click',function(e){
+        //console.log(e.target,isAdd)
+        main_form.getFormValues(function(e){
+            console.log(e)
+            if(e.success){
+                insert('string_format',e.values,function(res){
+                    console.log(res.success);
+                    if(res.success){
+                        $().minfo('show',{title:"提示",message:"保存完毕。"},function(){});
+                        resourceDatas.string_format_=updateOriginalData(resourceDatas.string_format_,e.values,"id");
+                    }else{
+                        $().minfo('show',{title:"提示",message:"保存出错。"+res.error},function(){});
+                    }
+                })
+            }
+        });
+    });
+}

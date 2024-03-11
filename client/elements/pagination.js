@@ -268,6 +268,8 @@ $.fn.extend({
             var exsit=$(this.jqmData('paginationContainer')).find('a');
             $(this.jqmData('paginationContainer')).empty();
             controlgroup.append(exsit);
+            var maxItem=$('<span class="pagination-maxItem"></span>');
+            controlgroup.append(maxItem);
             $(this.jqmData('paginationContainer')).append(controlgroup);
             $(this.jqmData('paginationContainer')).trigger('create');
 
@@ -906,7 +908,9 @@ $.fn.extend({
                     $('.page_btn_left').removeClass('ui-disabled');
                 }
             }
-            
+            var startIndex=_this.jqmData('currentPage')*_this.jqmData('itemsPerPage');
+            var nextIndex=startIndex+_this.jqmData('itemsPerPage')>_this.jqmData('currentData').length?_this.jqmData('currentData').length:startIndex+_this.jqmData('itemsPerPage');
+            $('.pagination-maxItem').text((startIndex+1)+"-"+nextIndex+"/"+_this.jqmData('currentData').length);
             console.log("no page",startPage,endPage,_this.jqmData('itemsPerPage'));
             var newItem;
             var tds;

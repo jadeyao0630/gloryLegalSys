@@ -76,7 +76,8 @@
 					<li data-role="list-divider" class="admin-ui">数据库</li>
 					<li><a href="#databasePage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-gear admin-ui" data-rel="back">数据库管理</a></li>
 					<li data-role="list-divider" class="super-ui manageLibraries">库管理</li>
-					<li><a href="#resourcesDatabasePage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue btn-icon-edit ui-icon-gear popup-menu-btns popup-edit-gear super-ui manageLibraries" data-rel="back">管理现有库</a></li>
+					<li><a href="#resourcesDatabasePage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-blue btn-icon-edit ui-icon-gear popup-menu-btns popup-edit-gear super-ui manageLibraries" data-rel="back">现有资源库</a></li>
+					<li><a href="#stringFormatesDatabasePage" class="ui-btn ui-btn-a ui-btn-icon-left btn-icon-green btn-icon-edit ui-icon-edit popup-menu-btns popup-edit-gear super-ui manageStringFormats" data-rel="back">字符库</a></li>
                 </ul>
             </div>
             
@@ -98,7 +99,9 @@
 						<!--<input type="text" id="num-rows-page" style="max-width:60px;" placeholder="每页行数" data-wrapper-class="controlgroup-textinput ui-btn">-->
 						<a href="#" id="case_assign" data-tooltip="分配所选案件给指定法务" class="ui-btn ui-btn-icon-left ui-icon-user btn-icon-green case_reg_but super-ui disabled-ItemInactived ui-disabled tooltip-btn assignCases">分配</a>
 					</div>
-					<div id="pagination_container" style="position: absolute;transform: translateX(-50%);left: 50%;margin-top: 3px;"><a id="submit_rows_page" href="#" data-tooltip="修改表格相关设置" class="ui-btn ui-icon-grid btn-icon-wendyblue footerBtn case_reg_but ui-btn-icon-notext tooltip-btn" onclick="setRowsPrePageEvent()">表格设置</a></div>
+					<div id="pagination_container" style="position: absolute;transform: translateX(-50%);left: 50%;margin-top: 3px;">
+						<a id="submit_rows_page" href="#" data-tooltip="修改表格相关设置" class="ui-btn ui-icon-grid btn-icon-wendyblue footerBtn case_reg_but ui-btn-icon-notext tooltip-btn" onclick="setRowsPrePageEvent()">表格设置</a>
+					</div>
 					<div data-role="controlgroup" data-type="horizontal" class="ui-mini ui-shadow ui-btn-right ui-footer-btns">
 						<button id="export_excel" class="btn-icon-blue btn-tooltip file-export" data-icon="action" data-tooltip="导出当前表格成EXCEL" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)" onclick="exportExcel()">导出</button>
 						<a href="#chart_sum_page" id="chart_sum" rel="external" class="ui-btn ui-icon-gear btn-icon-green ui-btn-icon-left case_reg_but chart-pie" data-tooltip="分析案件" onmouseout="hideTooltip(this)" onmouseover="showTooltip(this)">分析</a>
@@ -316,6 +319,15 @@
 			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
 			<h1 class="resourcesDatabaseDetailsTitle">库信息</h1>
 			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green edit-header-btn resourcesDBDetails-save-btn">保存</button>
+		</div><!-- /header -->
+		<div class="ui-body-d ui-content">
+		</div>
+	</div>
+	<div data-role="page" id="stringFormatesDatabasePage" >
+		<div data-role="header" data-position="fixed" data-tap-toggle="false">
+			<a href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back btn-icon-blue edit-header-btn" data-rel="back">返回</a>
+			<h1 class="stringFormatDatabaseTitle">管理字符库</h1>
+			<button name="save_btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-check btn-icon-green stringFormatsDBDetails-save-btn">保存</button>
 		</div><!-- /header -->
 		<div class="ui-body-d ui-content">
 		</div>

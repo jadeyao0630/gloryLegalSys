@@ -5,7 +5,7 @@ var IPS={
     test:{ip:'192.168.10.68',port:5556},
     remote:{ip:'cn.luyao.site',port:5568}}
 var showDebug=false;
-const serverSelection=IPS.home
+const serverSelection=IPS.glory
 let ip=serverSelection.ip;
 let port=serverSelection.port;
 var auth_code='1234';
@@ -432,9 +432,9 @@ const string_format={
 //     descriptions VARCHAR(255)
 // );
 
-// CREATE TABLE `glory`.`string_format`( 
-//     `id` VARCHAR(255) NOT NULL , 
-//     `displayFormat` VARCHAR(1000), 
+// CREATE TABLE string_format( 
+//     id VARCHAR(255) NOT NULL , 
+//     displayFormat VARCHAR(1000), 
 //     descriptions VARCHAR(255),
 //     PRIMARY KEY (`id`)
 //   )

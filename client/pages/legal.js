@@ -140,10 +140,9 @@ $('body').on(main_load_completed_event_name,function(){
         if (watinglist.hasOwnProperty('settings')) {
             clearInterval(intervalId);
             
-            
             InitialCombinedData();
             currentData=DataList.combinedData;
-            console.log('DataList.combinedData',DataList.combinedData)
+            //console.log('DataList.combinedData',DataList.combinedData)
             $('#pageOneTable').updateSource(DataList.combinedData);
             
             //$('#pageOneTable').trigger('create');
@@ -250,7 +249,7 @@ $('body').on(preload_completed_event_name,function(){
     
     setVisibleColumnToTemplate();
     var tableSettings=getUserTableSettings();
-    console.log('tableSettings',tableSettings);
+    //console.log('tableSettings',tableSettings);
     /*
     pageOnTable=new pageTable({
 		containerId:"pageOneTable",
@@ -269,7 +268,7 @@ $('body').on(preload_completed_event_name,function(){
     _firstPageTableColumns.rowButtons.data=tableFunBtns;
     _firstPageTableColumns.firstLegalCounsel.data = _legalcounsels;
     _firstPageTableColumns.secondLegalCounsel.data = _legalcounsels;
-    console.log("resourceDatas.legalCounsels",_legalcounsels);
+    //console.log("resourceDatas.legalCounsels",_legalcounsels);
     $("#pageOneTable").pagination({
         //source:DataList.casesDb,
         tableTemplate:_firstPageTableColumns,
@@ -804,7 +803,7 @@ function setTableMaxHeight(){
 function setPersonCaseSum(data){
     if(data==undefined) data=DataList.combinedData;
     var personCaseSum=getPersonCaseSum(data);
-    console.log(personCaseSum);
+    //console.log(personCaseSum);
     $('#panel_sum_info').empty();
     var info=$(`<li data-role="list-divider" style="border-bottom: 2px solid orangered;">当前表格案件总数<span class="ui-li-count">${personCaseSum.caseNum}</span></li>`+
         `<li>群诉<b id="footer_sum_label_group" style="color:#1362B7;"> ${personCaseSum.caseLabels[3].length} </b>件</li>`+
@@ -876,7 +875,7 @@ function getPersonCaseSum(data){
         sum.penaltyAmount+=parseFloat(d.penalty);
         sum.paidAmount+=parseFloat(d.paidAmount);
     });
-    console.log(sum);
+    //console.log(sum);
     return sum;
 }
 function setVisibleColumnToTemplate(){
@@ -912,7 +911,7 @@ function getLegalAngenciesSum(){
     //var legalAgencies1={};
     var summary={};
     var data=currentData || DataList.combinedData
-    console.log('getLegalAngenciesSum',data);
+    //console.log('getLegalAngenciesSum',data);
     data.forEach(item=>{
         var match=$.grep(resourceDatas.legalAgencies,(d=>d.id==item.legalAgencies));
         if(match.length>0){
@@ -940,7 +939,7 @@ function getLegalAngenciesSum(){
             summary[catelog]['amount']+=parseFloat(item.requestAmount);
         }
     });
-    console.log(summary)
+    //console.log(summary)
     return summary;
 }
 function _createNewCaseForm(template, constainerId){
@@ -986,33 +985,51 @@ function InitialCombinedData(){
         var date=update;
         if(update.hasOwnProperty('updatesId')){
             date=update.dateUpdated;
-            format=resourceDatas.string_format_.find(f=>f.id=='caseUpdates').displayFormat;
-            $.each(update,(key,val)=>{
-                format=format.replace(`{${key}}`,val)
-            })
+            format=resourceDatas.string_format_.find(f=>f.id=='caseUpdates');
+            if(format!=undefined){
+                format=format.displayFormat;
+                $.each(update,(key,val)=>{
+                    format=format.replace(`{${key}}`,val)
+                })
+            }
+            
         }
         else if(update.hasOwnProperty('excutesId')){
             date=update.dateExecuted;
-            format=resourceDatas.string_format_.find(f=>f.id=='caseExcutes').displayFormat;
-            $.each(update,(key,val)=>{
-                format=format.replace(`{${key}}`,val)
-            })
+            format=resourceDatas.string_format_.find(f=>f.id=='caseExcutes');
+            //console.log(format);
+            if(format!=undefined){
+                format=format.displayFormat;
+                $.each(update,(key,val)=>{
+                    format=format.replace(`{${key}}`,val)
+                })
+            }
         }
         else if(update.hasOwnProperty('propertyId')){
             date=update.dateUpdated;
-            format=resourceDatas.string_format_.find(f=>f.id=='caseProperties').displayFormat;
-            $.each(update,(key,val)=>{
-                format=format.replace(`{${key}}`,val)
-            })
+            format=resourceDatas.string_format_.find(f=>f.id=='caseProperties');
+            if(format!=undefined){
+                format=format.displayFormat;
+                $.each(update,(key,val)=>{
+                    format=format.replace(`{${key}}`,val)
+                })
+            }
         }
         else if(update.hasOwnProperty('evidenceId')){
             date=update.dateUploaded;
-            format=resourceDatas.string_format_.find(f=>f.id=='caseAttachments').displayFormat;
-            $.each(update,(key,val)=>{
-                format=format.replace(`{${key}}`,val)
-            })
+            format=resourceDatas.string_format_.find(f=>f.id=='caseAttachments');
+            if(format!=undefined){
+                format=format.displayFormat;
+                $.each(update,(key,val)=>{
+                    format=format.replace(`{${key}}`,val)
+                })
+            }
         }
-        update['summary']=formatDateTime(new Date(date),'yyyy年MM月dd日')+" "+format;
+        if(format!=undefined){
+            update['summary']=formatDateTime(new Date(date),'yyyy年MM月dd日')+" "+format;
+        }else{
+            console.error('string_format 尚未被设置')
+        }
         _updates[update.id].push(update);
     })
     const sortedKeys = Object.keys(_updates).sort((a, b) => b - a );
@@ -1045,7 +1062,7 @@ function InitialCombinedData(){
         _legalFees[data.id]+=Number(data.legalFee);
     })
     
-    console.log(_excutes)
+    //console.log(_excutes)
     var combinedData=[];
     DataList.casesDb.forEach((data)=>{
         var matchedData=DataList.caseStatus.filter(sta => sta.id==data.id);

@@ -298,7 +298,7 @@ $('#popupMenu').find('a').on('click',function(e){
             resourceLibraries($('#resourcesDatabasePage').find('.ui-content'));
             goToPage( $(this).attr( "href" ));
             break;
-        case '字符库':
+        case '字符模板库':
 
             stringFormatResources($('#stringFormatesDatabasePage').find('.ui-content'));
             goToPage( $(this).attr( "href" ));
@@ -411,7 +411,7 @@ function compareValues(source,target,prefix){
     if(isSame && Object.keys(waitingList).length>0) {isSame=false;}
     return isSame;
 }
-console.log('backbtn',$('#progress_point_info').find('[data-role="header"]'))
+//console.log('backbtn',$('#progress_point_info').find('[data-role="header"]'))
 $('#progress_point_info').find('[data-role="header"]').find('a[data-rel="back"]').on('click',function(e){
     //console.log(getGlobal('currentPage'));
     e.preventDefault();
@@ -2538,7 +2538,7 @@ function setUserNotifiications(){
     
     userData.notifications=JSON.stringify(notifications);
     setGlobalJson('currentUser',userData);
-    console.log("unreads",notifications,isread,getUnreadNum(notifications,isread));
+    //console.log("unreads",notifications,isread,getUnreadNum(notifications,isread));
     $('.notif_num').text(getUnreadNum(notifications,isread));
     if(getUnreadNum(notifications,isread)>0){
         $('.notif_num').show();

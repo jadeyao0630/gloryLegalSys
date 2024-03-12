@@ -100,12 +100,12 @@ function getValueIfHaveDataRef(template,data){
             }
             if(refData.length>0){
                 if(template.isMultipleValue){
-                    console.log("table item",data,refData);
+                    //console.log("table item",data,refData);
             
                     var temp_data=[];
                     if(template.hasOwnProperty('valueKey')){
                         $.each(refData,(i,v)=>{
-                            console.log(i,v);
+                            //console.log(i,v);
                             if(v.hasOwnProperty(template.valueKey)) {
                                 var val=v[template.valueKey];
                                 if(template.hasOwnProperty('displayFormat')){
@@ -354,7 +354,7 @@ $.fn.extend({
         $.each(datas,(index,value)=>{
             convertedDatas.push(_this.convertData(value));
         });
-        console.log('convertedDatas',convertedDatas);
+        //console.log('convertedDatas',convertedDatas);
         return convertedDatas;
     },
     convertData:function(data){
@@ -713,7 +713,7 @@ $.fn.extend({
         $(this).jqmData('currentData',$(this).jqmData('source'));
         $(this).sortColumn($(this).jqmData('currentSort'));
         $(this).updateTable();
-        console.log('updateSource',$(this).jqmData('source'),datas)
+        //console.log('updateSource',$(this).jqmData('source'),datas)
     },
     rebuiltPageIndicator:function(){
         var _this=this;
@@ -866,7 +866,7 @@ $.fn.extend({
     updateTable:function(isNewItem){
         
         var _this=$(this);
-        console.log('updateTask',_this.jqmData('updateTask'),_this.jqmData('currentAnimations'),_this.jqmData('currentPage'));
+        //console.log('updateTask',_this.jqmData('updateTask'),_this.jqmData('currentAnimations'),_this.jqmData('currentPage'));
         _this.animationsControl();
         _this.jqmData('updateTask',setTimeout( async function() {
             //console.log('updateTask',updateTask)
@@ -890,7 +890,7 @@ $.fn.extend({
                 $('.page_btn').hide();
                 $(_this.jqmData('paginationContainer')).find('.ui-select').hide();
             }else{
-                console.log({currentPage:_this.jqmData('currentPage'),maxPage:_this.jqmData('maxPage')});
+                //console.log({currentPage:_this.jqmData('currentPage'),maxPage:_this.jqmData('maxPage')});
                 $('.page_btn').show();
                 $(_this.jqmData('paginationContainer')).find('.ui-select').show();
                 if(_this.jqmData('maxPage')==1){
@@ -911,11 +911,11 @@ $.fn.extend({
             var startIndex=_this.jqmData('currentPage')*_this.jqmData('itemsPerPage');
             var nextIndex=startIndex+_this.jqmData('itemsPerPage')>_this.jqmData('currentData').length?_this.jqmData('currentData').length:startIndex+_this.jqmData('itemsPerPage');
             $('.pagination-maxItem').text((startIndex+1)+"-"+nextIndex+"/"+_this.jqmData('currentData').length);
-            console.log("no page",startPage,endPage,_this.jqmData('itemsPerPage'));
+            //console.log("no page",startPage,endPage,_this.jqmData('itemsPerPage'));
             var newItem;
             var tds;
             var columnVisibility=_this.jqmData('columnVisibility');
-            console.log('columnVisibility',columnVisibility);
+            //console.log('columnVisibility',columnVisibility);
             for(var index = startPage; index < endPage; index++){
                 //$.each(data,(key,value)=>{
                     var row=_this.jqmData('currentData')[index];
@@ -981,7 +981,7 @@ $.fn.extend({
         if(template==undefined || toggleButton==undefined) return;
         //console.log('tableColumnToggle',settings.template,settings.toggleButton,(settings.template.length>0 && settings.toggleButton!=undefined));
         if(ids.length>0){
-            console.log('tableColumnToggle ok');
+            //console.log('tableColumnToggle ok');
             
             var filterables={};
             var hiddenList={};
@@ -1095,7 +1095,7 @@ $.fn.extend({
         $(this).jqmData('currentData',data);
         $(this).jqmData('source',source);
 
-        console.log("sortColumn",columnData,data,source,new Date('0000-00-00 00:00:00'));
+        //console.log("sortColumn",columnData,data,source,new Date('0000-00-00 00:00:00'));
         $(this).updateTable();
     },
     setFixedHead:function(container) {

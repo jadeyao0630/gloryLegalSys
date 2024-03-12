@@ -27,7 +27,7 @@ mform.prototype={
         var _self=this;
         this.self=this;
         for(var attr in arg){
-            console.log(attr+": "+_self.opt[attr]+"-->"+arg[attr]);
+            //console.log(attr+": "+_self.opt[attr]+"-->"+arg[attr]);
             _self.opt[attr] = arg[attr];
         }
         var template=_self.opt.template;
@@ -694,7 +694,7 @@ mform.prototype={
         var subContainer=$('<div class="form-original" style="overflow: hidden;text-overflow: ellipsis;white-space: nowrap;"></div>');
         subContainer.append(selectItem);
         
-        console.log('generateComboBoxItem',itemId,itemTemplate,itemTemplate.isDisabled);
+        //console.log('generateComboBoxItem',itemId,itemTemplate,itemTemplate.isDisabled);
         if(itemTemplate.isDisabled){
             selectItem.prop("disabled",true);
         }
@@ -820,7 +820,7 @@ mform.prototype={
         var _this=this;
         //var templateKeys=Object.keys(template);
         $.each(template,(key,itemTemplate)=>{
-            console.log(key,itemTemplate);
+            //console.log(key,itemTemplate);
             if(itemTemplate.data!=undefined && itemTemplate.type==undefined){
                 $.each(itemTemplate.data,(subKey,subItemTemplate)=>{
                     _this.setValueById(subKey,undefined);

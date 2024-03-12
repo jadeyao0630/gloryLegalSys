@@ -81,7 +81,7 @@ $.fn.progressChart = function(options){
         point.append(indicator);
         
         var mainInfo=$('<ul data-role="listview" data-inset="true" class="main-info-panel"></ul>');
-        mainInfo.css({'top':(settings.size+20)+"px",width:(settings.distance-40)+"px","max-height":190,"overflow-y": "scroll"});
+        mainInfo.css({'top':(settings.size+20)+"px",width:(settings.distance-40)+"px","max-height":190,"overflow-y": "auto"});
 
         point.append(mainInfo);
         if(settings.status.hasOwnProperty(index)) {

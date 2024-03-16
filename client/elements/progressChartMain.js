@@ -118,27 +118,41 @@ $.fn.progressChart = function(options){
         
     }
     const setMainEventList=function(listview,id){
-        var list=['title','date','caseNo','legalInstitution','sum'];
+        var list={'title':{label:'标签'},
+            'date':{label:'日期'},
+            'caseNo':{label:'案件号'},
+            'legalInstitution':{label:'法院'},
+            'sum':{label:'概要'},
+            'requestAmount':{label:'金额（万）'}};
         listview.empty();
         settings.mainEventData.forEach(element => {
             console.log('updateMainEvent',element.index,id)
             if(element.index==id){
-                list.forEach((l)=>{
-                    var content=element[l];
-                    if(element[l]==null || element[l].length==0||element[l]=="无"||element[l]=="null") content='&nbsp;';
-                    
-                    if(l=="date" && (element[l]=='1999年11月30日' || element[l]=='N下午N年aN月aN日')){
-                        console.log(l,element[l],(l=="date" && element[l]=='1999年11月30日'))
-                        content='暂无'
+                Object.keys(list).forEach((l)=>{
+                    if(element.hasOwnProperty(l)){
+                        var label=$("<label style='font-weight:700;margin:auto 0px;'>"+list[l].label+"</label>");
+                        var content=$('<div>'+element[l]+"</div>");
+                        if(element[l]==null || element[l].length==0||element[l]=="无"||element[l]=="null") content='&nbsp;';
+                        
+                        if(l=="date" && (element[l]=='1999年11月30日' || element[l]=='N下午N年aN月aN日' || element[l]=='0000-00-00 00:00:00')){
+                            console.log(l,element[l],(l=="date" && element[l]=='1999年11月30日'))
+                            content.text('暂无');
+                        }
+                        var li=$('<li class="listview-item" style="word-wrap: break-word;overflow-wrap: break-word;hyphens: auto;white-space: normal;padding:0.3rem 0.5rem;display: grid;grid-template-columns: 80px 1fr;"></li>');
+                        
+                        if(l=="title") {
+                            //li.css({'font-weight':700})
+                            content=$('<h3>'+element[l]+"</h3>");
+                            li=$('<li data-role="list-divider" style="position:sticky;top:0;z-index:1000;padding:0.3rem 0.5rem;"></li>');
+                        }else{
+
+                            li.append(label)
+                        }
+                        li.append(content)
+                        listview.append(li);
+                        //li.setTooltip(";");
                     }
-                    var li=$('<li class="listview-item" style="word-wrap: break-word;overflow-wrap: break-word;hyphens: auto;white-space: normal;">'+content+'</li>');
                     
-                    if(l=="title") {
-                        //li.css({'font-weight':700})
-                        li=$('<li data-role="list-divider" style="position:sticky;top:0;z-index:1000;">'+content+'</li>');
-                    }
-                    listview.append(li);
-                    li.setTooltip(";");
                 })
                 listview.trigger('create').listview().listview('refresh');
                 //mainInfo.append(listview);

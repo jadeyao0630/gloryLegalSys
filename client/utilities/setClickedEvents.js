@@ -896,7 +896,17 @@ function functionBtnsEvent(but,index){
             
             var legalInstitution=$.grep(resourceDatas.legalInstitution_,d=>d.id==matchItems[0].legalInstitution);
             if(legalInstitution.length>0) legalInstitution=legalInstitution[0].name;
-            progressChartMainEvents.push({index:0,date:formatDateTime(new Date(matchItems[0].caseDate),'yyyy年MM月dd日'),caseNo:matchItems[0].caseNo,legalInstitution:legalInstitution,sum:matchItems[0].caseSum,title:'立案'})
+            var item_data={
+                index:0,
+                date:formatDateTime(new Date(matchItems[0].caseDate),'yyyy年MM月dd日'),
+                caseNo:matchItems[0].caseNo,
+                legalInstitution:legalInstitution,
+                sum:matchItems[0].caseSum,
+                title:'立案'};
+            console.log('matchItems[0]',matchItems[0]);
+            if(matchItems[0].hasOwnProperty('requestAmount')) item_data['requestAmount']=matchItems[0]['requestAmount'];
+            progressChartMainEvents.push(item_data)
+            
             $.each(matchedProgressStatus,(i,d)=>{
                 progressChartMainEvents.push(formatMainEventData(d))
             })
@@ -909,7 +919,7 @@ function functionBtnsEvent(but,index){
             var status=JSON.parse(matchItems[0].caseStatus);
             if(status.constructor!=Array)status=[status];
             $('#progress_diagram').progressChart({
-                width:screen.width-32-80,
+                width:window.innerWidth-32-80,
                 eventsData:eventsData,//更新事件数据
                 mainEventData:progressChartMainEvents,//流程图下主要事件数据提取
                 data:resourceDatas.caseStatus_,
@@ -2081,13 +2091,14 @@ $('.edit-header-btn').on('click',async function(e){
                     e.values['isInactived']=e.values.isInactived_a;
                     delete e.values.isInactived_a;
                     e.values.pass=encrypt(e.values.pass)
+                    if(e.values.hasOwnProperty('authCatalogues')) e.values.authCatalogues=e.values.authCatalogues.join(',');
                     saveCurrentUser(e.values,true).then((r)=>{
                         if(r.success){
                             console.log("添加成功。");
                             if(e.values.position>0)
                                 resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,e.values,'id');
-                            resourceDatas['users']=updateOriginalData(resourceDatas['users'],e.values,'id');
-                            $().minfo('show',{title:"提示",message:"添加成功。"},function(){
+                                resourceDatas['users']=updateOriginalData(resourceDatas['users'],e.values,'id');
+                                $().minfo('show',{title:"提示",message:"添加成功。"},function(){
                                 
                             });
                         }else{

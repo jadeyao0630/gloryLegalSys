@@ -8,7 +8,7 @@ const { env } = process;
 require('dotenv').config({
   path: path.resolve(
       __dirname,
-      `./env.${env.NODE_ENV ? env.NODE_ENV : "local"}`
+      `./env.${process.env.NODE_ENV ? process.env.NODE_ENV : "local"}`
     ),
 });
 //const $ = require("jquery");

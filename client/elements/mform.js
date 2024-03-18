@@ -839,6 +839,7 @@ mform.prototype={
         if(itemTemplate==undefined) return;
         if(val==undefined || val == null || val=="undefined"){
             if (itemTemplate.defaultValue!=undefined) val=itemTemplate.defaultValue;
+            else val=null;
         }
         //console.log('setValues',id,val,itemTemplate);
         if(itemTemplate.type.toLowerCase()=="supermulticombobox"){
@@ -850,6 +851,7 @@ mform.prototype={
         }else if(itemTemplate.type.toLowerCase()=="checkbox"){
             element.prop('checked',val);
         }else if(itemTemplate.type.toLowerCase()=="checkgroup"){
+            if (val==null) val=[];
             if(val.constructor == String) {
                 if(val.indexOf(',')>-1)
                     val=val.split(',');
@@ -895,6 +897,7 @@ mform.prototype={
             element.selectmenu().selectmenu('refresh');
         }else if(itemTemplate.type.toLowerCase()=="date" || itemTemplate.type.toLowerCase()=="datetime" || itemTemplate.type.toLowerCase()=="time") {
             console.log('日期 set 1',id,val);
+            if(val==null) val="";
             if(val!='0000-00-00 00:00:00' && val!='0000-00-00' && val!='00:00:00' && val!='1999-11-29T16:00:00.000Z' && val!='1999-11-30T00:00:00.000Z'){
                 if( itemTemplate.type.toLowerCase()=="date") val=formatDateTime(new Date(val),'yyyy-MM-dd');
                 if( itemTemplate.type.toLowerCase()=="datetime") val=formatDateTime(new Date(val),'yyyy-MM-dd');

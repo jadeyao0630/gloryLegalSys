@@ -128,12 +128,13 @@ filter: drop-shadow(0 0.2rem 0.25rem rgba(0, 0, 0, 0.5));
   max-width: 400px;
 }
 .listview-item{
+  position: relative;
   /*white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis;*/
+    overflow-y: auto;
     word-wrap: break-word;
     overflow-wrap: break-word;
     hyphens: auto;
     white-space: normal;
-
 }

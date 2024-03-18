@@ -4,9 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "set NODE_ENV=test && nodemon app.js",
-    "home": "cross-env NODE_ENV=home && node app.js",
-    "local": "cross-env NODE_ENV=local && node app.js"
+    "test": "cross-env NODE_ENV=test nodemon app.js",
+    "home": "cross-env NODE_ENV=home nodemon app.js",
+    "local": "cross-env NODE_ENV=local nodemon app.js"
   },
   "keywords": [],
   "author": "",

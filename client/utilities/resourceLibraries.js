@@ -237,12 +237,23 @@ function resourceDBDetails(parent,target){
         
     // })
     $(parent).find('.resourcesDBDetails-save-btn').off('click');
-    $(parent).find('.resourcesDBDetails-save-btn').on('click',function(e){
+    $(parent).find('.resourcesDBDetails-save-btn').on('click',function(ee){
         //console.log(e.target,isAdd)
         main_form.getFormValues(function(e){
             console.log(e)
             if(e.success){
-                console.log(e.success,table)
+                // var orginal=options[table].data.find(d=>d.id.toString()==e.values.id.toString());
+                // var isAdd=orginal==undefined;
+                // if(!isAdd){
+
+                // }
+                // var details={
+                //     table:table,
+                //     id:Number(e.values.id),
+                //     type:isAdd?'add':'update',
+                //     descriptions:isAdd?`添加 ${e.values.id} 项`:`修改 ${e.values.id} 项`,
+                // }
+                // console.log(e.success,table,details)
                 e.values.id=Number(e.values.id);
                 insert(table,e.values,function(res){
                     console.log(res.success);

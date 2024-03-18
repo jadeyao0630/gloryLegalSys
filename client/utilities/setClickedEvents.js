@@ -411,7 +411,9 @@ function compareValues(source,target,prefix){
     if(isSame && Object.keys(waitingList).length>0) {isSame=false;}
     return isSame;
 }
-//console.log('backbtn',$('#progress_point_info').find('[data-role="header"]'))
+
+
+//#region 节点编辑返回按钮
 $('#progress_point_info').find('[data-role="header"]').find('a[data-rel="back"]').on('click',function(e){
     //console.log(getGlobal('currentPage'));
     e.preventDefault();
@@ -447,35 +449,8 @@ $('#progress_point_info').find('[data-role="header"]').find('a[data-rel="back"]'
         }
     })
 })
-// var isFirstTimeBack=true;
-// var scrollSpeed=1000;
-// $(window).on('popstate', function(event) {
-//     //event.preventDefault();
-//     // if(event.originalEvent.state!=null){
-//     //     //console.log("pop",'back',sessionStorage.getItem('scrollPosition'));
-//     //     //sessionStorage.setItem('scrollPosition', );
-//     //     if(isFirstTimeBack){
-//     //         $("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, scrollSpeed);
-//     //         isFirstTimeBack=false;
-//     //         scrollSpeed=0;
-//     //     }else{
+//#endregion
 
-//     //         $("html, body").scrollTop(sessionStorage.getItem('scrollPosition'));
-//     //     }
-//     //     //console.log('currentPage',getGlobal('currentPage'))
-//     //     //$("html, body").animate({ scrollTop: sessionStorage.getItem('scrollPosition')}, 100);
-//     // }else{
-//     //     if(getGlobal('currentPage')!="#timeline")
-//     //         sessionStorage.setItem('scrollPosition', $("html, body").scrollTop());
-//     //     else{
-
-//     //         isFirstTimeBack=true;
-//     //         scrollSpeed=0;
-//     //     }
-//     //     //console.log("pop",sessionStorage.getItem('scrollPosition'));
-//     // }
-    
-// });
 var currentProgress={};
 
 function showTooltip(self){
@@ -513,7 +488,7 @@ $('.resourcesDatabase_but').on('click',function(e){
     var cango=resourceDBDetails($('#resourcesDatabaseDetailsPage'), $(e.target));
     if(cango) goToPage( $(this).attr( "href" ));
 })
-//节点修改保存按钮事件
+//#region 节点修改保存按钮事件
 $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
     
     console.log('save_btn',getGlobal("currentPoint"),$(this).jqmData('form'));
@@ -537,6 +512,8 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
             var currentDateTime=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
             e.values.typeId=getGlobal("currentPoint");
             runWaitingTask();
+
+            //如果是立案界面
             if(parseInt(getGlobal("currentPoint"))==0) {
                 
                 newData["caseCreateDate"]=currentDateTime;
@@ -663,6 +640,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
     });
     
 })
+//#endregion
 function progress_point_editor(typeId,pointIndex,data,update_data,isAdd){
     console.log('progress_point_editor',{typeId:typeId,data:data,update_data:update_data,pointIndex:pointIndex});
     
@@ -2017,7 +1995,7 @@ function saveMainForm(form,isAddPage){
         }
     });
 }
-//#region 保存按钮事件
+//#region 保存或修改按钮事件
 $('.edit-header-btn').on('click',async function(e){
     console.log('currentPage',sessionStorage.getItem('currentPage'));
     if($(this).text()=="保存"){
@@ -2156,6 +2134,7 @@ $('.edit-header-btn').on('click',async function(e){
     }
         
 })
+//#endregion
 function getFormatText(format,dataObject){
     var text=format;
     $.each(dataObject,(k,v)=>{
@@ -2177,7 +2156,6 @@ function resetPassChangeState(form){
     change_btn.removeClass('btn-icon-green').addClass('btn-icon-blue');
     change_btn.trigger('create');
 }
-//#endregion
 function _setTitleBar(titlebarId,displayKey){
     titlebarId=titlebarId.replace("#","");
     var matched=DataList.combinedData.filter((d)=>{return d.id==sessionStorage.getItem("currentId")});
@@ -2274,6 +2252,7 @@ function _isReadOnlyCurrentForm(){
         return datas[0].isReadOnly;
     return true;
 }
+//#region 转换老版本数据-现无用
 function formatCasesData(data){
 	$.each(data,(index,cas)=>{
 		var personnel=cas['casePersonnel'];
@@ -2458,6 +2437,7 @@ function formatCasesData(data){
 	});
 	return data;
 }
+//#endregion
 function getDataById(source,idKey,matchValue){
     return source.find((data)=>data[idKey]==matchValue);
     

@@ -1,4 +1,4 @@
-function resourceLibraries(parent){
+function resourceLibraries(parent){//无用
     console.log('parent',parent);
     $(parent).css({'max-height':'100%'});
     $('.show-hasInactived').hide();

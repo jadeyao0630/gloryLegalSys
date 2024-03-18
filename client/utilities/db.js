@@ -398,6 +398,22 @@ async function insertRows(table,datas,res){
         if(res!=undefined)res(data.data);
     });
 }
+async function pureInsertRows(table,datas,res){
+    await fetch("http://"+ip+":"+port+"/pureInsertAll",{
+        headers:headers,
+        method: 'POST',
+        body: JSON.stringify({ table: table, data:datas})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.data.success){
+            console.log(data.data.id);
+        }else{
+            console.log(data.data.error);
+        }
+        if(res!=undefined)res(data.data);
+    });
+}
 async function updateLastLogin(id){
     
     return await fetch("http://"+ip+":"+port+"/update",{

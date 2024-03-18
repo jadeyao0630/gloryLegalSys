@@ -349,6 +349,47 @@ class DbService{
             };
         }
     }
+    async pureInsertRows(table,datas){
+        try{
+            //console.log(name);
+            const dateAdded = new Date();
+            var queries=[];
+            var keys;
+            datas.forEach(data=>{
+                if(keys==undefined) keys=Object.keys(data);
+                const _values=[];
+                keys.forEach((key)=>{
+                    //console.log((data[key].constructor === String));
+                    var val=(data[key].constructor === String)?'"'+data[key]+'"':data[key];
+                    _values.push(val);
+                });
+                queries.push("("+_values.join()+")");
+            });
+            var query="INSERT INTO `"+table+"` ("+keys.join()+") VALUES "+queries.join();
+            const insertId = await new Promise((resolve,reject)=>{
+                //console.log(query);
+                mquery(query, (err,result)=>{
+                    if (err) reject(new Error(err.message));
+                    //console.log(result.insertId);
+                    resolve(result);
+                });
+            });
+            
+            //console.log(insertId);
+            return {
+                success: true,
+                id: insertId,
+                createDate: dateAdded,
+            };
+        }catch(error){
+            console.log(error);
+            return {
+                success: false,
+                error: error.message,
+                sourceData:datas
+            };
+        }
+    }
     async insertNewUser(user,pass){
         try{
             //console.log(name);

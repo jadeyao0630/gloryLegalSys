@@ -12,7 +12,7 @@ function findDifferingKeys(obj1, obj2) {
     let differingKeys = [];
     
     Object.keys(obj1).forEach(key => {
-      if (obj1[key] !== obj2[key]) {
+      if (obj1[key].toString() !== obj2[key].toString() ) {
         differingKeys.push(key);
       }
     });

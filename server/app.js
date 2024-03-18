@@ -460,6 +460,16 @@ app.post('/insertAll',(request,response) => {
     .then(data => response.json({data:data}) )
     .catch(err => console.log(err));
 });
+app.post('/pureInsertAll',(request,response) => {
+  //console.log("request.body "+request.header('Content-Type'));
+  const {data} = request.body;
+  const {table} = request.body;
+  const  db= DbService.getDbServiceInstance();
+  const result = db.pureInsertRows(table,data);
+  result
+  .then(data => response.json({data:data}) )
+  .catch(err => console.log(err));
+});
 
 app.post('/createTable',cors(corsOptions),(request,response) => {
     //console.log("request.body "+request.body.columns);

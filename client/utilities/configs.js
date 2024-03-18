@@ -5,7 +5,7 @@ var IPS={
     test:{ip:'192.168.10.68',port:5556},
     remote:{ip:'cn.luyao.site',port:5568}}
 var showDebug=false;
-const serverSelection=IPS.glory
+const serverSelection=IPS.home
 let ip=serverSelection.ip;
 let port=serverSelection.port;
 var auth_code='1234';
@@ -437,4 +437,18 @@ const string_format={
 //     displayFormat VARCHAR(1000), 
 //     descriptions VARCHAR(255),
 //     PRIMARY KEY (`id`)
+//   )
+
+// CREATE TABLE libChangeLog( 
+//     logId INT NOT NULL AUTO_INCREMENT,
+//     id INT NOT NULL , 
+//     userId INT NOT NULL , 
+//     userName VARCHAR(255),
+//     tableName VARCHAR(255),
+//     operateType VARCHAR(255),
+//     keyName VARCHAR(255),
+//     fromValue VARCHAR(255),
+//     toValue VARCHAR(255),
+//     changedTime DATETIME,
+//     PRIMARY KEY (`logId`)
 //   )

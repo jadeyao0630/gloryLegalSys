@@ -97,7 +97,7 @@ function resourceLibraries(parent){
 
                 columns.forEach(column=>{
                     var label=template.hasOwnProperty(column)?template[column].label.replace('(不建议修改)',''):column;
-                    console.log(template,column)
+                    //console.log(template,column)
                     var th=$('<th name="'+column+'"'+(template[column].width?'style="width:'+template[column].width+'"':'')+'>'+label+'</th>');
                     th.css({'user-select':'none'});
                     headTr.append(th)
@@ -242,21 +242,43 @@ function resourceDBDetails(parent,target){
         main_form.getFormValues(function(e){
             console.log(e)
             if(e.success){
-                // var orginal=options[table].data.find(d=>d.id.toString()==e.values.id.toString());
-                // var isAdd=orginal==undefined;
-                // if(!isAdd){
-                //    var diffs=findDifferingKeys(e.values,orginal);
-                    // if(diffs.includes('isInactived')){
-                    //     var active=e.values.isInactived===0?"激活":"禁用";
-                    // }
-                // }
-                // var details={
-                //     table:table,
-                //     id:Number(e.values.id),
-                //     type:isAdd?'add':'update',
-                //     descriptions:isAdd?`添加 ${e.values.id} 项`:`修改 ${e.values.id} 项`,
-                // }
-                // console.log(e.success,table,details)
+                var orginal=options[table].data.find(d=>d.id.toString()==e.values.id.toString());
+                var isAdd=orginal==undefined;
+                //var descriptions=isAdd?`添加 ${e.values.id} 项`:`修改 ${e.values.id} 项`;
+                var type=isAdd?'add':'update';
+                var changeLogs=[];
+                if(!isAdd){
+                   var diffs=findDifferingKeys(e.values,orginal);
+                    diffs.forEach(diff=>{
+                        changeLogs.push({
+                            tableName:table,
+                            id:Number(e.values.id),
+                            operateType:type,
+                            userId:getGlobalJson('currentUser').id,
+                            userName:getGlobalJson('currentUser').name,
+                            keyName:diff,
+                            fromValue:orginal[diff],
+                            toValue:e.values[diff],
+                            changedTime:formatDateTimeStr2Mysql(new Date())
+                        });
+                    })
+                    //descriptions=tempStr.join(", ")
+                }else{
+                    changeLogs.push({
+                        tableName:table,
+                        id:Number(e.values.id),
+                        operateType:type,
+                        userId:getGlobalJson('currentUser').id,
+                        userName:getGlobalJson('currentUser').name,
+                        keyName:"",
+                        fromValue:"",
+                        toValue:"",
+                        changedTime:formatDateTimeStr2Mysql(new Date())
+                    });
+                }
+
+                console.log(changeLogs);
+                pureInsertRows('libChangeLog',changeLogs,(res)=>console.log(res));
                 e.values.id=Number(e.values.id);
                 insert(table,e.values,function(res){
                     console.log(res.success);

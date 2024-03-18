@@ -611,7 +611,7 @@ var add_evidence_template;
         },
         id:{
         label: "序号",
-        width:50,
+        width:55,
         type:"label",
         isFixed:true,
         sortable:{

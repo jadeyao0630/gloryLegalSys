@@ -245,7 +245,10 @@ function resourceDBDetails(parent,target){
                 // var orginal=options[table].data.find(d=>d.id.toString()==e.values.id.toString());
                 // var isAdd=orginal==undefined;
                 // if(!isAdd){
-
+                //    var diffs=findDifferingKeys(e.values,orginal);
+                    // if(diffs.includes('isInactived')){
+                    //     var active=e.values.isInactived===0?"激活":"禁用";
+                    // }
                 // }
                 // var details={
                 //     table:table,

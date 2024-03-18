@@ -8,6 +8,17 @@ function extendOpt(opt1,opt2){
         opt1[attr] = opt2[attr];
     }
 }
+function findDifferingKeys(obj1, obj2) {
+    let differingKeys = [];
+    
+    Object.keys(obj1).forEach(key => {
+      if (obj1[key] !== obj2[key]) {
+        differingKeys.push(key);
+      }
+    });
+    
+    return differingKeys;
+  }
 function setAuthFunctions(){
     if(getGlobalJson('currentUser').level==adminLevel){
         //$('#case_reg_but_restore').show();

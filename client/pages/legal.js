@@ -786,6 +786,12 @@ window.addEventListener('resize',function(){
 function setTableMaxHeight(){
     $('.ui-content').css({'max-height':$(window).height()-83});
     $('#main-body').css({'max-height':$(window).height()-130});
+    const settings=$('#progress_diagram').jqmData('settings');
+    if(settings){
+        settings.width=window.innerWidth-32-80;
+        $('#progress_diagram').progressChart(settings)
+    }
+    
     // setTimeout(() => {
     //     $.each($("#pageOneTable").find('th.fixedColumn'),(index,column)=>{
     //         //console.log($(column).attr('name'),column.getBoundingClientRect().left);

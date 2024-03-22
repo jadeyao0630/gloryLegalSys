@@ -40,6 +40,7 @@ $.fn.progressChart = function(options){
     settings.distance=(settings.width-settings.size)/(settings.status.length-1);
     
     settings.topOffset=settings.size*0.4/3;
+    $(this).jqmData('settings',settings);
     const init = function() {
 
         _this.empty();
@@ -58,6 +59,8 @@ $.fn.progressChart = function(options){
         for(var i=0;i<settings.status.length;i++){
             $(_this).append(addPoint(i));
         }
+        $(_this).trigger('create')
+        $(_this).css({'width':settings.width+"px",height:(settings.topOffset+settings.size+20+210)+"px"})
     }
     const addPoint=function(index){
         settings.distance=(settings.width-settings.size)/(settings.status.length);
@@ -81,7 +84,7 @@ $.fn.progressChart = function(options){
         point.append(indicator);
         
         var mainInfo=$('<ul data-role="listview" data-inset="true" class="main-info-panel"></ul>');
-        mainInfo.css({'top':(settings.size+20)+"px",width:(settings.distance-40)+"px","max-height":190,"overflow-y": "auto"});
+        mainInfo.css({'top':(settings.topOffset+settings.size+20)+"px",width:(settings.distance-40)+"px","max-height":190,"overflow-y": "auto"});
 
         point.append(mainInfo);
         if(settings.status.hasOwnProperty(index)) {

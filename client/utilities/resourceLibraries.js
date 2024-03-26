@@ -264,17 +264,22 @@ function resourceDBDetails(parent,target){
                     })
                     //descriptions=tempStr.join(", ")
                 }else{
-                    changeLogs.push({
-                        tableName:table,
-                        id:Number(e.values.id),
-                        operateType:type,
-                        userId:getGlobalJson('currentUser').id,
-                        userName:getGlobalJson('currentUser').name,
-                        keyName:"",
-                        fromValue:"",
-                        toValue:"",
-                        changedTime:formatDateTimeStr2Mysql(new Date())
-                    });
+                    $.each(e.values,(k,v)=>{
+                        if(v!==undefined && v!==null && v.length>0 && k!=='id' && k!=='isInactived'){
+                            changeLogs.push({
+                                tableName:table,
+                                id:Number(e.values.id),
+                                operateType:type,
+                                userId:getGlobalJson('currentUser').id,
+                                userName:getGlobalJson('currentUser').name,
+                                keyName:k,
+                                fromValue:"",
+                                toValue:v,
+                                changedTime:formatDateTimeStr2Mysql(new Date())
+                            });
+                        }
+                        
+                    })
                 }
 
                 console.log(changeLogs);

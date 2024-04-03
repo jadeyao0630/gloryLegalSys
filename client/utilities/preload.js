@@ -2,7 +2,6 @@
 
 var result=[];
 var collectDbList=true;
-
 $('#main-header').find('h1').html($('#main-header').find('h1').html().replace('{appname}',APP_TITLE).replace('{version}',VERSION))
 $('#main-container').find('h1').html($('#main-container').find('h1').html().replace('{appname}',APP_TITLE).replace('{version}',VERSION));
 document.title=APP_TITLE;

@@ -6,7 +6,8 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test npx nodemon app.js",
     "home": "cross-env NODE_ENV=home npx nodemon app.js",
-    "local": "cross-env NODE_ENV=local npx nodemon app.js"
+    "local": "cross-env NODE_ENV=local npx nodemon app.js",
+    "glory": "cross-env NODE_ENV=glory npx nodemon app.js"
   },
   "keywords": [],
   "author": "",

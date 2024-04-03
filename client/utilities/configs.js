@@ -1,11 +1,15 @@
 var isRunLocal=true;//https://socket.io/get-started/chat/
+
 var IPS={
     home:{ip:'192.168.10.241',port:5555},
     glory:{ip:'192.168.10.68',port:5555},
     test:{ip:'192.168.10.68',port:5556},
     remote:{ip:'cn.luyao.site',port:5568}}
 var showDebug=false;
-const serverSelection=IPS.home
+var serverSelection=IPS.glory
+
+let domain=getDomain();
+serverSelection=domain==="cn.luyao.site"?IPS.remote:serverSelection
 let ip=serverSelection.ip;
 let port=serverSelection.port;
 var auth_code='1234';
@@ -393,7 +397,27 @@ const string_format={
     displayFormat:'VARCHAR(1000)',
     descriptions:"VARCHAR(255)",//代理律师专长说明
 }
+function getDomain(){
+    // 获取referrer URL
+    var referrer = document.referrer;
 
+    // 判断referrer是否存在
+    if (referrer) {
+        // 使用URL构造函数解析referrer
+        var referrerURL = new URL(referrer);
+
+        // 获取referrer的域名
+        var referrerDomain = referrerURL.hostname;
+
+        // 输出referrer的域名
+        console.log('Referrer domain:', referrerDomain);
+        return referrerDomain;
+
+    } else {
+        console.log('没有referrer信息，可能是直接访问或其他情况。');
+    }
+    return undefined;
+}
 // 用户名
 // u_igso6mtg
 // 密码

@@ -519,7 +519,8 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                 newData["caseCreateDate"]=currentDateTime;
                 newData["lastUpdate"]=currentDateTime;
                 console.log('save data',e);
-                //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
+                newData={...newData,...getSuperMultiSelectValue(newData,form)}
+                //console.log("currentUser......",getSuperMultiSelectValue(newData,form),newData);
                 if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
                     $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
                         //HideMessage();
@@ -1355,14 +1356,22 @@ $('.chart-btn').on('click',function(e){
         $('#chart_sum_all').show();
         var data1={};
         var data2={};
+        
         dataSource.forEach(item=>{
-            var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseStatus>=0 && item.caseStatus<3));
-            if(match.length>0){
-                var catelog=match[0].name;
-                if(!data1.hasOwnProperty(catelog)) data1[catelog]=[];
-                if(!data2.hasOwnProperty(catelog)) data2[catelog]=0.0;
-                data1[catelog].push(item);
-                data2[catelog]+=item.requestAmount;
+            var lastStatus=JSON.parse(item.caseStatus)
+            //console.log("在审项目",lastStatus);
+            lastStatus=resourceDatas.caseStatus_.find(s=>s.id===Number(lastStatus[lastStatus.length-1]) && s.isTrial)
+            //console.log("在审项目",lastStatus);
+            if(lastStatus!==undefined){
+                var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject));
+                //console.log("在审项目",match);
+                if(match.length>0){
+                    var catelog=match[0].name;
+                    if(!data1.hasOwnProperty(catelog)) data1[catelog]=[];
+                    if(!data2.hasOwnProperty(catelog)) data2[catelog]=0.0;
+                    data1[catelog].push(item);
+                    data2[catelog]+=item.requestAmount;
+                }
             }
             //console.log('chart_sum',match.label,match)
             //caseCause.push({})
@@ -1389,13 +1398,19 @@ $('.chart-btn').on('click',function(e){
         var data1={};
         var data2={};
         dataSource.forEach(item=>{
-            var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject && item.caseStatus>=3 && item.caseStatus<4));
-            if(match.length>0){
-                var catelog=match[0].name;
-                if(!data1.hasOwnProperty(catelog)) data1[catelog]=[];
-                if(!data2.hasOwnProperty(catelog)) data2[catelog]=0.0;
-                data1[catelog].push(item);
-                data2[catelog]+=item.requestAmount;
+            var lastStatus=JSON.parse(item.caseStatus)
+            console.log("在审项目",lastStatus);
+            lastStatus=resourceDatas.caseStatus_.find(s=>s.id===Number(lastStatus[lastStatus.length-1]) && s.isExcute)
+            console.log("在审项目",lastStatus);
+            if(lastStatus!==undefined){
+                var match=$.grep(resourceDatas.projects_,(d=>d.id==item.caseProject));
+                if(match.length>0){
+                    var catelog=match[0].name;
+                    if(!data1.hasOwnProperty(catelog)) data1[catelog]=[];
+                    if(!data2.hasOwnProperty(catelog)) data2[catelog]=0.0;
+                    data1[catelog].push(item);
+                    data2[catelog]+=item.requestAmount;
+                }
             }
             //console.log('chart_sum',match.label,match)
             //caseCause.push({})
@@ -1954,6 +1969,54 @@ function showProgressDetails(datas,updates,excutes,properties,attachments,caseLi
     setTimeout(function() {
         $().mloader("hide");
     },10);
+}
+function getSuperMultiSelectValue(values,form){
+    var results={}
+    if(values.casePersonnel!==undefined){
+        var itemTemplate=form.getItemTemplate('casePersonnel_p');
+        //console.log('convertToSuperMultiSelectValue',e.values.casePersonnel_p);
+        var vals=[];
+        values.casePersonnel.split(',').forEach(v=>{
+            var formatedData=v.convertToSuperMultiSelectValue(itemTemplate.data,itemTemplate.valueKey,itemTemplate.matchKey);
+            var formatStr='';
+            if(itemTemplate.hasOwnProperty('displayFormat')){
+                formatStr=itemTemplate.displayFormat
+                $.each(formatedData,(k,v)=>{
+                    //console.log('convertToSuperMultiSelectValue',k,v)
+                    formatStr=formatStr.replace('{'+k+'}',v);
+                })
+            }
+            if(formatStr.length>0) vals.push(formatStr);
+            
+        });
+        console.log('convertToSuperMultiSelectValue',vals.join(","));
+        results['casePersonnelStr']=JSON.stringify(vals).replaceAll("\"","\\\"");
+    }
+    if(values.case2ndParty!==undefined){
+        var itemTemplate=form.getItemTemplate('case2ndParty_p');
+        var vals=[];
+        values.case2ndParty.split(',').forEach(v=>{
+            var formatedData=v.convertToSuperMultiInputValue();
+            
+        //console.log('convertToSuperMultiSelectValue',formatedData);
+            var formatStr='';
+            if(itemTemplate.hasOwnProperty('displayFormat')){
+                formatStr=itemTemplate.displayFormat
+                
+            }else{
+                formatStr="{value} ({status})";
+            }
+            $.each(formatedData,(k,v)=>{
+                //console.log('convertToSuperMultiSelectValue',k,v)
+                formatStr=formatStr.replace('{'+k+'}',v);
+            })
+            if(formatStr.length>0) vals.push(formatStr);
+            
+        });
+        console.log('convertToSuperMultiSelectValue',vals.join(","));
+        results['case2ndPartyStr']=JSON.stringify(vals).replaceAll("\"","\\\"");;
+    }
+    return results;
 }
 function saveMainForm(form,isAddPage){
     form.getFormValues(function(e){

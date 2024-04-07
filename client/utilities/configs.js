@@ -145,7 +145,9 @@ const columns={//案件主表
     //caseCompany:"INT NOT NULL DEFAULT '0'",
     caseProject:"INT NOT NULL DEFAULT '0'",//所属项目->projects*
     casePersonnel:"VARCHAR(255) NOT NULL",//我方当事人->corporateCompanies* && corporatePartners*
+    casePersonnelStr:"VARCHAR(500)",//我方当事人
     case2ndParty:"VARCHAR(255) NOT NULL",//对方当事人
+    case2ndPartyStr:"VARCHAR(500)",//对方当事人
     caseCatelog:"INT NOT NULL DEFAULT '0'",//案件类别->caseCatelogs*
     //caseBelongs:"INT NOT NULL DEFAULT '0'",
     caseType:"INT NOT NULL DEFAULT '0'",//案件类型->caseTypes*
@@ -268,6 +270,8 @@ const _caseLinked={//案件状态
 const _caseStatus={//案件状态
     id:"INT NOT NULL,PRIMARY KEY",//案件状态唯一序列号
     isMain:"bool default '1'",//案件状态子序列号
+    isTrial:"tinyint(1) DEFAULT '0' NULL",
+    isExcute:"tinyint(1) DEFAULT '0' NULL",
     name:"VARCHAR(255)",//案件状态名称
     descriptions:"VARCHAR(255)",//案件类型说明
 }
@@ -476,3 +480,9 @@ function getDomain(){
 //     changedTime DATETIME,
 //     PRIMARY KEY (`logId`)
 //   )
+// ALTER TABLE cases ADD casePersonnelStr JSON AFTER casePersonnel;
+// ALTER TABLE cases ADD case2ndPartyStr JSON AFTER case2ndParty;
+
+// alter table `glory`.`case_status` 
+//    add column `isTrial` tinyint(1) DEFAULT '0' NULL after `isMain`, 
+//    add column `isExcute` tinyint(1) DEFAULT '0' NULL after `isTrial`

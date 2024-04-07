@@ -1176,6 +1176,9 @@ $.fn.extend({
                             }
                         }
                     }
+                    if(value!==undefined && value!==null && value.constructor == Array){
+                        value=value.join(',');
+                    }
                     rowData[column_label]=value;
                     //if(!columnName.includes(column_label)) columnName.push(column_label);
                 }

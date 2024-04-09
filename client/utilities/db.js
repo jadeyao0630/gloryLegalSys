@@ -335,10 +335,11 @@ async function removeCases(ids,table,res){
     });
 }
 async function insertCase(data,template,res){
+    console.log('insertCase',JSON.stringify({ template: template, data:data}).replaceAll("\"",""));
     await fetch("http://"+ip+":"+port+"/insertCase",{
         headers:headers,
         method: 'POST',
-        body: JSON.stringify({ template: template, data:data})
+        body: JSON.stringify({ template: template, data:data}).replaceAll("\\\"","")
     })
     .then(response => response.json())
     .then(data => {

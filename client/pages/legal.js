@@ -634,11 +634,13 @@ $('body').on('caseChanged',function(e){
             if(result.length==0){
                 console.log("修改添加成功。");
                 console.log("on data changed0",currentData,DataList.combinedData,DataList.caseStatus,e);
+                saveCaseChangeLog(e.action=="add"?'add':'edit',e.action!="add"?getChanges(DataList.combinedData,e.value):undefined);
+                
+
                 //更新缓存内数据
                 currentData=updateOriginalData(currentData,e.value,'id');//tools.js
                 DataList.combinedData=updateOriginalData(DataList.combinedData,e.value,'id');//tools.js
                 DataList.caseStatus=updateOriginalData(DataList.caseStatus,e.value,'id');//tools.js
-                
                 //更新页面ui数据显示
                 if(e.action=="add"){
                     history.back();
@@ -653,6 +655,7 @@ $('body').on('caseChanged',function(e){
                 }
                 console.log("on data changed1",DataList.combinedData,DataList.caseStatus,e);
                 setPersonCaseSum(currentData);
+                
                 $().mloader('hide');
             }else{
                 console.log(r);
@@ -665,6 +668,71 @@ $('body').on('caseChanged',function(e){
     }, 100);
     
 })
+
+//#region 保存案件变更日志
+function saveCaseChangeLog(operation,changes=undefined){
+    var currentUser=getGlobalJson("currentUser");
+    var currentId=getGlobal("currentId");
+    //var isAdd=isAddPage;
+    var changeDateTime=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
+    if(currentUser==null || currentUser==undefined){
+        $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
+            //HideMessage();
+            window.location.href = 'index.html';
+        });
+    }else{
+        if(operation==='edit' && Object.keys(changes).length==0) return;
+        pureinsert('caseChangeLog',{
+            userName:currentUser.name,
+            userId:currentUser.id,
+            caseId:currentId,
+            operation:operation,
+            date:formatDateTimeStr2Mysql(changeDateTime),
+            changes: changes==undefined?undefined:JSON.stringify(changes).replaceAll("\"","\\\"")
+        },function(r){
+            console.log('保存日志',r,{user:currentUser,caseId:currentId,operation:operation,dateTime:changeDateTime,changes:changes});
+        })
+    }
+}
+function saveCaseUpdateChangeLog(data){
+
+    var currentUser=getGlobalJson("currentUser");
+    if(currentUser==null || currentUser==undefined){
+        $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
+            //HideMessage();
+            window.location.href = 'index.html';
+        });
+    }else{
+        if(data.operation==='edit' && Object.keys(data.changes).length==0) return;
+        pureinsert('caseUpdateChangeLog',data,function(r){
+            console.log('保存日志',r,data);
+        })
+    }
+}
+const unCheckKeys=['case2ndPartyStr','casePersonnelStr','caseCreateDate','caseDate','lastUpdate']
+function getChanges(original,now,matchKey="id"){
+    var matchedOriginal=original.constructor==Array?original.find(d=>d[matchKey]==now[matchKey]):original;
+    
+    var changes={};
+    if(matchedOriginal!==undefined){
+        $.each(now,(key,val)=>{
+            if(!unCheckKeys.includes(key) && matchedOriginal[key]!==null && matchedOriginal[key].toString()!=val.toString()){
+                
+                changes[key]={new:val,old:matchedOriginal[key]};
+            }
+        })
+    }
+    else{
+        $.each(now,(key,val)=>{
+            if(!unCheckKeys.includes(key)){
+                changes[key]=val;
+            }
+        })
+    }
+    return changes;
+}
+//#endregion
+
 $(window).on('waiting',function(e){
     $().mloader('show',{message:"请稍等..."});
 })
@@ -856,7 +924,7 @@ function setInfoBarPosition(){
 }
 function getPersonCaseSum(data){
     var sum={
-        caseNum:data.length,
+        caseNum:data==undefined?0:data.length,
         caseLabels:{
             0:[],
             1:[],
@@ -867,20 +935,23 @@ function getPersonCaseSum(data){
         penaltyAmount:0,
         paidAmount:0
     }
-    data.forEach(d=>{
-        //findValue
-        /*
-        var label=resourceDatas.caseLabels_.findValue(d.caseLabel,'id','label');
-        if(label!=undefined){
-            if(!sum.caseLabels.hasOwnProperty(label)) sum.caseLabels[label]=[];
-            sum.caseLabels[label].push(d.id);
-        }
-        */
-        sum.caseLabels[d.caseLabel].push(d.id);
-        sum.rquestAmount+=parseFloat(d.requestAmount);
-        sum.penaltyAmount+=parseFloat(d.penalty);
-        sum.paidAmount+=parseFloat(d.paidAmount);
-    });
+    if(data!==undefined){
+        data.forEach(d=>{
+            //findValue
+            /*
+            var label=resourceDatas.caseLabels_.findValue(d.caseLabel,'id','label');
+            if(label!=undefined){
+                if(!sum.caseLabels.hasOwnProperty(label)) sum.caseLabels[label]=[];
+                sum.caseLabels[label].push(d.id);
+            }
+            */
+            sum.caseLabels[d.caseLabel].push(d.id);
+            sum.rquestAmount+=parseFloat(d.requestAmount);
+            sum.penaltyAmount+=parseFloat(d.penalty);
+            sum.paidAmount+=parseFloat(d.paidAmount);
+        });
+    }
+    
     //console.log(sum);
     return sum;
 }

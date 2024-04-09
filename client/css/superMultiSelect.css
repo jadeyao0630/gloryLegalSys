@@ -20,11 +20,13 @@
 .ui-m-controlgroup select{
     text-align: left;
 }
+
 .ui-super-listview > .ui-li-static{
     padding:0px;
     margin:0px;
     border:none;
     width:100%;
+    
 }
 .sub-selectmenu {
 border-radius: 0;

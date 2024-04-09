@@ -138,6 +138,17 @@ $.fn.updateListView=function(args){
                                         delete e.values.isTemp;
                                     pureinsert(data.table,e.values,(r)=>{
                                         console.log('insert result',data.table,r);
+                                        //==============================添加日志=================================
+                                        saveCaseUpdateChangeLog({
+                                            userName:getGlobalJson('currentUser').name,
+                                            userId:getGlobalJson('currentUser').id,
+                                            date:formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss'),
+                                            changes:JSON.stringify(e.values).replaceAll("\"","\\\""),
+                                            tableName:data.table,
+                                            caseId:e.values.id,
+                                            typeId:e.values[data.key],
+                                            operation:"add"
+                                        });
                                         //添加新提交的数据到缓存
                                         console.log("更新缓存前",DataList[data.table],e.values)
                                         DataList[data.table].push(e.values);
@@ -363,7 +374,7 @@ $.fn.updateListViewData=function(data){
                     case 'caseProperties':
                         console.log("财产");
                         form= new mform({template:add_property_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
-                        data={table:data.type,idkey:'propertyId',dateKey:'dateUpdated',data:itemData};
+                        data={table:data.type,idkey:'propertyId',dateKey:'dateOccur',data:itemData};
                         caption="修改资产变更";
                         break;
                     case 'caseAttachments':
@@ -403,13 +414,27 @@ $.fn.updateListViewData=function(data){
                                     newData[key]=val;
                                 }
                             })
-                            newData[data.dateKey]=getDateTime();
-                            newData[data.idkey]=data.data[data.idkey];
                             console.log('newData',newData)
+                            console.log(data.dateKey,newData[data.dateKey]);
+                            newData[data.dateKey]=new Date(newData[data.dateKey]).toISOString();
+                            newData[data.idkey]=data.data[data.idkey];
+                            
                             waitingList[data.key+data.id]=function(){
                                 update("id="+data.data.id+" AND "+data.idkey+"="+data.data[data.idkey],
                                     data.table,
                                     vals.join(),async function(r){
+                                        //==============================添加日志=================================
+                                        var changes=getChanges(DataList[data.table],newData,data.idkey);
+                                        saveCaseUpdateChangeLog({
+                                            userName:getGlobalJson('currentUser').name,
+                                            userId:getGlobalJson('currentUser').id,
+                                            date:formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss'),
+                                            changes:changes==undefined?undefined:JSON.stringify(changes).replaceAll("\"","\\\""),
+                                            tableName:data.table,
+                                            caseId:data.data.id,
+                                            typeId:data.data[data.idkey],
+                                            operation:"edit"
+                                        });    
                                     DataList[data.table]=updateOriginalData(DataList[data.table],newData,data.idkey);
                                     console.log('caseExcutes',data.table,DataList[data.table],newData)
                                     if(data.table=='caseExcutes'){
@@ -456,6 +481,16 @@ $.fn.updateListViewData=function(data){
                     //storeTempData(data.type,value,data.key)
                     waitingList[data.key+data.id]=function(){
                         console.log('删除',data);
+                        saveCaseUpdateChangeLog({
+                            userName:getGlobalJson('currentUser').name,
+                            userId:getGlobalJson('currentUser').id,
+                            date:formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss'),
+                            changes:"",
+                            tableName:data.type,
+                            caseId:data.caseId,
+                            typeId:data.id,
+                            operation:"delete"
+                        });
                         DataList[data.type]=updateOriginalData(DataList[data.type],value,data.key);
                         inactiveItem(data.key+'='+data.id,data.type,function(r){});
                     };
@@ -477,6 +512,16 @@ $.fn.updateListViewData=function(data){
                 }
                 
                 waitingList[data.key+data.id]=function(){
+                    saveCaseUpdateChangeLog({
+                        userName:getGlobalJson('currentUser').name,
+                        userId:getGlobalJson('currentUser').id,
+                        date:formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss'),
+                        changes:"",
+                        tableName:data.type,
+                        caseId:data.caseId,
+                        typeId:data.id,
+                        operation:"recover"
+                    });
                     DataList[data.type]=updateOriginalData(DataList[data.type],value,data.key);
                     restoreItem(data.key+'='+data.id,data.type,function(r){});
                 };

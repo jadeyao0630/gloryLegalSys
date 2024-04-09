@@ -486,3 +486,26 @@ function getDomain(){
 // alter table `glory`.`case_status` 
 //    add column `isTrial` tinyint(1) DEFAULT '0' NULL after `isMain`, 
 //    add column `isExcute` tinyint(1) DEFAULT '0' NULL after `isTrial`
+
+// CREATE TABLE caseChangeLog( 
+//     id INT NOT NULL AUTO_INCREMENT, 
+//     caseId INT, 
+//     changes text,
+//     date DATETIME, 
+//     operation VARCHAR(255),
+//     userName VARCHAR(255),
+//     userId INT,
+//     PRIMARY KEY (`id`)
+//   )
+
+// CREATE TABLE caseUpdateChangeLog( 
+//     id INT NOT NULL AUTO_INCREMENT, 
+//     caseId INT, 
+//     tableName VARCHAR(255),
+//     changes text,
+//     date DATETIME, 
+//     operation VARCHAR(255),
+//     userName VARCHAR(255),
+//     userId INT,
+//     PRIMARY KEY (`id`)
+//   )

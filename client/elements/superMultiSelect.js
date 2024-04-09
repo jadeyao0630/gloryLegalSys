@@ -25,6 +25,7 @@ $.fn.extend({
         if(template.isFilterable) {
             listboxMenu=$('<ul class="ui-selectmenu-list ui-listview ui-super-listview" id="'+id+'-menu" role="listbox" data-filter="true" data-filter-placeholder="搜索关键字"></ul>');
         }
+        listboxMenu.css({"max-height":(window.innerHeight-200)+"px","overflow-y":"auto"});
         listbox.append(listboxMenu);
         selectPopupMenu.append(listbox)
         $(this).append(selectPopupMenu);

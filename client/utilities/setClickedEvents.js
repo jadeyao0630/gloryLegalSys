@@ -154,6 +154,7 @@ $('#new_message_page').find('[name="send_new_message"]').on('click',function(e){
         }
     })
 });
+//#region 右上菜单按钮
 $('#popupMenu').find('a').on('click',function(e){
     e.preventDefault();
     switch($(this).text()){
@@ -316,6 +317,7 @@ $('#popupMenu').find('a').on('click',function(e){
     }
     
 })
+//#endregion
 function setLoginList(data,systemReboot){
     $('#loginInfo_title_body').find('ul[data-role="listview"]').remove();
     var listview=$('<ul data-role="listview" data-inset="true"><li>无数据</li></ul>');
@@ -546,6 +548,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                     if(ee.success){
                         var isDone=false;
                         var isSuccessed=false;
+                        //saveCaseChangeLog(e.action=="add"?'add':'edit',e.action!="add"?getChanges(DataList.combinedData,e.value):undefined);
                         DataList.caseProgresses=updateOriginalDataM(DataList.caseProgresses,newData,['id','typeId']);
                         if(parseInt(getGlobal("currentIsAdd"))==1){
                             
@@ -1040,8 +1043,7 @@ function removeDataFromTempData(){
 
 
 
-
-//第一页左下方 添加 删除 按钮事件
+//#region 第一页左下方 添加 删除 功能按钮事件
 $('.case_reg_but').on('click',async function(e){
     e.preventDefault();
     if(this.id=="case_reg_but_add"){//第一页左下方 添加
@@ -1111,6 +1113,7 @@ $('.case_reg_but').on('click',async function(e){
                         console.log(DataList.combinedData);
                         inactiveCases(ids,(res)=>{
                             showResponse(res);
+                            saveCaseChangeLog('inactive');
                         });
                         
                     })
@@ -1239,7 +1242,9 @@ $('.case_reg_but').on('click',async function(e){
         });
     }
 })
+//#endregion
 
+//#region 数据图形化
 $('#export_chart').on('click',function(e){
     var form= new mform({template:export_chart_template,isAdmin:getGlobalJson('currentUser').level==adminLevel});
     $('#export_popup_title').text("导出设置");
@@ -1934,6 +1939,9 @@ function setChartPage(data1,data2){
         document.getElementById("export_popup_form_submit").addEventListener("click", exportAllChartsToPDF);
     });
 }
+//#endregion
+
+
 //#region 查看信息页面的按钮事件
 
 function showProgressDetails(datas,updates,excutes,properties,attachments,caseLinked){
@@ -1974,6 +1982,7 @@ function getSuperMultiSelectValue(values,form){
     var results={}
     if(values.casePersonnel!==undefined){
         var itemTemplate=form.getItemTemplate('casePersonnel_p');
+        if (itemTemplate==undefined) itemTemplate=form.getItemTemplate('casePersonnel');
         //console.log('convertToSuperMultiSelectValue',e.values.casePersonnel_p);
         var vals=[];
         values.casePersonnel.split(',').forEach(v=>{
@@ -1994,6 +2003,7 @@ function getSuperMultiSelectValue(values,form){
     }
     if(values.case2ndParty!==undefined){
         var itemTemplate=form.getItemTemplate('case2ndParty_p');
+        if (itemTemplate==undefined) itemTemplate=form.getItemTemplate('case2ndParty');
         var vals=[];
         values.case2ndParty.split(',').forEach(v=>{
             var formatedData=v.convertToSuperMultiInputValue();
@@ -2038,6 +2048,7 @@ function saveMainForm(form,isAddPage){
             //e.values=Object.assign(e.values,e.caseStatus);
             e.values["caseCreateDate"]=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
             console.log('save data',e);
+            e.values={...e.values,...getSuperMultiSelectValue(e.values,form)}
             //console.log("currentUser......"+sessionStorage.getItem("currentUser"));
             if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
                 $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
@@ -2053,11 +2064,11 @@ function saveMainForm(form,isAddPage){
             
             
         }else{
-            
             console.log(e.valiation.join()," 有错误。");
         }
     });
 }
+
 //#region 保存或修改按钮事件
 $('.edit-header-btn').on('click',async function(e){
     console.log('currentPage',sessionStorage.getItem('currentPage'));

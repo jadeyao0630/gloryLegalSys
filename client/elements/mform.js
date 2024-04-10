@@ -243,8 +243,10 @@ mform.prototype={
                 label=$('<label>'+(form_item_template.label || '')+'</label>')
                 item_container.append(label);
             }else{
-                label=_this.generateLabel(key,form_item_template);
-                item_container.append(label);
+                
+
+                    label=_this.generateLabel(key,form_item_template);
+                    item_container.append(label);
             } 
             switch(form_item_type){
                 case "text":

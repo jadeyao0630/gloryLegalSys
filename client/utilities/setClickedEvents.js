@@ -2147,6 +2147,12 @@ $('.edit-header-btn').on('click',async function(e){
                     saveCurrentUser(e.values,true).then((r)=>{
                         if(r.success){
                             console.log("添加成功。");
+                            
+                            saveUserChangeLog({
+                                targetId:e.values.id,
+                                operation:"add",
+                                changes:undefined
+                            })
                             if(e.values.position>0)
                                 resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,e.values,'id');
                                 resourceDatas['users']=updateOriginalData(resourceDatas['users'],e.values,'id');
@@ -2188,7 +2194,13 @@ $('.edit-header-btn').on('click',async function(e){
                         
                         
                         if(r.data.data.affectedRows>0){
-                            console.log("修改成功。");
+                            console.log("修改成功。",getChanges(userD,e.values));
+                            //console.log("userD",userD)
+                            saveUserChangeLog({
+                                targetId:e.values.id,
+                                operation:"edit",
+                                changes:getChanges(userD,e.values)
+                            })
                             if(e.values.position>0)
                                 resourceDatas.legalAgencies=updateOriginalData(resourceDatas.legalAgencies,e.values,'id');
                             resourceDatas['users']=updateOriginalData(resourceDatas['users'],e.values,'id');

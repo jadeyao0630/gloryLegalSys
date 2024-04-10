@@ -670,6 +670,29 @@ $('body').on('caseChanged',function(e){
 })
 
 //#region 保存案件变更日志
+function saveUserChangeLog(data){
+    var currentUser=getGlobalJson("currentUser");
+    //var isAdd=isAddPage;
+    var changeDateTime=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
+    if(currentUser==null || currentUser==undefined){
+        $().minfo('show',{title:"错误: "+error.FORM_INVALID_USER.message,message:"是否跳转到登录页面？"},function(){
+            //HideMessage();
+            window.location.href = 'index.html';
+        });
+    }else{
+        if(data.operation==='edit' && Object.keys(data.changes).length==0) return;
+        pureinsert('userChangeLog',{
+            userName:currentUser.name,
+            userId:currentUser.id,
+            targetId:data.targetId,
+            operation:data.operation,
+            date:formatDateTimeStr2Mysql(changeDateTime),
+            changes: data==undefined?undefined:JSON.stringify(data.changes).replaceAll("\"","\\\"")
+        },function(r){
+            console.log('保存日志',r,{user:currentUser,targetId:data.targetId,operation:data.operation,dateTime:changeDateTime,changes:data.changes});
+        })
+    }
+}
 function saveCaseChangeLog(operation,changes=undefined){
     var currentUser=getGlobalJson("currentUser");
     var currentId=getGlobal("currentId");
@@ -712,7 +735,7 @@ function saveCaseUpdateChangeLog(data){
 const unCheckKeys=['case2ndPartyStr','casePersonnelStr','caseCreateDate','caseDate','lastUpdate']
 function getChanges(original,now,matchKey="id"){
     var matchedOriginal=original.constructor==Array?original.find(d=>d[matchKey]==now[matchKey]):original;
-    
+    console.log('matchedOriginal',original,'now',now);
     var changes={};
     if(matchedOriginal!==undefined){
         $.each(now,(key,val)=>{

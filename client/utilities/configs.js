@@ -509,3 +509,14 @@ function getDomain(){
 //     userId INT,
 //     PRIMARY KEY (`id`)
 //   )
+
+// CREATE TABLE userChangeLog( 
+//     id INT NOT NULL AUTO_INCREMENT, 
+//     targetId INT, 
+//     changes text,
+//     date DATETIME, 
+//     operation VARCHAR(255),
+//     userName VARCHAR(255),
+//     userId INT,
+//     PRIMARY KEY (`id`)
+//   )

@@ -489,7 +489,7 @@ $.fn.updateListViewData=function(data){
                             tableName:data.type,
                             caseId:data.caseId,
                             typeId:data.id,
-                            operation:"delete"
+                            operation:"inactive"
                         });
                         DataList[data.type]=updateOriginalData(DataList[data.type],value,data.key);
                         inactiveItem(data.key+'='+data.id,data.type,function(r){});

@@ -1566,10 +1566,11 @@ var add_evidence_template;
                   authCatalogues:{
                     label:"选择子权限",
                     type:"checkgroup",
-                    data:resourceDatas.auth_catalogues,
+                    data:resourceDatas.auth_catalogues_,
                     isOptional:true,
-                    valueKey:'id',
-                    displayFormat:'{name}',
+                    valueKey:'name',
+                    displayFormat:'{descriptions}',
+                    isAdminOnly:true
                   },
               }
               
@@ -1664,6 +1665,7 @@ var add_evidence_template;
                     isOptional:true,
                     valueKey:'name',
                     displayFormat:'{descriptions}',
+                    isAdminOnly:true
                   },
               }
               

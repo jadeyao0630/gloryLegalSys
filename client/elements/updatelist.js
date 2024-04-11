@@ -6,8 +6,9 @@ function appendToWaiting(key,task){
 
 $.fn.updateListView=function(args){
     var _this=this;
+    $(this).css({"position":"relative"});
     var collapsible=$('<div data-role="collapsible" data-theme="b" data-content-theme="a" data-collapsed="false"><h3>更新</h3><div>');
-    var newUpdateBtn=$('<a href="#progress_point_popupMenu_" data-rel="popup" style="position: absolute;z-index:100;margin-top:2px;right:10px;height:14px;line-height:14px;" class="ui-btn ui-btn-a ui-mini ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus btn-icon-green">添加</a>')
+    var newUpdateBtn=$('<a href="#progress_point_popupMenu_" data-rel="popup" style="position: absolute;z-index:100;margin-top:2px;right:0px;height:14px;line-height:14px;" class="ui-btn ui-btn-a ui-mini ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-plus btn-icon-green">添加</a>')
     this.append(newUpdateBtn);
     this.jqmData('listview',$('<ul data-role="listview" id="progress_point_info_body"></ul>'));
     collapsible.append(this.jqmData('listview'));
@@ -236,7 +237,7 @@ $.fn.updateListViewData=function(data){
                 var group=$('<div style="display: grid;grid-gap: 0px;margin:-8px 0px;"></div>');
                 var view_btn=$('<a href="#" class="ui-btn ui-icon-eye ui-btn-icon-notext btn-icon-green view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">查看</a>')
                 console.log('preview',"http://"+ip+':'+port+'/downloadLocal?fileName='+itemData.filePath+'&folder='+itemData.id);
-                var download_btn=$('<a href="http://'+ip+':'+port+'/downloadLocal?fileName='+itemData.filePath+'&folder='+itemData.id+'" class="ui-btn ui-icon-action ui-btn-icon-notext btn-icon-blue view-list-button" style="padding:10px 5px;border-top: none;border-bottom: none;">下载</a>')
+                var download_btn=$('<a href="http://'+ip+':'+port+'/downloadLocal?fileName='+itemData.filePath+'&folder='+itemData.id+'" class="ui-btn ui-icon-action ui-btn-icon-notext btn-icon-blue view-list-button canDownload" style="padding:10px 5px;border-top: none;border-bottom: none;">下载</a>')
                 del_btn=$('<a href="#" name="del" class="ui-btn ui-icon-delete ui-btn-icon-notext btn-icon-red view-list-button" style="padding:10px 5px;border: none;">删除</a>')
                 
                 if(item.isInactived){

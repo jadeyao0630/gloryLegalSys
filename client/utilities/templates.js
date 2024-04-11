@@ -754,7 +754,7 @@ var add_evidence_template;
             id:'caseDate',
           }},
           lastUpdate:{label:"更新日期",
-            type:"date", dateFormat:'yyyy年MM月dd日', isFilterable:true,
+            type:"date", dateFormat:'yyyy年MM月dd日 HH:mm', isFilterable:true,
             defaultValue:'尚未设定',
             sortable:{
               type:'date',

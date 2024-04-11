@@ -1225,16 +1225,25 @@ $('.case_reg_but').on('click',async function(e){
                 //$().mloader('show',{message:"读取中..."});
                 //console.log("currentSelectedCases:",currentSelectedCases,$(selt).find('option:selected').val(),currentData.filter(item=>currentSelectedCases.includes(item.id)))
                 var where=[];
+                var newDatas=[];
                 currentSelectedCases.forEach(id=>{
                     var newData={id:id,legalAgencies:Number($(selt).find('option:selected').val())};
-                    DataList.combinedData=updateOriginalData(DataList.combinedData,newData,"id");
-                    DataList.casesDb=updateOriginalData(DataList.casesDb,newData,"id");
-                    $('#pageOneTable').updateTableItem(newData);
+                    newDatas.push(newData)
+                    
                     where.push('id = '+id);
                 })
                 $('#pageOneTable').find('[class^=reg-checkbox]').prop('checked',false);
                 var query="UPDATE caseStatus SET legalAgencies = "+$(selt).find('option:selected').val()+" WHERE "+where.join(' OR ');
-                execute(query).then(r=>console.log(r));
+                execute(query).then(r=>{
+                    console.log(r);
+                    newDatas.forEach(d=>{
+                        var changes=getChanges(DataList.combinedData,d)
+                        saveCaseChangeLog('edit',changes);
+                        DataList.combinedData=updateOriginalData(DataList.combinedData,d,"id");
+                        DataList.casesDb=updateOriginalData(DataList.casesDb,d,"id");
+                        $('#pageOneTable').updateTableItem(d);
+                    })
+                });
                 //console.log("currentSelectedCases:",DataList.combinedData,query);
                 
             }

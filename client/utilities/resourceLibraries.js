@@ -43,8 +43,8 @@ function resourceLibraries(parent){
         law_firms:{label:"律所",data:resourceDatas.lawFirms_},
         attorneys:{label:"律师",data:resourceDatas.attorneys_},
         projects:{label:"项目",data:resourceDatas.projects_},
-        caseCause:{label:"案由",data:resourceDatas.caseCauses_},
-        caseReason:{label:"案发原因",data:resourceDatas.caseReason_},
+        case_causes:{label:"案由",data:resourceDatas.caseCauses_},
+        case_reasons:{label:"案发原因",data:resourceDatas.caseReason_},
     }
     var container=$('<div></div>')
     var selectorFrame=$('<div class="ui-field-contain"></div>')

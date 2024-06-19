@@ -616,6 +616,7 @@ $('body').on('caseChanged',function(e){
     //保存修改数据到数据库
     $().mloader('show',{message:"保存中..."});
     setTimeout(() => {
+        console.log('caseChanged',e.value);
         insertCase(e.value,caseInfoList,function(r){
             //console.log(r);
             var error="添加过程中有问题";
@@ -681,13 +682,14 @@ function saveUserChangeLog(data){
         });
     }else{
         if(data.operation==='edit' && Object.keys(data.changes).length==0) return;
+        console.log(data.changes);
         pureinsert('userChangeLog',{
             userName:currentUser.name,
             userId:currentUser.id,
             targetId:data.targetId,
             operation:data.operation,
             date:formatDateTimeStr2Mysql(changeDateTime),
-            changes: data==undefined?undefined:JSON.stringify(data.changes).replaceAll("\"","\\\"")
+            changes: data==undefined||data.changes==undefined?undefined:JSON.stringify(data.changes).replaceAll("\"","\\\"")
         },function(r){
             console.log('保存日志',r,{user:currentUser,targetId:data.targetId,operation:data.operation,dateTime:changeDateTime,changes:data.changes});
         })
@@ -1242,8 +1244,12 @@ function setUserAuth(){
         
         
         autoCatalogues.forEach(catalogue=>{
-            console.log('currentUser',getGlobalJson('currentUser'),$('.'+catalogue));
-            $('.'+catalogue).show();
+            console.log(catalogue)
+            if(catalogue!==''){
+                console.log('currentUser',getGlobalJson('currentUser'),$('.'+catalogue));
+                $('.'+catalogue).show();
+            }
+            
         })
     }
 }

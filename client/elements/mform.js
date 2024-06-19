@@ -1026,9 +1026,9 @@ mform.prototype={
                 if( itemTemplate.type.toLowerCase()=="time") val="00:00:00";
                 //val='NULL';
             }else{
-                if( itemTemplate.type.toLowerCase()=="date") val=formatDateTime(new Date(val),'yyyy-MM-dd HH:mm:ss');
-                if( itemTemplate.type.toLowerCase()=="datetime") val=formatDateTime(new Date(val),'yyyy-MM-dd HH:mm:ss');
-                if( itemTemplate.type.toLowerCase()=="time") val=formatDateTime(new Date(val),'HH:mm:ss');
+                if( itemTemplate.type.toLowerCase()=="date") val=formatDateTimeStr2Mysql(formatDateTime(new Date(val),'yyyy-MM-dd HH:mm:ss'));
+                if( itemTemplate.type.toLowerCase()=="datetime") val=formatDateTimeStr2Mysql(formatDateTime(new Date(val),'yyyy-MM-dd HH:mm:ss'));
+                if( itemTemplate.type.toLowerCase()=="time") val=formatDateTimeStr2Mysql(formatDateTime(new Date(val),'HH:mm:ss'));
             }
             
             console.log('日期 get2',id,val);

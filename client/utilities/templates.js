@@ -684,26 +684,26 @@ var add_evidence_template;
               id:'requestAmount',
             },
         },
-        penalty:{
-          label:"判决金额(万)",
-          type:"label", isFilterable:true,
-          displayFormat:'{}',
-          sortable:{
-            type:'number',
-            isASC:true,
-            id:'penalty',
-          },
-      },
-      paidAmount:{
-        label:"执行金额(万)",
-        type:"label", isFilterable:true,
-          displayFormat:'{}',
-          sortable:{
-            type:'number',
-            isASC:true,
-            id:'paidAmount',
-          },
-      },
+      //   penalty:{
+      //     label:"判决金额(万)",
+      //     type:"label", isFilterable:true,
+      //     displayFormat:'{}',
+      //     sortable:{
+      //       type:'number',
+      //       isASC:true,
+      //       id:'penalty',
+      //     },
+      // },
+      // paidAmount:{
+      //   label:"执行金额(万)",
+      //   type:"label", isFilterable:true,
+      //     displayFormat:'{}',
+      //     sortable:{
+      //       type:'number',
+      //       isASC:true,
+      //       id:'paidAmount',
+      //     },
+      // },
       
       legalFee:{
         type:"label",
@@ -872,19 +872,19 @@ var add_evidence_template;
                 displayFormat:'{name} {contact}',
                 defaultValue:'无0'
             },
-            penalty_p:{
-                type:"text",
-                label:"判决金额(万)：",
-                isOptional:true,
-                defaultValue:0.0
-            },
-                paidAmount_p:{
-                type:"text",
-                label:"执行金额(万)：",
-                isOptional:true,
-                defaultValue:0.0,
-                isDisabled:true
-            },
+            // penalty_p:{
+            //     type:"text",
+            //     label:"判决金额(万)：",
+            //     isOptional:true,
+            //     defaultValue:0.0
+            // },
+            //     paidAmount_p:{
+            //     type:"text",
+            //     label:"执行金额(万)：",
+            //     isOptional:true,
+            //     defaultValue:0.0,
+            //     isDisabled:true
+            // },
             FirstInstance_p:{
                 type:"date",
                 label:"一审日期：",
@@ -1809,20 +1809,20 @@ var add_evidence_template;
         isHidden:true,
       },
       
-      penalty_f:{
-        label:"判决金额(万):",
-        type:"textrange", 
-        isOptional:true,
+    //   penalty_f:{
+    //     label:"判决金额(万):",
+    //     type:"textrange", 
+    //     isOptional:true,
         
-        span:'1/2'
-    },
+    //     span:'1/2'
+    // },
     caseDate_f:{
         label:"立案日期:",
         type:"textrange",
         subType:"date",
         isOptional:true,
         
-        span:'2/3'
+        span:'1/2'
     },
       custom:{
         type:"custom",

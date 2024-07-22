@@ -521,6 +521,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                 newData["caseCreateDate"]=currentDateTime;
                 newData["lastUpdate"]=currentDateTime;
                 console.log('save data',e);
+                console.log("data" ,newData,getSuperMultiSelectValue(newData,form));
                 newData={...newData,...getSuperMultiSelectValue(newData,form)}
                 //console.log("currentUser......",getSuperMultiSelectValue(newData,form),newData);
                 if(getGlobalJson("currentUser")==null || getGlobalJson("currentUser")==undefined){
@@ -562,6 +563,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                                             mainEventData:formatMainEventData(newData)});
                                 $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
                             }
+                            
                             update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
                                 $().mloader("hide");
                                 isDone=true;

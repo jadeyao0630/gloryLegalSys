@@ -633,7 +633,7 @@ $('body').on('caseChanged',function(e){
                 error=result.join();
             }
             if(result.length==0){
-                console.log("修改添加成功。");
+                console.log("修改/添加成功。");
                 console.log("on data changed0",currentData,DataList.combinedData,DataList.caseStatus,e);
                 saveCaseChangeLog(e.action=="add"?'add':'edit',e.action!="add"?getChanges(DataList.combinedData,e.value):undefined);
                 
@@ -740,7 +740,7 @@ function getChanges(original,now,matchKey="id"){
     var changes={};
     if(matchedOriginal!==undefined){
         $.each(now,(key,val)=>{
-            if(!unCheckKeys.includes(key) && matchedOriginal[key]!==null && matchedOriginal[key].toString()!=val.toString()){
+            if(!unCheckKeys.includes(key) && matchedOriginal[key]!==undefined && matchedOriginal[key]!==null && matchedOriginal[key].toString()!=val.toString()){
                 
                 changes[key]={new:val,old:matchedOriginal[key]};
             }

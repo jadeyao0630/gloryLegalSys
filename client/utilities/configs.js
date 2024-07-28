@@ -1,12 +1,12 @@
 var isRunLocal=true;//https://socket.io/get-started/chat/
 
 var IPS={
-    home:{ip:'192.168.10.241',port:5555},
+    home:{ip:'192.168.10.122',port:5555},
     glory:{ip:'192.168.10.68',port:5555},
     test:{ip:'192.168.10.68',port:5556},
     remote:{ip:'cn.luyao.site',port:5568}}
 var showDebug=false;
-var serverSelection=IPS.glory
+var serverSelection=IPS.home
 
 let domain=getDomain();
 serverSelection=domain==="cn.luyao.site"?IPS.remote:serverSelection
@@ -145,9 +145,9 @@ const columns={//案件主表
     //caseCompany:"INT NOT NULL DEFAULT '0'",
     caseProject:"INT NOT NULL DEFAULT '0'",//所属项目->projects*
     casePersonnel:"VARCHAR(255) NOT NULL",//我方当事人->corporateCompanies* && corporatePartners*
-    casePersonnelStr:"VARCHAR(500)",//我方当事人
+    //casePersonnelStr:"VARCHAR(500)",//我方当事人
     case2ndParty:"VARCHAR(255) NOT NULL",//对方当事人
-    case2ndPartyStr:"VARCHAR(500)",//对方当事人
+    //case2ndPartyStr:"VARCHAR(500)",//对方当事人
     caseCatelog:"INT NOT NULL DEFAULT '0'",//案件类别->caseCatelogs*
     //caseBelongs:"INT NOT NULL DEFAULT '0'",
     caseType:"INT NOT NULL DEFAULT '0'",//案件类型->caseTypes*

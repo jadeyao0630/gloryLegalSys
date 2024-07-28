@@ -615,7 +615,7 @@ class DbService{
                 success:true
             };
         }catch(error){
-            console.log(error);
+            console.log(error,query,"value",value);
             return{
                 data:error_mesg,success:false,state:'error'
             }

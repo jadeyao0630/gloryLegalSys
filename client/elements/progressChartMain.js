@@ -166,20 +166,18 @@ $.fn.progressChart = function(options){
         $(_this).off();
         $('.progress_point').off();
         $('.progress_point').on('click',function(e){
-            //if($(_this).find('actived_point').length==settings.steps) return;
-            //if($(this).hasClass('last_point')) return;
             $(_this).trigger({type:'pointClick',event:e,source:$(this),index:$(this).data('index'),steps:settings.steps});
-            /*
-            var currentIndex=$(this).data('index');
-            var next=$(_this).find('.progress_point[data-index='+(currentIndex+1)+']');
-            console.log($(this).data('index'),$(this).hasClass('last_point'));
-            $(_this).find('.progress_path.actived_point').animate({
-                width:(currentIndex+1)*settings.distance
-            },500,function(){
-                next.removeClass('deactived_point').addClass('actived_point').show();
-            })
-            */
         })
+        $(_this).on('updatePoint',function(e){
+            settings.status=e.status;
+            console.log("updatePoint",settings.status)
+
+            init();
+            $('.progress_point').off();
+            $('.progress_point').on('click',function(e){
+                $(_this).trigger({type:'pointClick',event:e,source:$(this),index:$(this).data('index'),steps:settings.steps});
+            })
+        });
         $(_this).on('updateIndicator',function(e){
             settings.eventsData=e.eventsData;
             var exsited=$(_this).find('.progress_point.actived_point');

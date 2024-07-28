@@ -851,7 +851,7 @@ mform.prototype={
             if (val==null) val="";
             element.setSuperMultiInputValues(val);
         }else if(itemTemplate.type.toLowerCase()=="checkbox"){
-            element.prop('checked',val);
+            element.prop('checked',val).checkboxradio( "refresh" );
         }else if(itemTemplate.type.toLowerCase()=="checkgroup"){
             if (val==null) val=[];
             if(val.constructor == String) {
@@ -925,7 +925,7 @@ mform.prototype={
                     }else{
                         $(ele).prop( "checked", false );
                     }
-                    $(ele).checkboxradio().checkboxradio( "refresh" ).trigger("change");
+                    //$(ele).checkboxradio().checkboxradio( "refresh" ).trigger("change");
                 })
             }
                 

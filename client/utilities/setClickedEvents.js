@@ -418,38 +418,39 @@ function compareValues(source,target,prefix){
 //#region 节点编辑返回按钮
 $('#progress_point_info').find('[data-role="header"]').find('a[data-rel="back"]').on('click',function(e){
     //console.log(getGlobal('currentPage'));
-    e.preventDefault();
-    currentForm.getFormValues(function(e){
-        console.log(e,currentForm.currentData);
-        if(compareValues(e.values,currentForm.currentData,"_p")){
-            console.log('数据没有变化');
-            history.back();
-        }else{
-            console.log('数据不同');
+    //e.preventDefault();
+    //history.back();
+    // currentForm.getFormValues(function(e){
+    //     console.log(e,currentForm.currentData);
+    //     if(compareValues(e.values,currentForm.currentData,"_p")){
+    //         console.log('数据没有变化');
+    //         history.back();
+    //     }else{
+    //         console.log('数据不同');
             
-                $().requestDialog({
-                    title:'提示',
-                    message:'信息尚未保存，是否保存当前?',
-                },function(go){
-                    if(go){
-                        if(e.success){
-                        $('#progress_point_info').find('[name="save_btn"]').trigger('click')
+    //             $().requestDialog({
+    //                 title:'提示',
+    //                 message:'信息尚未保存，是否保存当前?',
+    //             },function(go){
+    //                 if(go){
+    //                     if(e.success){
+    //                     $('#progress_point_info').find('[name="save_btn"]').trigger('click')
                         
-                    setTimeout(() => {
-                        history.back();
-                    }, 200);
-                    }
-                    }else{
-                        //restoreTempData();
-                        waitingList={};
+    //                 setTimeout(() => {
+    //                     history.back();
+    //                 }, 200);
+    //                 }
+    //                 }else{
+    //                     //restoreTempData();
+    //                     waitingList={};
                         
-                    setTimeout(() => {
-                        history.back();
-                    }, 200);
-                    }
-                });
-        }
-    })
+    //                 setTimeout(() => {
+    //                     history.back();
+    //                 }, 200);
+    //                 }
+    //             });
+    //     }
+    // })
 })
 //#endregion
 
@@ -501,18 +502,19 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
     form.getFormValues(function(e){
 
         console.log('compareValues',getGlobal("currentPoint"),e.values,form.currentData);
-        if(compareValues(e.values,form.currentData,"_p")){
-            $().minfo('show',{title:"提示",message:"您还没有修改过任何数据。不需要保存。"},function(){});
-            return;
-        }
+        // if(compareValues(e.values,form.currentData,"_p")){
+        //     $().minfo('show',{title:"提示",message:"您还没有修改过任何数据。不需要保存。"},function(){});
+        //     return;
+        // }
         var newData={};
+        
+        console.log("save progress data",e.values);
         if(e.success){
             $.each(e.values,(key,val)=>{
                 newData[key.replace("_p","")]=val;
             })
-            
             var currentDateTime=formatDateTime(new Date(),'yyyy-MM-dd HH:mm:ss');
-            e.values.typeId=getGlobal("currentPoint");
+            //e.values.typeId=getGlobal("currentPoint");
             runWaitingTask();
 
             //如果是立案界面
@@ -551,7 +553,7 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                         var isSuccessed=false;
                         //saveCaseChangeLog(e.action=="add"?'add':'edit',e.action!="add"?getChanges(DataList.combinedData,e.value):undefined);
                         DataList.caseProgresses=updateOriginalDataM(DataList.caseProgresses,newData,['id','typeId']);
-                        if(parseInt(getGlobal("currentIsAdd"))==1){
+                        if(parseInt(getGlobal("currentIsAdd"))==1){//--------------------添加节点--------------------
                             
                             
                             var matched=$.grep(resourceDatas.caseStatus_,label=>label.id==parseInt(getGlobal("currentPoint")));//获取节点属性数据
@@ -563,7 +565,6 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                                             mainEventData:formatMainEventData(newData)});
                                 $('#pageOneTable').updateTableItem({caseStatus:parseInt(getGlobal("currentPoint")),id:newData.id});
                             }
-                            
                             update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify($('#progress_diagram').jqmData('status'))},function(eee){
                                 $().mloader("hide");
                                 isDone=true;
@@ -578,7 +579,8 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                                 }
                                 updatePenaltyPaidSummary($('#execute_summary'));
                             });
-                        }else{
+                            setGlobal("currentIsAdd",0);
+                        }else{//--------------------修改节点--------------------
                             DataList.caseProgresses.forEach(progress=>{
                                 if(progress.id==newData.id && progress.typeId==newData.typeId){
                                     $.each(newData,(key,val)=>{
@@ -587,17 +589,51 @@ $('#progress_point_info').find('[name="save_btn"]').on('click',function(e){
                                     return false;
                                 }
                             })
-                            //DataList.caseProgresses=updateOriginalData(DataList.caseProgresses,newData,'id');
-                            $().mloader("hide");
-                            //$().minfo('show',{title:"提示",message:"更新成功。"},function(){});
-                            isDone=true;
-                            isSuccessed=true;
-                            updatePenaltyPaidSummary($('#execute_summary'));
-                            console.log("更新成功",newData.typeId,newData,formatMainEventData(newData));
-                            $('#progress_diagram').trigger({type:'updateMainEvent',targetIndex:parseInt(getGlobal("currentIndex")),
-                                mainEventData:formatMainEventData(newData)});
+                            var matched=DataList.combinedData.find(v=>v.id.toString()===newData.id.toString());//获取节点属性数据
+                            if(matched!==undefined){
+                                console.log("matched",JSON.parse(matched.caseStatus),getGlobal("currentPoint"),newData.typeId);
+                                var statusIndx=JSON.parse(matched.caseStatus);
+                                if(Number(getGlobal("currentPoint"))!==Number(newData.typeId)){
+                                    let index = statusIndx.indexOf(Number(getGlobal("currentPoint")));
+                                    if (index !== -1) {
+                                        statusIndx[index] = Number(newData.typeId);
+                                    }
+                                }
+                                
+                                update('id='+newData.id,'caseStatus',{'caseStatus':JSON.stringify(statusIndx)},function(eee){
+                                    $().mloader("hide");
+                                    isDone=true;
+                                    if(eee.data.success){
+                                        DataList.combinedData=updateOriginalData(DataList.combinedData,{id:newData.id,caseStatus:JSON.stringify(statusIndx)},'id');
+                                        //DataList.caseStatus=updateOriginalData(DataList.caseStatus,{id:newData.id,caseStatus:JSON.stringify(statusIndx)},'id');
+                                        //$().minfo('show',{title:"提示",message:"保存成功。"},function(){});
+                                        isSuccessed=true;
+                                        console.log("更新成功",newData.typeId,newData,formatMainEventData(newData),parseInt(getGlobal("currentIndex")));
+                                        $('#progress_diagram').trigger({type:'updatePoint',status:statusIndx});
+                                        $('#progress_diagram').trigger({type:'updateMainEvent',targetIndex:Number(newData.typeId),
+                                            mainEventData:formatMainEventData(newData)});
+                                        form.setValues(newData);
+                                        
+                                    }else{
+                                        $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
+                                    }
+                                    updatePenaltyPaidSummary($('#execute_summary'));
+                                });
+                            }else{
+                                console.error("无法找到对应的id",DataList.combinedData,newData.id)
+                            }
                             
-                            form.setValues(newData);
+                            //DataList.caseProgresses=updateOriginalData(DataList.caseProgresses,newData,'id');
+                            // $().mloader("hide");
+                            // //$().minfo('show',{title:"提示",message:"更新成功。"},function(){});
+                            // isDone=true;
+                            // isSuccessed=true;
+                            // //updatePenaltyPaidSummary($('#execute_summary'));
+                            // console.log("更新成功",newData.typeId,newData,formatMainEventData(newData));
+                            // $('#progress_diagram').trigger({type:'updateMainEvent',targetIndex:parseInt(getGlobal("currentIndex")),
+                            //     mainEventData:formatMainEventData(newData)});
+                            
+                            // form.setValues(newData);
                         }
 
                         const intervalId = setInterval(() => {
@@ -916,6 +952,41 @@ function functionBtnsEvent(but,index){
             //节点点击事件
             $('#progress_diagram').on('pointClick',function(e){
                 console.log(e);
+                $('#point_move_next').off()
+                $('#point_move_prev').off()
+                $('#point_move_prev').on("click",()=>{
+                    history.back();
+                    console.log($(e.source).jqmData('id'),status);
+                    var caseStatus=moveElementBeforePrev(status,$(e.source).jqmData('id'));
+                    
+                    update('id='+index,'caseStatus',{'caseStatus':JSON.stringify(caseStatus)},function(eee){
+                        if(eee.data.success){
+                            DataList.combinedData=updateOriginalData(DataList.combinedData,{id:index,caseStatus:JSON.stringify(caseStatus)},'id');
+                            $('#progress_diagram').trigger({type:'updatePoint',status:caseStatus});
+                            //form.setValues({caseStatus:caseStatus});
+                            $('#pageOneTable').updateTableItem({caseStatus:JSON.stringify(caseStatus),id:index});
+                        }else{
+                            $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
+                        }
+                    })
+                })
+                
+                $('#point_move_next').on("click",()=>{
+                    history.back();
+                    console.log($(e.source).jqmData('id'),status)
+                    var caseStatus=moveElementAfterNext(status,$(e.source).jqmData('id'));
+                   
+                    update('id='+index,'caseStatus',{'caseStatus':JSON.stringify(caseStatus)},function(eee){
+                        if(eee.data.success){
+                            DataList.combinedData=updateOriginalData(DataList.combinedData,{id:index,caseStatus:JSON.stringify(caseStatus)},'id');
+                            $('#progress_diagram').trigger({type:'updatePoint',status:caseStatus});
+                            //form.setValues({caseStatus:caseStatus});
+                            $('#pageOneTable').updateTableItem({caseStatus:JSON.stringify(caseStatus),id:index});
+                        }else{
+                            $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
+                        }
+                    })
+                })
                 //当前节点id
                 $('#progress_point_viewer_btn').jqmData('point',$(e.source).jqmData('id'));
                 //获取当前节点数据
@@ -929,7 +1000,7 @@ function functionBtnsEvent(but,index){
                     itemData=$.grep(matchedProgressStatus,d=>d.typeId==$(e.source).jqmData('id'))
                     if(itemData.length>0) itemData=itemData[0]
                 }
-                console.log('source id',$(e.source).jqmData('id'),matchedProgressStatus,itemData);
+                console.log('source id',$(e.source).jqmData('id'),matchedProgressStatus,itemData,e.index);
                 $('#progress_point_viewer_btn').jqmData('item',itemData);
                 //var title=progresses[e.Position.main] instanceof Array?progresses[e.Position.main][e.Position.sub]:progresses[e.Position.main];
                 $('#progress_point_popupMenu_add_list').empty();
@@ -939,10 +1010,22 @@ function functionBtnsEvent(but,index){
                     if($(point).jqmData('index')!=undefined)
                         ids.push($(point).jqmData('id'));
                 });
+                $('#point_move_btns').css({"grid-template-columns":"auto auto"});
                 if($(e.source).hasClass('last_point')&&ids.length<resourceDatas.caseStatus_.length){
                     console.log('ids',ids);
                     
+                    $('#point_move_btns').css({"grid-template-columns":"1fr auto"});
                     $('#progress_point_popupMenu_add').show();
+                    $('#point_move_next').show();
+                    $('#point_move_prev').show();
+                    if(e.index===0){
+                        $('#point_move_prev').hide();
+                        $('#point_move_next').hide();
+                    }else if(e.index===1){
+                        $('#point_move_prev').hide();
+                    }else{
+                        $('#point_move_next').hide();
+                    }
                     resourceDatas.caseStatus_.forEach(label=>{
                         if(label.name!="立案"){
                             if(!ids.includes(label.id)){
@@ -966,6 +1049,17 @@ function functionBtnsEvent(but,index){
                     })
                 }else{
                     $('#progress_point_popupMenu_add').hide();
+                    $('#point_move_next').show();
+                    $('#point_move_prev').show();
+                    if(e.index===0){
+                        $('#point_move_prev').hide();
+                        $('#point_move_next').hide();
+                    }else if(e.index===1){
+                        $('#point_move_btns').css({"grid-template-columns":""});
+                        $('#point_move_prev').hide();
+                    }else{
+                       
+                    }
                 }
                 
                 $("#progress_point_popupMenu_add").trigger('create')
@@ -984,7 +1078,32 @@ function functionBtnsEvent(but,index){
         },10);
     }
 }
-
+function moveElementBeforePrev(arr, element) {
+    const index = arr.indexOf(element);
+    
+    // 检查元素是否存在于数组中并且不是第一个元素
+    if (index !== -1 && index > 0) {
+      // 移除该元素
+      const [removedElement] = arr.splice(index, 1);
+      // 将其插入到前一个元素之前
+      arr.splice(index - 1, 0, removedElement);
+    }
+    
+    return arr;
+  }
+  function moveElementAfterNext(arr, element) {
+    const index = arr.indexOf(element);
+    
+    // 检查元素是否存在于数组中并且不是最后一个元素
+    if (index !== -1 && index < arr.length - 1) {
+      // 移除该元素
+      const [removedElement] = arr.splice(index, 1);
+      // 将其插入到下一个元素之后
+      arr.splice(index + 1, 0, removedElement);
+    }
+    
+    return arr;
+  }
 //#endregion /主表里的功能按钮
 
 function generateUpdateInfoList(listview,dateSortItems){

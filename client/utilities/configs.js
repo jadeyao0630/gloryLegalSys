@@ -6,7 +6,7 @@ var IPS={
     test:{ip:'192.168.10.68',port:5556},
     remote:{ip:'cn.luyao.site',port:5568}}
 var showDebug=false;
-var serverSelection=IPS.home
+var serverSelection=IPS.glory
 
 let domain=getDomain();
 serverSelection=domain==="cn.luyao.site"?IPS.remote:serverSelection
@@ -18,7 +18,7 @@ var supervisorLevel=2;
 const keyStr = 'it@glory.com'
 const ivStr = 'it@glory.com'
 const APP_TITLE='国瑞法务管理系统';
-const VERSION="v1.4a";
+const VERSION="v1.5";
 var enableConsoleLog=true;
 var enableRealDelete=true;
 var enableReadOnlyMode=false;

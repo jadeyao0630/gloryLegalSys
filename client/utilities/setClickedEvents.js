@@ -954,6 +954,7 @@ function functionBtnsEvent(but,index){
                 console.log(e);
                 $('#point_move_next').off()
                 $('#point_move_prev').off()
+                $('#progress_point_remove_btn').off()
                 $('#point_move_prev').on("click",()=>{
                     history.back();
                     console.log($(e.source).jqmData('id'),status);
@@ -987,6 +988,36 @@ function functionBtnsEvent(but,index){
                         }
                     })
                 })
+                
+                $('#progress_point_remove_btn').on("click",()=>{
+                    history.back();
+                    $().requestDialog({
+                        title:'提示',
+                        message:"确认删除所选节点吗？",
+                    },function(go){
+                        if(go){
+                            let _index = status.indexOf($(e.source).jqmData('id'));
+                            // 检查索引是否有效
+                            if (_index !== -1) {
+                                // 移除索引处的一个元素
+                                status.splice(_index, 1);
+                            }
+                            console.log(status);
+                            var json_status=JSON.stringify(status);
+                            update('id='+index,'caseStatus',{'caseStatus':json_status},function(eee){
+                                if(eee.data.success){
+                                    DataList.combinedData=updateOriginalData(DataList.combinedData,{id:index,caseStatus:json_status},'id');
+                                    $('#progress_diagram').trigger({type:'updatePoint',status:status});
+                                    //form.setValues({caseStatus:caseStatus});
+                                    $('#pageOneTable').updateTableItem({caseStatus:json_status,id:index});
+                                }else{
+                                    $().minfo('show',{title:"错误",message:eee.data.data.sqlMessage});
+                                }
+                            })
+                        }
+                    });
+                    
+                });
                 //当前节点id
                 $('#progress_point_viewer_btn').jqmData('point',$(e.source).jqmData('id'));
                 //获取当前节点数据
@@ -1011,49 +1042,55 @@ function functionBtnsEvent(but,index){
                         ids.push($(point).jqmData('id'));
                 });
                 $('#point_move_btns').css({"grid-template-columns":"auto auto"});
-                if($(e.source).hasClass('last_point')&&ids.length<resourceDatas.caseStatus_.length){
-                    console.log('ids',ids);
+                if($(e.source).hasClass('last_point')){
+                    if(ids.length<resourceDatas.caseStatus_.length){
+                        console.log('ids',ids);
                     
-                    $('#point_move_btns').css({"grid-template-columns":"1fr auto"});
-                    $('#progress_point_popupMenu_add').show();
-                    $('#point_move_next').show();
-                    $('#point_move_prev').show();
-                    if(e.index===0){
-                        $('#point_move_prev').hide();
-                        $('#point_move_next').hide();
-                    }else if(e.index===1){
-                        $('#point_move_prev').hide();
-                    }else{
-                        $('#point_move_next').hide();
-                    }
-                    resourceDatas.caseStatus_.forEach(label=>{
-                        if(label.name!="立案"){
-                            if(!ids.includes(label.id)){
-                                var li=$('<li data-index='+label.id+'></li>');
-                                var a=$('<a href="#" data-rel="back">'+label.name+'</a>');
-            
-                                li.append(a);
-                                $('#progress_point_popupMenu_add_list').append(li);
-                                a.on('click',function(ee){
-                                    console.log('eventsData',eventsData,label.id,);
-                                    var updatesdata=getProgressEvents(eventsData,label.id);
-                                    progress_point_editor(label.id,e.index,matchItems[0],updatesdata,true);
-                                    //$('#progress_diagram').trigger({type:'moveNext',sourceData:label,sourceIndex:e.index,eventsData:updatesdata});
-                                    $('#progress_point_popupMenu_add').collapsible( "collapse" );
-                                    //console.log($(this).jqmData('index'),$(this).jqmData('item'))
-                                });
-                            }
+                        $('#point_move_btns').css({"grid-template-columns":"1fr auto"});
+                        $('#progress_point_popupMenu_add').show();
+                        $('#point_move_next').show();
+                        $('#point_move_prev').show();
+                        $('#progress_point_remove_btn').show();
+                        if(e.index===0){
+                            $('#point_move_prev').hide();
+                            $('#point_move_next').hide();
+                            $('#progress_point_remove_btn').hide();
+                        }else{
+                            if(ids.length<3) $('#point_move_prev').hide();
+                            $('#point_move_next').hide();
                         }
-                        
-                        
-                    })
+                        resourceDatas.caseStatus_.forEach(label=>{
+                            if(label.name!="立案"){
+                                if(!ids.includes(label.id)){
+                                    var li=$('<li data-index='+label.id+'></li>');
+                                    var a=$('<a href="#" data-rel="back">'+label.name+'</a>');
+                
+                                    li.append(a);
+                                    $('#progress_point_popupMenu_add_list').append(li);
+                                    a.on('click',function(ee){
+                                        console.log('eventsData',eventsData,label.id,);
+                                        var updatesdata=getProgressEvents(eventsData,label.id);
+                                        progress_point_editor(label.id,e.index,matchItems[0],updatesdata,true);
+                                        //$('#progress_diagram').trigger({type:'moveNext',sourceData:label,sourceIndex:e.index,eventsData:updatesdata});
+                                        $('#progress_point_popupMenu_add').collapsible( "collapse" );
+                                        //console.log($(this).jqmData('index'),$(this).jqmData('item'))
+                                    });
+                                }
+                            }
+                            
+                            
+                        })
+                    }
+                    
                 }else{
                     $('#progress_point_popupMenu_add').hide();
                     $('#point_move_next').show();
                     $('#point_move_prev').show();
+                    $('#progress_point_remove_btn').show();
                     if(e.index===0){
                         $('#point_move_prev').hide();
                         $('#point_move_next').hide();
+                        $('#progress_point_remove_btn').hide();
                     }else if(e.index===1){
                         $('#point_move_btns').css({"grid-template-columns":""});
                         $('#point_move_prev').hide();

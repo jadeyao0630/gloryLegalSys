@@ -183,6 +183,7 @@
 					<a href="#"><i class="fa fa-arrow-from-right text-blue" style="margin-right:10px;"></i>前移</a>
 					<a href="#"><i class="fa fa-arrow-from-left text-blue"></i>后移</a>
 				</li>
+				<li><a href="#"><i class="fa fa-times text-red" style="margin-right:10px;"></i>移除</a></li>
 				<li data-role="list-divider" class="progress_popupMenu_add_group">添加</li>
 				<ul data-role="listview" id="progress_popupMenu_add_group" class="progress_popupMenu_add_group">
 					<li><a href="#"><i class="fa fa-thumbtack text-blue" style="margin-right:10px;"></i>进展</a></li>
@@ -193,7 +194,7 @@
 				</ul>
 			</ul>
 		</div><!-- /collapsible -->
-		<div data-role="popup" id="progress_point_popupMenu" data-theme="a" style="min-width:240px;">
+		<div data-role="popup" id="progress_point_popupMenu" data-theme="a" style="min-width:210px;">
 			
 				<ul data-role="listview">
 					<li data-role="list-divider" id="progress_popupMenu_title" style="border-bottom: 2px solid orangered;">请选择操作</li>
@@ -205,6 +206,11 @@
 							<button style="margin:0;" id="point_move_prev"><i class="fa fa-arrow-left-long text-blue" style="margin-right: 5px;"></i>前移</button>
 							<button style="margin:0;" id="point_move_next">后移<i class="fa fa-arrow-right-long text-blue" style="margin-left: 5px;"></i></button>
 						</div>
+					</li>
+					<li id="progress_point_remove_btn_container">
+						<a href="#" id="progress_point_remove_btn">
+							<i class="fa fa-times text-red" style="margin-right:10px;"></i>移除节点
+						</a>
 					</li>
 					<div id="progress_point_popupMenu_add" data-role="collapsible" data-theme="a" data-content-theme="a" data-collapsed-icon="carat-d" data-expanded-icon="carat-u" data-iconpos="right" style="margin:0;border-radius:0;">
 						<h4><i class="fa fa-thumbtack text-blue" style="margin-right:10px;"></i>添加节点</h4>
